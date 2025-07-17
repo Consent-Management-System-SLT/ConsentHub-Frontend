@@ -143,3 +143,187 @@ export const PrivacyNotices: React.FC = () => {
     </div>
   );
 };
+
+// import React, { useEffect, useState } from 'react';
+// import { FileText, Eye, Download, Calendar, CheckCircle, XCircle } from 'lucide-react';
+
+// // Typescript interface matching your backend schema (simplified for display)
+// interface PrivacyNotice {
+//   id: string;
+//   version: string;
+//   title: string;
+//   content: string;
+//   contentType: 'text/plain' | 'text/html' | 'text/markdown';
+//   category: string;
+//   purposes: string[];
+//   legalBasis: string;
+//   effectiveDate: string; // ISO string
+//   expirationDate?: string;
+//   status: 'draft' | 'active' | 'inactive' | 'archived';
+//   language: 'en' | 'si' | 'ta';
+//   metadata: {
+//     createdBy: string;
+//   };
+// }
+
+// const PrivacyNotices: React.FC = () => {
+//   const [notices, setNotices] = useState<PrivacyNotice[]>([]);
+//   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
+//   const [loading, setLoading] = useState<boolean>(true);
+//   const [error, setError] = useState<string | null>(null);
+
+//   useEffect(() => {
+//     const fetchNotices = async () => {
+//       try {
+//         setLoading(true);
+//         setError(null);
+//         const response = await fetch(
+//           'https://consenthub-backend.onrender.com/api-docs/api/v1/privacy-notice/privacyNotice'
+//         );
+//         if (!response.ok) {
+//           throw new Error(`HTTP error! status: ${response.status}`);
+//         }
+//         const data = await response.json();
+//         // Assuming data is an array of PrivacyNotice objects, or maybe wrapped
+//         // Adjust here if your API wraps data, e.g. { items: [...] }
+//         setNotices(data);
+//       } catch (err: any) {
+//         setError(err.message || 'Failed to fetch notices');
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchNotices();
+//   }, []);
+
+//   const filteredNotices = notices.filter((notice) => {
+//     if (filter === 'active') return notice.status === 'active';
+//     if (filter === 'inactive') return notice.status === 'inactive';
+//     return true;
+//   });
+
+//   const getStatusIcon = (status: string) =>
+//     status === 'active' ? (
+//       <CheckCircle className="h-4 w-4 text-green-500" />
+//     ) : (
+//       <XCircle className="h-4 w-4 text-red-500" />
+//     );
+
+//   const getStatusColor = (status: string) =>
+//     status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+
+//   return (
+//     <div className="space-y-6 p-6 max-w-7xl mx-auto">
+//       <h2 className="text-2xl font-semibold mb-4 flex items-center text-gray-900">
+//         <FileText className="h-6 w-6 mr-2 text-blue-600" />
+//         Privacy Notices
+//       </h2>
+
+//       <div className="mb-6 flex items-center space-x-4">
+//         <label htmlFor="statusFilter" className="font-medium text-gray-700">
+//           Filter by status:
+//         </label>
+//         <select
+//           id="statusFilter"
+//           value={filter}
+//           onChange={(e) => setFilter(e.target.value as any)}
+//           className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+//         >
+//           <option value="all">All Notices</option>
+//           <option value="active">Active Only</option>
+//           <option value="inactive">Inactive Only</option>
+//         </select>
+//       </div>
+
+//       {loading && (
+//         <div className="text-center text-gray-500 py-12">Loading privacy notices...</div>
+//       )}
+
+//       {error && (
+//         <div className="text-center text-red-600 py-12">
+//           Error loading notices: {error}
+//         </div>
+//       )}
+
+//       {!loading && !error && filteredNotices.length === 0 && (
+//         <div className="text-center py-12 text-gray-500">
+//           No privacy notices found matching your filter.
+//         </div>
+//       )}
+
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//         {!loading &&
+//           !error &&
+//           filteredNotices.map((notice) => (
+//             <div
+//               key={notice.id}
+//               className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+//             >
+//               <div className="flex items-center justify-between mb-4">
+//                 <div className="flex items-center space-x-2">
+//                   {getStatusIcon(notice.status)}
+//                   <span
+//                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+//                       notice.status
+//                     )}`}
+//                   >
+//                     {notice.status.charAt(0).toUpperCase() + notice.status.slice(1)}
+//                   </span>
+//                 </div>
+//               </div>
+
+//               <h3 className="text-lg font-medium text-gray-900 mb-2">{notice.title}</h3>
+
+//               <div className="space-y-1 mb-4 text-sm text-gray-700">
+//                 <div>
+//                   <strong>Version:</strong> {notice.version}
+//                 </div>
+//                 <div>
+//                   <strong>Category:</strong> {notice.category}
+//                 </div>
+//                 <div>
+//                   <strong>Language:</strong> {notice.language}
+//                 </div>
+//                 <div className="flex items-center space-x-1">
+//                   <Calendar className="h-4 w-4 text-gray-400" />
+//                   <span>
+//                     Effective Date: {new Date(notice.effectiveDate).toLocaleDateString()}
+//                   </span>
+//                 </div>
+//                 {notice.expirationDate && (
+//                   <div className="flex items-center space-x-1">
+//                     <Calendar className="h-4 w-4 text-gray-400" />
+//                     <span>
+//                       Expiration Date: {new Date(notice.expirationDate).toLocaleDateString()}
+//                     </span>
+//                   </div>
+//                 )}
+//               </div>
+
+//               <div className="text-gray-700 line-clamp-3 mb-4">{notice.content}</div>
+
+//               <div className="flex space-x-2">
+//                 <button
+//                   onClick={() => alert('View content feature coming soon!')}
+//                   className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+//                 >
+//                   <Eye className="h-4 w-4 mr-2" />
+//                   View
+//                 </button>
+//                 <button
+//                   onClick={() => alert('Download feature coming soon!')}
+//                   className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+//                 >
+//                   <Download className="h-4 w-4 mr-2" />
+//                   Download
+//                 </button>
+//               </div>
+//             </div>
+//           ))}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default PrivacyNotices;

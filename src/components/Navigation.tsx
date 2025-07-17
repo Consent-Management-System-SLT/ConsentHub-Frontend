@@ -24,12 +24,12 @@ export const Navigation: React.FC<NavigationProps> = ({
   const { logout } = useAuth();
 
   const navItems = [
+        { id: 'search', label: 'Customer Search', icon: Search },
     { id: 'consents', label: 'Consent Management', icon: Shield },
     { id: 'preferences', label: 'Communication Preferences', icon: Settings },
-    { id: 'notices', label: 'Privacy Notices', icon: FileText },
     { id: 'audit', label: 'Audit Trail', icon: Activity },
     { id: 'dsar', label: 'DSAR Requests', icon: Database },
-    { id: 'search', label: 'Customer Search', icon: Search },
+        { id: 'notices', label: 'Privacy Notices', icon: FileText }
   ];
 
   // ✅ Automatically select default tab "consents"
