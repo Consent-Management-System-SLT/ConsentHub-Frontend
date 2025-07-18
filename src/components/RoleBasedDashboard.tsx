@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import Dashboard from './Dashboard';
+import AdminDashboard from './AdminDashboard';
 import CustomerDashboard from './CustomerDashboard';
 import CSRDashboard from './CSRDashboard';
 
@@ -14,13 +14,13 @@ const RoleBasedDashboard: React.FC = () => {
   // Route to appropriate dashboard based on user role
   switch (user.role) {
     case 'admin':
-      return <Dashboard />;
+      return <AdminDashboard />;
     case 'customer':
       return <CustomerDashboard />;
     case 'csradmin':
       return <CSRDashboard/>;
     default:
-      return <Dashboard />; // Default to admin dashboard
+      return <AdminDashboard />; // Default to admin dashboard
   }
 };
 
