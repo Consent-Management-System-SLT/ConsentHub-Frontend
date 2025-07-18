@@ -18,7 +18,7 @@ class ApiClient {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    this.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3011';
     
     this.axiosInstance = axios.create({
       baseURL: this.baseURL,
@@ -69,7 +69,14 @@ class ApiClient {
   }
 
   private getAuthToken(): string | null {
-    return localStorage.getItem('authToken');
+    // Try to get token from localStorage first
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      return token;
+    }
+    
+    // Fallback to legacy token storage
+    return localStorage.getItem('token');
   }
 
   private generateCorrelationId(): string {

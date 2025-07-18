@@ -12,7 +12,7 @@ import {
   MapPin,
   Tag
 } from 'lucide-react';
-import { useConsents } from '../../hooks/useApi';
+import { useCustomerConsents } from '../../hooks/useCustomerApi';
 
 interface Consent {
   id: string;
@@ -39,20 +39,20 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   const [selectedConsent, setSelectedConsent] = useState<Consent | null>(null);
 
   // Use real data from backend
-  const { data: consentsData, loading, error } = useConsents();
+  const { data: consentsData, loading, error } = useCustomerConsents();
 
   // Transform backend data to match UI format
-  const consents: Consent[] = consentsData ? consentsData.map((consent: any) => ({
+  const consents: Consent[] = consentsData?.consents ? consentsData.consents.map((consent: any) => ({
     id: consent.id,
     purpose: consent.purpose,
     status: consent.status,
-    channel: 'Email, SMS', // Default or derive from data
-    validFrom: consent.validFor?.startDateTime || consent.createdAt,
-    validUntil: consent.validFor?.endDateTime,
+    channel: consent.channel || 'Email, SMS',
+    validFrom: consent.grantedDate || consent.createdAt,
+    validUntil: consent.expiryDate,
     description: consent.description || consent.purpose,
-    category: consent.consentType || 'General',
-    jurisdiction: 'LK', // Default or derive from data
-    lastUpdated: consent.updatedAt,
+    category: consent.categories ? consent.categories.join(', ') : 'General',
+    jurisdiction: consent.jurisdiction || 'LK',
+    lastUpdated: consent.lastModified || consent.updatedAt,
     grantedBy: consent.partyId
   })) : [];
 

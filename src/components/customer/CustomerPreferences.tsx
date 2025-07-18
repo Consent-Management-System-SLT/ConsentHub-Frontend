@@ -10,8 +10,8 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
-import { usePreferences } from '../../hooks/useApi';
-import { preferenceService } from '../../services';
+import { useCustomerPreferences } from '../../hooks/useCustomerApi';
+import { customerApiClient } from '../../services/customerApiClient';
 
 interface PreferenceSettings {
   channels: {
@@ -80,15 +80,15 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   // Load real preferences data
-  const { data: preferencesData, loading, error } = usePreferences();
+  const { data: preferencesData, loading, error } = useCustomerPreferences();
 
   // Update preferences when data loads
   useEffect(() => {
-    if (preferencesData && Array.isArray(preferencesData)) {
+    if (preferencesData && preferencesData.preferences && Array.isArray(preferencesData.preferences)) {
       const loadedPreferences = { ...preferences };
       
       // Map backend preference data to UI format
-      preferencesData.forEach((pref: any) => {
+      preferencesData.preferences.forEach((pref: any) => {
         if (pref.channelType === 'email') {
           loadedPreferences.channels.email = pref.isAllowed;
         } else if (pref.channelType === 'sms') {
