@@ -60,6 +60,8 @@ const Login: React.FC = () => {
             <div className="text-xs text-blue-700 space-y-1">
               <div><strong>Admin:</strong> admin@sltmobitel.lk / admin123</div>
               <div><strong>Customer:</strong> customer@sltmobitel.lk / customer123</div>
+              <div><strong>CSR Admin:</strong> csr@sltmobitel.lk / csr123</div>
+
             </div>
           </div>
 
