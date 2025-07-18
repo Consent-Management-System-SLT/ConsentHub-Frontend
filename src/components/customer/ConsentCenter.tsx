@@ -12,6 +12,7 @@ import {
   MapPin,
   Tag
 } from 'lucide-react';
+import { useConsents } from '../../hooks/useApi';
 
 interface Consent {
   id: string;
@@ -37,72 +38,46 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [selectedConsent, setSelectedConsent] = useState<Consent | null>(null);
 
-  // Mock data - replace with API calls
-  const consents: Consent[] = [
-    {
-      id: 'CONS-001',
-      purpose: 'Marketing Communications',
-      status: 'granted',
-      channel: 'Email, SMS',
-      validFrom: '2024-01-15',
-      validUntil: '2025-01-15',
-      description: 'Permission to send promotional offers, product updates, and marketing communications via email and SMS.',
-      category: 'Marketing',
-      jurisdiction: 'Sri Lanka',
-      lastUpdated: '2024-01-15',
-      grantedBy: 'Customer Portal'
-    },
-    {
-      id: 'CONS-002',
-      purpose: 'Service Notifications',
-      status: 'granted',
-      channel: 'Email, Push',
-      validFrom: '2024-01-10',
-      description: 'Essential service notifications including billing, service disruptions, and account updates.',
-      category: 'Essential',
-      jurisdiction: 'Sri Lanka',
-      lastUpdated: '2024-01-10',
-      grantedBy: 'Customer Portal'
-    },
-    {
-      id: 'CONS-003',
-      purpose: 'Analytics and Insights',
-      status: 'revoked',
-      channel: 'Data Processing',
-      validFrom: '2023-12-01',
-      validUntil: '2024-12-01',
-      description: 'Processing of usage data for analytics, service improvement, and personalized recommendations.',
-      category: 'Analytics',
-      jurisdiction: 'Sri Lanka',
-      lastUpdated: '2024-06-15',
-      grantedBy: 'Mobile App'
-    },
-    {
-      id: 'CONS-004',
-      purpose: 'Third-party Sharing',
-      status: 'expired',
-      channel: 'Data Sharing',
-      validFrom: '2023-01-01',
-      validUntil: '2024-01-01',
-      description: 'Sharing of aggregated data with partner companies for joint marketing initiatives.',
-      category: 'Sharing',
-      jurisdiction: 'Sri Lanka',
-      lastUpdated: '2024-01-01',
-      grantedBy: 'Customer Service'
-    },
-    {
-      id: 'CONS-005',
-      purpose: 'Location-based Services',
-      status: 'pending',
-      channel: 'Mobile App',
-      validFrom: '2024-07-15',
-      description: 'Use of location data for personalized service recommendations and network optimization.',
-      category: 'Location',
-      jurisdiction: 'Sri Lanka',
-      lastUpdated: '2024-07-15',
-      grantedBy: 'Mobile App'
-    }
-  ];
+  // Use real data from backend
+  const { data: consentsData, loading, error } = useConsents();
+
+  // Transform backend data to match UI format
+  const consents: Consent[] = consentsData ? consentsData.map((consent: any) => ({
+    id: consent.id,
+    purpose: consent.purpose,
+    status: consent.status,
+    channel: 'Email, SMS', // Default or derive from data
+    validFrom: consent.validFor?.startDateTime || consent.createdAt,
+    validUntil: consent.validFor?.endDateTime,
+    description: consent.description || consent.purpose,
+    category: consent.consentType || 'General',
+    jurisdiction: 'LK', // Default or derive from data
+    lastUpdated: consent.updatedAt,
+    grantedBy: consent.partyId
+  })) : [];
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">Loading consents...</span>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600 font-medium">Error loading consents</p>
+          <p className="text-gray-500 text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   const filteredConsents = consents.filter(consent => {
     const matchesSearch = consent.purpose.toLowerCase().includes(searchTerm.toLowerCase()) ||

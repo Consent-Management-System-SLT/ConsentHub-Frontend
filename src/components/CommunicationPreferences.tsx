@@ -10,15 +10,14 @@ import {
   X,
   Search,
 } from 'lucide-react';
-import { mockPreferences, mockParties } from '../data/mockData';
 import { PrivacyPreference, Party } from '../types/consent';
+import { usePreferences, useParties, usePreferenceMutation } from '../hooks/useApi';
 
 interface CommunicationPreferencesProps {
   selectedCustomer?: Party;
 }
 
 export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> = ({ selectedCustomer }) => {
-  const [preferences, setPreferences] = useState<PrivacyPreference[]>(mockPreferences);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<PrivacyPreference>>({});
 
@@ -26,9 +25,20 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredCustomer, setFilteredCustomer] = useState<Party | null>(selectedCustomer || null);
 
+  // Load data from backend
+  const { data: preferencesData, loading: preferencesLoading, refetch: refetchPreferences } = usePreferences(filteredCustomer?.id);
+  const { data: partiesData, loading: partiesLoading } = useParties();
+  const { updatePreference, loading: mutationLoading } = usePreferenceMutation();
+
+  // Transform data to ensure it's an array
+  const preferences = Array.isArray(preferencesData) ? preferencesData : 
+    (preferencesData && (preferencesData as any).preferences ? (preferencesData as any).preferences : []);
+  const parties = Array.isArray(partiesData) ? partiesData : 
+    (partiesData && (partiesData as any).parties ? (partiesData as any).parties : []);
+
   // Search handler
   const handleCustomerSearch = () => {
-    const match = mockParties.find(p =>
+    const match = parties.find((p: any) =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.id.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -36,11 +46,21 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
   };
 
   const filteredPreferences = filteredCustomer
-    ? preferences.filter(pref => pref.partyId === filteredCustomer.id)
+    ? preferences.filter((pref: any) => pref.partyId === filteredCustomer.id)
     : preferences;
 
+  // Loading state
+  if (preferencesLoading || partiesLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">Loading preferences...</span>
+      </div>
+    );
+  }
+
   const getCustomerName = (partyId: string) => {
-    const party = mockParties.find(p => p.id === partyId);
+    const party = parties.find((p: any) => p.id === partyId);
     return party ? party.name : 'Unknown Customer';
   };
 
@@ -49,17 +69,16 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
     setEditForm(preference);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editingId && editForm) {
-      setPreferences(prev =>
-        prev.map(pref =>
-          pref.id === editingId
-            ? { ...pref, ...editForm, lastUpdated: new Date().toISOString() }
-            : pref
-        )
-      );
-      setEditingId(null);
-      setEditForm({});
+      try {
+        await updatePreference(editingId, editForm);
+        await refetchPreferences(); // Refresh the data
+        setEditingId(null);
+        setEditForm({});
+      } catch (error) {
+        console.error('Failed to update preference:', error);
+      }
     }
   };
 

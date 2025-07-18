@@ -1,4 +1,5 @@
-// TMF669 Event Management Service for ConsentHub
+// TMF669 Event Management API Service
+import { apiClient, ApiResponse } from './apiClient';
 import type { PrivacyConsent, PrivacyPreference, PrivacyNotice, DSARRequest } from '../types/consent';
 
 // TMF669 Event Envelope
@@ -94,7 +95,7 @@ interface EventHubRegistration {
 }
 
 class TMF669EventService {
-  private baseUrl = process.env.VITE_TMF669_API_URL || 'http://localhost:3000/tmf-api/eventManagement/v4';
+  private baseUrl = import.meta.env.VITE_TMF669_API_URL || 'http://localhost:3000/tmf-api/eventManagement/v4';
   private eventSubscriptions: Map<string, Function[]> = new Map();
 
   private getAuthHeaders() {

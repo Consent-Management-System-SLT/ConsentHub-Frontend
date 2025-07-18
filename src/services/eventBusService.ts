@@ -21,7 +21,7 @@ export const EVENT_TYPES = {
 export const EVENT_BUS_CONFIG = {
   // Kafka Configuration
   KAFKA: {
-    BROKERS: process.env.VITE_KAFKA_BROKERS?.split(',') || ['localhost:9092'],
+    BROKERS: import.meta.env.VITE_KAFKA_BROKERS?.split(',') || ['localhost:9092'],
     CLIENT_ID: 'consenthub-frontend',
     GROUP_ID: 'consenthub-consumers',
     TOPICS: Object.values(EVENT_TOPICS)
@@ -29,14 +29,14 @@ export const EVENT_BUS_CONFIG = {
 
   // Azure Event Grid Configuration
   AZURE_EVENT_GRID: {
-    ENDPOINT: process.env.VITE_AZURE_EVENT_GRID_ENDPOINT,
-    ACCESS_KEY: process.env.VITE_AZURE_EVENT_GRID_ACCESS_KEY,
+    ENDPOINT: import.meta.env.VITE_AZURE_EVENT_GRID_ENDPOINT,
+    ACCESS_KEY: import.meta.env.VITE_AZURE_EVENT_GRID_ACCESS_KEY,
     TOPIC_NAME: 'consenthub-events'
   },
 
   // RabbitMQ Configuration
   RABBITMQ: {
-    CONNECTION_STRING: process.env.VITE_RABBITMQ_CONNECTION_STRING || 'amqp://localhost:5672',
+    CONNECTION_STRING: import.meta.env.VITE_RABBITMQ_CONNECTION_STRING || 'amqp://localhost:5672',
     EXCHANGE: 'consenthub-events',
     QUEUE_PREFIX: 'consenthub'
   }

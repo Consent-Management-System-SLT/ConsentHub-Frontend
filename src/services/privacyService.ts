@@ -51,7 +51,7 @@ interface TMF632PrivacyPreference {
 }
 
 class TMF632PrivacyService {
-  private baseUrl = process.env.VITE_TMF632_API_URL || 'http://localhost:3000/tmf-api/privacyManagement/v4';
+  private baseUrl = import.meta.env.VITE_TMF632_API_URL || 'http://localhost:3000/tmf-api/privacyManagement/v4';
 
   private getAuthHeaders() {
     const token = localStorage.getItem('authToken');

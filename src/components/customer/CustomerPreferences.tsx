@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Settings, 
   Bell, 
@@ -10,6 +10,8 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
+import { usePreferences } from '../../hooks/useApi';
+import { preferenceService } from '../../services';
 
 interface PreferenceSettings {
   channels: {
@@ -76,6 +78,33 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
 
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Load real preferences data
+  const { data: preferencesData, loading, error } = usePreferences();
+
+  // Update preferences when data loads
+  useEffect(() => {
+    if (preferencesData && Array.isArray(preferencesData)) {
+      const loadedPreferences = { ...preferences };
+      
+      // Map backend preference data to UI format
+      preferencesData.forEach((pref: any) => {
+        if (pref.channelType === 'email') {
+          loadedPreferences.channels.email = pref.isAllowed;
+        } else if (pref.channelType === 'sms') {
+          loadedPreferences.channels.sms = pref.isAllowed;
+        } else if (pref.channelType === 'push') {
+          loadedPreferences.channels.push = pref.isAllowed;
+        }
+        
+        if (pref.preferenceType === 'marketing') {
+          loadedPreferences.topics.offers = pref.isAllowed;
+        }
+      });
+      
+      setPreferences(loadedPreferences);
+    }
+  }, [preferencesData]);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const updateChannelPreference = (channel: keyof PreferenceSettings['channels'], value: boolean) => {

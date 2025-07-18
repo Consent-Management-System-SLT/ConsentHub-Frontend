@@ -7,7 +7,14 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start:full": "powershell -ExecutionPolicy Bypass -File start-consenthub.ps1",
+    "start:simple": "powershell -ExecutionPolicy Bypass -File start-simple.ps1",
+    "start:mongodb": "powershell -ExecutionPolicy Bypass -File start-mongodb.ps1",
+    "start:backend": "cd backend && npm run start:all",
+    "start:frontend": "npm run dev",
+    "install:all": "npm install && cd backend && npm install && npm run install:all",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@types/node": "^24.0.4",
@@ -46,6 +53,5 @@
   "main": "eslint.config.js",
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "description": ""
+  "license": "ISC"
 }
