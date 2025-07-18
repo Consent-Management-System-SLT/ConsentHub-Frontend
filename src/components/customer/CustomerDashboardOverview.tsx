@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   CheckCircle, 
   XCircle, 
@@ -30,6 +31,8 @@ interface QuickStat {
 }
 
 const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ customerName }) => {
+  const { t } = useTranslation();
+  
   // Mock data - replace with API calls
   const consentSummary: ConsentSummary = {
     granted: 8,
@@ -40,61 +43,61 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
 
   const quickStats: QuickStat[] = [
     {
-      label: 'Active Consents',
+      label: t('customerDashboard.overview.activeConsents'),
       value: '8',
       icon: <CheckCircle className="w-6 h-6" />,
       color: 'text-green-600 bg-green-50 border-green-200',
-      trend: '+2 this month'
+      trend: t('customerDashboard.overview.monthlyTrend', { count: 2 })
     },
     {
-      label: 'Communication Channels',
+      label: t('customerDashboard.overview.communicationChannels'),
       value: '3',
       icon: <Settings className="w-6 h-6" />,
       color: 'text-blue-600 bg-blue-50 border-blue-200',
-      trend: 'Email, SMS, Push'
+      trend: t('customerDashboard.overview.channelTypes')
     },
     {
-      label: 'Privacy Notices',
+      label: t('customerDashboard.overview.privacyNotices'),
       value: '5',
       icon: <FileText className="w-6 h-6" />,
       color: 'text-purple-600 bg-purple-50 border-purple-200',
-      trend: '2 pending review'
+      trend: t('customerDashboard.overview.pendingReviewCount', { count: 2 })
     },
     {
-      label: 'DSAR Requests',
+      label: t('customerDashboard.overview.dsarRequests'),
       value: '1',
       icon: <Download className="w-6 h-6" />,
       color: 'text-orange-600 bg-orange-50 border-orange-200',
-      trend: 'In progress'
+      trend: t('customerDashboard.overview.inProgress')
     }
   ];
 
   const recentActivity = [
     {
       id: 1,
-      action: 'Granted consent for marketing communications',
-      timestamp: '2 hours ago',
+      action: t('customerDashboard.overview.activities.grantedConsent'),
+      timestamp: t('customerDashboard.overview.timestamps.hoursAgo', { count: 2 }),
       type: 'consent',
       icon: <CheckCircle className="w-4 h-4 text-green-600" />
     },
     {
       id: 2,
-      action: 'Updated communication preferences',
-      timestamp: '1 day ago',
+      action: t('customerDashboard.overview.activities.updatedPreferences'),
+      timestamp: t('customerDashboard.overview.timestamps.daysAgo', { count: 1 }),
       type: 'preference',
       icon: <Settings className="w-4 h-4 text-blue-600" />
     },
     {
       id: 3,
-      action: 'Accepted Privacy Policy v2.1',
-      timestamp: '3 days ago',
+      action: t('customerDashboard.overview.activities.acceptedPolicy'),
+      timestamp: t('customerDashboard.overview.timestamps.daysAgo', { count: 3 }),
       type: 'privacy',
       icon: <FileText className="w-4 h-4 text-purple-600" />
     },
     {
       id: 4,
-      action: 'Submitted data export request',
-      timestamp: '1 week ago',
+      action: t('customerDashboard.overview.activities.submittedExport'),
+      timestamp: t('customerDashboard.overview.timestamps.weeksAgo', { count: 1 }),
       type: 'dsar',
       icon: <Download className="w-4 h-4 text-orange-600" />
     }
@@ -102,29 +105,29 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
 
   const quickActions = [
     {
-      title: 'Manage Consents',
-      description: 'View and update your data consents',
+      title: t('customerDashboard.overview.actions.manageConsents'),
+      description: t('customerDashboard.overview.actions.manageConsentsDesc'),
       icon: <Shield className="w-8 h-8 text-blue-600" />,
       action: 'consent-center',
       color: 'bg-blue-50 hover:bg-blue-100 border-blue-200'
     },
     {
-      title: 'Communication Preferences',
-      description: 'Set your notification preferences',
+      title: t('customerDashboard.overview.actions.communicationPrefs'),
+      description: t('customerDashboard.overview.actions.communicationPrefsDesc'),
       icon: <Settings className="w-8 h-8 text-green-600" />,
       action: 'preferences',
       color: 'bg-green-50 hover:bg-green-100 border-green-200'
     },
     {
-      title: 'Privacy Notices',
-      description: 'Review latest privacy policies',
+      title: t('customerDashboard.overview.actions.privacyNotices'),
+      description: t('customerDashboard.overview.actions.privacyNoticesDesc'),
       icon: <FileText className="w-8 h-8 text-purple-600" />,
       action: 'privacy-notices',
       color: 'bg-purple-50 hover:bg-purple-100 border-purple-200'
     },
     {
-      title: 'Request My Data',
-      description: 'Export or delete your personal data',
+      title: t('customerDashboard.overview.actions.requestData'),
+      description: t('customerDashboard.overview.actions.requestDataDesc'),
       icon: <Download className="w-8 h-8 text-orange-600" />,
       action: 'dsar-requests',
       color: 'bg-orange-50 hover:bg-orange-100 border-orange-200'
@@ -137,9 +140,11 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
       <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-white">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Welcome back, {customerName}!</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+              {t('customerDashboard.overview.welcomeBack', { name: customerName })}!
+            </h1>
             <p className="text-blue-100 text-base sm:text-lg">
-              Manage your privacy settings and data consents in one place.
+              {t('customerDashboard.overview.welcomeDesc')}
             </p>
           </div>
           <div className="hidden lg:block flex-shrink-0">
@@ -155,28 +160,28 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
               <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 text-green-200" />
               <span className="font-bold text-xl sm:text-2xl leading-none">{consentSummary.granted}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">Active Consents</p>
+            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">{t('customerDashboard.overview.activeConsents')}</p>
           </div>
           <div className="bg-white bg-opacity-10 rounded-lg p-3 sm:p-4 backdrop-blur-sm">
             <div className="flex items-center justify-start gap-3 mb-2">
               <XCircle className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 text-red-200" />
               <span className="font-bold text-xl sm:text-2xl leading-none">{consentSummary.revoked}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">Revoked</p>
+            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">{t('customerDashboard.overview.revoked')}</p>
           </div>
           <div className="bg-white bg-opacity-10 rounded-lg p-3 sm:p-4 backdrop-blur-sm">
             <div className="flex items-center justify-start gap-3 mb-2">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 text-yellow-200" />
               <span className="font-bold text-xl sm:text-2xl leading-none">{consentSummary.expired}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">Expired</p>
+            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">{t('customerDashboard.overview.expired')}</p>
           </div>
           <div className="bg-white bg-opacity-10 rounded-lg p-3 sm:p-4 backdrop-blur-sm">
             <div className="flex items-center justify-start gap-3 mb-2">
               <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 text-orange-200" />
               <span className="font-bold text-xl sm:text-2xl leading-none">{consentSummary.pending}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">Pending Review</p>
+            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">{t('customerDashboard.overview.pendingReview')}</p>
           </div>
         </div>
       </div>

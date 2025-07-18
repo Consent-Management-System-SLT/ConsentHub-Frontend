@@ -56,7 +56,28 @@
   },
   "customerDashboard": {
     "title": "Customer Dashboard",
+    "brand": "ConsentHub",
+    "subtitle": "Customer Portal",
+    "userRole": "Customer",
     "welcome": "Welcome, {{name}}",
+    "navigation": {
+      "dashboard": "Dashboard",
+      "dashboardDesc": "Overview of your consents and preferences",
+      "consentCenter": "Consent Center",
+      "consentCenterDesc": "Manage your data consents",
+      "preferences": "Preferences",
+      "preferencesDesc": "Communication and notification settings",
+      "privacyNotices": "Privacy Notices",
+      "privacyNoticesDesc": "View privacy policies and notices",
+      "dsarRequests": "DSAR Requests",
+      "dsarRequestsDesc": "Data export and deletion requests"
+    },
+    "sidebar": {
+      "title": "Navigation",
+      "subtitle": "Manage your privacy settings",
+      "privacyTitle": "Privacy Protected",
+      "privacyDesc": "Your data is secure and protected with enterprise-grade encryption"
+    },
     "tabs": {
       "overview": "Overview",
       "preferences": "Consent Preferences",
@@ -66,16 +87,80 @@
     },
     "overview": {
       "title": "Consent Overview",
+      "welcomeBack": "Welcome back, {{name}}",
+      "welcomeDesc": "Manage your privacy settings and data consents in one place",
       "totalConsents": "Total Consents",
       "activeConsents": "Active Consents",
+      "revoked": "Revoked",
+      "expired": "Expired",
+      "pendingReview": "Pending Review",
       "pendingConsents": "Pending Consents",
+      "communicationChannels": "Communication Channels",
+      "privacyNotices": "Privacy Notices",
+      "dsarRequests": "DSAR Requests",
+      "monthlyTrend": "+{{count}} this month",
+      "channelTypes": "Email, SMS, Push",
+      "pendingReviewCount": "{{count}} pending review",
+      "inProgress": "In progress",
       "lastActivity": "Last Activity",
       "quickActions": "Quick Actions",
       "updatePreferences": "Update Preferences",
       "viewHistory": "View History",
       "downloadData": "Download My Data",
       "recentActivity": "Recent Activity",
-      "noRecentActivity": "No recent activity"
+      "noRecentActivity": "No recent activity",
+      "activities": {
+        "grantedConsent": "Granted consent for marketing communications",
+        "updatedPreferences": "Updated communication preferences",
+        "acceptedPolicy": "Accepted Privacy Policy v2.1",
+        "submittedExport": "Submitted data export request"
+      },
+      "timestamps": {
+        "hoursAgo": "{{count}} hours ago",
+        "daysAgo": "{{count}} day ago",
+        "daysAgo_plural": "{{count}} days ago",
+        "weeksAgo": "{{count}} week ago",
+        "weeksAgo_plural": "{{count}} weeks ago"
+      },
+      "actions": {
+        "manageConsents": "Manage Consents",
+        "manageConsentsDesc": "View and update your data consents",
+        "communicationPrefs": "Communication Preferences",
+        "communicationPrefsDesc": "Set your notification preferences",
+        "privacyNotices": "Privacy Notices",
+        "privacyNoticesDesc": "Review latest privacy policies",
+        "requestData": "Request My Data",
+        "requestDataDesc": "Export or delete your personal data"
+      }
+    },
+    "privacyNotices": {
+      "title": "Privacy Notices",
+      "subtitle": "Review and manage privacy policies and terms",
+      "accepted": "Accepted",
+      "pendingReview": "Pending Review",
+      "languages": "Languages",
+      "actionRequired": "Action Required",
+      "searchPlaceholder": "Search privacy notices...",
+      "filters": {
+        "allStatus": "All Status",
+        "accepted": "Accepted",
+        "pending": "Pending",
+        "declined": "Declined",
+        "expired": "Expired",
+        "allLanguages": "All Languages"
+      },
+      "actions": {
+        "view": "View",
+        "accept": "Accept",
+        "decline": "Decline",
+        "download": "Download"
+      },
+      "status": {
+        "accepted": "Accepted",
+        "pending": "Pending",
+        "declined": "Declined",
+        "expired": "Expired"
+      }
     },
     "preferences": {
       "title": "Consent Preferences",

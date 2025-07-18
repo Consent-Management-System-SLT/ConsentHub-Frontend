@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   FileText, 
   CheckCircle, 
@@ -37,82 +38,152 @@ interface CustomerPrivacyNoticesProps {
 }
 
 const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
+  const { t, i18n } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [languageFilter, setLanguageFilter] = useState('all');
   const [selectedNotice, setSelectedNotice] = useState<PrivacyNotice | null>(null);
 
-  // Mock data - replace with API calls
-  const privacyNotices: PrivacyNotice[] = [
-    {
-      id: 'PN-001',
-      title: 'Privacy Policy',
-      version: '2.1',
-      publishedDate: '2024-06-15',
-      jurisdiction: 'Sri Lanka',
-      language: 'en',
-      acceptanceStatus: 'accepted',
-      acceptedDate: '2024-06-20',
-      category: 'Privacy Policy',
-      description: 'Our comprehensive privacy policy outlining how we collect, use, and protect your personal data.',
-      content: `This Privacy Policy explains how SLT Mobitel collects, uses, and protects your personal information...`,
-      mandatory: true
-    },
-    {
-      id: 'PN-002',
-      title: 'Terms of Service',
-      version: '1.8',
-      publishedDate: '2024-05-01',
-      jurisdiction: 'Sri Lanka',
-      language: 'en',
-      acceptanceStatus: 'accepted',
-      acceptedDate: '2024-05-01',
-      category: 'Terms',
-      description: 'Terms and conditions governing the use of our services.',
-      content: `These Terms of Service govern your use of SLT Mobitel services...`,
-      mandatory: true
-    },
-    {
-      id: 'PN-003',
-      title: 'Cookie Policy',
-      version: '1.2',
-      publishedDate: '2024-07-01',
-      jurisdiction: 'Sri Lanka',
-      language: 'en',
-      acceptanceStatus: 'pending',
-      category: 'Cookies',
-      description: 'Information about how we use cookies and similar technologies.',
-      content: `This Cookie Policy explains how we use cookies and similar technologies...`,
-      mandatory: false
-    },
-    {
-      id: 'PN-004',
-      title: 'Data Processing Agreement',
-      version: '1.0',
-      publishedDate: '2024-03-15',
-      jurisdiction: 'Sri Lanka',
-      language: 'en',
-      acceptanceStatus: 'accepted',
-      acceptedDate: '2024-03-20',
-      category: 'Data Processing',
-      description: 'Agreement on third-party data processing for enhanced services.',
-      content: `This Data Processing Agreement outlines the terms for third-party data processing...`,
-      mandatory: false
-    },
-    {
-      id: 'PN-005',
-      title: 'සේවා නියමයන්',
-      version: '1.8',
-      publishedDate: '2024-05-01',
-      jurisdiction: 'Sri Lanka',
-      language: 'si',
-      acceptanceStatus: 'pending',
-      category: 'Terms',
-      description: 'අපගේ සේවා භාවිතය පාලනය කරන නියමයන් සහ කොන්දේසි.',
-      content: `මෙම සේවා නියමයන් SLT Mobitel සේවා භාවිතය පාලනය කරයි...`,
-      mandatory: false
+  // Get notices based on current language
+  const getLocalizedNotices = (): PrivacyNotice[] => {
+    const currentLang = i18n.language;
+    
+    if (currentLang === 'si') {
+      return [
+        {
+          id: 'PN-001',
+          title: 'පුද්ගලිකත්ව ප්‍රතිපත්තිය',
+          version: '2.1',
+          publishedDate: '2024-06-15',
+          jurisdiction: 'ශ්‍රී ලංකාව',
+          language: 'si',
+          acceptanceStatus: 'accepted',
+          acceptedDate: '2024-06-20',
+          category: 'පුද්ගලිකත්ව ප්‍රතිපත්තිය',
+          description: 'අපි ඔබේ පුද්ගලික දත්ත එකතු කරන, භාවිතා කරන සහ ආරක්ෂා කරන ආකාරය විස්තර කරන අපගේ සම්පූර්ණ පුද්ගලිකත්ව ප්‍රතිපත්තිය.',
+          content: `මෙම පුද්ගලිකත්ව ප්‍රතිපත්තිය SLT Mobitel ඔබේ පුද්ගලික තොරතුරු එකතු කරන, භාවිතා කරන සහ ආරක්ෂා කරන ආකාරය පැහැදිලි කරයි...`,
+          mandatory: true
+        },
+        {
+          id: 'PN-002',
+          title: 'සේවා නියමයන්',
+          version: '1.8',
+          publishedDate: '2024-05-01',
+          jurisdiction: 'ශ්‍රී ලංකාව',
+          language: 'si',
+          acceptanceStatus: 'pending',
+          category: 'නියමයන්',
+          description: 'අපගේ සේවා භාවිතය පාලනය කරන නියමයන් සහ කොන්දේසි.',
+          content: `මෙම සේවා නියමයන් SLT Mobitel සේවා භාවිතය පාලනය කරයි...`,
+          mandatory: false
+        },
+        {
+          id: 'PN-003',
+          title: 'කුකී ප්‍රතිපත්තිය',
+          version: '1.2',
+          publishedDate: '2024-07-01',
+          jurisdiction: 'ශ්‍රී ලංකාව',
+          language: 'si',
+          acceptanceStatus: 'pending',
+          category: 'කුකීස්',
+          description: 'අපි කුකීස් සහ සමාන තාක්ෂණයන් භාවිතා කරන ආකාරය පිළිබඳ තොරතුරු.',
+          content: `මෙම කුකී ප්‍රතිපත්තිය අපි කුකීස් සහ සමාන තාක්ෂණයන් භාවිතා කරන ආකාරය පැහැදිලි කරයි...`,
+          mandatory: false
+        }
+      ];
+    } else if (currentLang === 'ta') {
+      return [
+        {
+          id: 'PN-001',
+          title: 'தனியுரிமை கொள்கை',
+          version: '2.1',
+          publishedDate: '2024-06-15',
+          jurisdiction: 'இலங்கை',
+          language: 'ta',
+          acceptanceStatus: 'accepted',
+          acceptedDate: '2024-06-20',
+          category: 'தனியுரிமை கொள்கை',
+          description: 'உங்கள் தனிப்பட்ட தரவை நாங்கள் எப்படி சேகரிக்கிறோம், பயன்படுத்துகிறோம் மற்றும் பாதுகாக்கிறோம் என்பதை விவரிக்கும் எங்களின் விரிவான தனியுரிமை கொள்கை.',
+          content: `இந்த தனியுரிமை கொள்கை SLT Mobitel உங்கள் தனிப்பட்ட தகவல்களை எப்படி சேகரிக்கிறது, பயன்படுத்துகிறது மற்றும் பாதுகாக்கிறது என்பதை விளக்குகிறது...`,
+          mandatory: true
+        },
+        {
+          id: 'PN-002',
+          title: 'சேவை விதிமுறைகள்',
+          version: '1.8',
+          publishedDate: '2024-05-01',
+          jurisdiction: 'இலங்கை',
+          language: 'ta',
+          acceptanceStatus: 'pending',
+          category: 'விதிமுறைகள்',
+          description: 'எங்களின் சேவைகளின் பயன்பாட்டை நிர்வகிக்கும் விதிமுறைகள் மற்றும் நிபந்தனைகள்.',
+          content: `இந்த சேவை விதிமுறைகள் SLT Mobitel சேவைகளின் பயன்பாட்டை நிர்வகிக்கின்றன...`,
+          mandatory: false
+        }
+      ];
+    } else {
+      // Default to English
+      return [
+        {
+          id: 'PN-001',
+          title: 'Privacy Policy',
+          version: '2.1',
+          publishedDate: '2024-06-15',
+          jurisdiction: 'Sri Lanka',
+          language: 'en',
+          acceptanceStatus: 'accepted',
+          acceptedDate: '2024-06-20',
+          category: 'Privacy Policy',
+          description: 'Our comprehensive privacy policy outlining how we collect, use, and protect your personal data.',
+          content: `This Privacy Policy explains how SLT Mobitel collects, uses, and protects your personal information...`,
+          mandatory: true
+        },
+        {
+          id: 'PN-002',
+          title: 'Terms of Service',
+          version: '1.8',
+          publishedDate: '2024-05-01',
+          jurisdiction: 'Sri Lanka',
+          language: 'en',
+          acceptanceStatus: 'pending',
+          category: 'Terms',
+          description: 'Terms and conditions governing the use of our services.',
+          content: `These Terms of Service govern your use of SLT Mobitel services...`,
+          mandatory: false
+        },
+        {
+          id: 'PN-003',
+          title: 'Cookie Policy',
+          version: '1.2',
+          publishedDate: '2024-07-01',
+          jurisdiction: 'Sri Lanka',
+          language: 'en',
+          acceptanceStatus: 'pending',
+          category: 'Cookies',
+          description: 'Information about how we use cookies and similar technologies.',
+          content: `This Cookie Policy explains how we use cookies and similar technologies...`,
+          mandatory: false
+        },
+        {
+          id: 'PN-004',
+          title: 'Data Processing Agreement',
+          version: '1.0',
+          publishedDate: '2024-03-15',
+          jurisdiction: 'Sri Lanka',
+          language: 'en',
+          acceptanceStatus: 'accepted',
+          acceptedDate: '2024-03-20',
+          category: 'Data Processing',
+          description: 'Agreement on third-party data processing for enhanced services.',
+          content: `This Data Processing Agreement outlines the terms for third-party data processing...`,
+          mandatory: false
+        }
+      ];
     }
-  ];
+  };
+
+  // Mock data - replace with API calls
+  const privacyNotices: PrivacyNotice[] = getLocalizedNotices();
 
   const filteredNotices = privacyNotices.filter(notice => {
     const matchesSearch = notice.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -288,8 +359,8 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Privacy Notices</h1>
-          <p className="text-gray-600 mt-2">Review and manage privacy policies and terms</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('customerDashboard.privacyNotices.title')}</h1>
+          <p className="text-gray-600 mt-2">{t('customerDashboard.privacyNotices.subtitle')}</p>
         </div>
         <LanguageSelector />
       </div>
@@ -303,7 +374,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
               <p className="text-2xl font-bold text-gray-900">
                 {privacyNotices.filter(n => n.acceptanceStatus === 'accepted').length}
               </p>
-              <p className="text-sm text-gray-500">Accepted</p>
+              <p className="text-sm text-gray-500">{t('customerDashboard.privacyNotices.accepted')}</p>
             </div>
           </div>
         </div>
@@ -314,7 +385,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
               <p className="text-2xl font-bold text-gray-900">
                 {privacyNotices.filter(n => n.acceptanceStatus === 'pending').length}
               </p>
-              <p className="text-sm text-gray-500">Pending Review</p>
+              <p className="text-sm text-gray-500">{t('customerDashboard.privacyNotices.pendingReview')}</p>
             </div>
           </div>
         </div>
@@ -325,7 +396,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
               <p className="text-2xl font-bold text-gray-900">
                 {new Set(privacyNotices.map(n => n.language)).size}
               </p>
-              <p className="text-sm text-gray-500">Languages</p>
+              <p className="text-sm text-gray-500">{t('customerDashboard.privacyNotices.languages')}</p>
             </div>
           </div>
         </div>
@@ -336,7 +407,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
               <p className="text-2xl font-bold text-gray-900">
                 {privacyNotices.filter(n => n.mandatory && n.acceptanceStatus === 'pending').length}
               </p>
-              <p className="text-sm text-gray-500">Action Required</p>
+              <p className="text-sm text-gray-500">{t('customerDashboard.privacyNotices.actionRequired')}</p>
             </div>
           </div>
         </div>
@@ -349,7 +420,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search privacy notices..."
+              placeholder={t('customerDashboard.privacyNotices.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -362,21 +433,21 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="all">All Status</option>
-              <option value="accepted">Accepted</option>
-              <option value="pending">Pending</option>
-              <option value="declined">Declined</option>
-              <option value="expired">Expired</option>
+              <option value="all">{t('customerDashboard.privacyNotices.filters.allStatus')}</option>
+              <option value="accepted">{t('customerDashboard.privacyNotices.filters.accepted')}</option>
+              <option value="pending">{t('customerDashboard.privacyNotices.filters.pending')}</option>
+              <option value="declined">{t('customerDashboard.privacyNotices.filters.declined')}</option>
+              <option value="expired">{t('customerDashboard.privacyNotices.filters.expired')}</option>
             </select>
             <select
               value={languageFilter}
               onChange={(e) => setLanguageFilter(e.target.value)}
               className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="all">All Languages</option>
-              <option value="en">English</option>
-              <option value="si">Sinhala</option>
-              <option value="ta">Tamil</option>
+              <option value="all">{t('customerDashboard.privacyNotices.filters.allLanguages')}</option>
+              <option value="en">{t('language.english')}</option>
+              <option value="si">{t('language.sinhala')}</option>
+              <option value="ta">{t('language.tamil')}</option>
             </select>
           </div>
         </div>

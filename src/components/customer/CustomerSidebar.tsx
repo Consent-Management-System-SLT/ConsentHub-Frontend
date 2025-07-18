@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Home, 
   Shield, 
@@ -23,36 +24,38 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
   isOpen, 
   onToggle 
 }) => {
+  const { t } = useTranslation();
+  
   const navigationItems = [
     {
       id: 'dashboard',
-      label: 'Dashboard',
+      label: t('customerDashboard.navigation.dashboard'),
       icon: Home,
-      description: 'Overview of your consents and preferences'
+      description: t('customerDashboard.navigation.dashboardDesc')
     },
     {
       id: 'consent-center',
-      label: 'Consent Center',
+      label: t('customerDashboard.navigation.consentCenter'),
       icon: Shield,
-      description: 'Manage your data consents'
+      description: t('customerDashboard.navigation.consentCenterDesc')
     },
     {
       id: 'preferences',
-      label: 'Preferences',
+      label: t('customerDashboard.navigation.preferences'),
       icon: Settings,
-      description: 'Communication and notification settings'
+      description: t('customerDashboard.navigation.preferencesDesc')
     },
     {
       id: 'privacy-notices',
-      label: 'Privacy Notices',
+      label: t('customerDashboard.navigation.privacyNotices'),
       icon: FileText,
-      description: 'View privacy policies and notices'
+      description: t('customerDashboard.navigation.privacyNoticesDesc')
     },
     {
       id: 'dsar-requests',
-      label: 'DSAR Requests',
+      label: t('customerDashboard.navigation.dsarRequests'),
       icon: Download,
-      description: 'Data export and deletion requests'
+      description: t('customerDashboard.navigation.dsarRequestsDesc')
     }
   ];
 
@@ -90,8 +93,8 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
           <div className="px-4 sm:px-6 py-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Navigation</h2>
-                <p className="text-sm text-gray-500 mt-1">Manage your privacy settings</p>
+                <h2 className="text-lg font-semibold text-gray-900">{t('customerDashboard.sidebar.title')}</h2>
+                <p className="text-sm text-gray-500 mt-1">{t('customerDashboard.sidebar.subtitle')}</p>
               </div>
               {/* Close button for mobile */}
               <button
@@ -174,9 +177,9 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
                   <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-sm font-semibold text-blue-900 mb-1">Privacy Protected</h4>
+                  <h4 className="text-sm font-semibold text-blue-900 mb-1">{t('customerDashboard.sidebar.privacyTitle')}</h4>
                   <p className="text-xs text-blue-700 leading-relaxed">
-                    Your data is secure and protected with enterprise-grade encryption
+                    {t('customerDashboard.sidebar.privacyDesc')}
                   </p>
                 </div>
               </div>
