@@ -1,24 +1,24 @@
-# Consent Management System - Backend API
+# ConsentHub - Backend API
 
 ## Overview
 This backend implements the TM Forum APIs required for a complete Consent Management System, ensuring compliance with Sri Lanka's Personal Data Protection Act (PDPA) 2022.
 
 ## TM Forum APIs Implemented
 
-### ✅ TMF651 - Agreement Management API
-- **Endpoints**: `/tmf-api/agreementManagement/v4/agreement`
-- **Purpose**: Manage customer consent agreements
-- **Features**: Create, read, update, delete consent agreements
+### ✅ TMF632 - Party Privacy Management API
+- **Endpoints**: `/tmf-api/partyPrivacyManagement/v4/privacyConsent`
+- **Purpose**: Manage customer privacy consents and preferences
+- **Features**: Consent grant/revoke, privacy preferences, compliance tracking
 
-### ✅ TMF629 - Customer Management API  
-- **Endpoints**: `/tmf-api/customerManagement/v4/customer`
-- **Purpose**: Manage customer profiles and consent preferences
-- **Features**: Customer CRUD, consent preferences, profile management
+### ✅ TMF641 - Party Management API  
+- **Endpoints**: `/tmf-api/partyManagement/v4/party`
+- **Purpose**: Manage party (customer) profiles and relationships
+- **Features**: Customer profiles, guardian relationships, party management
 
-### ✅ TMF688 - Event Management API
+### ✅ TMF669 - Event Management API
 - **Endpoints**: `/tmf-api/eventManagement/v4/event`
-- **Purpose**: Audit trail and compliance logging
-- **Features**: Event logging, audit trail export, compliance reporting
+- **Purpose**: Privacy consent change events and notifications
+- **Features**: Event publishing, consent change notifications, audit events
 
 ### ✅ Consent Management API
 - **Endpoints**: `/api/consent`
@@ -63,7 +63,7 @@ curl http://localhost:3000/api/info
 
 ### Core TM Forum APIs
 
-#### Agreement Management (TMF651)
+#### Privacy Consent Management (TMF632)
 ```bash
 # Get all agreements
 GET /tmf-api/agreementManagement/v4/agreement
@@ -81,7 +81,7 @@ PATCH /tmf-api/agreementManagement/v4/agreement/{id}
 DELETE /tmf-api/agreementManagement/v4/agreement/{id}
 ```
 
-#### Customer Management (TMF629)
+#### Party Management (TMF641)
 ```bash
 # Get all customers
 GET /tmf-api/customerManagement/v4/customer
@@ -102,7 +102,7 @@ GET /tmf-api/customerManagement/v4/customer/{id}/consents
 PATCH /tmf-api/customerManagement/v4/customer/{id}/consents
 ```
 
-#### Event Management (TMF688)
+#### Event Management (TMF669)
 ```bash
 # Get audit events
 GET /tmf-api/eventManagement/v4/event
@@ -267,9 +267,9 @@ backend/
 ├── server.js              # Main server file
 ├── routes/
 │   ├── agreement.js       # TMF651 routes (existing)
-│   ├── customers.js       # TMF629 routes (new)
-│   ├── audit.js          # TMF688 routes (new)
-│   └── consent.js        # Consent management (new)
+│   ├── customers.js       # TMF641 routes (party management)
+│   ├── audit.js          # TMF669 routes (event management)
+│   └── consent.js        # TMF632 routes (privacy management)
 ├── models/               # Database models
 ├── middleware/           # Express middleware
 ├── utils/               # Utility functions

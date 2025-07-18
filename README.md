@@ -1,8 +1,8 @@
-# Consent Management System - Frontend
+# ConsentHub - Frontend
 
 ## Overview
 
-A modern, responsive frontend application for managing customer consent and privacy preferences in compliance with Sri Lanka's Personal Data Protection Act (PDPA) 2022. Built with React, TypeScript, and Tailwind CSS, this application provides a comprehensive interface for telecom operators to manage customer consent agreements and privacy settings.
+A modern, responsive frontend application for managing customer consent and privacy preferences in compliance with Sri Lanka's Personal Data Protection Act (PDPA) 2022. Built with React, TypeScript, and Tailwind CSS, this application provides a comprehensive interface aligned with TM Forum Open APIs (TMF632, TMF641, TMF669) for privacy consent management.
 
 ## 🚀 Features
 
@@ -10,8 +10,8 @@ A modern, responsive frontend application for managing customer consent and priv
 - **Multi-language Support**: English, Sinhala, and Tamil localization
 - **Role-based Access Control**: Different dashboards for different user roles
 - **Customer Dashboard**: Self-service portal for customers to manage their consent preferences
-- **Agreement Management**: Create, view, and manage consent agreements
-- **Product Offerings**: Manage telecom product offerings and associated consent requirements
+- **TMF632 Privacy Management**: Consent capture, update, revoke, and tracking
+- **Communication Preferences**: Granular control over communication channels and topics
 - **Audit Trail**: Complete audit logging for compliance purposes
 - **Authentication System**: Secure login, signup, and password recovery
 
@@ -174,9 +174,9 @@ The frontend integrates with the backend through:
 - **Data Retention**: Configurable data retention policies
 
 ### TM Forum Standards
-- **TMF651**: Agreement Management API integration
-- **TMF629**: Customer Management API integration
-- **TMF688**: Event Management API integration
+- **TMF632**: Party Privacy Management API integration
+- **TMF641**: Party Management API integration
+- **TMF669**: Event Management API integration
 
 ## 🚀 Deployment
 

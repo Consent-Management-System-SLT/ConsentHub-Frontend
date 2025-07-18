@@ -1,4 +1,4 @@
-// Customer-specific API service for self-service portal
+// TMF632 Privacy Management & TMF641 Party Management API service
 
 interface ConsentPreference {
   dataProcessing: boolean;
@@ -32,10 +32,10 @@ class CustomerService {
     };
   }
 
-  // Get customer's consent preferences
+  // TMF632 - Get customer's consent preferences
   async getConsentPreferences(customerId: string): Promise<ConsentPreference> {
     const response = await fetch(
-      `${this.baseUrl}/tmf-api/customerManagement/v4/customer/${customerId}/consent-preferences`,
+      `${this.baseUrl}/tmf-api/partyPrivacyManagement/v4/privacyConsent?partyId=${customerId}`,
       {
         headers: this.getAuthHeaders()
       }

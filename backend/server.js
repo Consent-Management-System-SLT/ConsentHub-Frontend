@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 // Import route modules
-const agreementRoutes = require('./routes/agreement');
 const customerRoutes = require('./routes/customers');
 const auditRoutes = require('./routes/audit');
 const consentRoutes = require('./routes/consent');
@@ -66,21 +65,18 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-// TMF Forum API Routes
-app.use('/tmf-api/agreementManagement/v4/agreement', agreementRoutes);
-app.use('/tmf-api/customerManagement/v4/customer', customerRoutes);
+// TMF Forum API Routes - TMF632 Privacy Management
+app.use('/tmf-api/partyPrivacyManagement/v4/privacyConsent', consentRoutes);
+app.use('/tmf-api/partyManagement/v4/party', customerRoutes);
 app.use('/tmf-api/eventManagement/v4/event', auditRoutes);
 app.use('/api/consent', consentRoutes);
-
-// Legacy route for backward compatibility
-app.use('/agreements', agreementRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy', 
     timestamp: new Date().toISOString(),
-    services: ['TMF651-Agreement', 'TMF629-Customer', 'TMF688-Event']
+    services: ['TMF632-Privacy', 'TMF641-Party', 'TMF669-Event']
   });
 });
 
@@ -96,21 +92,21 @@ app.get('/test-cors', (req, res) => {
 // Consent Management System info endpoint
 app.get('/api/info', (req, res) => {
   res.json({
-    system: 'Consent Management System',
+    system: 'ConsentHub - Privacy Management System',
     version: '1.0.0',
     apis: [
-      'TMF651 - Agreement Management',
-      'TMF629 - Customer Management', 
-      'TMF688 - Event Management'
+      'TMF632 - Party Privacy Management',
+      'TMF641 - Party Management', 
+      'TMF669 - Event Management'
     ],
     compliance: 'PDPA Sri Lanka 2022'
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Consent Management System API running on http://localhost:${PORT}`);
-  console.log(`📋 TMF651 Agreement API: http://localhost:${PORT}/tmf-api/agreementManagement/v4/agreement`);
-  console.log(`👥 TMF629 Customer API: http://localhost:${PORT}/tmf-api/customerManagement/v4/customer`);
-  console.log(`📊 TMF688 Event API: http://localhost:${PORT}/tmf-api/eventManagement/v4/event`);
-  console.log(`🛡️  Consent API: http://localhost:${PORT}/api/consent`);
+  console.log(`🚀 ConsentHub API running on http://localhost:${PORT}`);
+  console.log(`�️  TMF632 Privacy API: http://localhost:${PORT}/tmf-api/partyPrivacyManagement/v4/privacyConsent`);
+  console.log(`👥 TMF641 Party API: http://localhost:${PORT}/tmf-api/partyManagement/v4/party`);
+  console.log(`📊 TMF669 Event API: http://localhost:${PORT}/tmf-api/eventManagement/v4/event`);
+  console.log(`� Consent API: http://localhost:${PORT}/api/consent`);
 });
