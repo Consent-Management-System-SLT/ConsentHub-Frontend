@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Dashboard from './Dashboard';
 import CustomerDashboard from './CustomerDashboard';
+import CSRDashboard from './CSRDashboard';
 
 const RoleBasedDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -16,6 +17,8 @@ const RoleBasedDashboard: React.FC = () => {
       return <Dashboard />;
     case 'customer':
       return <CustomerDashboard />;
+    case 'csradmin':
+      return <CSRDashboard/>;
     default:
       return <Dashboard />; // Default to admin dashboard
   }

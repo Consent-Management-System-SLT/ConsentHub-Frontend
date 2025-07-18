@@ -4,7 +4,7 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'customer';
+  role: 'admin' | 'customer' | 'csradmin';
   phone?: string;
   department?: string;
 }
@@ -38,6 +38,15 @@ const DEMO_USERS = [
     role: 'customer' as const,
     phone: '+94 77 1234567',
     department: 'Customer Relations'
+  },
+  {
+    id: '3',
+    email: 'csr@sltmobitel.lk',
+    password: 'csr123',
+    name: 'CSR User',
+    role: 'csradmin' as const,
+    phone: '+94 77 1234337',
+    department: 'CSR'
   }
 ];
 
