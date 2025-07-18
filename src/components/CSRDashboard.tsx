@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Settings, 
@@ -12,18 +12,21 @@ import {
   CheckCircle,
   Clock,
   User,
-  HelpCircle
+  HelpCircle,
+  RefreshCw,
+  Activity
 } from 'lucide-react';
+import { apiClient } from '../services/apiClient';
 
-// Import CSR components (using default imports for now)
+// Import CSR components (using backend-integrated versions)
 import CSRHeader from './csr/CSRHeader';
 import SidebarNav from './csr/SidebarNav';
-import CustomerSearchForm from './csr/CustomerSearchForm';
-import ConsentHistoryTable from './csr/ConsentHistoryTable';
-import PreferenceEditorForm from './csr/PreferenceEditorForm';
-import DSARRequestPanel from './csr/DSARRequestPanel';
-import GuardianConsentForm from './csr/GuardianConsentForm';
-import AuditLogTable from './csr/AuditLogTable';
+import CustomerSearchForm from './csr/CustomerSearchForm_Backend';
+import ConsentHistoryTable from './csr/ConsentHistoryTable_Backend';
+import PreferenceEditorForm from './csr/PreferenceEditorForm_Backend';
+import DSARRequestPanel from './csr/DSARRequestPanel_Backend';
+import GuardianConsentForm from './csr/GuardianConsentForm_Backend';
+import AuditLogTable from './csr/AuditLogTable_Backend';
 import HelpModal from './csr/HelpModal';
 
 interface CSRDashboardProps {
@@ -33,42 +36,139 @@ interface CSRDashboardProps {
 const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   const [activeSection, setActiveSection] = useState('overview');
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Use sidebarOpen instead of collapsed
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [dashboardStats, setDashboardStats] = useState({
+    totalCustomers: 0,
+    pendingRequests: 0,
+    consentUpdates: 0,
+    guardiansManaged: 0,
+    todayActions: 0,
+    riskAlerts: 0
+  });
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [insights, setInsights] = useState({
+    consentRate: 0,
+    resolvedRequests: 0,
+    newCustomers: 0
+  });
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
-  // Mock dashboard statistics
-  const dashboardStats = {
-    totalCustomers: 15487,
-    pendingRequests: 23,
-    consentUpdates: 156,
-    guardiansManaged: 45,
-    todayActions: 89,
-    riskAlerts: 3
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  // Auto-refresh functionality
+  useEffect(() => {
+    if (autoRefresh) {
+      const interval = setInterval(() => {
+        console.log('Auto-refreshing CSR dashboard data...');
+        loadDashboardData();
+      }, 30000); // Refresh every 30 seconds
+      return () => clearInterval(interval);
+    }
+  }, [autoRefresh]);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch data from multiple endpoints
+      const [partiesResponse, consentsResponse, dsarResponse, eventsResponse] = await Promise.all([
+        apiClient.get('/api/v1/party'),
+        apiClient.get('/api/v1/consent'),
+        apiClient.get('/api/v1/dsar'),
+        apiClient.get('/api/v1/event')
+      ]);
+
+      const parties = partiesResponse.data as any[];
+      const consents = consentsResponse.data as any[];
+      const dsarRequests = dsarResponse.data as any[];
+      const events = eventsResponse.data as any[];
+
+      // Calculate real statistics
+      const totalCustomers = parties.length;
+      const pendingRequests = dsarRequests.filter((req: any) => req.status === 'pending').length;
+      const grantedConsents = consents.filter((consent: any) => consent.status === 'granted').length;
+      const todayEvents = events.filter((event: any) => {
+        const eventDate = new Date(event.createdAt);
+        const today = new Date();
+        return eventDate.toDateString() === today.toDateString();
+      }).length;
+
+      setDashboardStats({
+        totalCustomers,
+        pendingRequests,
+        consentUpdates: grantedConsents,
+        guardiansManaged: 0, // No guardian data in current API
+        todayActions: todayEvents,
+        riskAlerts: dsarRequests.filter((req: any) => req.status === 'pending' && 
+          new Date(req.submittedAt) < new Date(Date.now() - 25 * 24 * 60 * 60 * 1000) // 25+ days old
+        ).length
+      });
+
+      // Calculate insights
+      const totalConsents = consents.length;
+      const consentRate = totalConsents > 0 ? Math.round((grantedConsents / totalConsents) * 100) : 0;
+      const resolvedRequests = dsarRequests.filter((req: any) => req.status === 'completed').length;
+      const newCustomersCount = parties.filter((party: any) => {
+        const createdDate = new Date(party.createdAt);
+        const today = new Date();
+        return createdDate.toDateString() === today.toDateString();
+      }).length;
+
+      setInsights({
+        consentRate,
+        resolvedRequests,
+        newCustomers: newCustomersCount
+      });
+
+      // Create recent activities from events
+      const recentEvents = events
+        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5)
+        .map((event: any, index: number) => ({
+          id: index + 1,
+          type: event.eventType.includes('consent') ? 'consent' : 
+                event.eventType.includes('dsar') ? 'dsar' : 'system',
+          message: event.description,
+          timestamp: getRelativeTime(event.createdAt),
+          priority: event.eventType.includes('dsar') ? 'high' : 'medium'
+        }));
+
+      setRecentActivities(recentEvents);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+      // Keep default values if API fails
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const recentActivities = [
-    {
-      id: 1,
-      type: 'consent',
-      message: 'John Doe updated marketing preferences',
-      timestamp: '2 minutes ago',
-      priority: 'medium'
-    },
-    {
-      id: 2,
-      type: 'dsar',
-      message: 'New DSAR request from Jane Smith',
-      timestamp: '15 minutes ago',
-      priority: 'high'
-    },
-    {
-      id: 3,
-      type: 'guardian',
-      message: 'Guardian consent verified for Alex Johnson',
-      timestamp: '1 hour ago',
-      priority: 'low'
+  // Handle manual refresh
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Error refreshing CSR dashboard:', error);
+    } finally {
+      setIsRefreshing(false);
     }
-  ];
+  };
+
+  const getRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
+    return `${Math.floor(diffInMinutes / 1440)} days ago`;
+  };
 
   const handleCustomerSelect = (customer: any) => {
     setSelectedCustomer(customer);
@@ -78,23 +178,43 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   const renderContent = () => {
     switch (activeSection) {
       case 'overview':
-        return <DashboardOverview stats={dashboardStats} activities={recentActivities} onSectionChange={setActiveSection} />;
+        return <DashboardOverview 
+          stats={dashboardStats} 
+          activities={recentActivities} 
+          onSectionChange={setActiveSection} 
+          loading={loading}
+          onRefresh={handleRefresh}
+          insights={insights}
+          isRefreshing={isRefreshing}
+          autoRefresh={autoRefresh}
+          onAutoRefreshChange={setAutoRefresh}
+        />;
       case 'customer-search':
         return <CustomerSearchForm onCustomerSelect={handleCustomerSelect} />;
       case 'consent-history':
-        return <ConsentHistoryTable />;
+        return <ConsentHistoryTable customerId={selectedCustomer?.id} />;
       case 'preference-editor':
-        return <PreferenceEditorForm />;
+        return <PreferenceEditorForm customerId={selectedCustomer?.id} />;
       case 'dsar-requests':
-        return <DSARRequestPanel />;
+        return <DSARRequestPanel customerId={selectedCustomer?.id} />;
       case 'guardian-consent':
-        return <GuardianConsentForm />;
+        return <GuardianConsentForm customerId={selectedCustomer?.id} />;
       case 'audit-logs':
-        return <AuditLogTable />;
+        return <AuditLogTable customerId={selectedCustomer?.id} />;
       case 'customer-profile':
         return <CustomerProfile customer={selectedCustomer} onBack={() => setActiveSection('customer-search')} onSectionChange={setActiveSection} />;
       default:
-        return <DashboardOverview stats={dashboardStats} activities={recentActivities} onSectionChange={setActiveSection} />;
+        return <DashboardOverview 
+          stats={dashboardStats} 
+          activities={recentActivities} 
+          onSectionChange={setActiveSection} 
+          loading={loading}
+          onRefresh={handleRefresh}
+          insights={insights}
+          isRefreshing={isRefreshing}
+          autoRefresh={autoRefresh}
+          onAutoRefreshChange={setAutoRefresh}
+        />;
     }
   };
 
@@ -111,7 +231,10 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
       {/* Main content area */}
       <div className="flex-1 lg:ml-0 flex flex-col">
         {/* Header */}
-        <CSRHeader />
+        <CSRHeader 
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
+        />
         
         {/* Main Content */}
         <main className="flex-1 overflow-auto">
@@ -140,254 +263,318 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
 };
 
 // Dashboard Overview Component
-const DashboardOverview: React.FC<{ stats: any; activities: any[]; onSectionChange: (section: string) => void }> = ({ stats, activities, onSectionChange }) => {
+const DashboardOverview: React.FC<{ 
+  stats: any; 
+  activities: any[]; 
+  onSectionChange: (section: string) => void;
+  loading?: boolean;
+  onRefresh?: () => void;
+  insights?: { consentRate: number; resolvedRequests: number; newCustomers: number };
+  isRefreshing?: boolean;
+  autoRefresh?: boolean;
+  onAutoRefreshChange?: (value: boolean) => void;
+}> = ({ 
+  stats, 
+  activities, 
+  onSectionChange, 
+  loading = false, 
+  onRefresh, 
+  insights, 
+  isRefreshing = false, 
+  autoRefresh = false, 
+  onAutoRefreshChange 
+}) => {
+  
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        {/* Loading Welcome Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Loading Dashboard...</h1>
+              <p className="text-blue-100 text-sm sm:text-base">
+                Please wait while we fetch your real-time data.
+              </p>
+            </div>
+            <div className="hidden sm:block">
+              <RefreshCw className="w-16 h-16 opacity-80 animate-spin" />
+            </div>
+          </div>
+        </div>
+
+        {/* Loading Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 animate-pulse">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                </div>
+                <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-6 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Welcome to ConsentHub CSR Dashboard</h1>
-            <p className="text-blue-100 text-sm sm:text-base">
-              Manage customer consent, preferences, and data requests efficiently. 
-              Your comprehensive tool for privacy compliance and customer service.
-            </p>
-          </div>
-          <div className="hidden sm:block">
-            <img 
-              src="/SLTMobitel_Logo.svg.png" 
-              alt="SLT Mobitel" 
-              className="h-16 w-auto opacity-80"
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+          <p className="text-gray-600 mt-1">Customer Support Representative Dashboard</p>
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <label className="text-sm font-medium text-gray-700">Auto-refresh:</label>
+            <input
+              type="checkbox"
+              checked={autoRefresh}
+              onChange={(e) => onAutoRefreshChange && onAutoRefreshChange(e.target.checked)}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
+          </div>
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              title="Refresh Data"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Customers</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalCustomers.toLocaleString()}</p>
+              <p className="text-xs text-blue-600 mt-1">Active accounts</p>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-full">
+              <Users className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Pending Requests</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.pendingRequests}</p>
+              <p className="text-xs text-orange-600 mt-1">Awaiting response</p>
+            </div>
+            <div className="p-3 bg-orange-100 rounded-full">
+              <Clock className="w-6 h-6 text-orange-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Consent Updates</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.consentUpdates}</p>
+              <p className="text-xs text-green-600 mt-1">This period</p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-full">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Guardian Managed</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.guardiansManaged}</p>
+              <p className="text-xs text-purple-600 mt-1">Under supervision</p>
+            </div>
+            <div className="p-3 bg-purple-100 rounded-full">
+              <Shield className="w-6 h-6 text-purple-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Today's Actions</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.todayActions}</p>
+              <p className="text-xs text-indigo-600 mt-1">Completed tasks</p>
+            </div>
+            <div className="p-3 bg-indigo-100 rounded-full">
+              <TrendingUp className="w-6 h-6 text-indigo-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Risk Alerts</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.riskAlerts}</p>
+              <p className="text-xs text-red-600 mt-1">Requires attention</p>
+            </div>
+            <div className="p-3 bg-red-100 rounded-full">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <StatCard
-          title="Total Customers"
-          value={stats.totalCustomers.toLocaleString()}
-          icon={Users}
-          color="blue"
-          onClick={() => onSectionChange('customer-search')}
-        />
-        <StatCard
-          title="Pending Requests"
-          value={stats.pendingRequests}
-          icon={Clock}
-          color="orange"
-          onClick={() => onSectionChange('dsar-requests')}
-        />
-        <StatCard
-          title="Consent Updates"
-          value={stats.consentUpdates}
-          icon={CheckCircle}
-          color="green"
-          onClick={() => onSectionChange('consent-history')}
-        />
-        <StatCard
-          title="Guardian Managed"
-          value={stats.guardiansManaged}
-          icon={Shield}
-          color="purple"
-          onClick={() => onSectionChange('guardian-consent')}
-        />
-        <StatCard
-          title="Today's Actions"
-          value={stats.todayActions}
-          icon={TrendingUp}
-          color="indigo"
-          onClick={() => onSectionChange('audit-logs')}
-        />
-        <StatCard
-          title="Risk Alerts"
-          value={stats.riskAlerts}
-          icon={AlertTriangle}
-          color="red"
-          onClick={() => onSectionChange('audit-logs')}
-        />
-      </div>
-
-      {/* Quick Actions */}
+      {/* Quick Actions and Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <QuickActions onSectionChange={onSectionChange} />
-        <RecentActivity activities={activities} onSectionChange={onSectionChange} />
+        {/* Quick Actions */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <div className="space-y-3">
+            <button
+              onClick={() => onSectionChange('customer-search')}
+              className="w-full flex items-center space-x-3 p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+            >
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-gray-900">Search Customers</p>
+                <p className="text-sm text-gray-600">Find and manage customer accounts</p>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => onSectionChange('dsar-requests')}
+              className="w-full flex items-center space-x-3 p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
+            >
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <FileText className="w-5 h-5 text-orange-600" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-gray-900">DSAR Requests</p>
+                <p className="text-sm text-gray-600">Process data subject requests</p>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => onSectionChange('consent-history')}
+              className="w-full flex items-center space-x-3 p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
+            >
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Shield className="w-5 h-5 text-green-600" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-gray-900">Consent Management</p>
+                <p className="text-sm text-gray-600">Review and update consents</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+            {isRefreshing && (
+              <div className="flex items-center text-blue-600 text-sm">
+                <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+                Refreshing...
+              </div>
+            )}
+          </div>
+          <div className="space-y-4">
+            {activities.length > 0 ? (
+              activities.slice(0, 5).map((activity, index) => (
+                <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <div className={`p-2 rounded-lg ${
+                    activity.type === 'consent' ? 'bg-green-100' :
+                    activity.type === 'dsar' ? 'bg-orange-100' :
+                    'bg-blue-100'
+                  }`}>
+                    {activity.type === 'consent' ? (
+                      <Shield className={`w-4 h-4 ${
+                        activity.type === 'consent' ? 'text-green-600' :
+                        activity.type === 'dsar' ? 'text-orange-600' :
+                        'text-blue-600'
+                      }`} />
+                    ) : activity.type === 'dsar' ? (
+                      <FileText className={`w-4 h-4 ${
+                        activity.type === 'consent' ? 'text-green-600' :
+                        activity.type === 'dsar' ? 'text-orange-600' :
+                        'text-blue-600'
+                      }`} />
+                    ) : (
+                      <Activity className={`w-4 h-4 ${
+                        activity.type === 'consent' ? 'text-green-600' :
+                        activity.type === 'dsar' ? 'text-orange-600' :
+                        'text-blue-600'
+                      }`} />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900">{activity.message}</p>
+                    <p className="text-xs text-gray-500 mt-1">{activity.timestamp}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Activity className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No recent activity</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Recent Insights */}
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Today's Insights</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Today's Insights</h3>
+          {isRefreshing && (
+            <div className="flex items-center text-blue-600 text-sm">
+              <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+              Refreshing...
+            </div>
+          )}
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
             <div className="flex items-center space-x-2">
               <TrendingUp className="w-5 h-5 text-blue-600" />
               <span className="text-sm font-medium text-blue-800">Consent Rate</span>
             </div>
-            <p className="text-2xl font-bold text-blue-900 mt-2">87%</p>
-            <p className="text-sm text-blue-600">↑ 3% from yesterday</p>
+            <p className="text-2xl font-bold text-blue-900 mt-2">{insights?.consentRate || 0}%</p>
+            <p className="text-sm text-blue-600">Based on active consents</p>
           </div>
           <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5 text-green-600" />
               <span className="text-sm font-medium text-green-800">Resolved Requests</span>
             </div>
-            <p className="text-2xl font-bold text-green-900 mt-2">45</p>
-            <p className="text-sm text-green-600">↑ 12% from yesterday</p>
+            <p className="text-2xl font-bold text-green-900 mt-2">{insights?.resolvedRequests || 0}</p>
+            <p className="text-sm text-green-600">Completed DSAR requests</p>
           </div>
           <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
             <div className="flex items-center space-x-2">
               <Users className="w-5 h-5 text-orange-600" />
               <span className="text-sm font-medium text-orange-800">New Customers</span>
             </div>
-            <p className="text-2xl font-bold text-orange-900 mt-2">23</p>
-            <p className="text-sm text-orange-600">↑ 8% from yesterday</p>
+            <p className="text-2xl font-bold text-orange-900 mt-2">{insights?.newCustomers || 0}</p>
+            <p className="text-sm text-orange-600">Registered today</p>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-// Stat Card Component
-const StatCard: React.FC<{ title: string; value: string | number; icon: any; color: string; onClick?: () => void }> = ({
-  title,
-  value,
-  icon: Icon,
-  color,
-  onClick
-}) => {
-  const colorClasses = {
-    blue: 'bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 border-blue-200',
-    orange: 'bg-gradient-to-br from-orange-50 to-orange-100 text-orange-600 border-orange-200',
-    green: 'bg-gradient-to-br from-green-50 to-green-100 text-green-600 border-green-200',
-    purple: 'bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 border-purple-200',
-    indigo: 'bg-gradient-to-br from-indigo-50 to-indigo-100 text-indigo-600 border-indigo-200',
-    red: 'bg-gradient-to-br from-red-50 to-red-100 text-red-600 border-red-200'
-  };
-
-  const Component = onClick ? 'button' : 'div';
-
-  return (
-    <Component
-      onClick={onClick}
-      className={`bg-white rounded-xl shadow-sm p-6 border border-gray-200 transition-all duration-200 ${onClick ? 'hover:shadow-md cursor-pointer hover:scale-105' : ''}`}
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-        </div>
-        <div className={`p-3 rounded-lg ${colorClasses[color as keyof typeof colorClasses]} border`}>
-          <Icon className="w-6 h-6" />
-        </div>
-      </div>
-    </Component>
-  );
-};
-
-// Quick Actions Component
-const QuickActions: React.FC<{ onSectionChange: (section: string) => void }> = ({ onSectionChange }) => {
-  const actions = [
-    { id: 'customer-search', label: 'Search Customer', icon: Search, color: 'blue' },
-    { id: 'consent-history', label: 'Manage Consent', icon: FileText, color: 'green' },
-    { id: 'dsar-requests', label: 'DSAR Request', icon: Database, color: 'purple' },
-    { id: 'guardian-consent', label: 'Guardian Consent', icon: Shield, color: 'indigo' },
-    { id: 'preference-editor', label: 'Preferences', icon: Settings, color: 'orange' },
-    { id: 'audit-logs', label: 'Audit Logs', icon: Database, color: 'red' }
-  ];
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-      <div className="grid grid-cols-2 gap-3">
-        {actions.map(action => (
-          <button
-            key={action.id}
-            onClick={() => onSectionChange(action.id)}
-            className="flex items-center space-x-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg hover:from-blue-50 hover:to-blue-100 hover:border-blue-200 transition-all duration-200 text-left border border-gray-200 group"
-          >
-            <action.icon className="w-5 h-5 text-gray-600 group-hover:text-blue-600" />
-            <span className="text-sm font-medium text-gray-900 group-hover:text-blue-700">{action.label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Recent Activity Component
-const RecentActivity: React.FC<{ activities: any[]; onSectionChange: (section: string) => void }> = ({ activities, onSectionChange }) => {
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'consent':
-        return <FileText className="w-4 h-4 text-blue-600" />;
-      case 'dsar':
-        return <Database className="w-4 h-4 text-purple-600" />;
-      case 'guardian':
-        return <Shield className="w-4 h-4 text-green-600" />;
-      default:
-        return <Bell className="w-4 h-4 text-gray-600" />;
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'low':
-        return 'bg-green-100 text-green-800 border-green-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getActivitySection = (type: string) => {
-    switch (type) {
-      case 'consent':
-        return 'consent-history';
-      case 'dsar':
-        return 'dsar-requests';
-      case 'guardian':
-        return 'guardian-consent';
-      default:
-        return 'overview';
-    }
-  };
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-      <div className="space-y-3">
-        {activities.map(activity => (
-          <button
-            key={activity.id}
-            onClick={() => onSectionChange(getActivitySection(activity.type))}
-            className="w-full flex items-start space-x-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:from-blue-50 hover:to-blue-100 hover:border-blue-200 transition-all duration-200 text-left"
-          >
-            <div className="flex-shrink-0 mt-1 p-2 bg-white rounded-full shadow-sm">
-              {getActivityIcon(activity.type)}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 mb-1">{activity.message}</p>
-              <div className="flex items-center space-x-2">
-                <span className="text-xs text-gray-500">{activity.timestamp}</span>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getPriorityColor(activity.priority)}`}>
-                  {activity.priority}
-                </span>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-      <button 
-        onClick={() => onSectionChange('audit-logs')}
-        className="w-full mt-4 p-2 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 font-medium rounded-lg transition-colors border border-blue-200"
-      >
-        View All Activities
-      </button>
     </div>
   );
 };

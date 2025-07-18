@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut, User, Bell, Settings, X, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { LogOut, User, Bell, Settings, X, AlertCircle, CheckCircle, Clock, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import LanguageSelector from '../LanguageSelector';
 
@@ -7,12 +7,16 @@ interface CSRHeaderProps {
   className?: string;
   onNotificationClick?: () => void;
   onSettingsClick?: () => void;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
 const CSRHeader: React.FC<CSRHeaderProps> = ({ 
   className = '', 
   onNotificationClick, 
-  onSettingsClick 
+  onSettingsClick,
+  onRefresh,
+  isRefreshing = false
 }) => {
   const { logout } = useAuth();
   const [notificationCount, setNotificationCount] = useState(3);
@@ -103,6 +107,20 @@ const CSRHeader: React.FC<CSRHeaderProps> = ({
             {/* Language Selector - Hidden on mobile to save space */}
             <div className="hidden sm:flex items-center">
               <LanguageSelector />
+            </div>
+
+            {/* Refresh Button */}
+            <div className="flex items-center">
+              <button
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                className={`p-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors ${
+                  isRefreshing ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                title="Refresh Dashboard"
+              >
+                <RefreshCw className={`w-5 h-5 sm:w-6 sm:h-6 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </button>
             </div>
 
             {/* Notifications */}
