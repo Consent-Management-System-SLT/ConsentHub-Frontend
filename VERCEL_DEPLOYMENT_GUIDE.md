@@ -57,8 +57,6 @@
    ```
    VITE_API_URL=https://consenthub-backend.onrender.com
    VITE_API_BASE_URL=https://consenthub-backend.onrender.com/api/v1
-   VITE_TMF632_API_URL=https://consenthub-backend.onrender.com/tmf-api/privacyManagement/v4
-   VITE_TMF669_API_URL=https://consenthub-backend.onrender.com/tmf-api/eventManagement/v4
    VITE_CUSTOMER_API_URL=https://consenthub-backend.onrender.com
    VITE_CSR_API_URL=https://consenthub-backend.onrender.com
    VITE_GATEWAY_API_URL=https://consenthub-backend.onrender.com
@@ -70,9 +68,6 @@
    VITE_EVENT_API_URL=https://consenthub-backend.onrender.com/api/v1/event
    VITE_NODE_ENV=production
    VITE_APP_NAME=ConsentHub
-   VITE_APP_VERSION=1.0.0
-   VITE_COMPANY_NAME=SLT Mobitel
-   VITE_COMPANY_LOGO=/SLTMobitel_Logo.svg.png
    ```
 
 5. **Deploy**

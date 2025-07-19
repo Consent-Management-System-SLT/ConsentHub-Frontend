@@ -134,29 +134,55 @@ class CustomerApiClient {
     return this.request<T>({ ...config, method: 'DELETE', url });
   }
 
-  // Dashboard APIs
+  // Dashboard APIs - Using available backend endpoints
   async getDashboardOverview() {
-    return this.get<any>('/api/v1/customer/dashboard/overview');
+    // Since backend doesn't have customer dashboard, aggregate from available endpoints
+    try {
+      const [consents, preferences, dsarRequests] = await Promise.all([
+        this.get<any>('/api/v1/consent'),
+        this.get<any>('/api/v1/preference'),
+        this.get<any>('/api/v1/dsar')
+      ]);
+      
+      return {
+        success: true,
+        data: {
+          consents: consents.data || [],
+          preferences: preferences.data || [],
+          dsarRequests: dsarRequests.data || []
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: { consents: [], preferences: [], dsarRequests: [] },
+        message: 'Dashboard data unavailable'
+      };
+    }
   }
 
   async getCustomerProfile() {
-    return this.get<any>('/api/v1/customer/dashboard/profile');
+    // Use party endpoint for profile data
+    return this.get<any>('/api/v1/party');
   }
 
   async updateCustomerProfile(data: any) {
-    return this.put<any>('/api/v1/customer/dashboard/profile', data);
+    // Use party endpoint for profile updates
+    return this.put<any>('/api/v1/party', data);
   }
 
   async getActivityHistory(params?: { page?: number; limit?: number }) {
+    // Use event endpoint for activity history
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     
-    return this.get<any>(`/api/v1/customer/dashboard/activity?${queryParams.toString()}`);
+    return this.get<any>(`/api/v1/event?${queryParams.toString()}`);
   }
 
   async getCustomerSummary() {
-    return this.get<any>('/api/v1/customer/dashboard/summary');
+    // Aggregate summary from available endpoints
+    return this.getDashboardOverview();
   }
 
   // Consent APIs
@@ -168,27 +194,27 @@ class CustomerApiClient {
     if (params?.purpose) queryParams.append('purpose', params.purpose);
     if (params?.consentType) queryParams.append('consentType', params.consentType);
     
-    return this.get<any>(`/api/v1/customer/consents?${queryParams.toString()}`);
+    return this.get<any>(`/api/v1/consent?${queryParams.toString()}`);
   }
 
   async getConsentById(id: string) {
-    return this.get<any>(`/api/v1/customer/consents/${id}`);
+    return this.get<any>(`/api/v1/consent/${id}`);
   }
 
   async grantConsent(data: any) {
-    return this.post<any>('/api/v1/customer/consents', data);
+    return this.post<any>('/api/v1/consent', data);
   }
 
   async revokeConsent(id: string) {
-    return this.post<any>(`/api/v1/customer/consents/${id}/revoke`);
+    return this.post<any>(`/api/v1/consent/${id}/revoke`);
   }
 
   async getConsentHistory(id: string) {
-    return this.get<any>(`/api/v1/customer/consents/${id}/history`);
+    return this.get<any>(`/api/v1/consent/${id}/history`);
   }
 
   async getConsentSummary() {
-    return this.get<any>('/api/v1/customer/consents/summary');
+    return this.get<any>('/api/v1/consent/summary');
   }
 
   // Preference APIs
@@ -200,31 +226,31 @@ class CustomerApiClient {
     if (params?.channelType) queryParams.append('channelType', params.channelType);
     if (params?.isAllowed !== undefined) queryParams.append('isAllowed', params.isAllowed.toString());
     
-    return this.get<any>(`/api/v1/customer/preferences?${queryParams.toString()}`);
+    return this.get<any>(`/api/v1/preference?${queryParams.toString()}`);
   }
 
   async getPreferenceById(id: string) {
-    return this.get<any>(`/api/v1/customer/preferences/${id}`);
+    return this.get<any>(`/api/v1/preference/${id}`);
   }
 
   async createOrUpdatePreference(data: any) {
-    return this.post<any>('/api/v1/customer/preferences', data);
+    return this.post<any>('/api/v1/preference', data);
   }
 
   async updatePreference(id: string, data: any) {
-    return this.put<any>(`/api/v1/customer/preferences/${id}`, data);
+    return this.put<any>(`/api/v1/preference/${id}`, data);
   }
 
   async deletePreference(id: string) {
-    return this.delete<any>(`/api/v1/customer/preferences/${id}`);
+    return this.delete<any>(`/api/v1/preference/${id}`);
   }
 
   async getPreferenceSummary() {
-    return this.get<any>('/api/v1/customer/preferences/summary');
+    return this.get<any>('/api/v1/preference/summary');
   }
 
   async getPreferencesByChannel() {
-    return this.get<any>('/api/v1/customer/preferences/by-channel');
+    return this.get<any>('/api/v1/preference/by-channel');
   }
 
   // DSAR APIs
@@ -236,31 +262,31 @@ class CustomerApiClient {
     if (params?.requestType) queryParams.append('requestType', params.requestType);
     if (params?.category) queryParams.append('category', params.category);
     
-    return this.get<any>(`/api/v1/customer/dsar?${queryParams.toString()}`);
+    return this.get<any>(`/api/v1/dsar?${queryParams.toString()}`);
   }
 
   async getDSARRequestById(id: string) {
-    return this.get<any>(`/api/v1/customer/dsar/${id}`);
+    return this.get<any>(`/api/v1/dsar/${id}`);
   }
 
   async createDSARRequest(data: any) {
-    return this.post<any>('/api/v1/customer/dsar', data);
+    return this.post<any>('/api/v1/dsar', data);
   }
 
   async cancelDSARRequest(id: string, reason: string) {
-    return this.post<any>(`/api/v1/customer/dsar/${id}/cancel`, { reason });
+    return this.post<any>(`/api/v1/dsar/${id}/cancel`, { reason });
   }
 
   async getDSARRequestHistory(id: string) {
-    return this.get<any>(`/api/v1/customer/dsar/${id}/history`);
+    return this.get<any>(`/api/v1/dsar/${id}/history`);
   }
 
   async getDSARRequestSummary() {
-    return this.get<any>('/api/v1/customer/dsar/summary');
+    return this.get<any>('/api/v1/dsar/summary');
   }
 
   async getDSARRequestTypes() {
-    return this.get<any>('/api/v1/customer/dsar/types');
+    return this.get<any>('/api/v1/dsar/types');
   }
 }
 
