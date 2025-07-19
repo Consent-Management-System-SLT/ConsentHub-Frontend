@@ -3,15 +3,15 @@ import axios, { AxiosInstance } from 'axios';
 
 // Service configurations
 const SERVICES = {
-  CUSTOMER: 'http://localhost:3011',
-  CSR: 'http://localhost:3010', 
-  GATEWAY: 'http://localhost:3000',
-  CONSENT: 'http://localhost:3001',
-  PREFERENCE: 'http://localhost:3002',
-  PRIVACY_NOTICE: 'http://localhost:3003',
-  PARTY: 'http://localhost:3006',
-  DSAR: 'http://localhost:3008',
-  EVENT: 'http://localhost:3005',
+  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'https://consenthub-backend.onrender.com/customer',
+  CSR: import.meta.env.VITE_CSR_API_URL || 'https://consenthub-backend.onrender.com/csr', 
+  GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'https://consenthub-backend.onrender.com',
+  CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'https://consenthub-backend.onrender.com/consent',
+  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'https://consenthub-backend.onrender.com/preference',
+  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'https://consenthub-backend.onrender.com/privacy-notice',
+  PARTY: import.meta.env.VITE_PARTY_API_URL || 'https://consenthub-backend.onrender.com/party',
+  DSAR: import.meta.env.VITE_DSAR_API_URL || 'https://consenthub-backend.onrender.com/dsar',
+  EVENT: import.meta.env.VITE_EVENT_API_URL || 'https://consenthub-backend.onrender.com/event',
 };
 
 // Service-specific API clients
