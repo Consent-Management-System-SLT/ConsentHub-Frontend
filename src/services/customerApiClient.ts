@@ -141,7 +141,7 @@ class CustomerApiClient {
       const [consents, preferences, dsarRequests] = await Promise.all([
         this.get<any>('/api/v1/consent'),
         this.get<any>('/api/v1/preference'),
-        this.get<any>('/api/v1/dsar')
+        this.get<any>('/api/v1/dsar/dsarRequest')
       ]);
       
       return {
@@ -163,12 +163,12 @@ class CustomerApiClient {
 
   async getCustomerProfile() {
     // Use party endpoint for profile data
-    return this.get<any>('/api/v1/party');
+    return this.get<any>('/api/v1/party/party');
   }
 
   async updateCustomerProfile(data: any) {
     // Use party endpoint for profile updates
-    return this.put<any>('/api/v1/party', data);
+    return this.put<any>('/api/v1/party/party', data);
   }
 
   async getActivityHistory(params?: { page?: number; limit?: number }) {
@@ -262,31 +262,31 @@ class CustomerApiClient {
     if (params?.requestType) queryParams.append('requestType', params.requestType);
     if (params?.category) queryParams.append('category', params.category);
     
-    return this.get<any>(`/api/v1/dsar?${queryParams.toString()}`);
+    return this.get<any>(`/api/v1/dsar/dsarRequest?${queryParams.toString()}`);
   }
 
   async getDSARRequestById(id: string) {
-    return this.get<any>(`/api/v1/dsar/${id}`);
+    return this.get<any>(`/api/v1/dsar/dsarRequest/${id}`);
   }
 
   async createDSARRequest(data: any) {
-    return this.post<any>('/api/v1/dsar', data);
+    return this.post<any>('/api/v1/dsar/dsarRequest', data);
   }
 
   async cancelDSARRequest(id: string, reason: string) {
-    return this.post<any>(`/api/v1/dsar/${id}/cancel`, { reason });
+    return this.post<any>(`/api/v1/dsar/dsarRequest/${id}/cancel`, { reason });
   }
 
   async getDSARRequestHistory(id: string) {
-    return this.get<any>(`/api/v1/dsar/${id}/history`);
+    return this.get<any>(`/api/v1/dsar/dsarRequest/${id}/history`);
   }
 
   async getDSARRequestSummary() {
-    return this.get<any>('/api/v1/dsar/summary');
+    return this.get<any>('/api/v1/dsar/dsarRequest/summary');
   }
 
   async getDSARRequestTypes() {
-    return this.get<any>('/api/v1/dsar/types');
+    return this.get<any>('/api/v1/dsar/dsarRequest/types');
   }
 }
 
