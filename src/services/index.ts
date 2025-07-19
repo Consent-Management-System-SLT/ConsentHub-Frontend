@@ -1,11 +1,15 @@
-// Service exports for ConsentHub
+// Service exports for ConsentHub - Multi-Service Architecture
 export { apiClient } from './apiClient';
-export { consentService } from './consentService';
-export { preferenceService } from './preferenceService';
-export { partyService } from './partyService';
+
+// Import updated services
+export { consentService } from './consentService_new';
+export { preferenceService } from './preferenceService_new';
+export { partyService } from './partyService_new';
+export { dsarService } from './dsarService_new';
+
+// Keep existing services that don't need updates
 export { privacyNoticeService } from './privacyNoticeService';
 export { tmf669EventService } from './eventService';
-export { dsarService } from './dsarService';
 export { authService } from './authService';
 export { customerService } from './customerService';
 export { auditService } from './auditService';

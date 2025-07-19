@@ -1,5 +1,5 @@
 // TMF632 Party Privacy Management API Service
-import { apiClient, ApiResponse } from './apiClient';
+import { multiServiceApiClient } from './multiServiceApiClient';
 import { PrivacyConsent, ConsentStatus, ConsentPurpose } from '../types/consent';
 
 export interface ConsentCreateRequest {
