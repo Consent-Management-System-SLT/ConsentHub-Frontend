@@ -3,15 +3,15 @@ import axios, { AxiosInstance } from 'axios';
 
 // Service configurations
 const SERVICES = {
-  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'https://consenthub-backend.onrender.com/customer',
-  CSR: import.meta.env.VITE_CSR_API_URL || 'https://consenthub-backend.onrender.com/csr', 
+  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'https://consenthub-backend.onrender.com/api/v1',
+  CSR: import.meta.env.VITE_CSR_API_URL || 'https://consenthub-backend.onrender.com/api/v1', 
   GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'https://consenthub-backend.onrender.com',
-  CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'https://consenthub-backend.onrender.com/consent',
-  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'https://consenthub-backend.onrender.com/preference',
-  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'https://consenthub-backend.onrender.com/privacy-notice',
-  PARTY: import.meta.env.VITE_PARTY_API_URL || 'https://consenthub-backend.onrender.com/party',
-  DSAR: import.meta.env.VITE_DSAR_API_URL || 'https://consenthub-backend.onrender.com/dsar',
-  EVENT: import.meta.env.VITE_EVENT_API_URL || 'https://consenthub-backend.onrender.com/event',
+  CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'https://consenthub-backend.onrender.com/api/v1/consent',
+  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'https://consenthub-backend.onrender.com/api/v1/preference',
+  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'https://consenthub-backend.onrender.com/api/v1/privacy-notice',
+  PARTY: import.meta.env.VITE_PARTY_API_URL || 'https://consenthub-backend.onrender.com/api/v1/party',
+  DSAR: import.meta.env.VITE_DSAR_API_URL || 'https://consenthub-backend.onrender.com/api/v1/dsar',
+  EVENT: import.meta.env.VITE_EVENT_API_URL || 'https://consenthub-backend.onrender.com/api/v1/event',
 };
 
 // Service-specific API clients
