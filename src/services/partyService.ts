@@ -1,4 +1,4 @@
-// TMF641 Party Management API Service - Updated for correct endpoints
+// TMF641 Party Management API Service - Fixed single endpoints v2
 import { apiClient, ApiResponse } from './apiClient';
 import { Party, PartyType } from '../types/consent';
 
@@ -55,6 +55,7 @@ export interface PartyRelationship {
 
 class PartyService {
   private readonly basePath = '/api/v1';
+  private readonly version = '1.0.1'; // Force new build
 
   /**
    * TMF641 - Get list of parties
