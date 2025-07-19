@@ -2,7 +2,9 @@
 
 ## Why Vercel Isn't Deploying Your Latest Commits
 
-Your git commits are up to date (latest commit: `1561c65`), but Vercel isn't deploying. Here are the most common reasons:
+Your git commits are up to date (latest commit: `a3907da`), but Vercel isn't deploying. Here are the most common reasons:
+
+**🚨 URGENT: Console logs show deployed version still has doubled endpoints!**
 
 ### 1. Check Vercel Auto-Deploy Settings
 - Go to your Vercel dashboard: https://vercel.com/dashboard
