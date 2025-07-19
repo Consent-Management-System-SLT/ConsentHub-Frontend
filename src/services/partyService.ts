@@ -1,4 +1,4 @@
-// TMF641 Party Management API Service
+// TMF641 Party Management API Service - Updated for correct endpoints
 import { apiClient, ApiResponse } from './apiClient';
 import { Party, PartyType } from '../types/consent';
 
@@ -69,7 +69,7 @@ class PartyService {
     });
 
     const queryString = params.toString();
-    const url = `${this.basePath}/party/party${queryString ? `?${queryString}` : ''}`;
+    const url = `${this.basePath}/party${queryString ? `?${queryString}` : ''}`;
     
     return apiClient.get<PartyListResponse>(url);
   }
@@ -78,28 +78,28 @@ class PartyService {
    * TMF641 - Get specific party by ID
    */
   async getPartyById(id: string): Promise<ApiResponse<Party>> {
-    return apiClient.get<Party>(`${this.basePath}/party/party/${id}`);
+    return apiClient.get<Party>(`${this.basePath}/party/${id}`);
   }
 
   /**
    * TMF641 - Create new party
    */
   async createParty(party: PartyCreateRequest): Promise<ApiResponse<Party>> {
-    return apiClient.post<Party>(`${this.basePath}/party/party`, party);
+    return apiClient.post<Party>(`${this.basePath}/party`, party);
   }
 
   /**
    * TMF641 - Update existing party
    */
   async updateParty(id: string, updates: PartyUpdateRequest): Promise<ApiResponse<Party>> {
-    return apiClient.patch<Party>(`${this.basePath}/party/party/${id}`, updates);
+    return apiClient.patch<Party>(`${this.basePath}/party/${id}`, updates);
   }
 
   /**
    * TMF641 - Delete party
    */
   async deleteParty(id: string): Promise<ApiResponse<void>> {
-    return apiClient.delete<void>(`${this.basePath}/party/party/${id}`);
+    return apiClient.delete<void>(`${this.basePath}/party/${id}`);
   }
 
   /**

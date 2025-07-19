@@ -62,7 +62,7 @@ class DSARService {
    * Create new DSAR request
    */
   async createDSARRequest(request: DSARRequestCreateRequest): Promise<ApiResponse<DSARRequest>> {
-    return apiClient.post<DSARRequest>(`${this.basePath}/dsar/dsarRequest`, request);
+    return apiClient.post<DSARRequest>(`${this.basePath}/dsar`, request);
   }
 
   /**
@@ -78,7 +78,7 @@ class DSARService {
     });
 
     const queryString = params.toString();
-    const url = `${this.basePath}/dsar/dsarRequest${queryString ? `?${queryString}` : ''}`;
+    const url = `${this.basePath}/dsar${queryString ? `?${queryString}` : ''}`;
     
     return apiClient.get<DSARListResponse>(url);
   }
@@ -87,7 +87,7 @@ class DSARService {
    * Get specific DSAR request by ID
    */
   async getDSARRequestById(id: string): Promise<ApiResponse<DSARRequest>> {
-    return apiClient.get<DSARRequest>(`${this.basePath}/dsar/dsarRequest/${id}`);
+    return apiClient.get<DSARRequest>(`${this.basePath}/dsar/${id}`);
   }
 
   /**
