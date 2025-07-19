@@ -243,8 +243,8 @@ export class MultiServiceApiClient {
       
       // Choose specific service client if provided
       if (service) {
-        // Format endpoint for API Gateway routing
-        fullEndpoint = `/api/v1/${service}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+        // Use endpoint as-is, don't add extra service prefix
+        fullEndpoint = endpoint;
         
         switch (service) {
           case 'consent':
