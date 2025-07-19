@@ -27,7 +27,7 @@ const CSRHeader: React.FC<CSRHeaderProps> = ({
       id: 1,
       type: 'urgent',
       title: 'High Priority DSAR Request',
-      message: 'Customer John Doe has submitted a new data deletion request.',
+      message: 'Customer Alice Johnson has submitted a new data deletion request.',
       time: '2 minutes ago',
       read: false
     },
@@ -35,7 +35,7 @@ const CSRHeader: React.FC<CSRHeaderProps> = ({
       id: 2,
       type: 'info',
       title: 'Consent Updated',
-      message: 'Marketing consent has been updated for customer Jane Smith.',
+      message: 'Marketing consent has been updated for customer Priya Fernando.',
       time: '15 minutes ago',
       read: false
     },
@@ -89,14 +89,9 @@ const CSRHeader: React.FC<CSRHeaderProps> = ({
     <header className={`bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40 ${className}`}>
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Brand */}
+          {/* Brand Text - Logo kept in sidebar */}
           <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-shrink-0">
-            <img 
-              src="/SLTMobitel_Logo.svg.png" 
-              alt="SLT Mobitel" 
-              className="h-8 sm:h-10 w-auto flex-shrink-0"
-            />
-            <div className="hidden sm:block min-w-0">
+            <div className="min-w-0">
               <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">ConsentHub</h1>
               <p className="text-xs sm:text-sm text-gray-500">CSR Dashboard</p>
             </div>

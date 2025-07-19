@@ -12,17 +12,12 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout 
   const { t } = useTranslation();
   
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+    <header className="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-200">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Brand */}
+          {/* Brand Text - Logo moved to sidebar */}
           <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-shrink-0">
-            <img 
-              src="/SLTMobitel_Logo.svg.png" 
-              alt="SLT Mobitel" 
-              className="h-8 sm:h-10 w-auto flex-shrink-0"
-            />
-            <div className="hidden sm:block min-w-0">
+            <div className="min-w-0">
               <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">{t('customerDashboard.brand')}</h1>
               <p className="text-xs sm:text-sm text-gray-500">{t('customerDashboard.subtitle')}</p>
             </div>
@@ -68,7 +63,7 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout 
         </div>
         
         {/* Mobile Language Selector */}
-        <div className="sm:hidden pb-3 border-t border-gray-100 pt-3">
+        <div className="sm:hidden pb-3 pt-3">
           <div className="flex items-center justify-center">
             <LanguageSelector />
           </div>

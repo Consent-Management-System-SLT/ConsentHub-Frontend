@@ -53,7 +53,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, className = '' 
     <header className={`bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40 ${className}`}>
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Brand */}
+          {/* Brand Text - Logo moved to sidebar */}
           <div className="flex items-center space-x-3 sm:space-x-4">
             {/* Mobile menu button */}
             <button
@@ -64,14 +64,9 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, className = '' 
             </button>
             
             <div className="flex items-center space-x-3">
-              <img 
-                src="/SLTMobitel_Logo.svg.png" 
-                alt="SLT Mobitel" 
-                className="h-8 sm:h-10 w-auto flex-shrink-0"
-              />
-              <div className="hidden sm:block">
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900">ConsentHub Admin</h1>
-                <p className="text-xs sm:text-sm text-gray-500">System Administration</p>
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">ConsentHub</h1>
+                <p className="text-xs sm:text-sm text-gray-500">Admin Dashboard</p>
               </div>
             </div>
           </div>

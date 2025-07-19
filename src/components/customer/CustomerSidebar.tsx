@@ -84,22 +84,27 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
 
       {/* Sidebar */}
       <aside className={`
-        fixed lg:relative left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40 
+        fixed lg:relative left-0 top-0 h-full w-64 bg-white z-40 
         transform transition-all duration-300 ease-in-out shadow-xl lg:shadow-none
+        border-r border-gray-200
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="px-4 sm:px-6 py-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">{t('customerDashboard.sidebar.title')}</h2>
-                <p className="text-sm text-gray-500 mt-1">{t('customerDashboard.sidebar.subtitle')}</p>
+          {/* Header - Match main header height exactly */}
+          <div className="px-4 sm:px-6 bg-gradient-to-r from-blue-50 to-indigo-50 h-16 flex items-center justify-center border-b border-gray-200">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center justify-center w-full">
+                <img 
+                  src="/SLTMobitel_Logo.svg.png" 
+                  alt="SLT Mobitel" 
+                  className="h-10 w-auto"
+                />
+                {/* Navigation text removed as requested */}
               </div>
               {/* Close button for mobile */}
               <button
                 onClick={onToggle}
-                className="lg:hidden p-2 rounded-lg hover:bg-white/60 transition-colors"
+                className="lg:hidden p-2 rounded-lg hover:bg-white/60 transition-colors absolute right-4"
                 aria-label="Close navigation menu"
               >
                 <X className="w-5 h-5 text-gray-500" />
@@ -170,7 +175,7 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
           </nav>
 
           {/* Footer */}
-          <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-gray-50/50">
+          <div className="px-4 sm:px-6 py-4 bg-gray-50/50">
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
