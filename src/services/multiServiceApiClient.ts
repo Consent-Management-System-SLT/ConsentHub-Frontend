@@ -44,7 +44,7 @@ export const adminApi = axios.create({
 
 // Specific service APIs for Admin/CSR dashboards - Route through API Gateway
 export const consentApi = axios.create({
-  baseURL: SERVICES.GATEWAY,
+  baseURL: SERVICES.CONSENT,
   timeout: 30000, // Increased timeout to prevent ECONNABORTED errors
   headers: {
     'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export const consentApi = axios.create({
 });
 
 export const preferenceApi = axios.create({
-  baseURL: SERVICES.GATEWAY,
+  baseURL: SERVICES.PREFERENCE,
   timeout: 30000, // Increased timeout
   headers: {
     'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export const preferenceApi = axios.create({
 });
 
 export const privacyNoticeApi = axios.create({
-  baseURL: SERVICES.GATEWAY,
+  baseURL: SERVICES.PRIVACY_NOTICE,
   timeout: 30000, // Increased timeout
   headers: {
     'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export const privacyNoticeApi = axios.create({
 });
 
 export const partyApi = axios.create({
-  baseURL: SERVICES.GATEWAY,
+  baseURL: SERVICES.PARTY,
   timeout: 30000, // Increased timeout
   headers: {
     'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export const partyApi = axios.create({
 });
 
 export const dsarApi = axios.create({
-  baseURL: SERVICES.GATEWAY,
+  baseURL: SERVICES.DSAR,
   timeout: 30000, // Increased timeout
   headers: {
     'Content-Type': 'application/json',
@@ -243,8 +243,9 @@ export class MultiServiceApiClient {
       
       // Choose specific service client if provided
       if (service) {
-        // Use endpoint as-is, don't add extra service prefix
-        fullEndpoint = endpoint;
+        // Extract just the path part since clients now have full base URLs
+        const pathPart = endpoint.replace('/api/v1', '');
+        fullEndpoint = pathPart;
         
         switch (service) {
           case 'consent':
