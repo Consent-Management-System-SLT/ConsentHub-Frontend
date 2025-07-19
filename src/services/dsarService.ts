@@ -1,74 +1,82 @@
-// Data Subject Access Rights (DSAR) Service - Extended TMF632
-import { apiClient, ApiResponse } from './apiClient';
-import { DSARRequest } from '../types/consent';
+// GDPR DSAR (Data Subject Access Request) Service - Updated for Multi-Service Architecture
+import { multiServiceApiClient } from './multiServiceApiClient';
 
-export interface DSARRequestCreateRequest {
+export interface DSARRequest {
+  id?: string;
   partyId: string;
-  type: 'data_export' | 'data_deletion' | 'restriction' | 'rectification' | 'portability';
+  requestType: 'access' | 'rectification' | 'erasure' | 'portability' | 'restriction' | 'objection';
+  status: 'pending' | 'in_progress' | 'completed' | 'rejected' | 'expired';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  submissionDate: string;
+  dueDate: string;
+  completionDate?: string;
+  requestor: {
+    name: string;
+    email: string;
+    phone?: string;
+    relationship: 'self' | 'legal_representative' | 'parent_guardian' | 'authorized_agent';
+  };
   description: string;
-  requestedData?: string[];
-  legalBasis?: string;
-  urgency?: 'low' | 'medium' | 'high';
-  metadata?: Record<string, any>;
+  dataCategories?: string[];
+  processingActivities?: string[];
+  documents?: Array<{
+    name: string;
+    url: string;
+    uploadDate: string;
+  }>;
+  responseData?: any;
+  rejectionReason?: string;
+  internalNotes?: string;
+  assignedTo?: string;
+  estimatedCompletionDate?: string;
 }
 
-export interface DSARRequestUpdateRequest {
-  status?: 'initiated' | 'processing' | 'completed' | 'failed' | 'cancelled';
-  description?: string;
-  processingNotes?: string;
-  completedAt?: string;
-  metadata?: Record<string, any>;
+export interface DSARCreateRequest {
+  partyId: string;
+  requestType: 'access' | 'rectification' | 'erasure' | 'portability' | 'restriction' | 'objection';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  requestor: {
+    name: string;
+    email: string;
+    phone?: string;
+    relationship: 'self' | 'legal_representative' | 'parent_guardian' | 'authorized_agent';
+  };
+  description: string;
+  dataCategories?: string[];
+  processingActivities?: string[];
+}
+
+export interface DSARUpdateRequest {
+  status?: 'pending' | 'in_progress' | 'completed' | 'rejected' | 'expired';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  assignedTo?: string;
+  internalNotes?: string;
+  estimatedCompletionDate?: string;
+  responseData?: any;
+  rejectionReason?: string;
 }
 
 export interface DSARQuery {
   partyId?: string;
-  type?: string;
+  requestType?: string;
   status?: string;
-  submittedAfter?: string;
-  submittedBefore?: string;
-  urgency?: string;
+  priority?: string;
+  submissionDateFrom?: string;
+  submissionDateTo?: string;
+  dueDateFrom?: string;
+  dueDateTo?: string;
+  assignedTo?: string;
   limit?: number;
   offset?: number;
-}
-
-export interface DSARListResponse {
-  requests: DSARRequest[];
-  totalCount: number;
-  hasMore: boolean;
-}
-
-export interface DSARExportResult {
-  requestId: string;
-  downloadUrl: string;
-  fileFormat: 'json' | 'csv' | 'pdf';
-  fileSize: number;
-  expiresAt: string;
-  categories: string[];
-}
-
-export interface DSARStats {
-  totalRequests: number;
-  byType: Record<string, number>;
-  byStatus: Record<string, number>;
-  pendingRequests: number;
-  averageProcessingTime: number;
-  complianceRate: number;
 }
 
 class DSARService {
   private readonly basePath = '/api/v1';
 
   /**
-   * Create new DSAR request
+   * Get list of DSAR requests
    */
-  async createDSARRequest(request: DSARRequestCreateRequest): Promise<ApiResponse<DSARRequest>> {
-    return apiClient.post<DSARRequest>(`${this.basePath}/dsar`, request);
-  }
-
-  /**
-   * Get DSAR requests
-   */
-  async getDSARRequests(query: DSARQuery = {}): Promise<ApiResponse<DSARListResponse>> {
+  async getDSARRequests(query: DSARQuery = {}): Promise<any> {
     const params = new URLSearchParams();
     
     Object.entries(query).forEach(([key, value]) => {
@@ -78,224 +86,120 @@ class DSARService {
     });
 
     const queryString = params.toString();
-    const url = `${this.basePath}/dsar${queryString ? `?${queryString}` : ''}`;
+    const url = `/dsar${queryString ? `?${queryString}` : ''}`;
     
-    return apiClient.get<DSARListResponse>(url);
+    return multiServiceApiClient.makeRequest('GET', url, undefined, 'admin', 'dsar');
   }
 
   /**
    * Get specific DSAR request by ID
    */
-  async getDSARRequestById(id: string): Promise<ApiResponse<DSARRequest>> {
-    return apiClient.get<DSARRequest>(`${this.basePath}/dsar/${id}`);
+  async getDSARRequestById(id: string): Promise<any> {
+    return multiServiceApiClient.makeRequest('GET', `/dsar/${id}`, undefined, 'admin', 'dsar');
   }
 
   /**
-   * Update DSAR request
+   * Create new DSAR request
    */
-  async updateDSARRequest(id: string, updates: DSARRequestUpdateRequest): Promise<ApiResponse<DSARRequest>> {
-    return apiClient.patch<DSARRequest>(`${this.basePath}/request/${id}`, updates);
+  async createDSARRequest(request: DSARCreateRequest): Promise<any> {
+    return multiServiceApiClient.makeRequest('POST', `/dsar`, request, 'admin', 'dsar');
+  }
+
+  /**
+   * Update existing DSAR request
+   */
+  async updateDSARRequest(id: string, updates: DSARUpdateRequest): Promise<any> {
+    return multiServiceApiClient.makeRequest('PUT', `/dsar/${id}`, updates, 'admin', 'dsar');
   }
 
   /**
    * Delete DSAR request
    */
-  async deleteDSARRequest(id: string): Promise<ApiResponse<void>> {
-    return apiClient.delete<void>(`${this.basePath}/request/${id}`);
+  async deleteDSARRequest(id: string): Promise<any> {
+    return multiServiceApiClient.makeRequest('DELETE', `/dsar/${id}`, undefined, 'admin', 'dsar');
   }
 
   /**
-   * Process data export request
+   * Assign DSAR request to user
    */
-  async processDataExport(requestId: string, format: 'json' | 'csv' | 'pdf' = 'json'): Promise<ApiResponse<DSARExportResult>> {
-    return apiClient.post<DSARExportResult>(`${this.basePath}/request/${requestId}/export`, { format });
+  async assignDSARRequest(id: string, assignedTo: string): Promise<any> {
+    return multiServiceApiClient.makeRequest('PUT', `/dsar/${id}/assign`, { assignedTo }, 'admin', 'dsar');
   }
 
   /**
-   * Download exported data
+   * Complete DSAR request
    */
-  async downloadExportedData(requestId: string): Promise<ApiResponse<{ downloadUrl: string; expiresAt: string }>> {
-    return apiClient.get<{ downloadUrl: string; expiresAt: string }>(`${this.basePath}/request/${requestId}/download`);
+  async completeDSARRequest(id: string, responseData?: any): Promise<any> {
+    return multiServiceApiClient.makeRequest('PUT', `/dsar/${id}/complete`, { responseData }, 'admin', 'dsar');
   }
 
   /**
-   * Process data deletion request
+   * Reject DSAR request
    */
-  async processDataDeletion(requestId: string, categories: string[] = []): Promise<ApiResponse<{
-    deleted: boolean;
-    deletedCategories: string[];
-    retainedCategories: string[];
-    retentionReasons: Record<string, string>;
-  }>> {
-    return apiClient.post<any>(`${this.basePath}/request/${requestId}/delete`, { categories });
+  async rejectDSARRequest(id: string, rejectionReason: string): Promise<any> {
+    return multiServiceApiClient.makeRequest('PUT', `/dsar/${id}/reject`, { rejectionReason }, 'admin', 'dsar');
   }
 
   /**
-   * Process data rectification request
+   * Get DSAR request statistics
    */
-  async processDataRectification(requestId: string, corrections: Array<{
-    field: string;
-    oldValue: string;
-    newValue: string;
-    reason: string;
-  }>): Promise<ApiResponse<{
-    corrected: boolean;
-    appliedCorrections: Array<{
-      field: string;
-      oldValue: string;
-      newValue: string;
-      appliedAt: string;
-    }>;
-  }>> {
-    return apiClient.post<any>(`${this.basePath}/request/${requestId}/rectify`, { corrections });
+  async getDSARStats(): Promise<any> {
+    return multiServiceApiClient.makeRequest('GET', `/dsar/stats`, undefined, 'admin', 'dsar');
   }
 
   /**
-   * Process data portability request
+   * Get overdue DSAR requests
    */
-  async processDataPortability(requestId: string, format: 'json' | 'csv' | 'xml' = 'json'): Promise<ApiResponse<DSARExportResult>> {
-    return apiClient.post<DSARExportResult>(`${this.basePath}/request/${requestId}/portability`, { format });
+  async getOverdueDSARRequests(): Promise<any> {
+    return multiServiceApiClient.makeRequest('GET', `/dsar/overdue`, undefined, 'admin', 'dsar');
   }
 
   /**
-   * Process data restriction request
+   * Export DSAR requests
    */
-  async processDataRestriction(requestId: string, restrictions: Array<{
-    category: string;
-    restrictionType: 'processing' | 'storage' | 'transfer';
-    reason: string;
-  }>): Promise<ApiResponse<{
-    restricted: boolean;
-    appliedRestrictions: Array<{
-      category: string;
-      restrictionType: string;
-      appliedAt: string;
-    }>;
-  }>> {
-    return apiClient.post<any>(`${this.basePath}/request/${requestId}/restrict`, { restrictions });
-  }
-
-  /**
-   * Get DSAR request status
-   */
-  async getDSARRequestStatus(requestId: string): Promise<ApiResponse<{
-    status: string;
-    progress: number;
-    estimatedCompletion?: string;
-    currentStep: string;
-    nextSteps: string[];
-  }>> {
-    return apiClient.get<any>(`${this.basePath}/request/${requestId}/status`);
-  }
-
-  /**
-   * Get DSAR requests by party ID
-   */
-  async getDSARRequestsByPartyId(partyId: string): Promise<ApiResponse<DSARListResponse>> {
-    return apiClient.get<DSARListResponse>(`${this.basePath}/request/party/${partyId}`);
-  }
-
-  /**
-   * Validate DSAR request
-   */
-  async validateDSARRequest(request: DSARRequestCreateRequest): Promise<ApiResponse<{
-    valid: boolean;
-    issues: Array<{
-      field: string;
-      message: string;
-      severity: 'error' | 'warning';
-    }>;
-  }>> {
-    return apiClient.post<any>(`${this.basePath}/request/validate`, request);
-  }
-
-  /**
-   * Get DSAR statistics
-   */
-  async getDSARStats(fromDate?: string, toDate?: string): Promise<ApiResponse<DSARStats>> {
+  async exportDSARRequests(query: DSARQuery = {}): Promise<any> {
     const params = new URLSearchParams();
-    if (fromDate) params.append('fromDate', fromDate);
-    if (toDate) params.append('toDate', toDate);
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined) {
+        params.append(key, value.toString());
+      }
+    });
 
     const queryString = params.toString();
-    const url = `${this.basePath}/stats${queryString ? `?${queryString}` : ''}`;
+    const url = `/dsar/export${queryString ? `?${queryString}` : ''}`;
     
-    return apiClient.get<DSARStats>(url);
+    return multiServiceApiClient.makeRequest('GET', url, undefined, 'admin', 'dsar');
   }
 
   /**
-   * Get DSAR compliance report
+   * Upload document for DSAR request
    */
-  async getComplianceReport(fromDate?: string, toDate?: string): Promise<ApiResponse<{
-    period: { from: string; to: string };
-    totalRequests: number;
-    completedWithinDeadline: number;
-    complianceRate: number;
-    averageResponseTime: number;
-    requestsByType: Record<string, number>;
-    requestsByStatus: Record<string, number>;
-    escalatedRequests: number;
-  }>> {
-    const params = new URLSearchParams();
-    if (fromDate) params.append('fromDate', fromDate);
-    if (toDate) params.append('toDate', toDate);
-
-    const queryString = params.toString();
-    const url = `${this.basePath}/compliance-report${queryString ? `?${queryString}` : ''}`;
+  async uploadDocument(id: string, file: File): Promise<any> {
+    const formData = new FormData();
+    formData.append('file', file);
     
-    return apiClient.get<any>(url);
+    return multiServiceApiClient.makeRequest('POST', `/dsar/${id}/documents`, formData, 'admin', 'dsar');
   }
 
   /**
-   * Escalate DSAR request
+   * Delete document from DSAR request
    */
-  async escalateDSARRequest(requestId: string, reason: string, escalationLevel: 'supervisor' | 'dpo' | 'legal'): Promise<ApiResponse<DSARRequest>> {
-    return apiClient.post<DSARRequest>(`${this.basePath}/request/${requestId}/escalate`, {
-      reason,
-      escalationLevel
-    });
+  async deleteDocument(id: string, documentId: string): Promise<any> {
+    return multiServiceApiClient.makeRequest('DELETE', `/dsar/${id}/documents/${documentId}`, undefined, 'admin', 'dsar');
   }
 
   /**
-   * Add comment to DSAR request
+   * Get DSAR request history/timeline
    */
-  async addCommentToDSARRequest(requestId: string, comment: string, isInternal: boolean = false): Promise<ApiResponse<{
-    commentId: string;
-    addedAt: string;
-  }>> {
-    return apiClient.post<any>(`${this.basePath}/request/${requestId}/comment`, {
-      comment,
-      isInternal
-    });
+  async getDSARHistory(id: string): Promise<any> {
+    return multiServiceApiClient.makeRequest('GET', `/dsar/${id}/history`, undefined, 'admin', 'dsar');
   }
 
   /**
-   * Get DSAR request comments
+   * Bulk update DSAR requests
    */
-  async getDSARRequestComments(requestId: string, includeInternal: boolean = false): Promise<ApiResponse<Array<{
-    id: string;
-    comment: string;
-    author: string;
-    isInternal: boolean;
-    addedAt: string;
-  }>>> {
-    const params = includeInternal ? '?includeInternal=true' : '';
-    return apiClient.get<any>(`${this.basePath}/request/${requestId}/comments${params}`);
-  }
-
-  /**
-   * Get data categories for party
-   */
-  async getDataCategories(partyId: string): Promise<ApiResponse<Array<{
-    category: string;
-    dataTypes: string[];
-    sources: string[];
-    retention: string;
-    canDelete: boolean;
-    canExport: boolean;
-    canRestrict: boolean;
-  }>>> {
-    return apiClient.get<any>(`${this.basePath}/data-categories/${partyId}`);
+  async bulkUpdateDSARRequests(requestIds: string[], updates: DSARUpdateRequest): Promise<any> {
+    return multiServiceApiClient.makeRequest('PUT', `/dsar/bulk`, { requestIds, updates }, 'admin', 'dsar');
   }
 }
 
