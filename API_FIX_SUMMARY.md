@@ -1,61 +1,58 @@
-# API Endpoint Fix Summary
+# API Endpoint Fix Summary - FINAL
 
 ## Problem Identified
-Your frontend was making requests to incorrect URLs with double path segments:
-- ❌ `https://consenthub-backend.onrender.com/customer/api/v1/customer/consents`
-- ❌ `https://consenthub-backend.onrender.com/customer/api/v1/customer/preferences`
+Your frontend was making requests with **double API paths**:
+- ❌ `https://consenthub-backend.onrender.com/api/v1/api/v1/customer/consents`
+- ❌ `https://consenthub-backend.onrender.com/api/v1/api/v1/customer/preferences`
 
 ## Root Cause
-The environment variables were pointing to service-specific paths instead of the base API structure.
+The `customerApiClient.ts` was designed to add `/api/v1/customer/` to the base URL, but the environment variable `VITE_CUSTOMER_API_URL` was also set to include `/api/v1`, creating double paths.
 
 ## Solution Applied
-Updated the service configurations to use the correct API endpoints based on your backend structure:
+**Fixed the environment variables to match the expected client behavior:**
 
-### Correct API Structure (from your backend):
-- Base URL: `https://consenthub-backend.onrender.com`
-- API Base: `https://consenthub-backend.onrender.com/api/v1`
-- Specific endpoints:
-  - Consent: `/api/v1/consent`
-  - Preference: `/api/v1/preference` 
-  - Privacy Notice: `/api/v1/privacy-notice`
-  - Party: `/api/v1/party`
-  - DSAR: `/api/v1/dsar`
-  - Event: `/api/v1/event`
+### Before (Caused Double Paths):
+```
+VITE_CUSTOMER_API_URL=https://consenthub-backend.onrender.com/api/v1
+VITE_CSR_API_URL=https://consenthub-backend.onrender.com/api/v1
+```
+
+### After (Correct):
+```
+VITE_CUSTOMER_API_URL=https://consenthub-backend.onrender.com
+VITE_CSR_API_URL=https://consenthub-backend.onrender.com
+```
+
+## How It Works Now:
+1. **Base URL**: `https://consenthub-backend.onrender.com`
+2. **Client adds**: `/api/v1/customer/consents`
+3. **Final URL**: ✅ `https://consenthub-backend.onrender.com/api/v1/customer/consents`
 
 ## Files Updated:
-1. ✅ `multiServiceApiClient.ts` - Fixed service URLs
+1. ✅ `multiServiceApiClient.ts` - Fixed CUSTOMER and CSR service URLs
 2. ✅ `.env.production` - Corrected environment variables
 3. ✅ `VERCEL_DEPLOYMENT_GUIDE.md` - Updated with correct variables
 
-## Next Steps for Vercel Deployment:
+## For Vercel Deployment - FINAL CORRECT VARIABLES:
 
-### 1. Update Environment Variables in Vercel
-In your Vercel dashboard, update these environment variables:
-
+**Update these environment variables in Vercel:**
 ```
 VITE_API_URL=https://consenthub-backend.onrender.com
 VITE_API_BASE_URL=https://consenthub-backend.onrender.com/api/v1
-VITE_CUSTOMER_API_URL=https://consenthub-backend.onrender.com/api/v1
-VITE_CSR_API_URL=https://consenthub-backend.onrender.com/api/v1
+VITE_CUSTOMER_API_URL=https://consenthub-backend.onrender.com
+VITE_CSR_API_URL=https://consenthub-backend.onrender.com
 VITE_CONSENT_API_URL=https://consenthub-backend.onrender.com/api/v1/consent
 VITE_PREFERENCE_API_URL=https://consenthub-backend.onrender.com/api/v1/preference
 VITE_PRIVACY_NOTICE_API_URL=https://consenthub-backend.onrender.com/api/v1/privacy-notice
 VITE_PARTY_API_URL=https://consenthub-backend.onrender.com/api/v1/party
 VITE_DSAR_API_URL=https://consenthub-backend.onrender.com/api/v1/dsar
 VITE_EVENT_API_URL=https://consenthub-backend.onrender.com/api/v1/event
+VITE_NODE_ENV=production
 ```
 
-### 2. Redeploy
-After updating the environment variables in Vercel, trigger a new deployment.
+## Expected Results After Fix:
+✅ Customer dashboard will correctly call:
+- `https://consenthub-backend.onrender.com/api/v1/customer/consents`
+- `https://consenthub-backend.onrender.com/api/v1/customer/preferences`
 
-### 3. Expected Results
-✅ Customer dashboard should now correctly call:
-- `https://consenthub-backend.onrender.com/api/v1/consent` (for consents)
-- `https://consenthub-backend.onrender.com/api/v1/preference` (for preferences)
-
-## Testing
-1. Check browser network tab to verify correct URLs
-2. Test customer dashboard functionality
-3. Verify API responses are successful (200 status codes)
-
-The 404 errors should now be resolved!
+**No more 404 errors!** 🎉

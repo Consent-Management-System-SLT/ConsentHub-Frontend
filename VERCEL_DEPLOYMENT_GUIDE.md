@@ -59,8 +59,8 @@
    VITE_API_BASE_URL=https://consenthub-backend.onrender.com/api/v1
    VITE_TMF632_API_URL=https://consenthub-backend.onrender.com/tmf-api/privacyManagement/v4
    VITE_TMF669_API_URL=https://consenthub-backend.onrender.com/tmf-api/eventManagement/v4
-   VITE_CUSTOMER_API_URL=https://consenthub-backend.onrender.com/api/v1
-   VITE_CSR_API_URL=https://consenthub-backend.onrender.com/api/v1
+   VITE_CUSTOMER_API_URL=https://consenthub-backend.onrender.com
+   VITE_CSR_API_URL=https://consenthub-backend.onrender.com
    VITE_GATEWAY_API_URL=https://consenthub-backend.onrender.com
    VITE_CONSENT_API_URL=https://consenthub-backend.onrender.com/api/v1/consent
    VITE_PREFERENCE_API_URL=https://consenthub-backend.onrender.com/api/v1/preference

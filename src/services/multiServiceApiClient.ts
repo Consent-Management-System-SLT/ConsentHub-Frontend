@@ -3,8 +3,8 @@ import axios, { AxiosInstance } from 'axios';
 
 // Service configurations
 const SERVICES = {
-  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'https://consenthub-backend.onrender.com/api/v1',
-  CSR: import.meta.env.VITE_CSR_API_URL || 'https://consenthub-backend.onrender.com/api/v1', 
+  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'https://consenthub-backend.onrender.com',
+  CSR: import.meta.env.VITE_CSR_API_URL || 'https://consenthub-backend.onrender.com', 
   GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'https://consenthub-backend.onrender.com',
   CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'https://consenthub-backend.onrender.com/api/v1/consent',
   PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'https://consenthub-backend.onrender.com/api/v1/preference',
