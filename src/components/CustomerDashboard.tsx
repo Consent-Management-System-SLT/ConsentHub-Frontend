@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import CustomerMainDashboard from './customer/CustomerMainDashboard';
+import ServerConnectionAlert from './shared/ServerConnectionAlert';
 
 const CustomerDashboard: React.FC = () => {
   const { user, logout } = useAuth();
+  const [showConnectionAlert, setShowConnectionAlert] = useState(true);
 
   if (!user) {
     return (
@@ -17,10 +19,21 @@ const CustomerDashboard: React.FC = () => {
   }
 
   return (
-    <CustomerMainDashboard 
-      customerName={user.name || user.email || 'Customer'} 
-      onLogout={logout} 
-    />
+    <div className="relative">
+      {/* Server Connection Alert */}
+      {showConnectionAlert && (
+        <ServerConnectionAlert 
+          onClose={() => setShowConnectionAlert(false)}
+          autoHide={true}
+          autoHideDelay={4000}
+        />
+      )}
+
+      <CustomerMainDashboard 
+        customerName={user.name || user.email || 'Customer'} 
+        onLogout={logout} 
+      />
+    </div>
   );
 };
 

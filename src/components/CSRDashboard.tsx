@@ -28,6 +28,7 @@ import DSARRequestPanel from './csr/DSARRequestPanel_Backend';
 import GuardianConsentForm from './csr/GuardianConsentForm_Backend';
 import AuditLogTable from './csr/AuditLogTable_Backend';
 import HelpModal from './csr/HelpModal';
+import ServerConnectionAlert from './shared/ServerConnectionAlert';
 
 interface CSRDashboardProps {
   className?: string;
@@ -38,6 +39,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showConnectionAlert, setShowConnectionAlert] = useState(true);
   const [dashboardStats, setDashboardStats] = useState({
     totalCustomers: 0,
     pendingRequests: 0,
@@ -220,6 +222,15 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
 
   return (
     <div className={`min-h-screen bg-gray-50 flex ${className}`}>
+      {/* Server Connection Alert */}
+      {showConnectionAlert && (
+        <ServerConnectionAlert 
+          onClose={() => setShowConnectionAlert(false)}
+          autoHide={true}
+          autoHideDelay={4000}
+        />
+      )}
+
       {/* Sidebar */}
       <SidebarNav
         activeSection={activeSection}

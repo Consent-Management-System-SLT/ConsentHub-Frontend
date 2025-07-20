@@ -15,6 +15,7 @@ import {
   Archive,
   MessageSquare
 } from 'lucide-react';
+import ServerConnectionAlert from '../shared/ServerConnectionAlert';
 
 interface DSARRequest {
   id: string;
@@ -52,6 +53,7 @@ const DSARManager: React.FC = () => {
   const [modalData, setModalData] = useState<DSARRequest | null>(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [assignmentData, setAssignmentData] = useState<DSARRequest | null>(null);
+  const [showConnectionAlert, setShowConnectionAlert] = useState(true);
 
   const handleViewRequest = (request: DSARRequest) => {
     setModalData(request);
@@ -248,6 +250,15 @@ const DSARManager: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden w-full">
+      {/* Server Connection Alert */}
+      {showConnectionAlert && (
+        <ServerConnectionAlert 
+          onClose={() => setShowConnectionAlert(false)}
+          autoHide={true}
+          autoHideDelay={4000}
+        />
+      )}
+
       <div className="max-w-full mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-8 w-full box-border">
         {/* Header */}
         <div className="flex flex-col space-y-4 mb-6 sm:mb-8">

@@ -31,6 +31,7 @@ import BulkImportManager from './admin/BulkImportManager';
 import EventListenerManager from './admin/EventListenerManager';
 import UserManagement from './admin/UserManagement';
 import ComplianceRulesManager from './admin/ComplianceRulesManager';
+import ServerConnectionAlert from './shared/ServerConnectionAlert';
 
 interface AdminDashboardProps {
   className?: string;
@@ -39,6 +40,7 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showConnectionAlert, setShowConnectionAlert] = useState(true);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -69,6 +71,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
 
   return (
     <div className={`min-h-screen bg-gray-50 flex ${className}`}>
+      {/* Server Connection Alert */}
+      {showConnectionAlert && (
+        <ServerConnectionAlert 
+          onClose={() => setShowConnectionAlert(false)}
+          autoHide={true}
+          autoHideDelay={4000}
+        />
+      )}
+
       {/* Sidebar */}
       <AdminSidebar
         activeSection={activeSection}

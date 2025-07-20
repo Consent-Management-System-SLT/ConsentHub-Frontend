@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Shield, User, Bell, FileText, Download, Eye } from 'lucide-react';
 import { useAuth, useCustomerDashboard, useConsentMutation, usePreferenceMutation } from '../hooks/useApi';
 import { dsarService } from '../services';
+import ServerConnectionAlert from './shared/ServerConnectionAlert';
 
 interface ConsentHubDashboardProps {
   customerId?: string;
@@ -14,6 +15,7 @@ export const ConsentHubDashboard: React.FC<ConsentHubDashboardProps> = ({ custom
   const { updateConsent, revokeConsent } = useConsentMutation();
   
   const [activeTab, setActiveTab] = useState<'consents' | 'preferences' | 'dsar' | 'profile'>('consents');
+  const [showConnectionAlert, setShowConnectionAlert] = useState(true);
 
   if (!isAuthenticated) {
     return (
@@ -91,6 +93,15 @@ export const ConsentHubDashboard: React.FC<ConsentHubDashboardProps> = ({ custom
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Server Connection Alert */}
+      {showConnectionAlert && (
+        <ServerConnectionAlert 
+          onClose={() => setShowConnectionAlert(false)}
+          autoHide={true}
+          autoHideDelay={4000}
+        />
+      )}
+
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
