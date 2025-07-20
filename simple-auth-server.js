@@ -9,6 +9,44 @@ const PORT = 3008; // Different port to avoid conflicts
 // In-memory user storage for testing
 const users = new Map();
 
+// Pre-populate with demo users for testing
+const demoUsers = [
+  {
+    id: 'demo-customer-001',
+    email: 'customer@sltmobitel.lk',
+    password: 'customer123',
+    firstName: 'Demo',
+    lastName: 'Customer',
+    role: 'customer',
+    emailVerified: true
+  },
+  {
+    id: 'demo-admin-001',
+    email: 'admin@sltmobitel.lk',
+    password: 'admin123',
+    firstName: 'Demo',
+    lastName: 'Admin',
+    role: 'admin',
+    emailVerified: true
+  },
+  {
+    id: 'demo-csr-001',
+    email: 'csr@sltmobitel.lk',
+    password: 'csr123',
+    firstName: 'Demo',
+    lastName: 'CSR',
+    role: 'csr',
+    emailVerified: true
+  }
+];
+
+// Add demo users to the users map
+demoUsers.forEach(user => {
+  users.set(user.email, user);
+});
+
+console.log('Demo users loaded:', Array.from(users.keys()));
+
 app.use(cors({
   origin: [
     'http://localhost:5173', 
@@ -309,6 +347,82 @@ app.get('/api/v1/auth/users', (req, res) => {
       totalUsers: userList.length
     }
   });
+});
+
+// Alternative login endpoint (without double /auth) for compatibility
+app.post('/api/v1/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Email and password are required'
+        }
+      });
+    }
+
+    // Find user
+    const user = users.get(email);
+    if (!user) {
+      return res.status(401).json({
+        error: {
+          code: 'INVALID_CREDENTIALS',
+          message: 'Invalid email or password'
+        }
+      });
+    }
+
+    // Simple password check for testing
+    if (password !== user.password) {
+      return res.status(401).json({
+        error: {
+          code: 'INVALID_CREDENTIALS',
+          message: 'Invalid email or password'
+        }
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        userId: user.id,
+        email: user.email,
+        role: user.role
+      },
+      'simple-jwt-secret',
+      { expiresIn: '24h' }
+    );
+
+    console.log(`✅ User logged in via /auth/login: ${email}`);
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      token: token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        role: user.role,
+        createdAt: user.createdAt,
+        status: 'active',
+        isActive: true,
+        emailVerified: true
+      }
+    });
+
+  } catch (error) {
+    console.error('Login error (alternative endpoint):', error);
+    res.status(500).json({
+      error: {
+        code: 'LOGIN_ERROR',
+        message: 'Failed to login'
+      }
+    });
+  }
 });
 
 app.listen(PORT, () => {
