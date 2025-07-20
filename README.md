@@ -1,33 +1,96 @@
-# ConsentHub Frontend 🚀
+# 🎯 ConsentHub Frontend
 
-[![React](https://img.shields.io/badge/React-18.0-blue.svg)](https://reactjs.org/)
+[![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
-[![TM Forum](https://img.shields.io/badge/TM%20Forum-Compliant-green.svg)](https://www.tmforum.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.0-purple.svg)](https://vitejs.dev/)
+[![TM Forum](https://img.shields.io/badge/TM%20Forum-Compliant-green.svg)](https://www.tmforum.org/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Available-brightgreen.svg)](https://consent-management-system-api.vercel.app)
 
-A comprehensive **Privacy and Consent Management System** built with modern React, TypeScript, and TM Forum Open Digital Architecture APIs. Enterprise-ready with 95% TM Forum compliance and production-grade monitoring.
+A **TM Forum-compliant Privacy and Consent Management System** for SLT Mobitel. Enterprise-grade solution with comprehensive GDPR/CCPA compliance, real-time monitoring, and microservices architecture.
+
+## 🌟 Live Demo & Production
+
+- **🚀 Frontend**: [https://consent-management-system-api.vercel.app](https://consent-management-system-api.vercel.app)
+- **🔧 Backend API**: [https://consenthub-backend.onrender.com](https://consenthub-backend.onrender.com)
+- **📚 API Documentation**: Available in backend repository
+
+### Demo Credentials
+```bash
+# Customer Portal
+Email: customer@sltmobitel.lk
+Password: customer123
+
+# Admin Dashboard  
+Email: admin@sltmobitel.lk
+Password: admin123
+
+# CSR Dashboard
+Email: csr@sltmobitel.lk
+Password: csr123
+```
 
 ## ✨ Key Features
 
 ### 🛡️ **Privacy & Consent Management**
-- **TMF632 Consent Management** - Complete consent lifecycle (create, update, revoke)
-- **TMF641 Party Management** - Customer identity and profile management  
-- **TMF669 Event Management** - Real-time event notifications and WebSocket support
-- **TMF620 Product Catalog** - Offer-specific consent and preference management
-- **TMF651 Agreement Management** - Digital agreements and signatures
+- **TMF632 Consent Management** - Complete consent lifecycle (create, view, update, revoke)
+- **TMF641 Party Management** - Customer identity and profile management
+- **TMF669 Event Management** - Real-time event notifications
+- **TMF651 Agreement Management** - Digital agreements and compliance tracking
+- **Data Subject Rights** - GDPR Article 15-22 implementation (Access, Rectification, Erasure, Portability)
 
 ### 📊 **Advanced Capabilities**
-- **Production Monitoring** - Real-time system health and performance metrics
-- **GDPR/CCPA/PDP Compliance** - Complete data subject rights implementation
-- **Multi-language Support** - English, Sinhala, and Tamil
-- **Role-based Dashboards** - Admin, CSR, and Customer interfaces
-- **Audit Trail** - Comprehensive compliance logging
+- **Real-time Dashboard** - Live metrics and system monitoring
+- **Multi-language Support** - English, Sinhala, Tamil (i18next)
+- **Role-based Access** - Customer, CSR, Admin dashboards with different permissions
+- **Audit Trail** - Comprehensive compliance and activity logging
+- **Communication Preferences** - Email, SMS, Push, Call preferences management
 
-### 🏗️ **Enterprise Architecture**
-- **Microservices Integration** - 9 backend services with API Gateway
-- **Real-time Updates** - WebSocket events for live data synchronization
+### 🏗️ **Technical Architecture**
+- **Modern React 18** with TypeScript and Vite for optimal performance
+- **Microservices Integration** - Connect to 8+ backend microservices
 - **Responsive Design** - Mobile-first UI with Tailwind CSS
-- **Type Safety** - Full TypeScript implementation
+- **State Management** - React Context with custom hooks
+- **Error Handling** - Comprehensive error boundaries and user feedback
+
+## 🚀 Quick Start
+
+### Prerequisites
+- **Node.js** >= 18.0.0
+- **npm** >= 8.0.0
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/Consent-Management-System-SLT/ConsentHub-Frontend.git
+cd ConsentHub-Frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+The application will be available at `http://localhost:5174`
+
+## 🔧 Configuration
+
+### Environment Variables
+
+#### Development (.env.local)
+```bash
+# Hosted Backend (Production)
+VITE_API_URL=https://consenthub-backend.onrender.com
+VITE_API_BASE_URL=https://consenthub-backend.onrender.com/api/v1
+VITE_AUTH_API_URL=https://consenthub-backend.onrender.com
+```
+
+#### Production (.env.production) 
+```bash
+VITE_API_URL=https://consenthub-backend.onrender.com
+VITE_API_BASE_URL=https://consenthub-backend.onrender.com/api/v1
+VITE_CONSENT_API_URL=https://consenthub-backend.onrender.com/api/v1/consent
+```
 
 ## 🚀 Quick Start
 
