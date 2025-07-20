@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   CheckCircle, 
@@ -8,8 +8,13 @@ import {
   Shield, 
   Settings, 
   FileText, 
-  Download
+  Download,
+  User,
+  RefreshCw
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { customerDashboardService, DashboardOverview } from '../../services/customerDashboardService';
+import CustomerProfileSection from './CustomerProfileSection';
 
 interface CustomerDashboardOverviewProps {
   customerName: string;
@@ -30,28 +35,61 @@ interface QuickStat {
   trend?: string;
 }
 
+interface Activity {
+  id: string | number;
+  action: string;
+  timestamp: string;
+  type: string;
+  icon?: React.ReactNode;
+  description?: string;
+}
+
 const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ customerName }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const [dashboardData, setDashboardData] = useState<DashboardOverview | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showProfile, setShowProfile] = useState(false);
   
-  // Mock data - replace with API calls
-  const consentSummary: ConsentSummary = {
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await customerDashboardService.getDashboardOverview();
+      setDashboardData(data);
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+      // Use fallback data
+      setDashboardData(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Use real data if available, otherwise use fallback data
+  const consentSummary = dashboardData?.consentStats || {
     granted: 8,
     revoked: 2,
     expired: 1,
     pending: 3
   };
 
+  const currentCustomerName = dashboardData?.customer?.name || user?.name || customerName;
+
   const quickStats: QuickStat[] = [
     {
       label: t('customerDashboard.overview.activeConsents'),
-      value: '8',
+      value: String(dashboardData?.consentStats?.granted || 8),
       icon: <CheckCircle className="w-6 h-6" />,
       color: 'text-green-600 bg-green-50 border-green-200',
       trend: t('customerDashboard.overview.monthlyTrend', { count: 2 })
     },
     {
       label: t('customerDashboard.overview.communicationChannels'),
-      value: '3',
+      value: String(dashboardData?.preferenceStats?.enabled || 3),
       icon: <Settings className="w-6 h-6" />,
       color: 'text-blue-600 bg-blue-50 border-blue-200',
       trend: t('customerDashboard.overview.channelTypes')
@@ -65,14 +103,14 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
     },
     {
       label: t('customerDashboard.overview.dsarRequests'),
-      value: '1',
+      value: String(dashboardData?.dsarStats?.total || 1),
       icon: <Download className="w-6 h-6" />,
       color: 'text-orange-600 bg-orange-50 border-orange-200',
-      trend: t('customerDashboard.overview.inProgress')
+      trend: dashboardData?.dsarStats?.pending ? t('customerDashboard.overview.inProgress') : t('customerDashboard.overview.completed')
     }
   ];
 
-  const recentActivity = [
+  const recentActivity = dashboardData?.recentActivity || [
     {
       id: 1,
       action: t('customerDashboard.overview.activities.grantedConsent'),
@@ -136,20 +174,58 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {/* Show Profile Section if requested */}
+      {showProfile && (
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">My Profile</h2>
+            <button
+              onClick={() => setShowProfile(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </div>
+          <CustomerProfileSection />
+        </div>
+      )}
+      
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-white">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex-1">
             <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-              {t('customerDashboard.overview.welcomeBack', { name: customerName })}!
+              {t('customerDashboard.overview.welcomeBack', { name: currentCustomerName })}!
             </h1>
             <p className="text-blue-100 text-base sm:text-lg">
               {t('customerDashboard.overview.welcomeDesc')}
             </p>
+            {dashboardData?.customer?.lastLogin && (
+              <p className="text-blue-200 text-sm mt-2">
+                Last login: {new Date(dashboardData.customer.lastLogin).toLocaleString()}
+              </p>
+            )}
           </div>
-          <div className="hidden lg:block flex-shrink-0">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <Shield className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+          <div className="flex space-x-3 items-center">
+            <button
+              onClick={() => setShowProfile(true)}
+              className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+            >
+              <User className="w-4 h-4" />
+              <span>Profile</span>
+            </button>
+            <button
+              onClick={loadDashboardData}
+              disabled={isLoading}
+              className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
+            </button>
+            <div className="hidden lg:block flex-shrink-0">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              </div>
             </div>
           </div>
         </div>
@@ -245,7 +321,10 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
             {recentActivity.map((activity) => (
               <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
                 <div className="flex-shrink-0 mt-1">
-                  {activity.icon}
+                  {'icon' in activity && activity.icon ? 
+                    activity.icon : 
+                    <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                  }
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 leading-relaxed">{activity.action}</p>

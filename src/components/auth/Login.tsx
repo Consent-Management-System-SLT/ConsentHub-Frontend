@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle, Info } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const { login } = useAuth();
@@ -18,20 +19,59 @@ const Login: React.FC = () => {
 
   const from = location.state?.from?.pathname || '/dashboard';
 
+  // Check for success message from signup
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccess(location.state.message);
+    }
+  }, [location.state]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setIsLoading(true);
+
+    // Basic validation
+    if (!email.trim()) {
+      setError('Email is required');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!password.trim()) {
+      setError('Password is required');
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const success = await login(email, password);
       if (success) {
-        navigate(from, { replace: true });
+        setSuccess('Login successful! Redirecting to dashboard...');
+        setTimeout(() => {
+          navigate(from, { replace: true });
+        }, 1500);
       } else {
-        setError(t('auth.invalidCredentials'));
+        setError('Invalid email or password. Please check your credentials and try again.');
       }
-    } catch (err) {
-      setError(t('auth.invalidCredentials'));
+    } catch (err: any) {
+      console.error('Login error:', err);
+      if (err.message.includes('404')) {
+        setError('Login service is not available. Please try again later.');
+      } else if (err.message.includes('Network Error')) {
+        setError('Network connection failed. Please check your internet connection.');
+      } else if (err.message.includes('timeout')) {
+        setError('Request timed out. Please try again.');
+      } else {
+        setError(err.message || 'Login failed. Please check your credentials and try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -57,6 +97,7 @@ const Login: React.FC = () => {
     setEmail(credentials[role].email);
     setPassword(credentials[role].password);
     setError(''); // Clear any existing errors
+    setSuccess('Credentials filled! Click Sign In to login.');
   };
 
   return (
@@ -82,13 +123,13 @@ const Login: React.FC = () => {
             <div className="space-y-2">
               <button
                 type="button"
-                onClick={() => fillCredentials('admin')}
+                onClick={() => fillCredentials('customer')}
                 className="w-full text-left p-2 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-medium text-blue-900">Admin</span>
-                    <div className="text-xs text-blue-700">admin@sltmobitel.lk / admin123</div>
+                    <span className="font-medium text-blue-900">Customer (Demo)</span>
+                    <div className="text-xs text-blue-700">customer@sltmobitel.lk / customer123</div>
                   </div>
                   <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100">Click to fill</span>
                 </div>
@@ -96,13 +137,13 @@ const Login: React.FC = () => {
               
               <button
                 type="button"
-                onClick={() => fillCredentials('customer')}
+                onClick={() => fillCredentials('admin')}
                 className="w-full text-left p-2 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-medium text-blue-900">Customer</span>
-                    <div className="text-xs text-blue-700">customer@sltmobitel.lk / customer123</div>
+                    <span className="font-medium text-blue-900">Admin (Demo)</span>
+                    <div className="text-xs text-blue-700">admin@sltmobitel.lk / admin123</div>
                   </div>
                   <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100">Click to fill</span>
                 </div>
@@ -115,7 +156,7 @@ const Login: React.FC = () => {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-medium text-blue-900">CSR Admin</span>
+                    <span className="font-medium text-blue-900">CSR Admin (Demo)</span>
                     <div className="text-xs text-blue-700">csr@sltmobitel.lk / csr123</div>
                   </div>
                   <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100">Click to fill</span>
@@ -123,6 +164,14 @@ const Login: React.FC = () => {
               </button>
             </div>
           </div>
+
+          {/* Success message */}
+          {success && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-center space-x-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              <span className="text-green-700 text-sm">{success}</span>
+            </div>
+          )}
 
           {/* Error message */}
           {error && (

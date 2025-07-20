@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Eye, EyeOff, User, Mail, Phone, Building, Lock, UserCheck } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, User, Mail, Phone, Building, Lock, UserCheck, AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { RegisterRequest } from '../../services/authService';
 
 interface SignupFormData {
   firstName: string;
@@ -29,6 +31,9 @@ interface SignupErrors {
 }
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate();
+  const { register } = useAuth();
+  
   const [formData, setFormData] = useState<SignupFormData>({
     firstName: '',
     lastName: '',
@@ -46,12 +51,37 @@ const Signup: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<SignupErrors>({});
+  const [success, setSuccess] = useState('');
+  const [generalError, setGeneralError] = useState('');
+
+  const getPasswordStrength = (password: string) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[@$!%*?&#]/.test(password)) strength++;
+    
+    return strength;
+  };
+
+  const getPasswordStrengthText = (strength: number) => {
+    if (strength === 0) return { text: '', color: '' };
+    if (strength <= 2) return { text: 'Weak', color: 'text-red-500' };
+    if (strength === 3) return { text: 'Fair', color: 'text-yellow-500' };
+    if (strength === 4) return { text: 'Good', color: 'text-blue-500' };
+    return { text: 'Strong', color: 'text-green-500' };
+  };
 
   const handleInputChange = (field: keyof SignupFormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+    // Clear general error when user makes changes
+    if (generalError) {
+      setGeneralError('');
     }
   };
 
@@ -65,11 +95,17 @@ const Signup: React.FC = () => {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^[\+]?[0-9]{10,15}$/.test(formData.phone.replace(/\s/g, ''))) {
+      newErrors.phone = 'Please enter a valid phone number';
+    }
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]/.test(formData.password)) {
+      newErrors.password = 'Password must contain uppercase, lowercase, number and special character';
     }
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
@@ -85,15 +121,60 @@ const Signup: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    setGeneralError('');
+    setSuccess('');
+    
     if (!validateForm()) return;
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const registrationData: RegisterRequest = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        company: formData.company,
+        department: formData.department,
+        jobTitle: formData.jobTitle,
+        acceptTerms: formData.agreeToTerms,
+        acceptPrivacy: formData.agreeToTerms,
+        language: 'en'
+      };
+
+      const success = await register(registrationData);
+      
+      if (success) {
+        setSuccess('Registration successful! Redirecting to dashboard...');
+        setTimeout(() => {
+          navigate('/dashboard', { 
+            state: { 
+              message: 'Welcome! Your account has been created successfully.' 
+            } 
+          });
+        }, 2000);
+      } else {
+        setGeneralError('Registration failed. Please check your information and try again.');
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      
+      // Handle specific errors
+      if (error.message.includes('User with this email already exists')) {
+        setErrors({ email: 'An account with this email already exists. Please use a different email or try logging in.' });
+      } else if (error.message.includes('404')) {
+        setGeneralError('Registration service is not available. Please try again later.');
+      } else if (error.message.includes('Network Error')) {
+        setGeneralError('Network connection failed. Please check your internet connection.');
+      } else if (error.message.includes('timeout')) {
+        setGeneralError('Request timed out. Please try again.');
+      } else {
+        setGeneralError(error.message || 'Registration failed. Please try again.');
+      }
+    } finally {
       setIsLoading(false);
-      alert('Registration successful! Please check your email for verification.');
-    }, 2000);
+    }
   };
 
   return (
@@ -110,6 +191,37 @@ const Signup: React.FC = () => {
               Create Account
             </h2>
             <p className="text-gray-600">Join our Consent Management System</p>
+          </div>
+
+          {/* Success message */}
+          {success && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md flex items-center space-x-3">
+              <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0" />
+              <div>
+                <p className="text-green-800 font-medium">Success!</p>
+                <p className="text-green-700 text-sm">{success}</p>
+              </div>
+            </div>
+          )}
+
+          {/* General error message */}
+          {generalError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md flex items-center space-x-3">
+              <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0" />
+              <div>
+                <p className="text-red-800 font-medium">Error</p>
+                <p className="text-red-700 text-sm">{generalError}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Information message */}
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md flex items-center space-x-3">
+            <Info className="h-5 w-5 text-blue-500 flex-shrink-0" />
+            <div>
+              <p className="text-blue-800 font-medium text-sm">Password Requirements:</p>
+              <p className="text-blue-700 text-xs">At least 8 characters with uppercase, lowercase, number, and special character.</p>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -274,6 +386,26 @@ const Signup: React.FC = () => {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                {formData.password && (
+                  <div className="mt-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex-1 h-2 bg-gray-200 rounded">
+                        <div 
+                          className={`h-2 rounded transition-all duration-300 ${
+                            getPasswordStrength(formData.password) <= 2 ? 'bg-red-500' :
+                            getPasswordStrength(formData.password) === 3 ? 'bg-yellow-500' :
+                            getPasswordStrength(formData.password) === 4 ? 'bg-blue-500' :
+                            'bg-green-500'
+                          }`}
+                          style={{ width: `${(getPasswordStrength(formData.password) / 5) * 100}%` }}
+                        ></div>
+                      </div>
+                      <span className={`text-xs font-medium ${getPasswordStrengthText(getPasswordStrength(formData.password)).color}`}>
+                        {getPasswordStrengthText(getPasswordStrength(formData.password)).text}
+                      </span>
+                    </div>
+                  </div>
+                )}
                 {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
               </div>
 

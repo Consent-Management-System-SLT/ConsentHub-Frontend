@@ -1,18 +1,19 @@
 // Multi-service API client configuration for ConsentHub
 import axios, { AxiosInstance } from 'axios';
 
-// Service configurations
+// Service configurations - Updated for local development
 const SERVICES = {
-  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'https://consenthub-backend.onrender.com',
-  CSR: import.meta.env.VITE_CSR_API_URL || 'https://consenthub-backend.onrender.com', 
-  GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'https://consenthub-backend.onrender.com',
-  CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'https://consenthub-backend.onrender.com/api/v1/consent',
-  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'https://consenthub-backend.onrender.com/api/v1/preference',
-  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'https://consenthub-backend.onrender.com/api/v1/privacy-notice',
-  PARTY: import.meta.env.VITE_PARTY_API_URL || 'https://consenthub-backend.onrender.com/api/v1/party',
-  DSAR: import.meta.env.VITE_DSAR_API_URL || 'https://consenthub-backend.onrender.com/api/v1/dsar',
-  EVENT: import.meta.env.VITE_EVENT_API_URL || 'https://consenthub-backend.onrender.com/api/v1/event',
-  CATALOG: import.meta.env.VITE_CATALOG_API_URL || 'https://consenthub-backend.onrender.com/api/v1/catalog',
+  AUTH: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:3008',
+  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3011',
+  CSR: import.meta.env.VITE_CSR_API_URL || 'http://localhost:3011',
+  GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3011',
+  CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'http://localhost:3012',
+  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'http://localhost:3013',
+  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'http://localhost:3014',
+  DSAR: import.meta.env.VITE_DSAR_API_URL || 'http://localhost:3015',
+  PARTY: import.meta.env.VITE_PARTY_API_URL || 'http://localhost:3011',
+  EVENT: import.meta.env.VITE_EVENT_API_URL || 'http://localhost:3011',
+  CATALOG: import.meta.env.VITE_CATALOG_API_URL || 'http://localhost:3011',
 };
 
 // Service-specific API clients
@@ -22,6 +23,14 @@ export const customerApi = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer customer-demo-token-123'
+  }
+});
+
+export const authApi = axios.create({
+  baseURL: SERVICES.AUTH,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
   }
 });
 
@@ -109,16 +118,38 @@ export const catalogApi = axios.create({
 
 // Enhanced API response handler
 const handleApiResponse = (response: any) => {
+  console.log('handleApiResponse - Raw response:', response);
+  console.log('handleApiResponse - Response data:', response.data);
   return response.data;
 };
 
 const handleApiError = (error: any) => {
   console.error('API Error:', error);
+  
+  // Extract error information from different response structures
+  const errorData = error.response?.data;
+  let errorMessage = 'An error occurred';
+  let errorCode = null;
+  
+  if (errorData) {
+    if (errorData.error) {
+      // Structure: { error: { code: "...", message: "..." } }
+      errorMessage = errorData.error.message || errorMessage;
+      errorCode = errorData.error.code;
+    } else if (errorData.message) {
+      // Structure: { message: "..." }
+      errorMessage = errorData.message;
+    }
+  } else {
+    errorMessage = error.message || errorMessage;
+  }
+  
   return {
     error: true,
-    message: error.response?.data?.message || error.message || 'An error occurred',
+    message: errorMessage,
+    code: errorCode,
     status: error.response?.status || 500,
-    details: error.response?.data?.details || null
+    details: error.response?.data || null
   };
 };
 
@@ -258,36 +289,68 @@ export class MultiServiceApiClient {
       let client: AxiosInstance;
       let fullEndpoint: string;
       
+      // Get auth token for authenticated requests
+      const token = localStorage.getItem('authToken');
+      const headers: any = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       // Choose specific service client if provided
       if (service) {
-        // Extract just the path part since clients now have full base URLs
-        const pathPart = endpoint.replace('/api/v1', '');
-        fullEndpoint = pathPart;
-        
         switch (service) {
+          case 'auth':
+            // Auth service needs full path
+            client = authApi;
+            fullEndpoint = endpoint;
+            break;
+          case 'csr':
+            // CSR service needs full path including /api/v1
+            client = this.csrClient;
+            fullEndpoint = endpoint;
+            break;
           case 'consent':
+            // Extract just the path part since clients now have full base URLs
+            const pathPartConsent = endpoint.replace('/api/v1', '');
+            fullEndpoint = pathPartConsent;
             client = this.consentClient;
             break;
           case 'preference':
+            const pathPartPreference = endpoint.replace('/api/v1', '');
+            fullEndpoint = pathPartPreference;
             client = this.preferenceClient;
             break;
           case 'privacy-notice':
+            const pathPartPrivacy = endpoint.replace('/api/v1', '');
+            fullEndpoint = pathPartPrivacy;
             client = this.privacyNoticeClient;
             break;
           case 'party':
+            const pathPartParty = endpoint.replace('/api/v1', '');
+            fullEndpoint = pathPartParty;
             client = this.partyClient;
             break;
           case 'dsar':
+            const pathPartDsar = endpoint.replace('/api/v1', '');
+            fullEndpoint = pathPartDsar;
             client = this.dsarClient;
             break;
           case 'event':
+            const pathPartEvent = endpoint.replace('/api/v1', '');
+            fullEndpoint = pathPartEvent;
             client = this.eventClient;
             break;
           case 'catalog':
+            const pathPartCatalog = endpoint.replace('/api/v1', '');
+            fullEndpoint = pathPartCatalog;
             client = this.catalogClient;
             break;
           default:
             client = this.getApiClient(role);
+            fullEndpoint = endpoint;
             fullEndpoint = endpoint;
         }
       } else {
@@ -296,26 +359,43 @@ export class MultiServiceApiClient {
       }
 
       console.log(`Making ${method} request to: ${fullEndpoint}`);
+      console.log('Request data:', data);
+      console.log('Request headers:', headers);
 
       let response;
       switch (method) {
         case 'GET':
-          response = await client.get(fullEndpoint);
+          response = await client.get(fullEndpoint, { headers });
           break;
         case 'POST':
-          response = await client.post(fullEndpoint, data);
+          response = await client.post(fullEndpoint, data, { headers });
           break;
         case 'PUT':
-          response = await client.put(fullEndpoint, data);
+          response = await client.put(fullEndpoint, data, { headers });
           break;
         case 'DELETE':
-          response = await client.delete(fullEndpoint);
+          response = await client.delete(fullEndpoint, { headers });
           break;
       }
       
-      return handleApiResponse(response);
+      console.log('makeRequest - Raw response:', response);
+      console.log('makeRequest - Response data after interceptors:', response);
+      
+      // The interceptors have already processed the response, so response IS the final data
+      return response;
+      
     } catch (error) {
-      return handleApiError(error);
+      const errorResult = handleApiError(error);
+      console.log('makeRequest - Error result:', errorResult);
+      
+      // Throw the error instead of returning it so authService can catch it properly
+      const errorToThrow = new Error(errorResult.message);
+      (errorToThrow as any).response = {
+        status: errorResult.status,
+        data: errorResult.details
+      };
+      (errorToThrow as any).code = errorResult.code;
+      throw errorToThrow;
     }
   }
 }

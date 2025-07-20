@@ -62,29 +62,30 @@ class AuthService {
       const registerPayload = {
         email: userData.email,
         password: userData.password,
-        name: `${userData.firstName} ${userData.lastName}`,
-        phone: userData.phone
+        displayName: `${userData.firstName} ${userData.lastName}`,
+        phoneNumber: userData.phone,
+        role: 'customer',
+        profile: {
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          company: userData.company,
+          department: userData.department,
+          jobTitle: userData.jobTitle,
+          language: userData.language || 'en'
+        }
       };
 
       const response = await multiServiceApiClient.makeRequest(
         'POST',
-        '/api/v1/auth/auth/register',  // Correct endpoint with double /auth/
-        registerPayload,
-        'customer',
-        'auth'  // Use auth service
+        `${this.authBaseUrl}/users`,
+        registerPayload
       );
 
-      console.log('Register response received:', response);
-      console.log('Response type:', typeof response);
-      console.log('Response success:', response?.data?.success);
-      console.log('Response data:', response?.data);
-
-      // Handle Axios response structure - check response.data.success
-      if (response && response.data && response.data.success) {
-        // Store auth data from response.data
+      if (response.success && response.data.user) {
+        // Store auth data
         const authData = {
-          token: response.data.token,
-          user: response.data.user,
+          token: response.data.token || this.generateDemoToken(response.data.user),
+          user: this.transformUser(response.data.user),
           expiresIn: '24h'
         };
 
@@ -100,12 +101,10 @@ class AuthService {
         };
       }
 
-      throw new Error(response?.data?.message || 'Registration failed');
+      throw new Error('Registration failed');
     } catch (error: any) {
       console.error('Registration error:', error);
-      
-      // The error message should now be properly set by multiServiceApiClient
-      throw new Error(error.message || 'Registration failed');
+      throw new Error(error.response?.data?.message || error.message || 'Registration failed');
     }
   }
 
@@ -114,43 +113,25 @@ class AuthService {
    */
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
-      let response;
-      
-      // Try production endpoint first, then fallback to local
-      try {
-        response = await multiServiceApiClient.makeRequest(
-          'POST',
-          '/api/v1/auth/login', // Production endpoint
-          credentials,
-          'customer',
-          'auth'
-        );
-      } catch (prodError) {
-        // Fallback to local development endpoint
-        response = await multiServiceApiClient.makeRequest(
-          'POST',
-          '/api/v1/auth/auth/login', // Local development endpoint
-          credentials,
-          'customer',
-          'auth'
-        );
-      }
+      const response = await multiServiceApiClient.makeRequest(
+        'POST',
+        `${this.authBaseUrl}/login`,
+        credentials
+      );
 
-      console.log('Login response received:', response);
-      console.log('Response type:', typeof response);
-      console.log('Response success:', response?.data?.success);
-
-      // Handle Axios response structure - check response.data.success
-      if (response && response.data && response.data.success) {
+      if (response.success && response.data) {
         const authData = {
-          token: response.data.token,
-          user: response.data.user,
-          expiresIn: '24h'
+          token: response.data.token || this.generateDemoToken(response.data.user),
+          user: this.transformUser(response.data.user),
+          expiresIn: response.data.expiresIn || '24h'
         };
 
         localStorage.setItem('authToken', authData.token);
         localStorage.setItem('user', JSON.stringify(authData.user));
         this.currentUser = authData.user;
+
+        // Update last login time
+        await this.updateLastLogin(authData.user.id);
 
         return {
           success: true,
@@ -160,10 +141,10 @@ class AuthService {
         };
       }
 
-      throw new Error(response?.data?.message || 'Invalid credentials');
+      throw new Error('Invalid credentials');
     } catch (error: any) {
       console.error('Login error:', error);
-      throw new Error(error.message || 'Login failed');
+      throw new Error(error.response?.data?.message || 'Login failed');
     }
   }
 
@@ -175,51 +156,25 @@ class AuthService {
       const token = this.getAuthToken();
       if (!token) return null;
 
-      // Try to get fresh user data from backend
-      try {
-        // Try production endpoint first, then fallback to local
-        let response;
-        try {
-          response = await multiServiceApiClient.makeRequest(
-            'GET',
-            '/api/v1/auth/profile', // Production endpoint
-            undefined,
-            'customer',
-            'auth'
-          );
-        } catch (prodError) {
-          // Fallback to local development endpoint
-          response = await multiServiceApiClient.makeRequest(
-            'GET',
-            '/api/v1/auth/auth/profile', // Local development endpoint
-            undefined,
-            'customer',
-            'auth'
-          );
-        }
+      const response = await multiServiceApiClient.makeRequest(
+        'GET',
+        `${this.customerBaseUrl}/dashboard/profile`,
+        undefined,
+        { 'Authorization': `Bearer ${token}` }
+      );
 
-        if (response && response.data && response.data.success) {
-          const user = this.transformUser(response.data.data);
-          this.currentUser = user;
-          localStorage.setItem('user', JSON.stringify(user));
-          return user;
-        }
-      } catch (apiError) {
-        console.log('Backend profile fetch failed, using stored user data');
-      }
-
-      // Fallback to stored user data if backend call fails
-      const storedUser = this.getStoredUser();
-      if (storedUser) {
-        return storedUser;
+      if (response.success && response.data) {
+        const user = this.transformUser(response.data);
+        this.currentUser = user;
+        localStorage.setItem('user', JSON.stringify(user));
+        return user;
       }
 
       return null;
     } catch (error) {
       console.error('Get current user error:', error);
-      // Don't clear auth data immediately - user might be offline
-      const storedUser = this.getStoredUser();
-      return storedUser;
+      this.clearAuthData();
+      return null;
     }
   }
 
@@ -228,11 +183,12 @@ class AuthService {
    */
   async updateProfile(updates: Partial<User>): Promise<User> {
     try {
+      const token = this.getAuthToken();
       const response = await multiServiceApiClient.makeRequest(
         'PUT',
         `${this.customerBaseUrl}/dashboard/profile`,
         updates,
-        'customer'
+        { 'Authorization': `Bearer ${token}` }
       );
 
       if (response.success && response.data) {
@@ -260,7 +216,7 @@ class AuthService {
           'POST',
           `${this.authBaseUrl}/logout`,
           {},
-          'customer'
+          { 'Authorization': `Bearer ${token}` }
         );
       }
     } catch (error) {
@@ -378,7 +334,7 @@ class AuthService {
       status: backendUser.status || 'active',
       createdAt: backendUser.createdAt || new Date().toISOString(),
       lastLoginAt: backendUser.lastLoginAt,
-      isActive: backendUser.isActive ?? (backendUser.status !== 'inactive' && backendUser.status !== 'suspended'),
+      isActive: backendUser.status !== 'inactive' && backendUser.status !== 'suspended',
       emailVerified: backendUser.emailVerified ?? true,
       phoneVerified: backendUser.phoneVerified ?? false
     };
@@ -389,11 +345,12 @@ class AuthService {
    */
   private async updateLastLogin(userId: string): Promise<void> {
     try {
+      const token = this.getAuthToken();
       await multiServiceApiClient.makeRequest(
         'PUT',
         `${this.authBaseUrl}/users/${userId}/last-login`,
         { lastLoginAt: new Date().toISOString() },
-        'customer'
+        { 'Authorization': `Bearer ${token}` }
       );
     } catch (error) {
       console.error('Failed to update last login:', error);
