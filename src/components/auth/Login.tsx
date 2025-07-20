@@ -37,6 +37,28 @@ const Login: React.FC = () => {
     }
   };
 
+  // Function to fill credentials for each role
+  const fillCredentials = (role: 'admin' | 'customer' | 'csr') => {
+    const credentials = {
+      admin: {
+        email: 'admin@sltmobitel.lk',
+        password: 'admin123'
+      },
+      customer: {
+        email: 'customer@sltmobitel.lk',
+        password: 'customer123'
+      },
+      csr: {
+        email: 'csr@sltmobitel.lk',
+        password: 'csr123'
+      }
+    };
+
+    setEmail(credentials[role].email);
+    setPassword(credentials[role].password);
+    setError(''); // Clear any existing errors
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0072CE] to-[#4CAF50] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -56,12 +78,49 @@ const Login: React.FC = () => {
 
           {/* Demo credentials */}
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Credentials:</h3>
-            <div className="text-xs text-blue-700 space-y-1">
-              <div><strong>Admin:</strong> admin@sltmobitel.lk / admin123</div>
-              <div><strong>Customer:</strong> customer@sltmobitel.lk / customer123</div>
-              <div><strong>CSR Admin:</strong> csr@sltmobitel.lk / csr123</div>
-
+            <h3 className="text-sm font-medium text-blue-800 mb-3">Quick Login - Click to Auto-Fill:</h3>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => fillCredentials('admin')}
+                className="w-full text-left p-2 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium text-blue-900">Admin</span>
+                    <div className="text-xs text-blue-700">admin@sltmobitel.lk / admin123</div>
+                  </div>
+                  <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100">Click to fill</span>
+                </div>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => fillCredentials('customer')}
+                className="w-full text-left p-2 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium text-blue-900">Customer</span>
+                    <div className="text-xs text-blue-700">customer@sltmobitel.lk / customer123</div>
+                  </div>
+                  <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100">Click to fill</span>
+                </div>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => fillCredentials('csr')}
+                className="w-full text-left p-2 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-medium text-blue-900">CSR Admin</span>
+                    <div className="text-xs text-blue-700">csr@sltmobitel.lk / csr123</div>
+                  </div>
+                  <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100">Click to fill</span>
+                </div>
+              </button>
             </div>
           </div>
 
