@@ -1,19 +1,22 @@
 // Service exports for ConsentHub - Multi-Service Architecture
 export { apiClient } from './apiClient';
+export { multiServiceApiClient } from './multiServiceApiClient';
 
-// Import updated services
-export { consentService } from './consentService_new';
-export { preferenceService } from './preferenceService_new';
-export { partyService } from './partyService_new';
-export { dsarService } from './dsarService_new';
+// Core services using standardized multiServiceApiClient
+export { consentService } from './consentService';
+export { preferenceService } from './preferenceService';
+export { partyService } from './partyService';
+export { dsarService } from './dsarService';
+export { customerService } from './customerService';
+export { tmf620ProductCatalogService } from './tmf620ProductCatalogService';
 
-// Keep existing services that don't need updates
+// Supporting services
 export { privacyNoticeService } from './privacyNoticeService';
 export { tmf669EventService } from './eventService';
 export { authService } from './authService';
-export { customerService } from './customerService';
 export { auditService } from './auditService';
 export { dashboardService } from './dashboardService';
+export { advancedMonitoringService } from './advancedMonitoringService';
 
 // Type exports
 export type { ApiResponse, ApiError } from './apiClient';
@@ -50,12 +53,10 @@ export type {
   DSARRequestEvent 
 } from './eventService';
 export type { 
-  DSARRequestCreateRequest, 
-  DSARRequestUpdateRequest, 
-  DSARQuery, 
-  DSARListResponse,
-  DSARExportResult,
-  DSARStats 
+  DSARRequest,
+  DSARCreateRequest, 
+  DSARUpdateRequest, 
+  DSARQuery
 } from './dsarService';
 export type { 
   LoginRequest, 
@@ -63,3 +64,12 @@ export type {
   AuthResponse, 
   User 
 } from './authService';
+export type {
+  ProductOffering,
+  ProductOfferingCategory,
+  ProductSpecificationRef,
+  ConsentRequirement,
+  OfferPrivacyPreference,
+  ProductOfferingQuery,
+  OfferSpecificConsentRequest
+} from './tmf620ProductCatalogService';

@@ -12,6 +12,7 @@ const SERVICES = {
   PARTY: import.meta.env.VITE_PARTY_API_URL || 'https://consenthub-backend.onrender.com/api/v1/party',
   DSAR: import.meta.env.VITE_DSAR_API_URL || 'https://consenthub-backend.onrender.com/api/v1/dsar',
   EVENT: import.meta.env.VITE_EVENT_API_URL || 'https://consenthub-backend.onrender.com/api/v1/event',
+  CATALOG: import.meta.env.VITE_CATALOG_API_URL || 'https://consenthub-backend.onrender.com/api/v1/catalog',
 };
 
 // Service-specific API clients
@@ -97,6 +98,15 @@ export const eventApi = axios.create({
   }
 });
 
+export const catalogApi = axios.create({
+  baseURL: SERVICES.CATALOG,
+  timeout: 30000, // Increased timeout
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer admin-demo-token-123'
+  }
+});
+
 // Enhanced API response handler
 const handleApiResponse = (response: any) => {
   return response.data;
@@ -113,7 +123,7 @@ const handleApiError = (error: any) => {
 };
 
 // Add response/error interceptors to all APIs
-[customerApi, csrApi, adminApi, consentApi, preferenceApi, privacyNoticeApi, partyApi, dsarApi, eventApi].forEach(api => {
+[customerApi, csrApi, adminApi, consentApi, preferenceApi, privacyNoticeApi, partyApi, dsarApi, eventApi, catalogApi].forEach(api => {
   api.interceptors.response.use(handleApiResponse, handleApiError);
 });
 
@@ -145,6 +155,7 @@ export class MultiServiceApiClient {
   private partyClient: AxiosInstance;
   private dsarClient: AxiosInstance;
   private eventClient: AxiosInstance;
+  private catalogClient: AxiosInstance;
 
   constructor() {
     this.customerClient = customerApi;
@@ -156,6 +167,7 @@ export class MultiServiceApiClient {
     this.partyClient = partyApi;
     this.dsarClient = dsarApi;
     this.eventClient = eventApi;
+    this.catalogClient = catalogApi;
   }
 
   // Get API client for role-based requests
@@ -195,6 +207,10 @@ export class MultiServiceApiClient {
     return this.eventClient;
   }
 
+  getCatalogClient(): AxiosInstance {
+    return this.catalogClient;
+  }
+
   // Health check for all services
   async checkAllServicesHealth(): Promise<any> {
     const services = [
@@ -206,7 +222,8 @@ export class MultiServiceApiClient {
       { name: 'Privacy Notice', client: this.privacyNoticeClient },
       { name: 'Party', client: this.partyClient },
       { name: 'DSAR', client: this.dsarClient },
-      { name: 'Event', client: this.eventClient }
+      { name: 'Event', client: this.eventClient },
+      { name: 'Catalog', client: this.catalogClient }
     ];
 
     const results: any = {};
@@ -265,6 +282,9 @@ export class MultiServiceApiClient {
             break;
           case 'event':
             client = this.eventClient;
+            break;
+          case 'catalog':
+            client = this.catalogClient;
             break;
           default:
             client = this.getApiClient(role);
