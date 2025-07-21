@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, X, User, Mail, MessageCircle, Phone, Bell, RefreshCw, Search } from 'lucide-react';
+import { 
+  Settings, 
+  Save, 
+  User, 
+  Mail, 
+  MessageCircle, 
+  Phone, 
+  Bell, 
+  RefreshCw, 
+  Search,
+  Clock,
+  Volume2,
+  VolumeX,
+  CheckCircle,
+  AlertCircle,
+  Globe,
+  Smartphone
+} from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 
 interface PreferenceEditorFormProps {
@@ -10,11 +27,50 @@ interface PreferenceEditorFormProps {
 const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className = '', customerId }) => {
   const [selectedCustomer, setSelectedCustomer] = useState<string>(customerId || '');
   const [customers, setCustomers] = useState<any[]>([]);
-  const [preferences, setPreferences] = useState<any>(null);
+  const [preferences, setPreferences] = useState<any>({
+    // Communication Channels
+    channels: {
+      email: true,
+      sms: true,
+      push: false,
+      inApp: true,
+      phone: false
+    },
+    // Topic Subscriptions  
+    topics: {
+      offers: true,
+      productUpdates: true,
+      serviceAlerts: true,
+      billing: true,
+      security: true,
+      newsletters: false,
+      marketing: false,
+      promotions: false
+    },
+    // Do Not Disturb Settings
+    dndSettings: {
+      enabled: true,
+      startTime: '22:00',
+      endTime: '08:00'
+    },
+    // Frequency Control
+    frequency: {
+      maxEmailsPerDay: 3,
+      maxSmsPerDay: 2,
+      digestMode: false,
+      immediateAlerts: ['security', 'billing']
+    },
+    // Language & Timezone
+    language: 'en',
+    timezone: 'Asia/Colombo'
+  });
+  
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [hasChanges, setHasChanges] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   // Load customers
   useEffect(() => {
@@ -44,34 +100,34 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
     setLoading(true);
     try {
       const response = await apiClient.get(`/api/v1/preferences?partyId=${selectedCustomer}`);
-      const data = response.data as any[];
+      const data = Array.isArray(response.data) ? response.data : [];
       const customerPrefs = data.find((pref: any) => pref.partyId === selectedCustomer);
       
       if (customerPrefs) {
-        setPreferences(customerPrefs);
-      } else {
-        // Create default preferences if none exist
-        const defaultPrefs = {
-          id: Date.now().toString(),
-          partyId: selectedCustomer,
-          preferredChannels: {
-            email: true,
-            sms: false,
-            phone: false,
-            push: true
+        // Merge loaded preferences with default structure
+        setPreferences((prev: any) => ({
+          ...prev,
+          ...customerPrefs,
+          channels: {
+            ...prev.channels,
+            ...(customerPrefs.channels || {}),
+            // Map legacy fields
+            email: customerPrefs.preferredChannels?.email ?? prev.channels.email,
+            sms: customerPrefs.preferredChannels?.sms ?? prev.channels.sms,
+            phone: customerPrefs.preferredChannels?.phone ?? prev.channels.phone,
+            push: customerPrefs.preferredChannels?.push ?? prev.channels.push
           },
-          topicSubscriptions: {
-            marketing: false,
-            promotions: false,
-            serviceUpdates: true,
-            billing: true,
-            security: true
-          },
-          frequency: 'immediate',
-          timezone: 'UTC',
-          lastUpdated: new Date().toISOString()
-        };
-        setPreferences(defaultPrefs);
+          topics: {
+            ...prev.topics,
+            ...(customerPrefs.topics || {}),
+            // Map legacy fields
+            marketing: customerPrefs.topicSubscriptions?.marketing ?? prev.topics.marketing,
+            promotions: customerPrefs.topicSubscriptions?.promotions ?? prev.topics.promotions,
+            serviceAlerts: customerPrefs.topicSubscriptions?.serviceUpdates ?? prev.topics.serviceAlerts,
+            billing: customerPrefs.topicSubscriptions?.billing ?? prev.topics.billing,
+            security: customerPrefs.topicSubscriptions?.security ?? prev.topics.security
+          }
+        }));
       }
     } catch (error) {
       console.error('Error loading preferences:', error);
@@ -80,281 +136,519 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
     }
   };
 
+  // Helper functions for updating preferences
+  const updateChannelPreference = (channel: string, value: boolean) => {
+    setPreferences((prev: any) => ({
+      ...prev,
+      channels: {
+        ...prev.channels,
+        [channel]: value
+      }
+    }));
+    setHasChanges(true);
+  };
+
+  const updateTopicPreference = (topic: string, value: boolean) => {
+    setPreferences((prev: any) => ({
+      ...prev,
+      topics: {
+        ...prev.topics,
+        [topic]: value
+      }
+    }));
+    setHasChanges(true);
+  };
+
+  const updateDndSettings = (setting: string, value: boolean | string) => {
+    setPreferences((prev: any) => ({
+      ...prev,
+      dndSettings: {
+        ...prev.dndSettings,
+        [setting]: value
+      }
+    }));
+    setHasChanges(true);
+  };
+
+  const updateFrequencySettings = (setting: string, value: number | boolean) => {
+    setPreferences((prev: any) => ({
+      ...prev,
+      frequency: {
+        ...prev.frequency,
+        [setting]: value
+      }
+    }));
+    setHasChanges(true);
+  };
+
   const handleSave = async () => {
     if (!preferences || !selectedCustomer) return;
     
     setSaving(true);
+    setSaveStatus('idle');
     try {
       const updatedPreferences = {
         ...preferences,
-        lastUpdated: new Date().toISOString()
+        partyId: selectedCustomer,
+        lastUpdated: new Date().toISOString(),
+        // Maintain backward compatibility
+        preferredChannels: preferences.channels,
+        topicSubscriptions: preferences.topics
       };
       
-      await apiClient.put(`/api/v1/preferences/${preferences.id}`, updatedPreferences);
-      setPreferences(updatedPreferences);
-      setIsEditing(false);
+      // Try to update existing preferences or create new ones
+      try {
+        await apiClient.put(`/api/v1/preferences/${selectedCustomer}`, updatedPreferences);
+      } catch (error) {
+        // If PUT fails, try POST to create new preferences
+        await apiClient.post('/api/v1/preferences', updatedPreferences);
+      }
       
-      // Show success message
-      alert('Preferences saved successfully!');
+      setIsEditing(false);
+      setHasChanges(false);
+      setSaveStatus('success');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
       console.error('Error saving preferences:', error);
-      alert('Error saving preferences. Please try again.');
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
       setSaving(false);
     }
   };
 
-  const handleChannelChange = (channel: string, value: boolean) => {
-    setPreferences((prev: any) => ({
-      ...prev,
-      preferredChannels: {
-        ...prev.preferredChannels,
-        [channel]: value
-      }
-    }));
-  };
-
-  const handleTopicChange = (topic: string, value: boolean) => {
-    setPreferences((prev: any) => ({
-      ...prev,
-      topicSubscriptions: {
-        ...prev.topicSubscriptions,
-        [topic]: value
-      }
-    }));
-  };
-
-  const filteredCustomers = customers.filter(customer => 
+  const filteredCustomers = customers.filter(customer =>
     customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg ${className}`}>
+    <div className={`space-y-6 ${className}`}>
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Settings className="w-6 h-6 text-indigo-600" />
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Communication Preferences</h2>
-              <p className="text-sm text-gray-600">Manage customer communication preferences</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                isEditing 
-                  ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
-                  : 'bg-indigo-600 text-white hover:bg-indigo-700'
-              }`}
-            >
-              {isEditing ? <X className="w-4 h-4" /> : <Settings className="w-4 h-4" />}
-              <span className="ml-2">{isEditing ? 'Cancel' : 'Edit'}</span>
-            </button>
-            {isEditing && (
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center space-x-2"
-              >
-                {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                <span>{saving ? 'Saving...' : 'Save'}</span>
-              </button>
-            )}
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Communication Preferences</h1>
+          <p className="text-gray-600 mt-2">Manage customer communication preferences and settings</p>
         </div>
       </div>
 
-      <div className="p-6">
-        {/* Customer Selection */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select Customer
-          </label>
+      {/* Customer Selection */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <User className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Customer Selection</h2>
+              <p className="text-sm text-gray-500">Search and select a customer to manage preferences</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-6">
           <div className="flex space-x-4">
             <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Customer</label>
               <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search customers..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Search customers..."
+                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-            </div>
-            <select
-              value={selectedCustomer}
-              onChange={(e) => setSelectedCustomer(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="">Select a customer</option>
-              {filteredCustomers.map(customer => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name} ({customer.email})
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Preferences Form */}
-        {selectedCustomer && (
-          <>
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <RefreshCw className="w-6 h-6 animate-spin text-indigo-600" />
-                <span className="ml-2 text-gray-600">Loading preferences...</span>
-              </div>
-            ) : preferences ? (
-              <div className="space-y-6">
-                {/* Preferred Channels */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Preferred Communication Channels</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Mail className="w-5 h-5 text-blue-600" />
-                        <div>
-                          <p className="font-medium text-gray-900">Email</p>
-                          <p className="text-sm text-gray-600">Receive updates via email</p>
-                        </div>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={preferences.preferredChannels?.email || false}
-                        onChange={(e) => handleChannelChange('email', e.target.checked)}
-                        disabled={!isEditing}
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <MessageCircle className="w-5 h-5 text-green-600" />
-                        <div>
-                          <p className="font-medium text-gray-900">SMS</p>
-                          <p className="text-sm text-gray-600">Receive text messages</p>
-                        </div>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={preferences.preferredChannels?.sms || false}
-                        onChange={(e) => handleChannelChange('sms', e.target.checked)}
-                        disabled={!isEditing}
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Phone className="w-5 h-5 text-orange-600" />
-                        <div>
-                          <p className="font-medium text-gray-900">Phone</p>
-                          <p className="text-sm text-gray-600">Receive phone calls</p>
-                        </div>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={preferences.preferredChannels?.phone || false}
-                        onChange={(e) => handleChannelChange('phone', e.target.checked)}
-                        disabled={!isEditing}
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Bell className="w-5 h-5 text-purple-600" />
-                        <div>
-                          <p className="font-medium text-gray-900">Push Notifications</p>
-                          <p className="text-sm text-gray-600">Receive app notifications</p>
-                        </div>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={preferences.preferredChannels?.push || false}
-                        onChange={(e) => handleChannelChange('push', e.target.checked)}
-                        disabled={!isEditing}
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Topic Subscriptions */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Topic Subscriptions</h3>
-                  <div className="space-y-3">
-                    {Object.entries(preferences.topicSubscriptions || {}).map(([topic, value]) => (
-                      <div key={topic} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900 capitalize">{topic.replace(/([A-Z])/g, ' $1').trim()}</p>
-                          <p className="text-sm text-gray-600">
-                            {topic === 'marketing' && 'Marketing communications and offers'}
-                            {topic === 'promotions' && 'Special promotions and deals'}
-                            {topic === 'serviceUpdates' && 'Service updates and announcements'}
-                            {topic === 'billing' && 'Billing and payment notifications'}
-                            {topic === 'security' && 'Security alerts and notifications'}
-                          </p>
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={value as boolean}
-                          onChange={(e) => handleTopicChange(topic, e.target.checked)}
-                          disabled={!isEditing}
-                          className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Frequency Settings */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Communication Frequency</h3>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      How often would you like to receive communications?
-                    </label>
-                    <select
-                      value={preferences.frequency || 'immediate'}
-                      onChange={(e) => setPreferences((prev: any) => ({ ...prev, frequency: e.target.value }))}
-                      disabled={!isEditing}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              {searchTerm && (
+                <div className="mt-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
+                  {filteredCustomers.map(customer => (
+                    <div
+                      key={customer.id}
+                      onClick={() => {
+                        setSelectedCustomer(customer.id);
+                        setSearchTerm('');
+                      }}
+                      className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                     >
-                      <option value="immediate">Immediate</option>
-                      <option value="daily">Daily Digest</option>
-                      <option value="weekly">Weekly Summary</option>
-                      <option value="monthly">Monthly Report</option>
-                    </select>
-                  </div>
+                      <div className="flex items-center space-x-3">
+                        <User className="w-4 h-4 text-gray-500" />
+                        <div>
+                          <div className="font-medium">{customer.name}</div>
+                          <div className="text-sm text-gray-500">{customer.email}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {filteredCustomers.length === 0 && (
+                    <div className="p-3 text-center text-gray-500">No customers found</div>
+                  )}
                 </div>
-
-                {/* Last Updated */}
-                <div className="text-sm text-gray-500">
-                  Last updated: {preferences.lastUpdated ? new Date(preferences.lastUpdated).toLocaleString() : 'Never'}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Settings className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p>No preferences found for this customer</p>
+              )}
+            </div>
+            {selectedCustomer && (
+              <div className="flex items-end">
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  {isEditing ? 'Cancel' : 'Edit Preferences'}
+                </button>
               </div>
             )}
-          </>
-        )}
-
-        {!selectedCustomer && (
-          <div className="text-center py-12 text-gray-500">
-            <User className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>Select a customer to view and edit their communication preferences</p>
           </div>
-        )}
+        </div>
       </div>
+
+      {/* Save Status */}
+      {saveStatus !== 'idle' && (
+        <div className="flex items-center justify-between">
+          <div></div>
+          {saveStatus === 'success' && (
+            <div className="flex items-center space-x-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg border border-green-200">
+              <CheckCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">Preferences saved successfully!</span>
+            </div>
+          )}
+          {saveStatus === 'error' && (
+            <div className="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg border border-red-200">
+              <AlertCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">Failed to save preferences. Please try again.</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Preferences Content */}
+      {selectedCustomer && !loading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Communication Channels */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Bell className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Communication Channels</h2>
+                  <p className="text-sm text-gray-500">Choose how the customer receives notifications</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              {[
+                { key: 'email', label: 'Email Notifications', icon: Mail, desc: 'Receive notifications via email' },
+                { key: 'sms', label: 'SMS Notifications', icon: MessageCircle, desc: 'Receive text messages' },
+                { key: 'push', label: 'Push Notifications', icon: Smartphone, desc: 'Mobile app notifications' },
+                { key: 'inApp', label: 'In-App Notifications', icon: Bell, desc: 'Notifications within the app' },
+                { key: 'phone', label: 'Phone Calls', icon: Phone, desc: 'Receive phone calls for urgent matters' }
+              ].map((channel, index) => {
+                const Icon = channel.icon;
+                return (
+                  <div key={channel.key} className={`flex items-center justify-between py-4 ${index < 4 ? 'border-b border-gray-100' : ''}`}>
+                    <div className="flex items-center space-x-3">
+                      <Icon className="w-5 h-5 text-gray-600" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{channel.label}</p>
+                        <p className="text-xs text-gray-500">{channel.desc}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => isEditing && updateChannelPreference(channel.key, !preferences.channels[channel.key])}
+                      disabled={!isEditing}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                        preferences.channels[channel.key] ? 'bg-blue-600' : 'bg-gray-200'
+                      } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          preferences.channels[channel.key] ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Topic Subscriptions */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Settings className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Topic Preferences</h2>
+                  <p className="text-sm text-gray-500">Control what types of content the customer receives</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              {[
+                { key: 'offers', label: 'Special Offers', desc: 'Promotional offers and discounts' },
+                { key: 'productUpdates', label: 'Product Updates', desc: 'New features and improvements' },
+                { key: 'serviceAlerts', label: 'Service Alerts', desc: 'Service disruptions and maintenance' },
+                { key: 'billing', label: 'Billing & Payments', desc: 'Bills, payments, and account changes' },
+                { key: 'security', label: 'Security Alerts', desc: 'Account security and suspicious activity' },
+                { key: 'newsletters', label: 'Newsletters', desc: 'Company news and updates' }
+              ].map((topic, index) => (
+                <div key={topic.key} className={`flex items-center justify-between py-4 ${index < 5 ? 'border-b border-gray-100' : ''}`}>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{topic.label}</p>
+                    <p className="text-xs text-gray-500">{topic.desc}</p>
+                  </div>
+                  <button
+                    onClick={() => isEditing && updateTopicPreference(topic.key, !preferences.topics[topic.key])}
+                    disabled={!isEditing}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                      preferences.topics[topic.key] ? 'bg-blue-600' : 'bg-gray-200'
+                    } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        preferences.topics[topic.key] ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : selectedCustomer && loading ? (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading preferences...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Settings className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Customer Selected</h3>
+            <p className="text-gray-500">Select a customer to view and edit their communication preferences</p>
+          </div>
+        </div>
+      )}
+
+      {/* Advanced Settings Section */}
+      {selectedCustomer && !loading && (
+        <div className="space-y-6">
+          {/* Do Not Disturb Settings */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  {preferences.dndSettings.enabled ? (
+                    <VolumeX className="w-5 h-5 text-purple-600" />
+                  ) : (
+                    <Volume2 className="w-5 h-5 text-purple-600" />
+                  )}
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Do Not Disturb</h2>
+                  <p className="text-sm text-gray-500">Control quiet hours for non-urgent notifications</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-4 border-b border-gray-100">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Enable Do Not Disturb</p>
+                    <p className="text-xs text-gray-500">Pause non-urgent notifications during specified hours</p>
+                  </div>
+                  <button
+                    onClick={() => isEditing && updateDndSettings('enabled', !preferences.dndSettings.enabled)}
+                    disabled={!isEditing}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                      preferences.dndSettings.enabled ? 'bg-blue-600' : 'bg-gray-200'
+                    } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        preferences.dndSettings.enabled ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {preferences.dndSettings.enabled && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Clock className="inline w-4 h-4 mr-1" />
+                        Start Time
+                      </label>
+                      <input
+                        type="time"
+                        value={preferences.dndSettings.startTime}
+                        onChange={(e) => isEditing && updateDndSettings('startTime', e.target.value)}
+                        disabled={!isEditing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Clock className="inline w-4 h-4 mr-1" />
+                        End Time
+                      </label>
+                      <input
+                        type="time"
+                        value={preferences.dndSettings.endTime}
+                        onChange={(e) => isEditing && updateDndSettings('endTime', e.target.value)}
+                        disabled={!isEditing}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Frequency Control & Language Settings */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Frequency Control */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <RefreshCw className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">Frequency Control</h2>
+                    <p className="text-sm text-gray-500">Manage communication limits</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Max Emails Per Day</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="20"
+                    value={preferences.frequency.maxEmailsPerDay}
+                    onChange={(e) => isEditing && updateFrequencySettings('maxEmailsPerDay', parseInt(e.target.value))}
+                    disabled={!isEditing}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Max SMS Per Day</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={preferences.frequency.maxSmsPerDay}
+                    onChange={(e) => isEditing && updateFrequencySettings('maxSmsPerDay', parseInt(e.target.value))}
+                    disabled={!isEditing}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between py-4 border-t border-gray-100">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Digest Mode</p>
+                    <p className="text-xs text-gray-500">Bundle notifications into daily summaries</p>
+                  </div>
+                  <button
+                    onClick={() => isEditing && updateFrequencySettings('digestMode', !preferences.frequency.digestMode)}
+                    disabled={!isEditing}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                      preferences.frequency.digestMode ? 'bg-blue-600' : 'bg-gray-200'
+                    } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        preferences.frequency.digestMode ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Language & Timezone */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">Language & Region</h2>
+                    <p className="text-sm text-gray-500">Localization preferences</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                  <select
+                    value={preferences.language}
+                    onChange={(e) => isEditing && setPreferences((prev: any) => ({ ...prev, language: e.target.value }))}
+                    disabled={!isEditing}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  >
+                    <option value="en">English</option>
+                    <option value="si">Sinhala</option>
+                    <option value="ta">Tamil</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+                  <select
+                    value={preferences.timezone}
+                    onChange={(e) => isEditing && setPreferences((prev: any) => ({ ...prev, timezone: e.target.value }))}
+                    disabled={!isEditing}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  >
+                    <option value="Asia/Colombo">Asia/Colombo (UTC+05:30)</option>
+                    <option value="UTC">UTC (UTC+00:00)</option>
+                    <option value="Asia/Dubai">Asia/Dubai (UTC+04:00)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          {isEditing && (
+            <div className="flex justify-end space-x-4 pt-6">
+              <button
+                onClick={() => {
+                  setIsEditing(false);
+                  setHasChanges(false);
+                  loadPreferences(); // Reload to reset changes
+                }}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={!hasChanges || saving}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                {saving ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                <span>{saving ? 'Saving...' : 'Save Preferences'}</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

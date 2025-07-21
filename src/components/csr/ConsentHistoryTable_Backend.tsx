@@ -32,11 +32,22 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       }
       
       const response = await apiClient.get(url);
-      const consentData = response.data as any[];
-      setConsents(consentData);
+      const consentData = response.data;
+      
+      // Ensure we always have an array
+      if (Array.isArray(consentData)) {
+        setConsents(consentData);
+      } else if (consentData && typeof consentData === 'object') {
+        // If it's an object, try to extract array from common properties
+        const dataObj = consentData as any;
+        setConsents(dataObj.data || dataObj.consents || []);
+      } else {
+        setConsents([]);
+      }
     } catch (err) {
       console.error('Error loading consents:', err);
       setError('Failed to load consent history. Please try again.');
+      setConsents([]); // Ensure consents is always an array even on error
     } finally {
       setLoading(false);
     }

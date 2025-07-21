@@ -27,6 +27,8 @@ import PreferenceEditorForm from './csr/PreferenceEditorForm_Backend';
 import DSARRequestPanel from './csr/DSARRequestPanel_Backend';
 import GuardianConsentForm from './csr/GuardianConsentForm_Backend';
 import AuditLogTable from './csr/AuditLogTable_Backend';
+import CSROverviewEnhanced from './csr/CSROverviewEnhanced';
+import CustomerProfile from './csr/CustomerProfile';
 import HelpModal from './csr/HelpModal';
 import ServerConnectionAlert from './shared/ServerConnectionAlert';
 
@@ -77,27 +79,32 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
     try {
       setLoading(true);
       
-      // Fetch data from multiple endpoints
+      // Fetch data from multiple endpoints with error handling
       const [partiesResponse, consentsResponse, dsarResponse, eventsResponse] = await Promise.all([
-        apiClient.get('/api/v1/party'),
-        apiClient.get('/api/v1/consent'),
-        apiClient.get('/api/v1/dsar'),
-        apiClient.get('/api/v1/event')
+        apiClient.get('/api/v1/party').catch(() => ({ data: [] })),
+        apiClient.get('/api/v1/consent').catch(() => ({ data: [] })),
+        apiClient.get('/api/v1/dsar').catch(() => ({ data: [] })),
+        apiClient.get('/api/v1/event').catch(() => ({ data: [] }))
       ]);
 
-      const parties = partiesResponse.data as any[];
-      const consents = consentsResponse.data as any[];
-      const dsarRequests = dsarResponse.data as any[];
-      const events = eventsResponse.data as any[];
+      // Ensure all data is arrays
+      const parties = Array.isArray(partiesResponse.data) ? partiesResponse.data : [];
+      const consents = Array.isArray(consentsResponse.data) ? consentsResponse.data : [];
+      const dsarRequests = Array.isArray(dsarResponse.data) ? dsarResponse.data : [];
+      const events = Array.isArray(eventsResponse.data) ? eventsResponse.data : [];
 
       // Calculate real statistics
       const totalCustomers = parties.length;
       const pendingRequests = dsarRequests.filter((req: any) => req.status === 'pending').length;
       const grantedConsents = consents.filter((consent: any) => consent.status === 'granted').length;
       const todayEvents = events.filter((event: any) => {
-        const eventDate = new Date(event.createdAt);
-        const today = new Date();
-        return eventDate.toDateString() === today.toDateString();
+        try {
+          const eventDate = new Date(event.createdAt);
+          const today = new Date();
+          return eventDate.toDateString() === today.toDateString();
+        } catch {
+          return false;
+        }
       }).length;
 
       setDashboardStats({
@@ -180,7 +187,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   const renderContent = () => {
     switch (activeSection) {
       case 'overview':
-        return <DashboardOverview 
+        return <CSROverviewEnhanced 
           stats={dashboardStats} 
           activities={recentActivities} 
           onSectionChange={setActiveSection} 
@@ -206,7 +213,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
       case 'customer-profile':
         return <CustomerProfile customer={selectedCustomer} onBack={() => setActiveSection('customer-search')} onSectionChange={setActiveSection} />;
       default:
-        return <DashboardOverview 
+        return <CSROverviewEnhanced 
           stats={dashboardStats} 
           activities={recentActivities} 
           onSectionChange={setActiveSection} 
@@ -583,80 +590,6 @@ const DashboardOverview: React.FC<{
             </div>
             <p className="text-2xl font-bold text-orange-900 mt-2">{insights?.newCustomers || 0}</p>
             <p className="text-sm text-orange-600">Registered today</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Customer Profile Component
-const CustomerProfile: React.FC<{ customer: any; onBack: () => void; onSectionChange: (section: string) => void }> = ({ customer, onBack, onSectionChange }) => {
-  if (!customer) return null;
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
-        >
-          <span>← Back to Search</span>
-        </button>
-      </div>
-      
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
-        <div className="flex items-center space-x-4 mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-            <User className="w-8 h-8 text-white" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">{customer.name}</h2>
-            <p className="text-gray-600">{customer.email}</p>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Customer Information</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="text-gray-600">Phone:</span>
-                <span className="text-gray-900 font-medium">{customer.mobile}</span>
-              </div>
-              <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="text-gray-600">Customer ID:</span>
-                <span className="text-gray-900 font-medium">{customer.id}</span>
-              </div>
-              <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="text-gray-600">Type:</span>
-                <span className="text-gray-900 font-medium">{customer.type}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Quick Actions</h3>
-            <div className="space-y-2">
-              <button 
-                onClick={() => onSectionChange('consent-history')}
-                className="w-full p-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium"
-              >
-                View Consent History
-              </button>
-              <button 
-                onClick={() => onSectionChange('preference-editor')}
-                className="w-full p-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-medium"
-              >
-                Edit Preferences
-              </button>
-              <button 
-                onClick={() => onSectionChange('dsar-requests')}
-                className="w-full p-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-200 font-medium"
-              >
-                DSAR Request
-              </button>
-            </div>
           </div>
         </div>
       </div>

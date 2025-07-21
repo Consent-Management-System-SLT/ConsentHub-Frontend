@@ -114,10 +114,12 @@ class AuthService {
    */
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
+      console.log('Starting login process for:', credentials.email);
       let response;
       
       // Try production endpoint first, then fallback to local, then demo mode
       try {
+        console.log('Trying production endpoint...');
         response = await multiServiceApiClient.makeRequest(
           'POST',
           '/api/v1/auth/login', // Production endpoint
@@ -125,8 +127,11 @@ class AuthService {
           'customer',
           'auth'
         );
+        console.log('Production endpoint success');
       } catch (prodError) {
+        console.log('Production endpoint failed:', prodError.message);
         try {
+          console.log('Trying local development endpoint...');
           // Fallback to local development endpoint
           response = await multiServiceApiClient.makeRequest(
             'POST',
@@ -135,7 +140,9 @@ class AuthService {
             'customer',
             'auth'
           );
+          console.log('Local endpoint success');
         } catch (localError) {
+          console.log('Local endpoint failed:', localError.message);
           console.log('Backend unavailable, using demo authentication');
           // Demo fallback authentication
           return this.demoLogin(credentials);
@@ -177,6 +184,7 @@ class AuthService {
    * Demo authentication for development/testing when backend is unavailable
    */
   private demoLogin(credentials: LoginRequest): AuthResponse {
+    console.log('Demo login called with:', credentials.email);
     const demoUsers = [
       {
         email: 'admin@sltmobitel.lk',
@@ -231,9 +239,13 @@ class AuthService {
       }
     ];
 
+    console.log('Available demo users:', demoUsers.map(u => u.email));
+    
     const demoUser = demoUsers.find(u => 
       u.email === credentials.email && u.password === credentials.password
     );
+
+    console.log('Found demo user:', demoUser ? demoUser.email : 'none');
 
     if (demoUser) {
       const token = `demo_token_${Date.now()}`;
@@ -242,6 +254,7 @@ class AuthService {
       localStorage.setItem('user', JSON.stringify(demoUser.user));
       this.currentUser = demoUser.user;
 
+      console.log('Demo login successful for:', demoUser.user.role);
       return {
         success: true,
         token,
@@ -250,6 +263,7 @@ class AuthService {
       };
     }
 
+    console.log('Demo login failed - invalid credentials');
     throw new Error('Invalid demo credentials');
   }
 

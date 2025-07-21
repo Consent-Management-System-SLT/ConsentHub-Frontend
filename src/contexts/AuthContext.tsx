@@ -1,5 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authService, User, RegisterRequest } from '../services/authService';
+import { authService, User } from '../services/authService';
+
+interface RegisterRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone?: string;
+  company?: string;
+  department?: string;
+  jobTitle?: string;
+  acceptTerms: boolean;
+  acceptPrivacy: boolean;
+  language?: string;
+}
 
 interface AuthContextType {
   user: User | null;

@@ -17,7 +17,7 @@ const RoleBasedDashboard: React.FC = () => {
       return <AdminDashboard />;
     case 'customer':
       return <CustomerDashboard />;
-    case 'csradmin':
+    case 'csr':
       return <CSRDashboard/>;
     default:
       return <AdminDashboard />; // Default to admin dashboard

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 CSR API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .endpoint {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .success {
+            background: #d4edda !important;
+            border-color: #c3e6cb;
+        }
+        .error {
+            background: #f8d7da !important;
+            border-color: #f5c6cb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 CSR Dashboard API Test</h1>
+        <p>Testing all CSR endpoints that were causing 404 errors...</p>
+        
+        <div id="party" class="endpoint">
+            <h3>👥 Party/Customer Data</h3>
+            <p><strong>GET</strong> /api/v1/party</p>
+            <button onclick="testEndpoint('party', '/api/v1/party')">Test Party Endpoint</button>
+            <div id="party-result" class="result" style="display:none;"></div>
+        </div>
+        
+        <div id="consent" class="endpoint">
+            <h3>✅ Consent Records</h3>
+            <p><strong>GET</strong> /api/v1/consent</p>
+            <button onclick="testEndpoint('consent', '/api/v1/consent')">Test Consent Endpoint</button>
+            <div id="consent-result" class="result" style="display:none;"></div>
+        </div>
+        
+        <div id="dsar" class="endpoint">
+            <h3>📋 DSAR Requests</h3>
+            <p><strong>GET</strong> /api/v1/dsar</p>
+            <button onclick="testEndpoint('dsar', '/api/v1/dsar')">Test DSAR Endpoint</button>
+            <div id="dsar-result" class="result" style="display:none;"></div>
+        </div>
+        
+        <div id="event" class="endpoint">
+            <h3>📝 Audit Events</h3>
+            <p><strong>GET</strong> /api/v1/event</p>
+            <button onclick="testEndpoint('event', '/api/v1/event')">Test Event Endpoint</button>
+            <div id="event-result" class="result" style="display:none;"></div>
+        </div>
+        
+        <div id="preferences" class="endpoint">
+            <h3>⚙️ Customer Preferences</h3>
+            <p><strong>GET</strong> /api/v1/preferences</p>
+            <button onclick="testEndpoint('preferences', '/api/v1/preferences')">Test Preferences Endpoint</button>
+            <div id="preferences-result" class="result" style="display:none;"></div>
+        </div>
+        
+        <button onclick="testAllEndpoints()" style="background: #28a745; font-size: 16px; margin-top: 20px;">🚀 Test All Endpoints</button>
+        
+        <div id="summary" style="margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 4px; display:none;">
+            <h3>📊 Test Summary</h3>
+            <p id="summary-text"></p>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:3001';
+        
+        async function testEndpoint(name, endpoint) {
+            const container = document.getElementById(name);
+            const resultDiv = document.getElementById(`${name}-result`);
+            
+            try {
+                container.className = 'endpoint';
+                resultDiv.textContent = 'Testing...';
+                resultDiv.style.display = 'block';
+                
+                const response = await fetch(`${BACKEND_URL}${endpoint}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    container.className = 'endpoint success';
+                    resultDiv.textContent = `✅ SUCCESS (${response.status})\n\nData Count: ${Array.isArray(data) ? data.length : 'Not an array'} items\n\nSample Data:\n${JSON.stringify(data.slice ? data.slice(0, 2) : data, null, 2)}`;
+                    return true;
+                } else {
+                    container.className = 'endpoint error';
+                    resultDiv.textContent = `❌ ERROR (${response.status})\n\n${await response.text()}`;
+                    return false;
+                }
+            } catch (error) {
+                container.className = 'endpoint error';
+                resultDiv.textContent = `❌ NETWORK ERROR\n\n${error.message}`;
+                return false;
+            }
+        }
+        
+        async function testAllEndpoints() {
+            const endpoints = [
+                { name: 'party', endpoint: '/api/v1/party' },
+                { name: 'consent', endpoint: '/api/v1/consent' },
+                { name: 'dsar', endpoint: '/api/v1/dsar' },
+                { name: 'event', endpoint: '/api/v1/event' },
+                { name: 'preferences', endpoint: '/api/v1/preferences' }
+            ];
+            
+            const results = [];
+            
+            for (const ep of endpoints) {
+                const success = await testEndpoint(ep.name, ep.endpoint);
+                results.push({ name: ep.name, success });
+                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between tests
+            }
+            
+            const successCount = results.filter(r => r.success).length;
+            const totalCount = results.length;
+            
+            const summaryDiv = document.getElementById('summary');
+            const summaryText = document.getElementById('summary-text');
+            
+            summaryDiv.style.display = 'block';
+            
+            if (successCount === totalCount) {
+                summaryDiv.style.background = '#d4edda';
+                summaryText.innerHTML = `🎉 <strong>ALL TESTS PASSED!</strong><br>✅ ${successCount}/${totalCount} endpoints working<br><br>The 404 errors in your CSR Dashboard should now be resolved!`;
+            } else {
+                summaryDiv.style.background = '#f8d7da';
+                summaryText.innerHTML = `⚠️ <strong>SOME TESTS FAILED</strong><br>✅ ${successCount}/${totalCount} endpoints working<br><br>Failed: ${results.filter(r => !r.success).map(r => r.name).join(', ')}`;
+            }
+        }
+        
+        // Auto-test all endpoints on page load
+        window.onload = function() {
+            console.log('🔧 CSR API Tester loaded. Click "Test All Endpoints" to verify the fixes.');
+        }
+    </script>
+</body>
+</html>

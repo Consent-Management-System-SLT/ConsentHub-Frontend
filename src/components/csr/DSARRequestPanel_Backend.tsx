@@ -44,10 +44,29 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
   const updateRequestStatus = async (requestId: string, newStatus: string) => {
     try {
       setProcessing(requestId);
-      await apiClient.put(`/api/v1/dsar/${requestId}`, {
-        status: newStatus,
-        updatedAt: new Date().toISOString()
-      });
+      
+      // Add notification when status changes
+      const request = requests.find(r => r.id === requestId);
+      if (request) {
+        await apiClient.put(`/api/v1/dsar/${requestId}`, {
+          status: newStatus,
+          updatedAt: new Date().toISOString(),
+          processedBy: 'csr@sltmobitel.lk' // CSR user
+        });
+        
+        // Log the action
+        await apiClient.post('/api/v1/event', {
+          eventType: `dsar_${newStatus}`,
+          description: `DSAR request ${request.requestType} has been ${newStatus} by CSR`,
+          partyId: request.partyId,
+          metadata: {
+            requestId: requestId,
+            requestType: request.requestType,
+            previousStatus: request.status,
+            newStatus: newStatus
+          }
+        });
+      }
       
       // Refresh the request list
       await loadDSARRequests();
@@ -56,6 +75,44 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       setError('Failed to update request status. Please try again.');
     } finally {
       setProcessing(null);
+    }
+  };
+
+  const downloadRequestData = async (requestId: string) => {
+    try {
+      // In a real implementation, this would generate and download the requested data
+      const request = requests.find(r => r.id === requestId);
+      if (request) {
+        // Create a simple JSON file with the request data
+        const data = {
+          requestId: requestId,
+          requestType: request.requestType,
+          partyId: request.partyId,
+          status: request.status,
+          submittedAt: request.submittedAt,
+          processedAt: new Date().toISOString(),
+          data: "Sample data export - In production this would contain actual user data"
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dsar-${requestId}-${request.requestType}.json`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        // Log the download action
+        await apiClient.post('/api/v1/event', {
+          eventType: 'dsar_data_downloaded',
+          description: `DSAR ${request.requestType} data downloaded by CSR`,
+          partyId: request.partyId,
+          metadata: { requestId: requestId, requestType: request.requestType }
+        });
+      }
+    } catch (err) {
+      console.error('Error downloading DSAR data:', err);
+      setError('Failed to download request data. Please try again.');
     }
   };
 
@@ -285,6 +342,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                     
                     {request.status === 'completed' && (
                       <button
+                        onClick={() => downloadRequestData(request.id)}
                         className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 flex items-center gap-1"
                         title="Download Response"
                       >

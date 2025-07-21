@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSR Dashboard Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .status-good { background-color: #d4edda; border-color: #c3e6cb; }
+        .status-error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .test-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-btn:hover {
+            background: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 CSR Dashboard Connection Test</h1>
+        
+        <h2>Backend Status</h2>
+        <div class="status-item" id="backend-status">
+            <span>Backend Server (Port 3001)</span>
+            <span id="backend-indicator">Checking...</span>
+        </div>
+        
+        <h2>API Endpoint Tests</h2>
+        <div class="status-item" id="party-status">
+            <span>Party/Customer API</span>
+            <span id="party-indicator">Not tested</span>
+        </div>
+        
+        <div class="status-item" id="consent-status">
+            <span>Consent API</span>
+            <span id="consent-indicator">Not tested</span>
+        </div>
+        
+        <div class="status-item" id="dsar-status">
+            <span>DSAR API</span>
+            <span id="dsar-indicator">Not tested</span>
+        </div>
+        
+        <div class="status-item" id="event-status">
+            <span>Event/Audit API</span>
+            <span id="event-indicator">Not tested</span>
+        </div>
+        
+        <h2>Actions</h2>
+        <button class="test-btn" onclick="testAllEndpoints()">Test All APIs</button>
+        <button class="test-btn" onclick="testBackendConnection()">Test Backend Only</button>
+        <button class="test-btn" onclick="openCSRDashboard()">Open CSR Dashboard</button>
+        
+        <div id="results">
+            <h3>Test Results:</h3>
+            <p id="result-text">Click "Test All APIs" to start testing...</p>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:3001';
+        
+        function updateStatus(elementId, status, message) {
+            const element = document.getElementById(elementId);
+            const indicator = element.querySelector('span:last-child');
+            
+            element.className = 'status-item ' + (status === 'success' ? 'status-good' : 'status-error');
+            indicator.textContent = message;
+        }
+        
+        function logResult(message) {
+            const resultText = document.getElementById('result-text');
+            const timestamp = new Date().toLocaleTimeString();
+            resultText.innerHTML += `<br>[${timestamp}] ${message}`;
+        }
+        
+        async function testBackendConnection() {
+            logResult('Testing backend connection...');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/health`);
+                if (response.ok) {
+                    updateStatus('backend-status', 'success', '✅ Connected');
+                    logResult('✅ Backend server is running and accessible');
+                    return true;
+                } else {
+                    updateStatus('backend-status', 'error', '❌ Error: ' + response.status);
+                    logResult('❌ Backend returned error: ' + response.status);
+                    return false;
+                }
+            } catch (error) {
+                updateStatus('backend-status', 'error', '❌ Connection Failed');
+                logResult('❌ Cannot connect to backend: ' + error.message);
+                return false;
+            }
+        }
+        
+        async function testEndpoint(endpoint, statusId, name) {
+            try {
+                logResult(`Testing ${name} endpoint...`);
+                const response = await fetch(`${BACKEND_URL}${endpoint}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const isArray = Array.isArray(data);
+                    const count = isArray ? data.length : 'N/A';
+                    
+                    updateStatus(statusId, 'success', `✅ OK (${count} items)`);
+                    logResult(`✅ ${name}: ${count} items returned`);
+                    return true;
+                } else {
+                    updateStatus(statusId, 'error', `❌ Error: ${response.status}`);
+                    logResult(`❌ ${name}: HTTP ${response.status}`);
+                    return false;
+                }
+            } catch (error) {
+                updateStatus(statusId, 'error', '❌ Failed');
+                logResult(`❌ ${name}: ${error.message}`);
+                return false;
+            }
+        }
+        
+        async function testAllEndpoints() {
+            document.getElementById('result-text').innerHTML = 'Starting comprehensive API tests...';
+            
+            // Test backend first
+            const backendOk = await testBackendConnection();
+            if (!backendOk) {
+                logResult('⚠️ Backend connection failed. Cannot proceed with API tests.');
+                return;
+            }
+            
+            // Test all endpoints
+            const tests = [
+                { endpoint: '/api/v1/party', statusId: 'party-status', name: 'Party/Customer API' },
+                { endpoint: '/api/v1/consent', statusId: 'consent-status', name: 'Consent API' },
+                { endpoint: '/api/v1/dsar', statusId: 'dsar-status', name: 'DSAR API' },
+                { endpoint: '/api/v1/event', statusId: 'event-status', name: 'Event/Audit API' }
+            ];
+            
+            let successCount = 0;
+            for (const test of tests) {
+                const success = await testEndpoint(test.endpoint, test.statusId, test.name);
+                if (success) successCount++;
+                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between tests
+            }
+            
+            logResult(`<br><strong>Test Summary: ${successCount}/${tests.length} endpoints working</strong>`);
+            
+            if (successCount === tests.length) {
+                logResult('🎉 All systems operational! CSR Dashboard should work properly.');
+            } else {
+                logResult('⚠️ Some endpoints have issues. CSR Dashboard may have limited functionality.');
+            }
+        }
+        
+        function openCSRDashboard() {
+            logResult('Opening CSR Dashboard...');
+            const dashboardUrl = 'http://localhost:5173'; // Assuming Vite dev server default port
+            window.open(dashboardUrl, '_blank');
+            logResult('Dashboard should open in new tab. If not, make sure frontend is running with "npm run dev"');
+        }
+        
+        // Test backend connection on page load
+        window.onload = function() {
+            testBackendConnection();
+        }
+    </script>
+</body>
+</html>

@@ -38,7 +38,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       }
       
       const response = await apiClient.get(url);
-      const eventData = response.data as any[];
+      const eventData = Array.isArray(response.data) ? response.data : [];
       setAuditLogs(eventData);
     } catch (err) {
       console.error('Error loading audit logs:', err);

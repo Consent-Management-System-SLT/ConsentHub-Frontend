@@ -26,7 +26,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
     try {
       // Fetch all parties from backend
       const response = await apiClient.get('/api/v1/party');
-      const parties = response.data as any[];
+      const parties = Array.isArray(response.data) ? response.data : [];
       
       // Filter results based on search criteria
       const results = parties.filter((customer: any) => {
@@ -39,9 +39,13 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
           case 'name':
             return customer.name?.toLowerCase().includes(searchLower);
           case 'id':
-            return customer.id?.toLowerCase().includes(searchLower);
+            return customer.id?.toString().toLowerCase().includes(searchLower);
           default:
-            return false;
+            // Search all fields if no specific type
+            return customer.email?.toLowerCase().includes(searchLower) ||
+                   customer.name?.toLowerCase().includes(searchLower) ||
+                   customer.phone?.includes(searchTerm) ||
+                   customer.id?.toString().includes(searchTerm);
         }
       });
       

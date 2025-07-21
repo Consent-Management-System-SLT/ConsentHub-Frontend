@@ -172,6 +172,409 @@ app.get("/api/v1/health", (req, res) => {
     });
 });
 
+// ===== CSR DASHBOARD API ENDPOINTS (No Auth Required) =====
+// These endpoints are placed before authenticated endpoints to handle CSR requests
+
+// Dummy data for CSR Dashboard
+let parties = [
+    {
+        id: "1",
+        name: "John Doe", 
+        email: "john.doe@email.com",
+        phone: "+94771234567",
+        mobile: "+94771234567",
+        status: "active",
+        type: "individual",
+        partyType: "individual",
+        createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+        address: "123 Main St, Colombo 03",
+        dateOfBirth: "1985-06-15"
+    },
+    {
+        id: "2", 
+        name: "Jane Smith",
+        email: "jane.smith@email.com",
+        phone: "+94771234568",
+        mobile: "+94771234568", 
+        status: "active",
+        type: "individual",
+        partyType: "individual",
+        createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+        address: "456 Oak Ave, Kandy",
+        dateOfBirth: "1992-03-22"
+    },
+    {
+        id: "3",
+        name: "Robert Johnson",
+        email: "robert.j@email.com", 
+        phone: "+94771234569",
+        mobile: "+94771234569",
+        status: "active",
+        type: "guardian",
+        partyType: "guardian",
+        createdAt: new Date(Date.now() - 86400000 * 15).toISOString(),
+        address: "789 Pine Rd, Galle",
+        dateOfBirth: "1978-11-08"
+    },
+    {
+        id: "4",
+        name: "Emily Davis",
+        email: "emily.davis@email.com",
+        phone: "+94771234570", 
+        mobile: "+94771234570",
+        status: "inactive",
+        type: "individual",
+        partyType: "individual", 
+        createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        address: "321 Elm St, Matara",
+        dateOfBirth: "1995-09-12"
+    },
+    {
+        id: "5",
+        name: "Michael Wilson", 
+        email: "m.wilson@email.com",
+        phone: "+94771234571",
+        mobile: "+94771234571",
+        status: "active",
+        type: "individual", 
+        partyType: "individual",
+        createdAt: new Date().toISOString(),
+        address: "654 Maple Dr, Negombo",
+        dateOfBirth: "1988-12-03"
+    }
+];
+
+let csrConsents = [
+    {
+        id: "1",
+        partyId: "1",
+        customerId: "1",
+        type: "marketing",
+        purpose: "Email marketing communications",
+        status: "granted", 
+        grantedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "website",
+        lawfulBasis: "consent"
+    },
+    {
+        id: "2",
+        partyId: "1", 
+        customerId: "1",
+        type: "analytics",
+        purpose: "Website analytics and performance tracking", 
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "mobile_app",
+        lawfulBasis: "consent"
+    },
+    {
+        id: "3",
+        partyId: "2",
+        customerId: "2", 
+        type: "personalization",
+        purpose: "Personalized content and recommendations",
+        status: "denied",
+        deniedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        source: "website",
+        lawfulBasis: "consent"
+    },
+    {
+        id: "4",
+        partyId: "3",
+        customerId: "3",
+        type: "marketing", 
+        purpose: "SMS marketing communications",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "customer_service",
+        lawfulBasis: "consent"
+    },
+    {
+        id: "5",
+        partyId: "4",
+        customerId: "4",
+        type: "data_processing",
+        purpose: "Account management and billing",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 12).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 730).toISOString(),
+        source: "registration", 
+        lawfulBasis: "contract"
+    }
+];
+
+let dsarRequests = [
+    {
+        id: "1",
+        partyId: "1",
+        customerId: "1", 
+        requestType: "data_access",
+        status: "pending",
+        submittedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        description: "Request to access all personal data",
+        requestorName: "John Doe",
+        requestorEmail: "john.doe@email.com",
+        priority: "medium"
+    },
+    {
+        id: "2", 
+        partyId: "2",
+        customerId: "2",
+        requestType: "data_deletion",
+        status: "completed", 
+        submittedAt: new Date(Date.now() - 86400000 * 15).toISOString(),
+        completedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        description: "Request to delete marketing profile data",
+        requestorName: "Jane Smith",
+        requestorEmail: "jane.smith@email.com",
+        priority: "high"
+    },
+    {
+        id: "3",
+        partyId: "3", 
+        customerId: "3",
+        requestType: "data_portability",
+        status: "pending",
+        submittedAt: new Date(Date.now() - 86400000 * 28).toISOString(),
+        description: "Request to export account data",
+        requestorName: "Robert Johnson", 
+        requestorEmail: "robert.j@email.com",
+        priority: "high" // Over 25 days old - risk alert
+    },
+    {
+        id: "4",
+        partyId: "4",
+        customerId: "4", 
+        requestType: "data_rectification",
+        status: "in_progress",
+        submittedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+        description: "Request to update incorrect address information",
+        requestorName: "Emily Davis",
+        requestorEmail: "emily.davis@email.com", 
+        priority: "medium"
+    }
+];
+
+let auditEvents = [
+    {
+        id: "1",
+        partyId: "1",
+        eventType: "consent_granted",
+        description: "Marketing consent granted via website",
+        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        userId: "csr_001",
+        ipAddress: "192.168.1.100",
+        userAgent: "Mozilla/5.0...",
+        metadata: { consentId: "1", channel: "website" }
+    },
+    {
+        id: "2", 
+        partyId: "2",
+        eventType: "consent_denied",
+        description: "Personalization consent denied",
+        createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        userId: "csr_002", 
+        ipAddress: "192.168.1.101",
+        userAgent: "Mozilla/5.0...",
+        metadata: { consentId: "3", channel: "website" }
+    },
+    {
+        id: "3",
+        partyId: "1",
+        eventType: "dsar_request_submitted",
+        description: "Data access request submitted",
+        createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        userId: "customer", 
+        ipAddress: "192.168.1.102",
+        userAgent: "Mozilla/5.0...",
+        metadata: { dsarId: "1", requestType: "data_access" }
+    },
+    {
+        id: "4",
+        partyId: "2",
+        eventType: "dsar_request_completed", 
+        description: "Data deletion request completed",
+        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        userId: "csr_001",
+        ipAddress: "192.168.1.103",
+        userAgent: "Mozilla/5.0...",
+        metadata: { dsarId: "2", requestType: "data_deletion" }
+    },
+    {
+        id: "5",
+        partyId: "3",
+        eventType: "profile_updated",
+        description: "Customer profile information updated",
+        createdAt: new Date().toISOString(),
+        userId: "csr_002",
+        ipAddress: "192.168.1.104", 
+        userAgent: "Mozilla/5.0...",
+        metadata: { field: "address", oldValue: "old address", newValue: "new address" }
+    }
+];
+
+let customerPreferences = [
+    {
+        id: "1",
+        partyId: "1",
+        preferredChannels: {
+            email: true,
+            sms: false, 
+            phone: true,
+            push: true
+        },
+        topicSubscriptions: {
+            marketing: true,
+            promotions: false,
+            serviceUpdates: true,
+            billing: true,
+            security: true
+        },
+        frequency: "weekly",
+        language: "en",
+        timezone: "Asia/Colombo",
+        updatedAt: new Date(Date.now() - 86400000 * 5).toISOString()
+    },
+    {
+        id: "2", 
+        partyId: "2",
+        preferredChannels: {
+            email: false,
+            sms: true,
+            phone: false,
+            push: false
+        },
+        topicSubscriptions: {
+            marketing: false,
+            promotions: false, 
+            serviceUpdates: true,
+            billing: true,
+            security: true
+        },
+        frequency: "immediate",
+        language: "en",
+        timezone: "Asia/Colombo",
+        updatedAt: new Date(Date.now() - 86400000 * 2).toISOString()
+    }
+];
+
+// CSR Dashboard API Routes (No authentication required)
+
+// GET /api/v1/party - Get all customers/parties for CSR
+app.get("/api/v1/party", (req, res) => {
+    console.log('🔍 CSR Dashboard: Fetching party/customer data');
+    res.json(parties);
+});
+
+// GET /api/v1/consent - Get all consents for CSR  
+app.get("/api/v1/consent", (req, res) => {
+    console.log('✅ CSR Dashboard: Fetching consent data');
+    res.json(csrConsents);
+});
+
+// GET /api/v1/dsar - Get all DSAR requests for CSR
+app.get("/api/v1/dsar", (req, res) => {
+    console.log('📋 CSR Dashboard: Fetching DSAR data');
+    res.json(dsarRequests);
+});
+
+// GET /api/v1/event - Get all audit events for CSR
+app.get("/api/v1/event", (req, res) => {
+    console.log('📝 CSR Dashboard: Fetching event/audit data');
+    res.json(auditEvents);
+});
+
+// GET /api/v1/preferences - Get customer preferences for CSR
+app.get("/api/v1/preferences", (req, res) => {
+    console.log('⚙️ CSR Dashboard: Fetching preferences data');
+    const partyId = req.query.partyId;
+    if (partyId) {
+        const prefs = customerPreferences.filter(p => p.partyId === partyId);
+        res.json(prefs);
+    } else {
+        res.json(customerPreferences);
+    }
+});
+
+// POST /api/v1/preferences - Create/Update preferences for CSR
+app.post("/api/v1/preferences", (req, res) => {
+    console.log('⚙️ CSR Dashboard: Creating/updating preferences');
+    const newPrefs = {
+        id: Date.now().toString(),
+        ...req.body,
+        updatedAt: new Date().toISOString()
+    };
+    customerPreferences.push(newPrefs);
+    res.status(201).json(newPrefs);
+});
+
+// POST /api/v1/dsar - Create new DSAR request for CSR
+app.post("/api/v1/dsar", (req, res) => {
+    console.log('📋 CSR Dashboard: Creating DSAR request');
+    const newRequest = {
+        id: Date.now().toString(),
+        ...req.body,
+        status: "pending",
+        submittedAt: new Date().toISOString()
+    };
+    dsarRequests.push(newRequest);
+    res.status(201).json(newRequest);
+});
+
+// PUT /api/v1/dsar/:id - Update DSAR request for CSR
+app.put("/api/v1/dsar/:id", (req, res) => {
+    console.log(`📋 CSR Dashboard: Updating DSAR request ${req.params.id}`);
+    const { id } = req.params;
+    const requestIndex = dsarRequests.findIndex(r => r.id === id);
+    
+    if (requestIndex === -1) {
+        return res.status(404).json({ error: "DSAR request not found" });
+    }
+    
+    dsarRequests[requestIndex] = {
+        ...dsarRequests[requestIndex],
+        ...req.body,
+        updatedAt: new Date().toISOString()
+    };
+    
+    res.json(dsarRequests[requestIndex]);
+});
+
+// POST /api/v1/consent - Create new consent for CSR
+app.post("/api/v1/consent", (req, res) => {
+    console.log('✅ CSR Dashboard: Creating consent record');
+    const newConsent = {
+        id: Date.now().toString(),
+        ...req.body,
+        grantedAt: req.body.status === 'granted' ? new Date().toISOString() : undefined,
+        deniedAt: req.body.status === 'denied' ? new Date().toISOString() : undefined
+    };
+    csrConsents.push(newConsent);
+    res.status(201).json(newConsent);
+});
+
+// PUT /api/v1/consent/:id - Update consent for CSR
+app.put("/api/v1/consent/:id", (req, res) => {
+    console.log(`✅ CSR Dashboard: Updating consent ${req.params.id}`);
+    const { id } = req.params;
+    const consentIndex = csrConsents.findIndex(c => c.id === id);
+    
+    if (consentIndex === -1) {
+        return res.status(404).json({ error: "Consent not found" });
+    }
+    
+    csrConsents[consentIndex] = {
+        ...csrConsents[consentIndex],
+        ...req.body,
+        updatedAt: new Date().toISOString()
+    };
+    
+    res.json(csrConsents[consentIndex]);
+});
+
 // Authentication endpoints
 app.post("/api/v1/auth/login", (req, res) => {
     const { email, password } = req.body;
@@ -678,4 +1081,23 @@ app.listen(PORT, () => {
     console.log('   ✅ Privacy Notices');
     console.log('   ✅ Profile Management');
     console.log('   ✅ Data Subject Access Requests (DSAR)');
+    console.log('');
+    console.log('🔧 CSR Dashboard API Endpoints Available:');
+    console.log('   GET  /api/v1/party (Customer data)');
+    console.log('   GET  /api/v1/consent (Consent records)'); 
+    console.log('   GET  /api/v1/dsar (DSAR requests)');
+    console.log('   GET  /api/v1/event (Audit events)');
+    console.log('   GET  /api/v1/preferences (Customer preferences)');
+    console.log('   POST /api/v1/preferences (Create/Update preferences)');
+    console.log('   POST /api/v1/dsar (Create DSAR request)');
+    console.log('   PUT  /api/v1/dsar/:id (Update DSAR request)');
+    console.log('   POST /api/v1/consent (Create consent)');
+    console.log('   PUT  /api/v1/consent/:id (Update consent)');
+    console.log('');
+    console.log('📊 Dummy Data Loaded:');
+    console.log('   👥 5 Customer records (parties)');
+    console.log('   ✅ 5 Consent records');
+    console.log('   📋 4 DSAR requests (1 overdue for risk alerts)');
+    console.log('   📝 5 Audit events');
+    console.log('   ⚙️  2 Customer preference profiles');
 });
