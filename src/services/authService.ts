@@ -116,7 +116,7 @@ class AuthService {
     try {
       let response;
       
-      // Try production endpoint first, then fallback to local
+      // Try production endpoint first, then fallback to local, then demo mode
       try {
         response = await multiServiceApiClient.makeRequest(
           'POST',
@@ -126,14 +126,20 @@ class AuthService {
           'auth'
         );
       } catch (prodError) {
-        // Fallback to local development endpoint
-        response = await multiServiceApiClient.makeRequest(
-          'POST',
-          '/api/v1/auth/login', // Fixed: Local development endpoint (removed double auth)
-          credentials,
-          'customer',
-          'auth'
-        );
+        try {
+          // Fallback to local development endpoint
+          response = await multiServiceApiClient.makeRequest(
+            'POST',
+            '/api/v1/auth/login', // Fixed: Local development endpoint
+            credentials,
+            'customer',
+            'auth'
+          );
+        } catch (localError) {
+          console.log('Backend unavailable, using demo authentication');
+          // Demo fallback authentication
+          return this.demoLogin(credentials);
+        }
       }
 
       console.log('Login response received:', response);
@@ -165,6 +171,86 @@ class AuthService {
       console.error('Login error:', error);
       throw new Error(error.message || 'Login failed');
     }
+  }
+
+  /**
+   * Demo authentication for development/testing when backend is unavailable
+   */
+  private demoLogin(credentials: LoginRequest): AuthResponse {
+    const demoUsers = [
+      {
+        email: 'admin@sltmobitel.lk',
+        password: 'admin123',
+        user: {
+          id: 'demo-admin-001',
+          uid: 'demo-admin-001',
+          email: 'admin@sltmobitel.lk',
+          name: 'Admin User',
+          firstName: 'Admin',
+          lastName: 'User',
+          role: 'admin' as const,
+          status: 'active' as const,
+          createdAt: new Date().toISOString(),
+          isActive: true,
+          emailVerified: true
+        }
+      },
+      {
+        email: 'csr@sltmobitel.lk',
+        password: 'csr123',
+        user: {
+          id: 'demo-csr-001',
+          uid: 'demo-csr-001',
+          email: 'csr@sltmobitel.lk',
+          name: 'CSR User',
+          firstName: 'CSR',
+          lastName: 'User',
+          role: 'csr' as const,
+          status: 'active' as const,
+          createdAt: new Date().toISOString(),
+          isActive: true,
+          emailVerified: true
+        }
+      },
+      {
+        email: 'customer@sltmobitel.lk',
+        password: 'customer123',
+        user: {
+          id: 'demo-customer-001',
+          uid: 'demo-customer-001',
+          email: 'customer@sltmobitel.lk',
+          name: 'Customer User',
+          firstName: 'Customer',
+          lastName: 'User',
+          role: 'customer' as const,
+          status: 'active' as const,
+          createdAt: new Date().toISOString(),
+          isActive: true,
+          emailVerified: true
+        }
+      }
+    ];
+
+    const demoUser = demoUsers.find(u => 
+      u.email === credentials.email && u.password === credentials.password
+    );
+
+    if (demoUser) {
+      const token = `demo_token_${Date.now()}`;
+      
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('user', JSON.stringify(demoUser.user));
+      this.currentUser = demoUser.user;
+
+      return {
+        success: true,
+        token,
+        user: demoUser.user,
+        expiresIn: '24h'
+      };
+    }
+
+    throw new Error('Invalid demo credentials');
   }
 
   /**
