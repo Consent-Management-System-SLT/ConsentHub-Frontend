@@ -274,7 +274,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
           <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {quickActions.map((action) => {
+          {Array.isArray(quickActions) && quickActions.map((action) => {
             const Icon = action.icon;
             return (
               <div

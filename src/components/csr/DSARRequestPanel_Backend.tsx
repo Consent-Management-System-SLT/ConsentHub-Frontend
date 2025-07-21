@@ -31,11 +31,32 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       }
       
       const response = await apiClient.get(url);
-      const dsarData = response.data as any[];
-      setRequests(dsarData);
+      const dsarData = response.data;
+      
+      // Ensure we always have an array
+      let requestArray: any[] = [];
+      
+      if (Array.isArray(dsarData)) {
+        requestArray = dsarData;
+      } else if (dsarData && typeof dsarData === 'object') {
+        // If it's an object, try to extract array from common properties
+        const dataObj = dsarData as any;
+        requestArray = dataObj.data || dataObj.requests || dataObj.results || [];
+        
+        // Ensure extracted data is actually an array
+        if (!Array.isArray(requestArray)) {
+          requestArray = [];
+        }
+      } else {
+        requestArray = [];
+      }
+      
+      console.log('Loaded DSAR requests:', requestArray); // Debug log
+      setRequests(requestArray);
     } catch (err) {
       console.error('Error loading DSAR requests:', err);
       setError('Failed to load DSAR requests. Please try again.');
+      setRequests([]); // Ensure requests is always an array even on error
     } finally {
       setLoading(false);
     }
@@ -254,7 +275,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
         </div>
       </div>
 
-      {requests.length === 0 ? (
+      {requests && requests.length === 0 ? (
         <div className="text-center py-12">
           <ShieldCheck className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600">No DSAR requests found.</p>
@@ -264,7 +285,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
         </div>
       ) : (
         <div className="divide-y divide-gray-200">
-          {requests.map((request) => {
+          {Array.isArray(requests) && requests.map((request) => {
             const daysRemaining = calculateDaysRemaining(request.submittedAt);
             const isOverdue = daysRemaining < 0;
             

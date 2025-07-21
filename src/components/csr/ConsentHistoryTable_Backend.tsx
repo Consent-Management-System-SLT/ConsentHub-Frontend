@@ -35,15 +35,25 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       const consentData = response.data;
       
       // Ensure we always have an array
+      let consentArray: any[] = [];
+      
       if (Array.isArray(consentData)) {
-        setConsents(consentData);
+        consentArray = consentData;
       } else if (consentData && typeof consentData === 'object') {
         // If it's an object, try to extract array from common properties
         const dataObj = consentData as any;
-        setConsents(dataObj.data || dataObj.consents || []);
+        consentArray = dataObj.data || dataObj.consents || dataObj.results || [];
+        
+        // Ensure extracted data is actually an array
+        if (!Array.isArray(consentArray)) {
+          consentArray = [];
+        }
       } else {
-        setConsents([]);
+        consentArray = [];
       }
+      
+      console.log('Loaded consents:', consentArray); // Debug log
+      setConsents(consentArray);
     } catch (err) {
       console.error('Error loading consents:', err);
       setError('Failed to load consent history. Please try again.');
@@ -171,7 +181,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
         </div>
       </div>
 
-      {consents.length === 0 ? (
+      {consents && consents.length === 0 ? (
         <div className="text-center py-12">
           <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600">No consent records found.</p>
@@ -205,7 +215,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {consents.map((consent) => (
+              {Array.isArray(consents) && consents.map((consent) => (
                 <tr key={consent.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{consent.partyId}</div>
