@@ -341,13 +341,6 @@ The system includes comprehensive demo data for testing all features:
 - Include comprehensive testing
 - Update documentation as needed
 
-## 📞 Support
-
-### Getting Help
-- 🐛 **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions)
-- 📧 **Email**: consenthub-support@sltmobitel.lk
-
 ### Resources
 - 📚 **TMF Forum APIs**: [Official Documentation](https://www.tmforum.org/open-apis/)
 - 🎓 **GDPR Guide**: [EU GDPR Info](https://gdpr-info.eu/)
