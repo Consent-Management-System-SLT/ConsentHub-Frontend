@@ -8,7 +8,7 @@ import {
   Shield,
   RefreshCw
 } from 'lucide-react';
-import { apiClient } from '../../services/apiClient';
+import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface CSROverviewEnhancedProps {
   className?: string;
@@ -45,12 +45,12 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
   const loadDetailedStats = async () => {
     try {
       setLoading(true);
+      console.log('🔄 Loading CSR overview stats...');
       
-      // Fetch CSR dashboard statistics from the dedicated stats endpoint
-      const statsResponse = await apiClient.get('/api/csr/stats');
-      const statsData = statsResponse.data as any;
+      // Use the new CSR dashboard service with comprehensive fallbacks
+      const statsData = await csrDashboardService.getCSRStats();
       
-      // Update stats with actual data from backend
+      // Update stats with data from service
       setStats({
         totalCustomers: statsData.totalCustomers || 0,
         pendingRequests: statsData.pendingRequests || 0,
@@ -67,24 +67,26 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
         newCustomers: statsData.newCustomers || 0
       });
 
+      console.log('✅ CSR overview stats loaded:', statsData);
       await loadQuickActions();
 
     } catch (error) {
-      console.error('Error loading detailed stats:', error);
-      // Fallback to sample data if API fails
+      console.error('❌ Error loading CSR overview stats:', error);
+      
+      // Enhanced fallback data
       setStats({
-        totalCustomers: 8,
-        pendingRequests: 3,
-        consentUpdates: 12,
+        totalCustomers: 10,
+        pendingRequests: 4,
+        consentUpdates: 8,
         guardiansManaged: 2,
-        todayActions: 5,
-        riskAlerts: 1
+        todayActions: 15,
+        riskAlerts: 2
       });
       
       setInsights({
-        consentRate: 85,
-        resolvedRequests: 7,
-        newCustomers: 2
+        consentRate: 78,
+        resolvedRequests: 8,
+        newCustomers: 3
       });
       
       await loadQuickActions();

@@ -175,7 +175,7 @@ app.get("/api/v1/health", (req, res) => {
 // ===== CSR DASHBOARD API ENDPOINTS (No Auth Required) =====
 // These endpoints are placed before authenticated endpoints to handle CSR requests
 
-// Dummy data for CSR Dashboard
+// Comprehensive Dummy Data for CSR Dashboard - Extensive Dataset
 let parties = [
     {
         id: "1",
@@ -188,7 +188,11 @@ let parties = [
         partyType: "individual",
         createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
         address: "123 Main St, Colombo 03",
-        dateOfBirth: "1985-06-15"
+        dateOfBirth: "1985-06-15",
+        customerSince: "2023-01-15",
+        riskLevel: "low",
+        totalConsents: 8,
+        activeConsents: 6
     },
     {
         id: "2", 
@@ -201,7 +205,11 @@ let parties = [
         partyType: "individual",
         createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
         address: "456 Oak Ave, Kandy",
-        dateOfBirth: "1992-03-22"
+        dateOfBirth: "1992-03-22",
+        customerSince: "2023-03-10",
+        riskLevel: "medium",
+        totalConsents: 12,
+        activeConsents: 10
     },
     {
         id: "3",
@@ -214,7 +222,12 @@ let parties = [
         partyType: "guardian",
         createdAt: new Date(Date.now() - 86400000 * 15).toISOString(),
         address: "789 Pine Rd, Galle",
-        dateOfBirth: "1978-11-08"
+        dateOfBirth: "1978-11-08",
+        customerSince: "2022-12-05",
+        riskLevel: "low",
+        totalConsents: 15,
+        activeConsents: 12,
+        dependents: ["minor_001", "minor_002"]
     },
     {
         id: "4",
@@ -227,7 +240,114 @@ let parties = [
         partyType: "individual", 
         createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
         address: "321 Elm St, Matara",
-        dateOfBirth: "1995-09-12"
+        dateOfBirth: "1995-09-12",
+        customerSince: "2024-01-20",
+        riskLevel: "high",
+        totalConsents: 5,
+        activeConsents: 2
+    },
+    {
+        id: "5",
+        name: "Michael Chen",
+        email: "michael.chen@email.com",
+        phone: "+94771234571",
+        mobile: "+94771234571",
+        status: "active",
+        type: "individual",
+        partyType: "individual",
+        createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        address: "555 Tech Park, Colombo 07",
+        dateOfBirth: "1990-05-18",
+        customerSince: "2024-07-20",
+        riskLevel: "low",
+        totalConsents: 6,
+        activeConsents: 6
+    },
+    {
+        id: "6",
+        name: "Sarah Williams",
+        email: "sarah.w@email.com",
+        phone: "+94771234572",
+        mobile: "+94771234572",
+        status: "active",
+        type: "guardian",
+        partyType: "guardian",
+        createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+        address: "888 Garden Lane, Negombo",
+        dateOfBirth: "1985-12-03",
+        customerSince: "2023-05-12",
+        riskLevel: "medium",
+        totalConsents: 20,
+        activeConsents: 18,
+        dependents: ["minor_003"]
+    },
+    {
+        id: "7",
+        name: "David Brown",
+        email: "david.brown@email.com",
+        phone: "+94771234573",
+        mobile: "+94771234573",
+        status: "pending",
+        type: "individual",
+        partyType: "individual",
+        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        address: "999 Business District, Colombo 01",
+        dateOfBirth: "1988-07-25",
+        customerSince: "2024-07-19",
+        riskLevel: "medium",
+        totalConsents: 3,
+        activeConsents: 1
+    },
+    {
+        id: "8",
+        name: "Lisa Anderson",
+        email: "lisa.anderson@email.com",
+        phone: "+94771234574",
+        mobile: "+94771234574",
+        status: "active",
+        type: "individual",
+        partyType: "individual",
+        createdAt: new Date(Date.now() - 86400000 * 20).toISOString(),
+        address: "111 Coastal Road, Bentota",
+        dateOfBirth: "1993-02-14",
+        customerSince: "2023-02-01",
+        riskLevel: "low",
+        totalConsents: 14,
+        activeConsents: 11
+    },
+    {
+        id: "9",
+        name: "Alex Thompson",
+        email: "alex.thompson@email.com",
+        phone: "+94771234575",
+        mobile: "+94771234575",
+        status: "active",
+        type: "individual",
+        partyType: "individual",
+        createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
+        address: "222 Hill View, Nuwara Eliya",
+        dateOfBirth: "1987-09-30",
+        customerSince: "2022-10-15",
+        riskLevel: "low",
+        totalConsents: 18,
+        activeConsents: 16
+    },
+    {
+        id: "10",
+        name: "Maria Rodriguez",
+        email: "maria.rodriguez@email.com",
+        phone: "+94771234576",
+        mobile: "+94771234576",
+        status: "suspended",
+        type: "individual",
+        partyType: "individual",
+        createdAt: new Date(Date.now() - 86400000 * 45).toISOString(),
+        address: "333 Central Plaza, Anuradhapura",
+        dateOfBirth: "1991-04-07",
+        customerSince: "2022-08-20",
+        riskLevel: "high",
+        totalConsents: 9,
+        activeConsents: 3
     },
     {
         id: "5",
@@ -244,7 +364,9 @@ let parties = [
     }
 ];
 
+// Comprehensive CSR Consent Data - Extensive Dataset
 let csrConsents = [
+    // Customer 1 - John Doe (8 consents)
     {
         id: "1",
         partyId: "1",
@@ -255,7 +377,9 @@ let csrConsents = [
         grantedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
         expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
         source: "website",
-        lawfulBasis: "consent"
+        lawfulBasis: "consent",
+        category: "Marketing",
+        description: "Receive promotional emails and special offers"
     },
     {
         id: "2",
@@ -267,21 +391,265 @@ let csrConsents = [
         grantedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
         expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
         source: "mobile_app",
-        lawfulBasis: "consent"
+        lawfulBasis: "consent",
+        category: "Analytics",
+        description: "Allow usage tracking for service improvement"
     },
     {
         id: "3",
+        partyId: "1",
+        customerId: "1",
+        type: "service",
+        purpose: "Service communications and updates",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "registration",
+        lawfulBasis: "contract",
+        category: "Service",
+        description: "Essential service notifications and updates"
+    },
+    {
+        id: "4",
+        partyId: "1",
+        customerId: "1",
+        type: "personalization",
+        purpose: "Personalized content recommendations",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 15).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "website",
+        lawfulBasis: "consent",
+        category: "Personalization",
+        description: "Customize content based on preferences"
+    },
+    {
+        id: "5",
+        partyId: "1",
+        customerId: "1",
+        type: "sms_marketing",
+        purpose: "SMS promotional messages",
+        status: "denied",
+        deniedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        source: "customer_service",
+        lawfulBasis: "consent",
+        category: "Marketing",
+        description: "Receive promotional SMS messages"
+    },
+    {
+        id: "6",
+        partyId: "1",
+        customerId: "1",
+        type: "third_party_sharing",
+        purpose: "Share data with marketing partners",
+        status: "denied",
+        deniedAt: new Date(Date.now() - 86400000 * 8).toISOString(),
+        source: "website",
+        lawfulBasis: "consent",
+        category: "Third Party",
+        description: "Allow sharing with trusted marketing partners"
+    },
+    {
+        id: "7",
+        partyId: "1",
+        customerId: "1",
+        type: "location_tracking",
+        purpose: "Location-based services",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 20).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "mobile_app",
+        lawfulBasis: "consent",
+        category: "Location",
+        description: "Use location for nearby offers and services"
+    },
+    {
+        id: "8",
+        partyId: "1",
+        customerId: "1",
+        type: "cookies",
+        purpose: "Essential and functional cookies",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 30).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "website",
+        lawfulBasis: "consent",
+        category: "Cookies",
+        description: "Store cookies for better user experience"
+    },
+
+    // Customer 2 - Jane Smith (12 consents)
+    {
+        id: "9",
+        partyId: "2",
+        customerId: "2",
+        type: "marketing",
+        purpose: "Email marketing communications",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "website",
+        lawfulBasis: "consent",
+        category: "Marketing",
+        description: "Receive promotional emails and special offers"
+    },
+    {
+        id: "10",
         partyId: "2",
         customerId: "2", 
         type: "personalization",
         purpose: "Personalized content and recommendations",
-        status: "denied",
-        deniedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
         source: "website",
-        lawfulBasis: "consent"
+        lawfulBasis: "consent",
+        category: "Personalization",
+        description: "Customize content based on preferences"
     },
     {
-        id: "4",
+        id: "11",
+        partyId: "2",
+        customerId: "2",
+        type: "sms_marketing",
+        purpose: "SMS promotional messages",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "customer_service",
+        lawfulBasis: "consent",
+        category: "Marketing",
+        description: "Receive promotional SMS messages"
+    },
+    {
+        id: "12",
+        partyId: "2",
+        customerId: "2",
+        type: "analytics",
+        purpose: "Website and app analytics",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "mobile_app",
+        lawfulBasis: "consent",
+        category: "Analytics",
+        description: "Track usage for service improvement"
+    },
+    {
+        id: "13",
+        partyId: "2",
+        customerId: "2",
+        type: "service",
+        purpose: "Service communications",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 12).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "registration",
+        lawfulBasis: "contract",
+        category: "Service",
+        description: "Essential service notifications"
+    },
+    {
+        id: "14",
+        partyId: "2",
+        customerId: "2",
+        type: "location_tracking",
+        purpose: "Location-based services",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 14).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "mobile_app",
+        lawfulBasis: "consent",
+        category: "Location",
+        description: "Location-based offers and services"
+    },
+    {
+        id: "15",
+        partyId: "2",
+        customerId: "2",
+        type: "cookies",
+        purpose: "Functional cookies",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 18).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "website",
+        lawfulBasis: "consent",
+        category: "Cookies",
+        description: "Essential website functionality"
+    },
+    {
+        id: "16",
+        partyId: "2",
+        customerId: "2",
+        type: "third_party_sharing",
+        purpose: "Share with analytics partners",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 20).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "website",
+        lawfulBasis: "consent",
+        category: "Third Party",
+        description: "Share anonymized data with analytics partners"
+    },
+    {
+        id: "17",
+        partyId: "2",
+        customerId: "2",
+        type: "push_notifications",
+        purpose: "Mobile push notifications",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 25).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "mobile_app",
+        lawfulBasis: "consent",
+        category: "Notifications",
+        description: "Receive mobile push notifications"
+    },
+    {
+        id: "18",
+        partyId: "2",
+        customerId: "2",
+        type: "research",
+        purpose: "Market research participation",
+        status: "denied",
+        deniedAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+        source: "email",
+        lawfulBasis: "consent",
+        category: "Research",
+        description: "Participate in market research surveys"
+    },
+    {
+        id: "19",
+        partyId: "2",
+        customerId: "2",
+        type: "social_media",
+        purpose: "Social media integration",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 30).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "website",
+        lawfulBasis: "consent",
+        category: "Social Media",
+        description: "Connect with social media accounts"
+    },
+    {
+        id: "20",
+        partyId: "2",
+        customerId: "2",
+        type: "newsletter",
+        purpose: "Monthly newsletter subscription",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 35).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "website",
+        lawfulBasis: "consent",
+        category: "Newsletter",
+        description: "Receive monthly newsletter updates"
+    },
+
+    // Additional consents for other customers (15 consents for Robert Johnson)
+    {
+        id: "21",
         partyId: "3",
         customerId: "3",
         type: "marketing", 
@@ -290,10 +658,28 @@ let csrConsents = [
         grantedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
         expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
         source: "customer_service",
-        lawfulBasis: "consent"
+        lawfulBasis: "consent",
+        category: "Marketing",
+        description: "Guardian consent for marketing communications"
     },
     {
-        id: "5",
+        id: "22",
+        partyId: "3",
+        customerId: "3",
+        type: "guardian_consent",
+        purpose: "Consent on behalf of minor child",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "in_person",
+        lawfulBasis: "consent",
+        category: "Guardian",
+        description: "Legal guardian consent for minor's data processing"
+    },
+
+    // Quick additional consents for remaining customers
+    {
+        id: "23",
         partyId: "4",
         customerId: "4",
         type: "data_processing",
@@ -302,10 +688,41 @@ let csrConsents = [
         grantedAt: new Date(Date.now() - 86400000 * 12).toISOString(),
         expiresAt: new Date(Date.now() + 86400000 * 730).toISOString(),
         source: "registration", 
-        lawfulBasis: "contract"
+        lawfulBasis: "contract",
+        category: "Service",
+        description: "Essential account and billing data processing"
+    },
+    {
+        id: "24",
+        partyId: "5",
+        customerId: "5",
+        type: "marketing",
+        purpose: "Email marketing",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "website",
+        lawfulBasis: "consent",
+        category: "Marketing",
+        description: "New customer marketing consent"
+    },
+    {
+        id: "25",
+        partyId: "6",
+        customerId: "6",
+        type: "guardian_consent",
+        purpose: "Guardian data processing",
+        status: "granted",
+        grantedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+        expiresAt: new Date(Date.now() + 86400000 * 365).toISOString(),
+        source: "in_person",
+        lawfulBasis: "consent",
+        category: "Guardian",
+        description: "Guardian consent for dependent management"
     }
 ];
 
+// Comprehensive DSAR Requests - Extensive Dataset
 let dsarRequests = [
     {
         id: "1",
@@ -314,10 +731,14 @@ let dsarRequests = [
         requestType: "data_access",
         status: "pending",
         submittedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-        description: "Request to access all personal data",
+        description: "Request to access all personal data collected and processed",
         requestorName: "John Doe",
         requestorEmail: "john.doe@email.com",
-        priority: "medium"
+        priority: "medium",
+        estimatedCompletionDate: new Date(Date.now() + 86400000 * 27).toISOString(),
+        assignedTo: "CSR Team A",
+        category: "Subject Access Request",
+        legalBasis: "GDPR Article 15"
     },
     {
         id: "2", 
@@ -327,10 +748,14 @@ let dsarRequests = [
         status: "completed", 
         submittedAt: new Date(Date.now() - 86400000 * 15).toISOString(),
         completedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        description: "Request to delete marketing profile data",
+        description: "Request to delete marketing profile data and analytics cookies",
         requestorName: "Jane Smith",
         requestorEmail: "jane.smith@email.com",
-        priority: "high"
+        priority: "high",
+        assignedTo: "Sarah Wilson",
+        category: "Right to Erasure",
+        legalBasis: "GDPR Article 17",
+        completionNotes: "All marketing data successfully deleted. Customer notified."
     },
     {
         id: "3",
@@ -339,10 +764,15 @@ let dsarRequests = [
         requestType: "data_portability",
         status: "pending",
         submittedAt: new Date(Date.now() - 86400000 * 28).toISOString(),
-        description: "Request to export account data",
+        description: "Request to export complete account data for transfer to another service",
         requestorName: "Robert Johnson", 
         requestorEmail: "robert.j@email.com",
-        priority: "high" // Over 25 days old - risk alert
+        priority: "high", // Over 25 days old - risk alert!
+        estimatedCompletionDate: new Date(Date.now() + 86400000 * 2).toISOString(),
+        assignedTo: "Michael Chen",
+        category: "Data Portability",
+        legalBasis: "GDPR Article 20",
+        notes: "URGENT: Request approaching 30-day deadline"
     },
     {
         id: "4",
@@ -351,68 +781,296 @@ let dsarRequests = [
         requestType: "data_rectification",
         status: "in_progress",
         submittedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
-        description: "Request to update incorrect address information",
+        description: "Request to update incorrect address and phone number information",
         requestorName: "Emily Davis",
         requestorEmail: "emily.davis@email.com", 
-        priority: "medium"
+        priority: "medium",
+        estimatedCompletionDate: new Date(Date.now() + 86400000 * 23).toISOString(),
+        assignedTo: "Lisa Anderson",
+        category: "Right to Rectification",
+        legalBasis: "GDPR Article 16",
+        notes: "Verification documents received, processing updates"
+    },
+    {
+        id: "5",
+        partyId: "5",
+        customerId: "5",
+        requestType: "data_access",
+        status: "pending",
+        submittedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        description: "New customer requesting copy of all data collected during registration",
+        requestorName: "Michael Chen",
+        requestorEmail: "michael.chen@email.com",
+        priority: "low",
+        estimatedCompletionDate: new Date(Date.now() + 86400000 * 29).toISOString(),
+        assignedTo: "David Brown",
+        category: "Subject Access Request",
+        legalBasis: "GDPR Article 15"
+    },
+    {
+        id: "6",
+        partyId: "6",
+        customerId: "6",
+        requestType: "data_restriction",
+        status: "completed",
+        submittedAt: new Date(Date.now() - 86400000 * 12).toISOString(),
+        completedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        description: "Guardian requesting restriction of minor's data processing for marketing",
+        requestorName: "Sarah Williams",
+        requestorEmail: "sarah.w@email.com",
+        priority: "high",
+        assignedTo: "Alex Thompson",
+        category: "Right to Restriction",
+        legalBasis: "GDPR Article 18",
+        completionNotes: "Marketing data processing restricted for dependent minor_003"
+    },
+    {
+        id: "7",
+        partyId: "7",
+        customerId: "7",
+        requestType: "consent_withdrawal",
+        status: "completed",
+        submittedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+        completedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        description: "Withdrawal of consent for all non-essential data processing",
+        requestorName: "David Brown",
+        requestorEmail: "david.brown@email.com",
+        priority: "medium",
+        assignedTo: "Maria Rodriguez",
+        category: "Consent Withdrawal",
+        legalBasis: "GDPR Article 7(3)",
+        completionNotes: "All non-essential consents revoked, account status updated"
+    },
+    {
+        id: "8",
+        partyId: "8",
+        customerId: "8",
+        requestType: "data_deletion",
+        status: "pending",
+        submittedAt: new Date(Date.now() - 86400000 * 9).toISOString(),
+        description: "Request to delete inactive account and all associated data",
+        requestorName: "Lisa Anderson",
+        requestorEmail: "lisa.anderson@email.com",
+        priority: "medium",
+        estimatedCompletionDate: new Date(Date.now() + 86400000 * 21).toISOString(),
+        assignedTo: "Emily Davis",
+        category: "Right to Erasure",
+        legalBasis: "GDPR Article 17"
+    },
+    {
+        id: "9",
+        partyId: "9",
+        customerId: "9",
+        requestType: "data_portability",
+        status: "in_progress",
+        submittedAt: new Date(Date.now() - 86400000 * 18).toISOString(),
+        description: "Long-term customer requesting full data export for backup purposes",
+        requestorName: "Alex Thompson",
+        requestorEmail: "alex.thompson@email.com",
+        priority: "low",
+        estimatedCompletionDate: new Date(Date.now() + 86400000 * 12).toISOString(),
+        assignedTo: "Robert Johnson",
+        category: "Data Portability",
+        legalBasis: "GDPR Article 20",
+        notes: "Large dataset - processing in phases"
+    },
+    {
+        id: "10",
+        partyId: "10",
+        customerId: "10",
+        requestType: "account_investigation",
+        status: "pending",
+        submittedAt: new Date(Date.now() - 86400000 * 30).toISOString(),
+        description: "Investigation of suspected unauthorized data processing activities",
+        requestorName: "Maria Rodriguez",
+        requestorEmail: "maria.rodriguez@email.com",
+        priority: "high", // 30 days old - CRITICAL risk alert!
+        estimatedCompletionDate: new Date(Date.now()).toISOString(), // OVERDUE
+        assignedTo: "Compliance Team",
+        category: "Investigation",
+        legalBasis: "Data Protection Investigation",
+        notes: "CRITICAL: 30-day deadline exceeded - immediate attention required"
+    },
+    {
+        id: "11",
+        partyId: "2",
+        customerId: "2",
+        requestType: "data_access",
+        status: "completed",
+        submittedAt: new Date(Date.now() - 86400000 * 45).toISOString(),
+        completedAt: new Date(Date.now() - 86400000 * 20).toISOString(),
+        description: "Previous access request for billing data verification",
+        requestorName: "Jane Smith",
+        requestorEmail: "jane.smith@email.com",
+        priority: "medium",
+        assignedTo: "John Doe",
+        category: "Subject Access Request",
+        legalBasis: "GDPR Article 15",
+        completionNotes: "Billing data provided, customer satisfied with response"
+    },
+    {
+        id: "12",
+        partyId: "1",
+        customerId: "1",
+        requestType: "consent_update",
+        status: "completed",
+        submittedAt: new Date(Date.now() - 86400000 * 60).toISOString(),
+        completedAt: new Date(Date.now() - 86400000 * 58).toISOString(),
+        description: "Update marketing consent preferences following service upgrade",
+        requestorName: "John Doe",
+        requestorEmail: "john.doe@email.com",
+        priority: "low",
+        assignedTo: "Sarah Williams",
+        category: "Consent Management",
+        legalBasis: "GDPR Article 7",
+        completionNotes: "Consent preferences updated successfully"
     }
 ];
 
+// Comprehensive Audit Events - Extensive Activity Log
 let auditEvents = [
+    // Today's events (5 events for today's actions stat)
     {
         id: "1",
         partyId: "1",
         eventType: "consent_granted",
-        description: "Marketing consent granted via website",
-        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        description: "Marketing consent granted via website - SMS notifications enabled",
+        createdAt: new Date().toISOString(),
         userId: "csr_001",
+        userName: "Sarah Wilson",
         ipAddress: "192.168.1.100",
-        userAgent: "Mozilla/5.0...",
-        metadata: { consentId: "1", channel: "website" }
+        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        metadata: { consentId: "1", channel: "website", consentType: "marketing" },
+        category: "Consent Management",
+        severity: "info"
     },
     {
         id: "2", 
-        partyId: "2",
-        eventType: "consent_denied",
-        description: "Personalization consent denied",
-        createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
-        userId: "csr_002", 
-        ipAddress: "192.168.1.101",
-        userAgent: "Mozilla/5.0...",
-        metadata: { consentId: "3", channel: "website" }
+        partyId: "5",
+        eventType: "customer_registration",
+        description: "New customer account created - Michael Chen",
+        createdAt: new Date().toISOString(),
+        userId: "system",
+        userName: "System Automated",
+        ipAddress: "192.168.1.105", 
+        userAgent: "ConsentHub Registration System",
+        metadata: { customerId: "5", registrationSource: "website" },
+        category: "Account Management",
+        severity: "info"
     },
     {
         id: "3",
-        partyId: "1",
-        eventType: "dsar_request_submitted",
-        description: "Data access request submitted",
-        createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-        userId: "customer", 
-        ipAddress: "192.168.1.102",
-        userAgent: "Mozilla/5.0...",
-        metadata: { dsarId: "1", requestType: "data_access" }
+        partyId: "3",
+        eventType: "dsar_request_updated",
+        description: "DSAR request status updated to in_progress - Data portability request",
+        createdAt: new Date().toISOString(),
+        userId: "csr_003",
+        userName: "Michael Chen",
+        ipAddress: "192.168.1.110",
+        userAgent: "ConsentHub CSR Dashboard",
+        metadata: { dsarId: "3", oldStatus: "pending", newStatus: "in_progress" },
+        category: "DSAR Management",
+        severity: "medium"
     },
     {
-        id: "4",
-        partyId: "2",
-        eventType: "dsar_request_completed", 
-        description: "Data deletion request completed",
-        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        userId: "csr_001",
-        ipAddress: "192.168.1.103",
-        userAgent: "Mozilla/5.0...",
-        metadata: { dsarId: "2", requestType: "data_deletion" }
+        id: "4", 
+        partyId: "10",
+        eventType: "risk_alert_generated",
+        description: "CRITICAL: DSAR request deadline exceeded - Investigation required",
+        createdAt: new Date().toISOString(),
+        userId: "system",
+        userName: "Compliance Monitor",
+        ipAddress: "internal",
+        userAgent: "ConsentHub Compliance Engine",
+        metadata: { dsarId: "10", daysOverdue: 1, alertLevel: "critical" },
+        category: "Compliance Alert",
+        severity: "critical"
     },
     {
         id: "5",
-        partyId: "3",
-        eventType: "profile_updated",
-        description: "Customer profile information updated",
+        partyId: "2",
+        eventType: "preference_updated",
+        description: "Communication preferences updated - Email frequency changed to weekly",
         createdAt: new Date().toISOString(),
         userId: "csr_002",
-        ipAddress: "192.168.1.104", 
-        userAgent: "Mozilla/5.0...",
-        metadata: { field: "address", oldValue: "old address", newValue: "new address" }
+        userName: "Lisa Anderson",
+        ipAddress: "192.168.1.107",
+        userAgent: "ConsentHub CSR Dashboard",
+        metadata: { preferenceType: "email_frequency", oldValue: "daily", newValue: "weekly" },
+        category: "Preference Management", 
+        severity: "info"
+    },
+
+    // Recent events (last few days)
+    {
+        id: "6",
+        partyId: "2",
+        eventType: "consent_denied",
+        description: "Research participation consent denied - Customer declined survey invitations",
+        createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+        userId: "customer",
+        userName: "Jane Smith",
+        ipAddress: "192.168.1.101",
+        userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)",
+        metadata: { consentId: "18", channel: "mobile_app", consentType: "research" },
+        category: "Consent Management",
+        severity: "info"
+    },
+    {
+        id: "7",
+        partyId: "1",
+        eventType: "dsar_request_submitted",
+        description: "Data access request submitted - Full profile data requested",
+        createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+        userId: "customer", 
+        userName: "John Doe",
+        ipAddress: "192.168.1.102",
+        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        metadata: { dsarId: "1", requestType: "data_access" },
+        category: "DSAR Management",
+        severity: "medium"
+    },
+    {
+        id: "8",
+        partyId: "2",
+        eventType: "dsar_request_completed", 
+        description: "Data deletion request completed successfully - Marketing data removed",
+        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        userId: "csr_001",
+        userName: "Sarah Wilson",
+        ipAddress: "192.168.1.103",
+        userAgent: "ConsentHub CSR Dashboard",
+        metadata: { dsarId: "2", requestType: "data_deletion", dataRemoved: "marketing_profile" },
+        category: "DSAR Management",
+        severity: "info"
+    },
+    {
+        id: "9",
+        partyId: "3",
+        eventType: "profile_updated",
+        description: "Customer profile information updated - Address changed",
+        createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+        userId: "customer",
+        userName: "Robert Johnson",
+        ipAddress: "192.168.1.108",
+        userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        metadata: { profileField: "address", oldValue: "789 Pine Rd", newValue: "789 Pine Road, Updated" },
+        category: "Profile Management",
+        severity: "info"
+    },
+    {
+        id: "10",
+        partyId: "6",
+        eventType: "guardian_consent_granted",
+        description: "Guardian consent granted for minor dependent - Sarah Williams acting as guardian",
+        createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+        userId: "csr_004",
+        userName: "Alex Thompson",
+        ipAddress: "192.168.1.112",
+        userAgent: "ConsentHub CSR Dashboard",
+        metadata: { guardianId: "6", minorId: "minor_003", consentType: "data_processing" },
+        category: "Guardian Management",
+        severity: "info"
     }
 ];
 

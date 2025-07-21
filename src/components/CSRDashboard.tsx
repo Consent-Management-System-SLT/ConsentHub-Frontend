@@ -17,6 +17,7 @@ import {
   Activity
 } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
+import { csrDashboardService } from '../services/csrDashboardService';
 
 // Import CSR components (using backend-integrated versions)
 import CSRHeader from './csr/CSRHeader';
@@ -78,64 +79,35 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+      console.log('🔄 Loading comprehensive CSR dashboard data...');
       
-      // Fetch data from multiple endpoints with error handling
-      const [partiesResponse, consentsResponse, dsarResponse, eventsResponse] = await Promise.all([
-        apiClient.get('/api/v1/party').catch(() => ({ data: [] })),
-        apiClient.get('/api/v1/consent').catch(() => ({ data: [] })),
-        apiClient.get('/api/v1/dsar').catch(() => ({ data: [] })),
-        apiClient.get('/api/v1/event').catch(() => ({ data: [] }))
-      ]);
+      // Use the new CSR dashboard service with comprehensive fallbacks
+      const dashboardData = await csrDashboardService.getComprehensiveDashboardData();
+      
+      if (dashboardData.offlineMode) {
+        console.warn('📴 Operating in offline mode with fallback data');
+        setShowConnectionAlert(true);
+      }
 
-      // Ensure all data is arrays
-      const parties = Array.isArray(partiesResponse.data) ? partiesResponse.data : [];
-      const consents = Array.isArray(consentsResponse.data) ? consentsResponse.data : [];
-      const dsarRequests = Array.isArray(dsarResponse.data) ? dsarResponse.data : [];
-      const events = Array.isArray(eventsResponse.data) ? eventsResponse.data : [];
-
-      // Calculate real statistics
-      const totalCustomers = parties.length;
-      const pendingRequests = dsarRequests.filter((req: any) => req.status === 'pending').length;
-      const grantedConsents = consents.filter((consent: any) => consent.status === 'granted').length;
-      const todayEvents = events.filter((event: any) => {
-        try {
-          const eventDate = new Date(event.createdAt);
-          const today = new Date();
-          return eventDate.toDateString() === today.toDateString();
-        } catch {
-          return false;
-        }
-      }).length;
-
+      // Set stats from service
       setDashboardStats({
-        totalCustomers,
-        pendingRequests,
-        consentUpdates: grantedConsents,
-        guardiansManaged: 0, // No guardian data in current API
-        todayActions: todayEvents,
-        riskAlerts: dsarRequests.filter((req: any) => req.status === 'pending' && 
-          new Date(req.submittedAt) < new Date(Date.now() - 25 * 24 * 60 * 60 * 1000) // 25+ days old
-        ).length
+        totalCustomers: dashboardData.stats.totalCustomers,
+        pendingRequests: dashboardData.stats.pendingRequests,
+        consentUpdates: dashboardData.stats.consentUpdates,
+        guardiansManaged: dashboardData.stats.guardiansManaged,
+        todayActions: dashboardData.stats.todayActions,
+        riskAlerts: dashboardData.stats.riskAlerts
       });
 
-      // Calculate insights
-      const totalConsents = consents.length;
-      const consentRate = totalConsents > 0 ? Math.round((grantedConsents / totalConsents) * 100) : 0;
-      const resolvedRequests = dsarRequests.filter((req: any) => req.status === 'completed').length;
-      const newCustomersCount = parties.filter((party: any) => {
-        const createdDate = new Date(party.createdAt);
-        const today = new Date();
-        return createdDate.toDateString() === today.toDateString();
-      }).length;
-
+      // Set insights
       setInsights({
-        consentRate,
-        resolvedRequests,
-        newCustomers: newCustomersCount
+        consentRate: dashboardData.stats.consentRate,
+        resolvedRequests: dashboardData.stats.resolvedRequests,
+        newCustomers: dashboardData.stats.newCustomers
       });
 
-      // Create recent activities from events
-      const recentEvents = events
+      // Create recent activities from audit events
+      const recentEvents = dashboardData.auditEvents
         .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 5)
         .map((event: any, index: number) => ({
@@ -144,13 +116,51 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
                 event.eventType.includes('dsar') ? 'dsar' : 'system',
           message: event.description,
           timestamp: getRelativeTime(event.createdAt),
-          priority: event.eventType.includes('dsar') ? 'high' : 'medium'
+          priority: event.severity === 'critical' ? 'high' : 
+                   event.severity === 'high' ? 'high' : 'medium',
+          category: event.category || 'General'
         }));
 
       setRecentActivities(recentEvents);
+      
+      console.log('✅ CSR dashboard data loaded successfully');
+      console.log('📊 Stats:', dashboardData.stats);
+      console.log('👥 Customers:', dashboardData.customers.length);
+      console.log('🛡️ Consents:', dashboardData.consents.length);
+      console.log('📋 DSAR Requests:', dashboardData.dsarRequests.length);
+      console.log('📝 Audit Events:', dashboardData.auditEvents.length);
+
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
-      // Keep default values if API fails
+      console.error('❌ Error loading CSR dashboard data:', error);
+      
+      // Emergency fallback - ensure we always have some data
+      setDashboardStats({
+        totalCustomers: 10,
+        pendingRequests: 4,
+        consentUpdates: 8,
+        guardiansManaged: 2,
+        todayActions: 15,
+        riskAlerts: 2
+      });
+
+      setInsights({
+        consentRate: 78,
+        resolvedRequests: 8,
+        newCustomers: 3
+      });
+
+      setRecentActivities([
+        {
+          id: 1,
+          type: 'system',
+          message: 'System operating in offline mode with sample data',
+          timestamp: 'Just now',
+          priority: 'medium',
+          category: 'System'
+        }
+      ]);
+
+      setShowConnectionAlert(true);
     } finally {
       setLoading(false);
     }
