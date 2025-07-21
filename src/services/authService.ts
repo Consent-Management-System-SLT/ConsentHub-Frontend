@@ -68,7 +68,7 @@ class AuthService {
 
       const response = await multiServiceApiClient.makeRequest(
         'POST',
-        '/api/v1/auth/auth/register',  // Correct endpoint with double /auth/
+        '/api/v1/auth/register',  // Fixed: Correct endpoint (removed double auth)
         registerPayload,
         'customer',
         'auth'  // Use auth service
@@ -129,7 +129,7 @@ class AuthService {
         // Fallback to local development endpoint
         response = await multiServiceApiClient.makeRequest(
           'POST',
-          '/api/v1/auth/auth/login', // Local development endpoint
+          '/api/v1/auth/login', // Fixed: Local development endpoint (removed double auth)
           credentials,
           'customer',
           'auth'
@@ -177,35 +177,23 @@ class AuthService {
 
       // Try to get fresh user data from backend
       try {
-        // Try production endpoint first, then fallback to local
-        let response;
-        try {
-          response = await multiServiceApiClient.makeRequest(
-            'GET',
-            '/api/v1/auth/profile', // Production endpoint
-            undefined,
-            'customer',
-            'auth'
-          );
-        } catch (prodError) {
-          // Fallback to local development endpoint
-          response = await multiServiceApiClient.makeRequest(
-            'GET',
-            '/api/v1/auth/auth/profile', // Local development endpoint
-            undefined,
-            'customer',
-            'auth'
-          );
-        }
+        const response = await multiServiceApiClient.makeRequest(
+          'GET',
+          '/api/v1/auth/profile',
+          undefined,
+          'customer',
+          'auth'
+        );
 
-        if (response && response.data && response.data.success) {
-          const user = this.transformUser(response.data.data);
+        // Backend returns {user: {...}} format
+        if (response && response.user) {
+          const user = this.transformUser(response.user);
           this.currentUser = user;
           localStorage.setItem('user', JSON.stringify(user));
           return user;
         }
       } catch (apiError) {
-        console.log('Backend profile fetch failed, using stored user data');
+        console.log('Backend profile fetch failed, using stored user data:', apiError);
       }
 
       // Fallback to stored user data if backend call fails

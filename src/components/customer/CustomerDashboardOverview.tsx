@@ -172,6 +172,48 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
     }
   ];
 
+  const privacyStatusItems = [
+    {
+      id: 'privacy-policy',
+      title: 'Privacy Policy Accepted',
+      description: 'Version 2.1 - Current',
+      status: 'Active',
+      icon: <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />,
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-200',
+      textColor: 'text-green-900',
+      descColor: 'text-green-700',
+      statusBg: 'bg-green-100',
+      statusText: 'text-green-600'
+    },
+    {
+      id: 'communication-prefs',
+      title: 'Communication Preferences',
+      description: 'Last updated 1 day ago',
+      status: 'Configured',
+      icon: <Settings className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />,
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
+      textColor: 'text-blue-900',
+      descColor: 'text-blue-700',
+      statusBg: 'bg-blue-100',
+      statusText: 'text-blue-600'
+    },
+    {
+      id: 'dsar-request',
+      title: 'Pending DSAR Request',
+      description: 'Data export in progress',
+      status: 'Processing',
+      icon: <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />,
+      bgColor: 'bg-yellow-50',
+      borderColor: 'border-yellow-200',
+      textColor: 'text-yellow-900',
+      descColor: 'text-yellow-700',
+      statusBg: 'bg-yellow-100',
+      statusText: 'text-yellow-600'
+    }
+  ];
+
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Show Profile Section if requested */}
@@ -264,8 +306,8 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {quickStats.map((stat, index) => (
-          <div key={index} className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
+        {quickStats.map((stat) => (
+          <div key={stat.label} className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-600 mb-2">{stat.label}</p>
@@ -286,9 +328,9 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
       <div>
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {quickActions.map((action, index) => (
+          {quickActions.map((action) => (
             <button
-              key={index}
+              key={action.action}
               className={`p-4 sm:p-6 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${action.color}`}
               onClick={() => {
                 // This would be handled by the parent component
@@ -318,8 +360,8 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
             </button>
           </div>
           <div className="space-y-3 sm:space-y-4">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+            {recentActivity.map((activity, index) => (
+              <div key={activity.id || `activity-${index}`} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
                 <div className="flex-shrink-0 mt-1">
                   {'icon' in activity && activity.icon ? 
                     activity.icon : 
@@ -339,38 +381,18 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
         <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Privacy Status</h3>
           <div className="space-y-3 sm:space-y-4">
-            <div className="flex items-center justify-between p-3 sm:p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-start space-x-3 min-w-0 flex-1">
-                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-green-900 text-sm">Privacy Policy Accepted</p>
-                  <p className="text-xs sm:text-sm text-green-700">Version 2.1 - Current</p>
+            {privacyStatusItems.map((item) => (
+              <div key={item.id} className={`flex items-center justify-between p-3 sm:p-4 ${item.bgColor} rounded-lg border ${item.borderColor}`}>
+                <div className="flex items-start space-x-3 min-w-0 flex-1">
+                  {item.icon}
+                  <div className="min-w-0 flex-1">
+                    <p className={`font-medium ${item.textColor} text-sm`}>{item.title}</p>
+                    <p className={`text-xs sm:text-sm ${item.descColor}`}>{item.description}</p>
+                  </div>
                 </div>
+                <span className={`text-xs ${item.statusText} ${item.statusBg} px-2 py-1 rounded-full whitespace-nowrap ml-2`}>{item.status}</span>
               </div>
-              <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full whitespace-nowrap ml-2">Active</span>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-start space-x-3 min-w-0 flex-1">
-                <Settings className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-blue-900 text-sm">Communication Preferences</p>
-                  <p className="text-xs sm:text-sm text-blue-700">Last updated 1 day ago</p>
-                </div>
-              </div>
-              <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full whitespace-nowrap ml-2">Configured</span>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 sm:p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-              <div className="flex items-start space-x-3 min-w-0 flex-1">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-yellow-900 text-sm">Pending DSAR Request</p>
-                  <p className="text-xs sm:text-sm text-yellow-700">Data export in progress</p>
-                </div>
-              </div>
-              <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full whitespace-nowrap ml-2">Processing</span>
-            </div>
+            ))}
           </div>
         </div>
       </div>

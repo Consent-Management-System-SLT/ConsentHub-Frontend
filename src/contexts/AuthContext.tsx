@@ -26,19 +26,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         // Check if user is logged in and get current user data from backend
         const storedUser = authService.getStoredUser();
-        if (storedUser && authService.isAuthenticated()) {
-          // Verify with backend and get latest user data
-          const currentUser = await authService.getCurrentUser();
-          if (currentUser) {
-            setUser(currentUser);
-          } else {
-            // Token invalid or user not found, clear auth data
-            authService.logout();
+        const token = authService.getAuthToken();
+        
+        if (storedUser && token) {
+          // First, set the stored user immediately to avoid logout on page reload
+          setUser(storedUser);
+          
+          // Then try to get fresh data from backend, but don't logout if it fails
+          try {
+            const currentUser = await authService.getCurrentUser();
+            if (currentUser) {
+              setUser(currentUser);
+            }
+            // If getCurrentUser fails, we keep the stored user data
+          } catch (backendError) {
+            console.log('Backend verification failed, using stored user data:', backendError);
+            // Keep the stored user data - don't logout due to backend issues
           }
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        authService.logout();
+        // Only logout if there's a serious error, not just network issues
+        if (!authService.getStoredUser() || !authService.getAuthToken()) {
+          authService.logout();
+        }
       } finally {
         setIsLoading(false);
       }
@@ -72,7 +83,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.register(userData);
       
       if (response.success) {
-        setUser(response.user);
+        // Don't automatically log in after registration
+        // User should go to sign-in page to enter credentials
         return true;
       }
       

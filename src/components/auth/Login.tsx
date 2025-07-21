@@ -19,10 +19,13 @@ const Login: React.FC = () => {
 
   const from = location.state?.from?.pathname || '/dashboard';
 
-  // Check for success message from signup
+  // Check for success message and email from signup
   useEffect(() => {
     if (location.state?.message) {
       setSuccess(location.state.message);
+    }
+    if (location.state?.email) {
+      setEmail(location.state.email);
     }
   }, [location.state]);
 

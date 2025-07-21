@@ -146,11 +146,12 @@ const Signup: React.FC = () => {
       const success = await register(registrationData);
       
       if (success) {
-        setSuccess('Registration successful! Redirecting to dashboard...');
+        setSuccess('Account created successfully! Redirecting to sign in page...');
         setTimeout(() => {
-          navigate('/dashboard', { 
+          navigate('/login', { 
             state: { 
-              message: 'Welcome! Your account has been created successfully.' 
+              message: 'Account created successfully! Please sign in with your credentials.',
+              email: formData.email // Pre-fill email on login page
             } 
           });
         }, 2000);
