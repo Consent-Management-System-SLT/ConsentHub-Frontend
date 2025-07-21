@@ -8,12 +8,13 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start:full": "powershell -ExecutionPolicy Bypass -File start-consenthub.ps1",
+    "start": "powershell -ExecutionPolicy Bypass -File start-system.ps1",
+    "start:system": "start-system.bat",
     "start:simple": "powershell -ExecutionPolicy Bypass -File start-simple.ps1",
     "start:mongodb": "powershell -ExecutionPolicy Bypass -File start-mongodb.ps1",
-    "start:backend": "cd backend && npm run start:all",
+    "start:backend": "node comprehensive-backend.js",
     "start:frontend": "npm run dev",
-    "install:all": "npm install && cd backend && npm install && npm run install:all",
+    "install:all": "npm install && cd backend && npm install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
