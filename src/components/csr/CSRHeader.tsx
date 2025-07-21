@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { LogOut, User, Bell, Settings, X, AlertCircle, CheckCircle, Clock, RefreshCw } from 'lucide-react';
+import React from 'react';
+import { LogOut, User, Settings, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import LanguageSelector from '../LanguageSelector';
+import NotificationBell from '../shared/NotificationBell';
 
 interface CSRHeaderProps {
   className?: string;
-  onNotificationClick?: () => void;
   onSettingsClick?: () => void;
   onRefresh?: () => void;
   isRefreshing?: boolean;
@@ -13,54 +13,14 @@ interface CSRHeaderProps {
 
 const CSRHeader: React.FC<CSRHeaderProps> = ({ 
   className = '', 
-  onNotificationClick, 
   onSettingsClick,
   onRefresh,
   isRefreshing = false
 }) => {
   const { logout } = useAuth();
-  const [notificationCount, setNotificationCount] = useState(3);
-  const [showNotifications, setShowNotifications] = useState(false);
-
-  const notifications = [
-    {
-      id: 1,
-      type: 'urgent',
-      title: 'High Priority DSAR Request',
-      message: 'Customer Alice Johnson has submitted a new data deletion request.',
-      time: '2 minutes ago',
-      read: false
-    },
-    {
-      id: 2,
-      type: 'info',
-      title: 'Consent Updated',
-      message: 'Marketing consent has been updated for customer Priya Fernando.',
-      time: '15 minutes ago',
-      read: false
-    },
-    {
-      id: 3,
-      type: 'success',
-      title: 'Guardian Verification Complete',
-      message: 'Guardian consent verification completed for minor customer.',
-      time: '1 hour ago',
-      read: true
-    }
-  ];
 
   const handleLogout = () => {
     logout();
-  };
-
-  const handleNotificationClick = () => {
-    if (onNotificationClick) {
-      onNotificationClick();
-    } else {
-      setShowNotifications(!showNotifications);
-    }
-    // Clear notification count after clicking
-    setNotificationCount(0);
   };
 
   const handleSettingsClick = () => {
@@ -69,19 +29,6 @@ const CSRHeader: React.FC<CSRHeaderProps> = ({
     } else {
       // Show settings panel or redirect to settings
       console.log('Opening settings');
-    }
-  };
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'urgent':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
-      case 'success':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'info':
-        return <Clock className="w-5 h-5 text-blue-500" />;
-      default:
-        return <Bell className="w-5 h-5 text-gray-500" />;
     }
   };
 
@@ -119,68 +66,7 @@ const CSRHeader: React.FC<CSRHeaderProps> = ({
             </div>
 
             {/* Notifications */}
-            <div className="relative flex items-center">
-              <button 
-                onClick={handleNotificationClick}
-                className="relative p-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors"
-              >
-                <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
-                {notificationCount > 0 && (
-                  <span className="absolute -top-1 -right-1 block h-5 w-5 rounded-full bg-red-400 ring-2 ring-white text-xs font-bold text-white flex items-center justify-center">
-                    {notificationCount}
-                  </span>
-                )}
-              </button>
-              
-              {/* Notification Panel */}
-              {showNotifications && (
-                <div className="absolute right-0 top-12 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-                  <div className="p-4 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
-                      <button
-                        onClick={() => setShowNotifications(false)}
-                        className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                      >
-                        <X className="w-4 h-4 text-gray-500" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="max-h-96 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${
-                          !notification.read ? 'bg-blue-50' : ''
-                        }`}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div className="flex-shrink-0 mt-1">
-                            {getNotificationIcon(notification.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">
-                              {notification.title}
-                            </p>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              {notification.time}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="p-4 border-t border-gray-200">
-                    <button className="w-full text-sm text-blue-600 hover:text-blue-800 font-medium">
-                      View All Notifications
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <NotificationBell />
 
             {/* Settings */}
             <div className="flex items-center">

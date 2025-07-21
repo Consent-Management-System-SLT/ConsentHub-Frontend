@@ -1,7 +1,8 @@
 import React from 'react';
-import { LogOut, User, Bell } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LanguageSelector from '../LanguageSelector';
+import NotificationBell from '../shared/NotificationBell';
 
 interface CustomerHeaderProps {
   customerName: string;
@@ -31,12 +32,7 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout 
             </div>
 
             {/* Notifications */}
-            <div className="flex items-center">
-              <button className="relative p-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors">
-                <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
-                <span className="absolute -top-1 -right-1 block h-3 w-3 rounded-full bg-red-400 ring-2 ring-white"></span>
-              </button>
-            </div>
+            <NotificationBell size="sm" />
 
             {/* User Profile */}
             <div className="flex items-center gap-2">

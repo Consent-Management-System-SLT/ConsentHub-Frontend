@@ -13,6 +13,7 @@ import {
   Tag
 } from 'lucide-react';
 import { useCustomerConsents } from '../../hooks/useCustomerApi';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 interface Consent {
   id: string;
@@ -40,6 +41,9 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
 
   // Use real data from backend
   const { data: consentsData, loading, error } = useCustomerConsents();
+  
+  // Add notification functionality
+  const { addNotification } = useNotifications();
 
   // Transform backend data to match UI format
   const consents: Consent[] = consentsData?.consents ? consentsData.consents.map((consent: any) => ({
@@ -119,6 +123,23 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
 
   const handleConsentAction = (consentId: string, action: 'revoke' | 'renew' | 'grant') => {
     console.log(`${action} consent ${consentId}`);
+    
+    // Find the consent being modified
+    const consent = consents.find(c => c.id === consentId);
+    
+    // Add notification for admin/CSR users about the consent change
+    addNotification({
+      title: 'Customer Consent Updated',
+      message: `Customer has ${action}d consent for "${consent?.purpose || 'unknown purpose'}" at ${new Date().toLocaleString()}`,
+      type: 'consent',
+      category: action === 'revoke' ? 'warning' : 'info',
+      metadata: {
+        consentId,
+        action,
+        purpose: consent?.purpose
+      }
+    });
+    
     // Implement consent action logic here
   };
 

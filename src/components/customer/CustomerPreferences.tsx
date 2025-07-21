@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useCustomerPreferences } from '../../hooks/useCustomerApi';
 import { customerApiClient } from '../../services/customerApiClient';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 interface PreferenceSettings {
   channels: {
@@ -81,6 +82,9 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
 
   // Load real preferences data
   const { data: preferencesData, loading, error } = useCustomerPreferences();
+  
+  // Add notification functionality
+  const { addNotification } = useNotifications();
 
   // Update preferences when data loads
   useEffect(() => {
@@ -159,6 +163,15 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
       console.log('Saving preferences:', preferences);
       setSaveStatus('success');
       setHasChanges(false);
+      
+      // Add notification for admin/CSR users
+      addNotification({
+        title: 'Customer Preferences Updated',
+        message: `Customer has updated their communication preferences at ${new Date().toLocaleString()}`,
+        type: 'preference',
+        category: 'info'
+      });
+      
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
       setSaveStatus('error');

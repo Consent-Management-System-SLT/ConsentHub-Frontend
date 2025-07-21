@@ -15,6 +15,7 @@ import {
   Shield,
   Database
 } from 'lucide-react';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 interface DSARRequest {
   id: string;
@@ -41,6 +42,9 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
   const [additionalDetails, setAdditionalDetails] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  
+  // Add notification functionality
+  const { addNotification } = useNotifications();
 
   // Mock data - replace with API calls
   const dsarRequests: DSARRequest[] = [
@@ -142,6 +146,18 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
       
       console.log('Submitting DSAR request:', newRequest);
       setSubmitStatus('success');
+      
+      // Add notification for admin/CSR users about the new DSAR request
+      addNotification({
+        title: 'New DSAR Request Submitted',
+        message: `Customer has submitted a new ${requestType} request at ${new Date().toLocaleString()}`,
+        type: 'dsar',
+        category: 'urgent',
+        metadata: {
+          requestType,
+          reason: requestReason
+        }
+      });
       
       // Reset form
       setRequestReason('');

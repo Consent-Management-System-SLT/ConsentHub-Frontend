@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { LogOut, User, Bell, Settings, Menu, Shield } from 'lucide-react';
+import React from 'react';
+import { LogOut, User, Settings, Menu, Shield } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import LanguageSelector from '../LanguageSelector';
+import NotificationBell from '../shared/NotificationBell';
 
 interface AdminHeaderProps {
   onMenuToggle: () => void;
@@ -10,43 +11,9 @@ interface AdminHeaderProps {
 
 const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, className = '' }) => {
   const { logout } = useAuth();
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(5);
-
-  const notifications = [
-    {
-      id: 1,
-      type: 'urgent',
-      title: 'GDPR Compliance Alert',
-      message: 'New GDPR update requires immediate attention',
-      time: '5 minutes ago',
-      read: false
-    },
-    {
-      id: 2,
-      type: 'warning',
-      title: 'Bulk Import Failed',
-      message: 'Customer data import failed - check error logs',
-      time: '30 minutes ago',
-      read: false
-    },
-    {
-      id: 3,
-      type: 'info',
-      title: 'System Maintenance',
-      message: 'Scheduled maintenance window tonight at 2 AM',
-      time: '2 hours ago',
-      read: true
-    }
-  ];
 
   const handleLogout = () => {
     logout();
-  };
-
-  const handleNotificationClick = () => {
-    setShowNotifications(!showNotifications);
-    setNotificationCount(0);
   };
 
   return (
@@ -79,63 +46,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, className = '' 
             </div>
 
             {/* Notifications */}
-            <div className="relative flex items-center">
-              <button 
-                onClick={handleNotificationClick}
-                className="relative p-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors"
-              >
-                <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
-                {notificationCount > 0 && (
-                  <span className="absolute -top-1 -right-1 block h-5 w-5 rounded-full bg-red-500 ring-2 ring-white text-xs font-bold text-white flex items-center justify-center">
-                    {notificationCount}
-                  </span>
-                )}
-              </button>
-              
-              {/* Notification Panel */}
-              {showNotifications && (
-                <div className="absolute right-0 top-12 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-                  <div className="p-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Admin Notifications</h3>
-                  </div>
-                  <div className="max-h-96 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                          !notification.read ? 'bg-red-50' : ''
-                        }`}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div className="flex-shrink-0 mt-1">
-                            {notification.type === 'urgent' && (
-                              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                            )}
-                            {notification.type === 'warning' && (
-                              <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                            )}
-                            {notification.type === 'info' && (
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">
-                              {notification.title}
-                            </p>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              {notification.time}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            <NotificationBell />
 
             {/* Settings */}
             <div className="flex items-center">
