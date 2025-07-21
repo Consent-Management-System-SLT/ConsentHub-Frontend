@@ -17,7 +17,7 @@ import {
   Globe,
   Smartphone
 } from 'lucide-react';
-import { apiClient } from '../../services/apiClient';
+import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface PreferenceEditorFormProps {
   className?: string;
@@ -86,41 +86,12 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
 
   const loadCustomers = async () => {
     try {
-      const response = await apiClient.get('/api/v1/party');
-      const data = response.data as any;
-      const customerArray = Array.isArray(data) ? data : [];
-      setCustomers(customerArray);
-      
-      console.log('Loaded customers:', customerArray.length);
+      const customers = await csrDashboardService.getCustomers();
+      setCustomers(customers);
+      console.log('Loaded customers:', customers.length);
     } catch (error) {
       console.error('Error loading customers:', error);
-      // Fallback sample data if API fails
-      setCustomers([
-        {
-          id: "1",
-          name: "John Doe",
-          email: "john.doe@email.com",
-          phone: "+94771234567",
-          status: "active",
-          type: "individual"
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          email: "jane.smith@email.com",
-          phone: "+94771234568",
-          status: "active",
-          type: "individual"
-        },
-        {
-          id: "3",
-          name: "Robert Johnson",
-          email: "robert.j@email.com",
-          phone: "+94771234569",
-          status: "active",
-          type: "guardian"
-        }
-      ]);
+      setCustomers([]);
     }
   };
 
@@ -129,9 +100,8 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
     
     setLoading(true);
     try {
-      const response = await apiClient.get(`/api/v1/preferences?partyId=${selectedCustomer}`);
-      const data = Array.isArray(response.data) ? response.data : [];
-      const customerPrefs = data.find((pref: any) => pref.partyId === selectedCustomer);
+      const commPrefs = await csrDashboardService.getCommunicationPreferences();
+      const customerPrefs = commPrefs.find((pref: any) => pref.partyId === selectedCustomer);
       
       if (customerPrefs) {
         // Merge loaded preferences with default structure
@@ -141,7 +111,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
           channels: {
             ...prev.channels,
             ...(customerPrefs.channels || {}),
-            // Map legacy fields
+            // Map from communication preferences
             email: customerPrefs.preferredChannels?.email ?? prev.channels.email,
             sms: customerPrefs.preferredChannels?.sms ?? prev.channels.sms,
             phone: customerPrefs.preferredChannels?.phone ?? prev.channels.phone,
@@ -150,7 +120,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
           topics: {
             ...prev.topics,
             ...(customerPrefs.topics || {}),
-            // Map legacy fields
+            // Map from communication preferences
             marketing: customerPrefs.topicSubscriptions?.marketing ?? prev.topics.marketing,
             promotions: customerPrefs.topicSubscriptions?.promotions ?? prev.topics.promotions,
             serviceAlerts: customerPrefs.topicSubscriptions?.serviceUpdates ?? prev.topics.serviceAlerts,
@@ -226,13 +196,8 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
         topicSubscriptions: preferences.topics
       };
       
-      // Try to update existing preferences or create new ones
-      try {
-        await apiClient.put(`/api/v1/preferences/${selectedCustomer}`, updatedPreferences);
-      } catch (error) {
-        // If PUT fails, try POST to create new preferences
-        await apiClient.post('/api/v1/preferences', updatedPreferences);
-      }
+      // For demo purposes, just update local state
+      console.log('Saving preferences (demo mode):', updatedPreferences);
       
       setIsEditing(false);
       setHasChanges(false);

@@ -18,7 +18,7 @@ import {
   RefreshCw,
   Plus
 } from 'lucide-react';
-import { apiClient } from '../../services/apiClient';
+import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface GuardianConsentFormProps {
   onClose?: () => void;
@@ -67,15 +67,13 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
 
   const loadMinors = async () => {
     try {
-      const response = await apiClient.get('/api/v1/party');
-      const data = response.data as any;
-      const parties = Array.isArray(data) ? data : [];
+      const allCustomers = await csrDashboardService.getCustomers();
       // Filter for minors (assuming we have an age field or type)
-      const minorParties = parties.filter((party: any) => 
-        party.type === 'minor' || 
-        (party.dateOfBirth && calculateAge(party.dateOfBirth) < 18)
+      const minorCustomers = allCustomers.filter((customer: any) => 
+        customer.type === 'minor' || 
+        (customer.dateOfBirth && calculateAge(customer.dateOfBirth) < 18)
       );
-      setMinors(minorParties);
+      setMinors(minorCustomers);
     } catch (error) {
       console.error('Error loading minors:', error);
     }
@@ -83,15 +81,13 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
 
   const loadGuardians = async () => {
     try {
-      const response = await apiClient.get('/api/v1/party');
-      const data = response.data as any;
-      const parties = Array.isArray(data) ? data : [];
+      const allCustomers = await csrDashboardService.getCustomers();
       // Filter for guardians (adults)
-      const guardianParties = parties.filter((party: any) => 
-        party.type === 'guardian' || 
-        (party.dateOfBirth && calculateAge(party.dateOfBirth) >= 18)
+      const guardianCustomers = allCustomers.filter((customer: any) => 
+        customer.type === 'guardian' || 
+        (customer.dateOfBirth && calculateAge(customer.dateOfBirth) >= 18)
       );
-      setGuardians(guardianParties);
+      setGuardians(guardianCustomers);
     } catch (error) {
       console.error('Error loading guardians:', error);
     }
@@ -99,10 +95,8 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
 
   const loadGuardianConsents = async () => {
     try {
-      const response = await apiClient.get('/api/v1/consent?type=guardian');
-      const data = response.data as any;
-      const consents = Array.isArray(data) ? data : [];
-      setGuardianConsents(consents);
+      const guardianConsentData = await csrDashboardService.getGuardianConsentData();
+      setGuardianConsents(guardianConsentData);
     } catch (error) {
       console.error('Error loading guardian consents:', error);
     }
@@ -141,10 +135,8 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
         updatedAt: new Date().toISOString()
       };
 
-      await apiClient.post('/api/v1/consent', newConsent);
-      
-      // Refresh the consents list
-      await loadGuardianConsents();
+      // For demo purposes, just add to local state
+      setGuardianConsents(prev => [...prev, newConsent]);
       
       // Reset form
       setFormData({
@@ -157,7 +149,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
       });
       
       setActiveTab('manage');
-      alert('Guardian consent created successfully!');
+      alert('Guardian consent created successfully! (Demo Mode)');
     } catch (error) {
       console.error('Error creating consent:', error);
       alert('Error creating consent. Please try again.');
@@ -168,14 +160,16 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
 
   const handleUpdateConsentStatus = async (consentId: string, newStatus: string) => {
     try {
-      await apiClient.put(`/api/v1/consent/${consentId}`, {
-        status: newStatus,
-        updatedAt: new Date().toISOString()
-      });
+      // Update local state for demo
+      setGuardianConsents(prev => 
+        prev.map(consent => 
+          consent.id === consentId 
+            ? { ...consent, status: newStatus, updatedAt: new Date().toISOString() }
+            : consent
+        )
+      );
       
-      // Refresh the consents list
-      await loadGuardianConsents();
-      alert('Consent status updated successfully!');
+      alert('Consent status updated successfully! (Demo Mode)');
     } catch (error) {
       console.error('Error updating consent status:', error);
       alert('Error updating consent status. Please try again.');

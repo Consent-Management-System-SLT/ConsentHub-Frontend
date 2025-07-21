@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, User, Phone, Mail, Shield, AlertCircle, RefreshCw } from 'lucide-react';
-import { apiClient } from '../../services/apiClient';
+import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface CustomerSearchFormProps {
   onCustomerSelect?: (customer: any) => void;
@@ -24,32 +24,13 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
     setError(null);
     
     try {
-      // Fetch all parties from backend
-      const response = await apiClient.get('/api/v1/party');
-      const parties = Array.isArray(response.data) ? response.data : [];
-      
-      // Filter results based on search criteria
-      const results = parties.filter((customer: any) => {
-        const searchLower = searchTerm.toLowerCase();
-        switch (searchType) {
-          case 'email':
-            return customer.email?.toLowerCase().includes(searchLower);
-          case 'phone':
-            return customer.phone?.includes(searchTerm) || customer.mobile?.includes(searchTerm);
-          case 'name':
-            return customer.name?.toLowerCase().includes(searchLower);
-          case 'id':
-            return customer.id?.toString().toLowerCase().includes(searchLower);
-          default:
-            // Search all fields if no specific type
-            return customer.email?.toLowerCase().includes(searchLower) ||
-                   customer.name?.toLowerCase().includes(searchLower) ||
-                   customer.phone?.includes(searchTerm) ||
-                   customer.id?.toString().includes(searchTerm);
-        }
-      });
-      
+      // Use CSR dashboard service with comprehensive hardcoded fallback data
+      const results = await csrDashboardService.searchCustomers(searchTerm);
       setSearchResults(results);
+      
+      if (results.length === 0) {
+        setError('No customers found matching your search criteria.');
+      }
     } catch (err) {
       console.error('Error searching customers:', err);
       setError('Failed to search customers. Please try again.');

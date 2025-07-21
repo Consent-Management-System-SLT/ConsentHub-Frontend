@@ -9,7 +9,7 @@ import {
   Activity,
   ChevronRight,
   Menu,
-  X 
+  X
 } from 'lucide-react';
 
 interface SidebarNavProps {

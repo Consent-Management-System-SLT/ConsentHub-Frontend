@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Eye, Check, X, AlertCircle, RefreshCw } from 'lucide-react';
-import { apiClient } from '../../services/apiClient';
+import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface ConsentHistoryTableProps {
   className?: string;
@@ -26,34 +26,17 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       setLoading(true);
       setError(null);
       
-      let url = '/api/v1/consent';
+      // Use CSR dashboard service with comprehensive hardcoded fallback data
+      const consentArray = await csrDashboardService.getConsents();
+      
+      // Filter by customer ID if provided
+      let filteredConsents = consentArray;
       if (customerId) {
-        url += `?partyId=${customerId}`;
+        filteredConsents = consentArray.filter(consent => consent.customerId === customerId);
       }
       
-      const response = await apiClient.get(url);
-      const consentData = response.data;
-      
-      // Ensure we always have an array
-      let consentArray: any[] = [];
-      
-      if (Array.isArray(consentData)) {
-        consentArray = consentData;
-      } else if (consentData && typeof consentData === 'object') {
-        // If it's an object, try to extract array from common properties
-        const dataObj = consentData as any;
-        consentArray = dataObj.data || dataObj.consents || dataObj.results || [];
-        
-        // Ensure extracted data is actually an array
-        if (!Array.isArray(consentArray)) {
-          consentArray = [];
-        }
-      } else {
-        consentArray = [];
-      }
-      
-      console.log('Loaded consents:', consentArray); // Debug log
-      setConsents(consentArray);
+      console.log('Loaded consents:', filteredConsents); // Debug log
+      setConsents(filteredConsents);
     } catch (err) {
       console.error('Error loading consents:', err);
       setError('Failed to load consent history. Please try again.');
@@ -65,13 +48,15 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
 
   const updateConsentStatus = async (consentId: string, newStatus: string) => {
     try {
-      await apiClient.put(`/api/v1/consent/${consentId}`, {
-        status: newStatus,
-        updatedAt: new Date().toISOString()
-      });
+      // For demo purposes, we'll just update the local state
+      const updatedConsents = consents.map(consent => 
+        consent.id === consentId 
+          ? { ...consent, status: newStatus, updatedAt: new Date().toISOString() }
+          : consent
+      );
+      setConsents(updatedConsents);
       
-      // Refresh the consent list
-      await loadConsents();
+      console.log(`Updated consent ${consentId} to status: ${newStatus}`);
     } catch (err) {
       console.error('Error updating consent:', err);
       setError('Failed to update consent status. Please try again.');

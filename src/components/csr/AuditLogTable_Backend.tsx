@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Search, Filter, RefreshCw, AlertCircle, Calendar } from 'lucide-react';
-import { apiClient } from '../../services/apiClient';
+import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface AuditLogTableProps {
   className?: string;
@@ -32,14 +32,15 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       setLoading(true);
       setError(null);
       
-      let url = '/api/v1/event';
+      const allEvents = await csrDashboardService.getAuditEvents();
+      
+      // Filter by customer if specified
+      let filteredEvents = allEvents;
       if (customerId) {
-        url += `?partyId=${customerId}`;
+        filteredEvents = allEvents.filter(event => event.partyId === customerId);
       }
       
-      const response = await apiClient.get(url);
-      const eventData = Array.isArray(response.data) ? response.data : [];
-      setAuditLogs(eventData);
+      setAuditLogs(filteredEvents);
     } catch (err) {
       console.error('Error loading audit logs:', err);
       setError('Failed to load audit logs. Please try again.');

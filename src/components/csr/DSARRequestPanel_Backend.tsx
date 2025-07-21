@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Clock, AlertCircle, CheckCircle, XCircle, RefreshCw, Download, Calendar } from 'lucide-react';
-import { apiClient } from '../../services/apiClient';
+import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface DSARRequestPanelProps {
   className?: string;
@@ -25,38 +25,20 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       setLoading(true);
       setError(null);
       
-      let url = '/api/v1/dsar';
+      const allRequests = await csrDashboardService.getDSARRequests();
+      
+      // Filter by customer if specified
+      let filteredRequests = allRequests;
       if (customerId) {
-        url += `?partyId=${customerId}`;
+        filteredRequests = allRequests.filter(request => request.partyId === customerId);
       }
       
-      const response = await apiClient.get(url);
-      const dsarData = response.data;
-      
-      // Ensure we always have an array
-      let requestArray: any[] = [];
-      
-      if (Array.isArray(dsarData)) {
-        requestArray = dsarData;
-      } else if (dsarData && typeof dsarData === 'object') {
-        // If it's an object, try to extract array from common properties
-        const dataObj = dsarData as any;
-        requestArray = dataObj.data || dataObj.requests || dataObj.results || [];
-        
-        // Ensure extracted data is actually an array
-        if (!Array.isArray(requestArray)) {
-          requestArray = [];
-        }
-      } else {
-        requestArray = [];
-      }
-      
-      console.log('Loaded DSAR requests:', requestArray); // Debug log
-      setRequests(requestArray);
+      console.log('Loaded DSAR requests:', filteredRequests);
+      setRequests(filteredRequests);
     } catch (err) {
       console.error('Error loading DSAR requests:', err);
       setError('Failed to load DSAR requests. Please try again.');
-      setRequests([]); // Ensure requests is always an array even on error
+      setRequests([]);
     } finally {
       setLoading(false);
     }
@@ -66,31 +48,20 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
     try {
       setProcessing(requestId);
       
-      // Add notification when status changes
-      const request = requests.find(r => r.id === requestId);
-      if (request) {
-        await apiClient.put(`/api/v1/dsar/${requestId}`, {
-          status: newStatus,
-          updatedAt: new Date().toISOString(),
-          processedBy: 'csr@sltmobitel.lk' // CSR user
-        });
-        
-        // Log the action
-        await apiClient.post('/api/v1/event', {
-          eventType: `dsar_${newStatus}`,
-          description: `DSAR request ${request.requestType} has been ${newStatus} by CSR`,
-          partyId: request.partyId,
-          metadata: {
-            requestId: requestId,
-            requestType: request.requestType,
-            previousStatus: request.status,
-            newStatus: newStatus
-          }
-        });
-      }
+      // Update local state for demo purposes
+      setRequests(prevRequests => 
+        prevRequests.map(request => 
+          request.id === requestId 
+            ? { ...request, status: newStatus, updatedAt: new Date().toISOString() }
+            : request
+        )
+      );
       
-      // Refresh the request list
-      await loadDSARRequests();
+      console.log(`Updated DSAR request ${requestId} status to ${newStatus} (demo mode)`);
+      
+      // Simulate delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
     } catch (err) {
       console.error('Error updating DSAR request:', err);
       setError('Failed to update request status. Please try again.');
@@ -101,7 +72,6 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
 
   const downloadRequestData = async (requestId: string) => {
     try {
-      // In a real implementation, this would generate and download the requested data
       const request = requests.find(r => r.id === requestId);
       if (request) {
         // Create a simple JSON file with the request data
@@ -123,13 +93,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
         a.click();
         window.URL.revokeObjectURL(url);
         
-        // Log the download action
-        await apiClient.post('/api/v1/event', {
-          eventType: 'dsar_data_downloaded',
-          description: `DSAR ${request.requestType} data downloaded by CSR`,
-          partyId: request.partyId,
-          metadata: { requestId: requestId, requestType: request.requestType }
-        });
+        console.log(`Downloaded DSAR data for request ${requestId} (demo mode)`);
       }
     } catch (err) {
       console.error('Error downloading DSAR data:', err);

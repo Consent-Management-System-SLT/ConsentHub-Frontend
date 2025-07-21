@@ -17,7 +17,7 @@ import {
   Clock,
   Settings
 } from 'lucide-react';
-import { apiClient } from '../../services/apiClient';
+import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface CustomerProfileProps {
   customer: any;
@@ -49,27 +49,24 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
     try {
       setLoading(true);
       
-      // Load consents for this customer
-      const consentsResponse = await apiClient.get(`/api/v1/consent?partyId=${customer.id}`);
-      setConsents(consentsResponse.data || []);
+      // Get hardcoded data from service
+      const allConsents = await csrDashboardService.getConsents();
+      const customerConsents = allConsents.filter(c => c.partyId === customer.id);
+      setConsents(customerConsents);
 
-      // Load DSAR requests for this customer
-      const dsarResponse = await apiClient.get(`/api/v1/dsar?partyId=${customer.id}`);
-      setDsarRequests(dsarResponse.data || []);
+      const allDsarRequests = await csrDashboardService.getDSARRequests();
+      const customerDsarRequests = allDsarRequests.filter(d => d.partyId === customer.id);
+      setDsarRequests(customerDsarRequests);
 
-      // Load preferences for this customer
-      try {
-        const preferencesResponse = await apiClient.get(`/api/v1/preferences?partyId=${customer.id}`);
-        const customerPrefs = preferencesResponse.data.find((p: any) => p.partyId === customer.id);
-        setPreferences(customerPrefs);
-      } catch (error) {
-        console.log('No preferences found for customer');
-      }
+      // Get communication preferences
+      const commPrefs = await csrDashboardService.getCommunicationPreferences();
+      const customerPrefs = commPrefs.find(p => p.partyId === customer.id);
+      setPreferences(customerPrefs);
 
-      // Load recent activities for this customer
-      const eventsResponse = await apiClient.get(`/api/v1/event?partyId=${customer.id}`);
-      const events = eventsResponse.data || [];
-      const sortedEvents = events
+      // Get audit events for this customer
+      const allEvents = await csrDashboardService.getAuditEvents();
+      const customerEvents = allEvents.filter(e => e.partyId === customer.id);
+      const sortedEvents = customerEvents
         .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 10);
       setRecentActivities(sortedEvents);
@@ -83,19 +80,11 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
 
   const handleSaveEdit = async () => {
     try {
-      await apiClient.put(`/api/v1/party/${customer.id}`, editedData);
+      // For demo purposes, just update local state
       setCustomerData(editedData);
       setIsEditing(false);
       
-      // Log the update
-      await apiClient.post('/api/v1/event', {
-        eventType: 'customer_profile_updated',
-        description: `Customer profile updated by CSR`,
-        partyId: customer.id,
-        metadata: { updatedFields: Object.keys(editedData) }
-      });
-      
-      alert('Customer profile updated successfully');
+      alert('Customer profile updated successfully (Demo Mode)');
     } catch (error) {
       console.error('Error updating customer:', error);
       alert('Failed to update customer profile');
