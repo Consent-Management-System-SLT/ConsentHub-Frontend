@@ -463,6 +463,52 @@ let customerPreferences = [
 
 // CSR Dashboard API Routes (No authentication required)
 
+// GET /api/csr/stats - Get CSR Dashboard Statistics
+app.get("/api/csr/stats", (req, res) => {
+    console.log('📊 CSR Dashboard: Fetching dashboard statistics');
+    
+    // Calculate dynamic stats
+    const totalCustomers = parties.length;
+    const pendingRequests = dsarRequests.filter(r => r.status === 'pending').length;
+    const consentUpdates = csrConsents.filter(c => {
+        const grantedDate = new Date(c.grantedAt || c.createdAt);
+        const daysSince = (Date.now() - grantedDate.getTime()) / (1000 * 60 * 60 * 24);
+        return daysSince <= 7; // Consents updated in last 7 days
+    }).length;
+    const guardiansManaged = parties.filter(p => p.type === 'guardian').length;
+    const todayActions = auditEvents.filter(e => {
+        const eventDate = new Date(e.createdAt);
+        const today = new Date();
+        return eventDate.toDateString() === today.toDateString();
+    }).length;
+    
+    // Risk alerts: DSAR requests over 25 days old
+    const riskAlerts = dsarRequests.filter(r => {
+        const submitted = new Date(r.submittedAt);
+        const daysSince = (Date.now() - submitted.getTime()) / (1000 * 60 * 60 * 24);
+        return daysSince > 25 && r.status !== 'completed';
+    }).length;
+    
+    const stats = {
+        totalCustomers,
+        pendingRequests,
+        consentUpdates,
+        guardiansManaged,
+        todayActions,
+        riskAlerts,
+        // Additional insights
+        consentRate: Math.round((csrConsents.filter(c => c.status === 'granted').length / csrConsents.length) * 100),
+        resolvedRequests: dsarRequests.filter(r => r.status === 'completed').length,
+        newCustomers: parties.filter(p => {
+            const created = new Date(p.createdAt);
+            const daysSince = (Date.now() - created.getTime()) / (1000 * 60 * 60 * 24);
+            return daysSince <= 1;
+        }).length
+    };
+    
+    res.json(stats);
+});
+
 // GET /api/v1/party - Get all customers/parties for CSR
 app.get("/api/v1/party", (req, res) => {
     console.log('🔍 CSR Dashboard: Fetching party/customer data');
@@ -496,6 +542,83 @@ app.get("/api/v1/preferences", (req, res) => {
         res.json(prefs);
     } else {
         res.json(customerPreferences);
+    }
+});
+
+// POST /api/v1/dsar - Create new DSAR request
+app.post("/api/v1/dsar", (req, res) => {
+    console.log('📋 CSR Dashboard: Creating new DSAR request');
+    const newRequest = {
+        id: String(dsarRequests.length + 1),
+        ...req.body,
+        submittedAt: new Date().toISOString(),
+        status: req.body.status || 'pending'
+    };
+    dsarRequests.push(newRequest);
+    res.json(newRequest);
+});
+
+// PUT /api/v1/dsar/:id - Update DSAR request status
+app.put("/api/v1/dsar/:id", (req, res) => {
+    console.log('📋 CSR Dashboard: Updating DSAR request:', req.params.id);
+    const requestId = req.params.id;
+    const requestIndex = dsarRequests.findIndex(r => r.id === requestId);
+    
+    if (requestIndex >= 0) {
+        dsarRequests[requestIndex] = {
+            ...dsarRequests[requestIndex],
+            ...req.body,
+            updatedAt: new Date().toISOString()
+        };
+        
+        if (req.body.status === 'completed') {
+            dsarRequests[requestIndex].completedAt = new Date().toISOString();
+        }
+        
+        res.json(dsarRequests[requestIndex]);
+    } else {
+        res.status(404).json({ error: 'DSAR request not found' });
+    }
+});
+
+// POST /api/v1/consent - Create new consent record
+app.post("/api/v1/consent", (req, res) => {
+    console.log('✅ CSR Dashboard: Creating new consent');
+    const newConsent = {
+        id: String(csrConsents.length + 1),
+        ...req.body,
+        grantedAt: req.body.status === 'granted' ? new Date().toISOString() : undefined,
+        deniedAt: req.body.status === 'denied' ? new Date().toISOString() : undefined
+    };
+    csrConsents.push(newConsent);
+    res.json(newConsent);
+});
+
+// PUT /api/v1/consent/:id - Update consent status
+app.put("/api/v1/consent/:id", (req, res) => {
+    console.log('✅ CSR Dashboard: Updating consent:', req.params.id);
+    const consentId = req.params.id;
+    const consentIndex = csrConsents.findIndex(c => c.id === consentId);
+    
+    if (consentIndex >= 0) {
+        const updatedConsent = {
+            ...csrConsents[consentIndex],
+            ...req.body,
+            updatedAt: new Date().toISOString()
+        };
+        
+        if (req.body.status === 'granted') {
+            updatedConsent.grantedAt = new Date().toISOString();
+        } else if (req.body.status === 'denied') {
+            updatedConsent.deniedAt = new Date().toISOString();
+        } else if (req.body.status === 'revoked') {
+            updatedConsent.revokedAt = new Date().toISOString();
+        }
+        
+        csrConsents[consentIndex] = updatedConsent;
+        res.json(updatedConsent);
+    } else {
+        res.status(404).json({ error: 'Consent record not found' });
     }
 });
 

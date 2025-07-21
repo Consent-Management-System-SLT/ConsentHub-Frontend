@@ -88,9 +88,39 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
     try {
       const response = await apiClient.get('/api/v1/party');
       const data = response.data as any;
-      setCustomers(Array.isArray(data) ? data : []);
+      const customerArray = Array.isArray(data) ? data : [];
+      setCustomers(customerArray);
+      
+      console.log('Loaded customers:', customerArray.length);
     } catch (error) {
       console.error('Error loading customers:', error);
+      // Fallback sample data if API fails
+      setCustomers([
+        {
+          id: "1",
+          name: "John Doe",
+          email: "john.doe@email.com",
+          phone: "+94771234567",
+          status: "active",
+          type: "individual"
+        },
+        {
+          id: "2",
+          name: "Jane Smith",
+          email: "jane.smith@email.com",
+          phone: "+94771234568",
+          status: "active",
+          type: "individual"
+        },
+        {
+          id: "3",
+          name: "Robert Johnson",
+          email: "robert.j@email.com",
+          phone: "+94771234569",
+          status: "active",
+          type: "guardian"
+        }
+      ]);
     }
   };
 
