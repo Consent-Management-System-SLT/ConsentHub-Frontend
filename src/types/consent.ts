@@ -10,19 +10,6 @@ export interface Party {
   email: string;
   mobile: string;
   type: PartyType;
-  status?: 'active' | 'inactive' | 'suspended';
-  address?: string;
-  organization?: string;
-  department?: string;
-  jobTitle?: string;
-  createdAt?: string;
-  lastUpdated?: string;
-  userDetails?: {
-    status?: string;
-    lastLoginAt?: string;
-    emailVerified?: boolean;
-    createdAt?: string;
-  };
   relationship?: {
     role: string;
     linkedPartyId?: string;
