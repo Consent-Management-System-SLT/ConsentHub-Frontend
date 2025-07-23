@@ -80,14 +80,57 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
 
   const handleSaveEdit = async () => {
     try {
-      // For demo purposes, just update local state
-      setCustomerData(editedData);
-      setIsEditing(false);
+      setLoading(true);
       
-      alert('Customer profile updated successfully (Demo Mode)');
-    } catch (error) {
+      // Get auth token
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+      
+      // Make API call to update customer profile
+      const response = await fetch(`/api/v1/csr/customers/${customer.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: editedData.name,
+          email: editedData.email,
+          phone: editedData.mobile || editedData.phone,
+          address: editedData.address,
+          organization: editedData.organization,
+          department: editedData.department,
+          jobTitle: editedData.jobTitle,
+          status: editedData.status
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Update failed: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Update local state with the response
+        setCustomerData(editedData);
+        setIsEditing(false);
+        
+        // Show success message
+        alert('Customer profile updated successfully! Changes will be reflected in customer dashboard.');
+        
+        // Reload customer details to get updated data
+        await loadCustomerDetails();
+      } else {
+        throw new Error(data.message || 'Update failed');
+      }
+    } catch (error: any) {
       console.error('Error updating customer:', error);
-      alert('Failed to update customer profile');
+      alert(`Failed to update customer profile: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
