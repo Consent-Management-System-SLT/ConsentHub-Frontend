@@ -303,9 +303,9 @@ export class MultiServiceApiClient {
       if (service) {
         switch (service) {
           case 'auth':
-            // Auth service needs full path
+            // Auth service - strip /api/v1 prefix since baseURL is just the server
             client = authApi;
-            fullEndpoint = endpoint;
+            fullEndpoint = endpoint.replace('/api/v1', '') || endpoint;
             break;
           case 'csr':
             // CSR service needs full path including /api/v1

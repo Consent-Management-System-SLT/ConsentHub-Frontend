@@ -116,9 +116,9 @@ class AuthService {
       console.log('Starting login process for:', credentials.email);
       let response;
 
-      // Try production endpoint first, then fallback to local, then demo mode
+      // Try backend endpoint, fallback to demo mode on any error
       try {
-        console.log('Trying production endpoint...');
+        console.log('Trying backend endpoint...');
         response = await multiServiceApiClient.makeRequest(
           'POST',
           '/api/v1/auth/login',
@@ -126,24 +126,11 @@ class AuthService {
           'customer',
           'auth'
         );
-        console.log('Production endpoint success');
-      } catch (prodError) {
-        console.log('Production endpoint failed:', prodError.message);
-        try {
-          console.log('Trying local development endpoint...');
-          response = await multiServiceApiClient.makeRequest(
-            'POST',
-            '/api/v1/auth/login',
-            credentials,
-            'customer',
-            'auth'
-          );
-          console.log('Local endpoint success');
-        } catch (localError) {
-          console.log('Local endpoint failed:', localError.message);
-          console.log('Backend unavailable, using demo authentication');
-          return this.demoLogin(credentials);
-        }
+        console.log('Backend endpoint success');
+      } catch (backendError: any) {
+        console.log('Backend endpoint failed:', backendError.message);
+        console.log('Backend unavailable, using demo authentication');
+        return this.demoLogin(credentials);
       }
 
       // Accept both response.data.success and response.success for flexibility
