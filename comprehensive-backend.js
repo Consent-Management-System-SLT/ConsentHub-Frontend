@@ -1420,12 +1420,30 @@ app.get("/api/v1/auth/profile", verifyToken, (req, res) => {
 
 // User registration
 app.post("/api/v1/auth/register", (req, res) => {
-    const { email, password, name, phone, address } = req.body;
+    const { 
+        email, 
+        password, 
+        firstName, 
+        lastName, 
+        name, 
+        phone, 
+        address, 
+        company, 
+        department, 
+        jobTitle 
+    } = req.body;
     
-    if (!email || !password || !name) {
+    if (!email || !password) {
         return res.status(400).json({
             error: true,
-            message: "Email, password, and name are required"
+            message: "Email and password are required"
+        });
+    }
+    
+    if (!firstName && !lastName && !name) {
+        return res.status(400).json({
+            error: true,
+            message: "Either name or first/last name is required"
         });
     }
     
@@ -1437,22 +1455,150 @@ app.post("/api/v1/auth/register", (req, res) => {
         });
     }
     
+    // Generate unique user ID
+    const userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    
+    // Create full name from parts or use provided name
+    const fullName = name || (firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName);
+    
     const newUser = {
-        id: (users.length + 1).toString(),
-        email,
+        id: userId,
+        email: email.toLowerCase(),
         password,
-        name,
+        name: fullName,
+        firstName: firstName || fullName?.split(' ')[0] || '',
+        lastName: lastName || fullName?.split(' ').slice(1).join(' ') || '',
         phone: phone || "",
         address: address || "",
+        company: company || "SLT-Mobitel",
+        department: department || "",
+        jobTitle: jobTitle || "",
         role: "customer",
-        organization: "SLT-Mobitel",
-        createdAt: new Date().toISOString()
+        organization: company || "SLT-Mobitel",
+        status: "active",
+        emailVerified: false,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+        profileData: {
+            preferences: {
+                language: 'en',
+                timezone: 'Asia/Colombo',
+                notifications: {
+                    email: true,
+                    sms: true,
+                    marketing: false
+                }
+            },
+            communication: {
+                preferredChannel: 'email',
+                frequency: 'immediate'
+            }
+        }
     };
     
+    // Add user to users array
     users.push(newUser);
     
+    // Create corresponding party record for CSR access
+    const partyId = `party_${userId}`;
+    const newParty = {
+        id: partyId,
+        name: newUser.name,
+        email: newUser.email,
+        phone: newUser.phone,
+        mobile: newUser.phone,
+        dateOfBirth: null,
+        type: 'individual',
+        status: 'active',
+        userId: newUser.id,
+        address: newUser.address,
+        organization: newUser.organization,
+        department: newUser.department,
+        jobTitle: newUser.jobTitle,
+        createdAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString()
+    };
+    
+    // Add to parties array for CSR dashboard
+    if (!parties.find(p => p.email === newUser.email)) {
+        parties.push(newParty);
+    }
+    
+    // Generate token
     const token = generateToken(newUser);
-    console.log("New user registered:", newUser.email);
+    
+    // Create initial consent record
+    const consentId = `consent_${userId}_${Date.now()}`;
+    const initialConsent = {
+        id: consentId,
+        userId: newUser.id,
+        partyId: partyId,
+        purposeId: 'data_processing',
+        purpose: 'Data Processing',
+        description: 'Consent for basic data processing',
+        status: 'granted',
+        grantedAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
+        legalBasis: 'consent',
+        categories: ['personal_data'],
+        channels: ['account_creation']
+    };
+    
+    consents.push(initialConsent);
+    
+    // Create initial preferences
+    const preferenceId = `pref_${userId}_${Date.now()}`;
+    const initialPreferences = {
+        id: preferenceId,
+        userId: newUser.id,
+        partyId: partyId,
+        communicationChannels: {
+            email: true,
+            sms: false,
+            phone: false,
+            mail: false
+        },
+        topicSubscriptions: {
+            serviceUpdates: true,
+            billing: true,
+            marketing: false,
+            promotions: false,
+            security: true
+        },
+        frequency: 'immediate',
+        language: 'en',
+        timezone: 'Asia/Colombo',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    preferences.push(initialPreferences);
+    
+    // Create audit log entry
+    const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    const auditEntry = {
+        id: auditId,
+        partyId: partyId,
+        eventType: 'user_registration',
+        description: `New user account created for ${newUser.name}`,
+        createdAt: new Date().toISOString(),
+        userId: newUser.id,
+        userName: newUser.name,
+        ipAddress: req.ip || '127.0.0.1',
+        userAgent: req.get('User-Agent') || 'Unknown',
+        metadata: {
+            email: newUser.email,
+            registrationMethod: 'web_form',
+            profileComplete: !!(firstName && lastName && phone)
+        },
+        category: 'Account Management',
+        severity: 'info'
+    };
+    
+    auditEvents.push(auditEntry);
+    
+    console.log("New user registered:", newUser.email, "ID:", newUser.id);
     
     res.status(201).json({
         success: true,
@@ -1463,8 +1609,15 @@ app.post("/api/v1/auth/register", (req, res) => {
             email: newUser.email,
             role: newUser.role,
             name: newUser.name,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
             phone: newUser.phone,
-            organization: newUser.organization
+            company: newUser.company,
+            department: newUser.department,
+            jobTitle: newUser.jobTitle,
+            organization: newUser.organization,
+            status: newUser.status,
+            createdAt: newUser.createdAt
         }
     });
 });
@@ -1670,9 +1823,18 @@ app.post("/api/v1/privacy-notices/:id/acknowledge", verifyToken, (req, res) => {
     });
 });
 
-// User Profile Management
+// User Profile Management - Enhanced
 app.put("/api/v1/auth/profile", verifyToken, (req, res) => {
-    const { name, phone, address } = req.body;
+    const { 
+        name, 
+        firstName, 
+        lastName, 
+        phone, 
+        address, 
+        company, 
+        department, 
+        jobTitle 
+    } = req.body;
     
     const user = users.find(u => u.id === req.user.id);
     
@@ -1683,11 +1845,82 @@ app.put("/api/v1/auth/profile", verifyToken, (req, res) => {
         });
     }
     
+    // Store old values for audit
+    const oldValues = {
+        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        address: user.address,
+        company: user.company,
+        department: user.department,
+        jobTitle: user.jobTitle
+    };
+    
+    // Update user profile
     if (name) user.name = name;
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
     if (phone) user.phone = phone;
     if (address) user.address = address;
+    if (company) user.company = company;
+    if (department) user.department = department;
+    if (jobTitle) user.jobTitle = jobTitle;
     
-    console.log("Profile updated for:", user.email);
+    // Update full name if first/last names are provided
+    if (firstName || lastName) {
+        user.name = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    }
+    
+    // Update last modified timestamp
+    user.lastLoginAt = new Date().toISOString();
+    
+    // Update corresponding party record for CSR visibility
+    const party = parties.find(p => p.userId === user.id || p.email === user.email);
+    if (party) {
+        if (name || firstName || lastName) party.name = user.name;
+        if (phone) party.phone = phone;
+        if (phone) party.mobile = phone;
+        if (address) party.address = address;
+        if (company) party.organization = company;
+        if (department) party.department = department;
+        if (jobTitle) party.jobTitle = jobTitle;
+        party.lastUpdated = new Date().toISOString();
+    }
+    
+    // Create audit log entry
+    const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    const auditEntry = {
+        id: auditId,
+        partyId: party?.id || `party_${user.id}`,
+        eventType: 'profile_updated',
+        description: `User profile updated by ${user.name}`,
+        createdAt: new Date().toISOString(),
+        userId: user.id,
+        userName: user.name,
+        ipAddress: req.ip || '127.0.0.1',
+        userAgent: req.get('User-Agent') || 'Unknown',
+        metadata: {
+            oldValues,
+            newValues: {
+                name: user.name,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phone: user.phone,
+                address: user.address,
+                company: user.company,
+                department: user.department,
+                jobTitle: user.jobTitle
+            },
+            updatedFields: Object.keys(req.body)
+        },
+        category: 'Profile Management',
+        severity: 'info'
+    };
+    
+    auditEvents.push(auditEntry);
+    
+    console.log("Profile updated for:", user.email, "by user");
     
     res.json({
         success: true,
@@ -1697,14 +1930,21 @@ app.put("/api/v1/auth/profile", verifyToken, (req, res) => {
             email: user.email,
             role: user.role,
             name: user.name,
+            firstName: user.firstName,
+            lastName: user.lastName,
             phone: user.phone,
+            company: user.company,
+            department: user.department,
+            jobTitle: user.jobTitle,
             organization: user.organization,
-            address: user.address
+            address: user.address,
+            status: user.status,
+            lastLoginAt: user.lastLoginAt
         }
     });
 });
 
-// Customer Dashboard Profile Endpoint
+// Customer Dashboard Profile Endpoint - Enhanced
 app.get("/api/v1/customer/dashboard/profile", verifyToken, (req, res) => {
     const user = users.find(u => u.id === req.user.id);
     
@@ -1720,23 +1960,35 @@ app.get("/api/v1/customer/dashboard/profile", verifyToken, (req, res) => {
         data: {
             id: user.id,
             name: user.name,
-            firstName: user.name?.split(' ')[0] || '',
-            lastName: user.name?.split(' ').slice(1).join(' ') || '',
+            firstName: user.firstName || user.name?.split(' ')[0] || '',
+            lastName: user.lastName || user.name?.split(' ').slice(1).join(' ') || '',
             email: user.email,
             phone: user.phone,
-            company: user.organization || 'SLT-Mobitel',
+            company: user.company || user.organization || 'SLT-Mobitel',
             department: user.department || '',
             jobTitle: user.jobTitle || '',
             status: user.status || 'active',
             createdAt: user.createdAt,
-            lastLoginAt: user.lastLoginAt
+            lastLoginAt: user.lastLoginAt,
+            address: user.address || '',
+            emailVerified: user.emailVerified || false,
+            profileData: user.profileData || {}
         }
     });
 });
 
-// Customer Dashboard Profile Update Endpoint  
+// Customer Dashboard Profile Update Endpoint - Enhanced
 app.put("/api/v1/customer/dashboard/profile", verifyToken, (req, res) => {
-    const { name, firstName, lastName, phone, company, department, jobTitle } = req.body;
+    const { 
+        name, 
+        firstName, 
+        lastName, 
+        phone, 
+        company, 
+        department, 
+        jobTitle, 
+        address 
+    } = req.body;
     
     const user = users.find(u => u.id === req.user.id);
     
@@ -1747,15 +1999,88 @@ app.put("/api/v1/customer/dashboard/profile", verifyToken, (req, res) => {
         });
     }
     
+    // Store old values for audit
+    const oldValues = {
+        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        company: user.company,
+        department: user.department,
+        jobTitle: user.jobTitle,
+        address: user.address
+    };
+    
     // Update profile fields
     if (name) user.name = name;
-    if (firstName && lastName) user.name = `${firstName} ${lastName}`;
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
     if (phone) user.phone = phone;
-    if (company) user.organization = company;
-    if (department) user.department = department;  
+    if (company) user.company = company;
+    if (department) user.department = department;
     if (jobTitle) user.jobTitle = jobTitle;
+    if (address) user.address = address;
     
-    console.log("Customer profile updated for:", user.email);
+    // Update full name if first/last names are provided
+    if (firstName || lastName) {
+        user.name = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    }
+    
+    // Update organization field for backwards compatibility
+    if (company) user.organization = company;
+    
+    // Update last modified timestamp
+    user.lastLoginAt = new Date().toISOString();
+    
+    // Update corresponding party record for CSR visibility
+    const party = parties.find(p => p.userId === user.id || p.email === user.email);
+    if (party) {
+        if (user.name) party.name = user.name;
+        if (phone) {
+            party.phone = phone;
+            party.mobile = phone;
+        }
+        if (address) party.address = address;
+        if (company) party.organization = company;
+        if (department) party.department = department;
+        if (jobTitle) party.jobTitle = jobTitle;
+        party.lastUpdated = new Date().toISOString();
+    }
+    
+    // Create audit log entry
+    const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    const auditEntry = {
+        id: auditId,
+        partyId: party?.id || `party_${user.id}`,
+        eventType: 'customer_profile_updated',
+        description: `Customer profile updated via dashboard by ${user.name}`,
+        createdAt: new Date().toISOString(),
+        userId: user.id,
+        userName: user.name,
+        ipAddress: req.ip || '127.0.0.1',
+        userAgent: req.get('User-Agent') || 'Unknown',
+        metadata: {
+            oldValues,
+            newValues: {
+                name: user.name,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phone: user.phone,
+                company: user.company,
+                department: user.department,
+                jobTitle: user.jobTitle,
+                address: user.address
+            },
+            updatedFields: Object.keys(req.body),
+            source: 'customer_dashboard'
+        },
+        category: 'Profile Management',
+        severity: 'info'
+    };
+    
+    auditEvents.push(auditEntry);
+    
+    console.log("Customer profile updated for:", user.email, "via dashboard");
     
     res.json({
         success: true,
@@ -1763,16 +2088,18 @@ app.put("/api/v1/customer/dashboard/profile", verifyToken, (req, res) => {
         data: {
             id: user.id,
             name: user.name,
-            firstName: user.name?.split(' ')[0] || '',
-            lastName: user.name?.split(' ').slice(1).join(' ') || '',
+            firstName: user.firstName || user.name?.split(' ')[0] || '',
+            lastName: user.lastName || user.name?.split(' ').slice(1).join(' ') || '',
             email: user.email,
             phone: user.phone,
-            company: user.organization || 'SLT-Mobitel',
+            company: user.company || user.organization || 'SLT-Mobitel',
             department: user.department || '',
             jobTitle: user.jobTitle || '',
+            address: user.address || '',
             status: user.status || 'active',
             createdAt: user.createdAt,
-            lastLoginAt: user.lastLoginAt
+            lastLoginAt: user.lastLoginAt,
+            emailVerified: user.emailVerified || false
         }
     });
 });
@@ -1818,6 +2145,276 @@ app.post("/api/v1/dsar/request", verifyToken, (req, res) => {
         success: true,
         message: "DSAR request submitted successfully",
         request: newRequest
+    });
+});
+
+// CSR ENDPOINTS FOR CUSTOMER MANAGEMENT
+
+// CSR - Get all customers (parties)
+app.get("/api/v1/csr/customers", verifyToken, (req, res) => {
+    if (req.user.role !== 'csr' && req.user.role !== 'admin') {
+        return res.status(403).json({
+            error: true,
+            message: 'Access denied. CSR or Admin role required.'
+        });
+    }
+    
+    // Return all parties (customers) for CSR dashboard
+    const customersWithDetails = parties.map(party => {
+        const user = users.find(u => u.id === party.userId || u.email === party.email);
+        return {
+            ...party,
+            userDetails: user ? {
+                status: user.status,
+                lastLoginAt: user.lastLoginAt,
+                emailVerified: user.emailVerified,
+                createdAt: user.createdAt
+            } : null
+        };
+    });
+    
+    res.json({
+        success: true,
+        customers: customersWithDetails,
+        total: customersWithDetails.length
+    });
+});
+
+// CSR - Get specific customer details
+app.get("/api/v1/csr/customers/:customerId", verifyToken, (req, res) => {
+    if (req.user.role !== 'csr' && req.user.role !== 'admin') {
+        return res.status(403).json({
+            error: true,
+            message: 'Access denied. CSR or Admin role required.'
+        });
+    }
+    
+    const customerId = req.params.customerId;
+    
+    // Find customer by ID or user ID
+    const customer = parties.find(p => p.id === customerId || p.userId === customerId);
+    const user = users.find(u => u.id === customerId || u.id === customer?.userId || u.email === customer?.email);
+    
+    if (!customer && !user) {
+        return res.status(404).json({
+            error: true,
+            message: 'Customer not found'
+        });
+    }
+    
+    // Get customer's consents
+    const customerConsents = consents.filter(c => 
+        c.userId === customerId || 
+        c.userId === customer?.userId || 
+        c.partyId === customerId ||
+        c.partyId === customer?.id
+    );
+    
+    // Get customer's preferences
+    const customerPreferences = preferences.filter(p => 
+        p.userId === customerId || 
+        p.userId === customer?.userId || 
+        p.partyId === customerId ||
+        p.partyId === customer?.id
+    );
+    
+    // Get customer's audit events
+    const customerEvents = auditEvents.filter(e => 
+        e.userId === customerId || 
+        e.userId === customer?.userId || 
+        e.partyId === customerId ||
+        e.partyId === customer?.id
+    );
+    
+    res.json({
+        success: true,
+        customer: {
+            profile: {
+                ...customer,
+                userDetails: user
+            },
+            consents: customerConsents,
+            preferences: customerPreferences,
+            auditEvents: customerEvents.slice(-10), // Last 10 events
+            stats: {
+                totalConsents: customerConsents.length,
+                activeConsents: customerConsents.filter(c => c.status === 'granted').length,
+                totalPreferences: customerPreferences.length,
+                totalEvents: customerEvents.length
+            }
+        }
+    });
+});
+
+// CSR - Update customer profile
+app.put("/api/v1/csr/customers/:customerId", verifyToken, (req, res) => {
+    if (req.user.role !== 'csr' && req.user.role !== 'admin') {
+        return res.status(403).json({
+            error: true,
+            message: 'Access denied. CSR or Admin role required.'
+        });
+    }
+    
+    const customerId = req.params.customerId;
+    const updates = req.body;
+    
+    // Find customer and user records
+    const customer = parties.find(p => p.id === customerId || p.userId === customerId);
+    const user = users.find(u => u.id === customerId || u.id === customer?.userId || u.email === customer?.email);
+    
+    if (!customer && !user) {
+        return res.status(404).json({
+            error: true,
+            message: 'Customer not found'
+        });
+    }
+    
+    // Store old values for audit
+    const oldCustomerValues = customer ? { ...customer } : {};
+    const oldUserValues = user ? { ...user } : {};
+    
+    // Update customer (party) record
+    if (customer) {
+        if (updates.name) customer.name = updates.name;
+        if (updates.email) customer.email = updates.email;
+        if (updates.phone) {
+            customer.phone = updates.phone;
+            customer.mobile = updates.phone;
+        }
+        if (updates.address) customer.address = updates.address;
+        if (updates.organization) customer.organization = updates.organization;
+        if (updates.department) customer.department = updates.department;
+        if (updates.jobTitle) customer.jobTitle = updates.jobTitle;
+        if (updates.status) customer.status = updates.status;
+        
+        customer.lastUpdated = new Date().toISOString();
+    }
+    
+    // Update user record
+    if (user) {
+        if (updates.name) user.name = updates.name;
+        if (updates.firstName) user.firstName = updates.firstName;
+        if (updates.lastName) user.lastName = updates.lastName;
+        if (updates.phone) user.phone = updates.phone;
+        if (updates.address) user.address = updates.address;
+        if (updates.company || updates.organization) {
+            user.company = updates.company || updates.organization;
+            user.organization = updates.company || updates.organization;
+        }
+        if (updates.department) user.department = updates.department;
+        if (updates.jobTitle) user.jobTitle = updates.jobTitle;
+        if (updates.status) user.status = updates.status;
+        
+        // Update full name if first/last names are provided
+        if (updates.firstName || updates.lastName) {
+            user.name = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+            if (customer) customer.name = user.name;
+        }
+        
+        user.lastLoginAt = new Date().toISOString();
+    }
+    
+    // Create audit log entry
+    const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    const auditEntry = {
+        id: auditId,
+        partyId: customer?.id || `party_${user?.id}`,
+        eventType: 'csr_profile_update',
+        description: `Customer profile updated by CSR ${req.user.name || req.user.email}`,
+        createdAt: new Date().toISOString(),
+        userId: req.user.id,
+        userName: req.user.name || req.user.email,
+        ipAddress: req.ip || '127.0.0.1',
+        userAgent: req.get('User-Agent') || 'Unknown',
+        metadata: {
+            targetCustomerId: customerId,
+            targetCustomerName: customer?.name || user?.name,
+            oldValues: {
+                customer: oldCustomerValues,
+                user: oldUserValues
+            },
+            newValues: updates,
+            updatedFields: Object.keys(updates),
+            source: 'csr_dashboard'
+        },
+        category: 'CSR Actions',
+        severity: 'info'
+    };
+    
+    auditEvents.push(auditEntry);
+    
+    console.log(`CSR ${req.user.email} updated customer ${customer?.name || user?.name}`);
+    
+    res.json({
+        success: true,
+        message: 'Customer profile updated successfully',
+        customer: {
+            profile: {
+                ...customer,
+                userDetails: user
+            }
+        }
+    });
+});
+
+// CSR - Search customers
+app.get("/api/v1/csr/customers/search", verifyToken, (req, res) => {
+    if (req.user.role !== 'csr' && req.user.role !== 'admin') {
+        return res.status(403).json({
+            error: true,
+            message: 'Access denied. CSR or Admin role required.'
+        });
+    }
+    
+    const { query, type } = req.query;
+    
+    if (!query) {
+        return res.json({
+            success: true,
+            customers: [],
+            total: 0
+        });
+    }
+    
+    const searchQuery = query.toLowerCase();
+    let filteredCustomers = [];
+    
+    // Search in parties and users
+    const allCustomers = parties.map(party => {
+        const user = users.find(u => u.id === party.userId || u.email === party.email);
+        return {
+            ...party,
+            userDetails: user
+        };
+    });
+    
+    // Filter based on search criteria
+    filteredCustomers = allCustomers.filter(customer => {
+        const name = customer.name?.toLowerCase() || '';
+        const email = customer.email?.toLowerCase() || '';
+        const phone = customer.phone || '';
+        const mobile = customer.mobile || '';
+        
+        if (type === 'email') {
+            return email.includes(searchQuery);
+        } else if (type === 'phone') {
+            return phone.includes(searchQuery) || mobile.includes(searchQuery);
+        } else if (type === 'name') {
+            return name.includes(searchQuery);
+        } else {
+            // General search
+            return name.includes(searchQuery) || 
+                   email.includes(searchQuery) || 
+                   phone.includes(searchQuery) || 
+                   mobile.includes(searchQuery);
+        }
+    });
+    
+    res.json({
+        success: true,
+        customers: filteredCustomers,
+        total: filteredCustomers.length,
+        searchCriteria: { query, type }
     });
 });
 
