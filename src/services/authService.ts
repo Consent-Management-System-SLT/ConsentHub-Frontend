@@ -74,17 +74,12 @@ class AuthService {
         'auth'  // Use auth service
       );
 
-      console.log('Register response received:', response);
-      console.log('Response type:', typeof response);
-      console.log('Response success:', response?.data?.success);
-      console.log('Response data:', response?.data);
-
-      // Handle Axios response structure - check response.data.success
-      if (response && response.data && response.data.success) {
-        // Store auth data from response.data
+      // The multiServiceApiClient already extracts response.data for us
+      if (response && response.success) {
+        // Store auth data from response directly
         const authData = {
-          token: response.data.token,
-          user: response.data.user,
+          token: response.token,
+          user: response.user,
           expiresIn: '24h'
         };
 
@@ -100,7 +95,11 @@ class AuthService {
         };
       }
 
-      throw new Error(response?.data?.message || 'Registration failed');
+      // If backend returns user already exists, throw a specific error
+      if (response && response.error && response.message && response.message.includes('already exists')) {
+        throw new Error('User with this email already exists');
+      }
+      throw new Error(response?.message || 'Registration failed');
     } catch (error: any) {
       console.error('Registration error:', error);
       
@@ -116,13 +115,13 @@ class AuthService {
     try {
       console.log('Starting login process for:', credentials.email);
       let response;
-      
+
       // Try production endpoint first, then fallback to local, then demo mode
       try {
         console.log('Trying production endpoint...');
         response = await multiServiceApiClient.makeRequest(
           'POST',
-          '/api/v1/auth/login', // Production endpoint
+          '/api/v1/auth/login',
           credentials,
           'customer',
           'auth'
@@ -132,10 +131,9 @@ class AuthService {
         console.log('Production endpoint failed:', prodError.message);
         try {
           console.log('Trying local development endpoint...');
-          // Fallback to local development endpoint
           response = await multiServiceApiClient.makeRequest(
             'POST',
-            '/api/v1/auth/login', // Fixed: Local development endpoint
+            '/api/v1/auth/login',
             credentials,
             'customer',
             'auth'
@@ -144,27 +142,21 @@ class AuthService {
         } catch (localError) {
           console.log('Local endpoint failed:', localError.message);
           console.log('Backend unavailable, using demo authentication');
-          // Demo fallback authentication
           return this.demoLogin(credentials);
         }
       }
 
-      console.log('Login response received:', response);
-      console.log('Response type:', typeof response);
-      console.log('Response success:', response?.data?.success);
-
-      // Handle Axios response structure - check response.data.success
-      if (response && response.data && response.data.success) {
+      // Accept both response.data.success and response.success for flexibility
+      const resData = response?.data || response;
+      if (resData && resData.success) {
         const authData = {
-          token: response.data.token,
-          user: response.data.user,
+          token: resData.token,
+          user: resData.user,
           expiresIn: '24h'
         };
-
         localStorage.setItem('authToken', authData.token);
         localStorage.setItem('user', JSON.stringify(authData.user));
         this.currentUser = authData.user;
-
         return {
           success: true,
           token: authData.token,
@@ -173,9 +165,17 @@ class AuthService {
         };
       }
 
-      throw new Error(response?.data?.message || 'Invalid credentials');
+      // Only throw 'Invalid credentials' if login failed
+      throw new Error(resData?.message || 'Invalid credentials');
     } catch (error: any) {
-      console.error('Login error:', error);
+      // Only log unexpected errors
+      if (!error.message.includes('Invalid credentials')) {
+        console.error('Login error:', error);
+      }
+      // Only throw 'Invalid credentials' if that's the actual error
+      if (error.message && error.message.toLowerCase().includes('invalid credentials')) {
+        throw new Error('Invalid credentials');
+      }
       throw new Error(error.message || 'Login failed');
     }
   }

@@ -53,6 +53,7 @@ const Signup: React.FC = () => {
   const [errors, setErrors] = useState<SignupErrors>({});
   const [success, setSuccess] = useState('');
   const [generalError, setGeneralError] = useState('');
+  const [showAlreadyRegistered, setShowAlreadyRegistered] = useState(false);
 
   const getPasswordStrength = (password: string) => {
     let strength = 0;
@@ -163,7 +164,7 @@ const Signup: React.FC = () => {
       
       // Handle specific errors
       if (error.message.includes('User with this email already exists')) {
-        setErrors({ email: 'An account with this email already exists. Please use a different email or try logging in.' });
+        setShowAlreadyRegistered(true);
       } else if (error.message.includes('404')) {
         setGeneralError('Registration service is not available. Please try again later.');
       } else if (error.message.includes('Network Error')) {
@@ -212,6 +213,17 @@ const Signup: React.FC = () => {
               <div>
                 <p className="text-red-800 font-medium">Error</p>
                 <p className="text-red-700 text-sm">{generalError}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Already registered modal/alert */}
+          {showAlreadyRegistered && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md flex items-center space-x-3">
+              <AlertCircle className="h-6 w-6 text-yellow-500 flex-shrink-0" />
+              <div>
+                <p className="text-yellow-800 font-medium">Account already registered</p>
+                <p className="text-yellow-700 text-sm">This email is already registered. Please <button className="underline text-blue-700 hover:text-blue-900" onClick={() => navigate('/login', { state: { email: formData.email, message: 'You already have an account. Please login.' } })}>login to your account</button>.</p>
               </div>
             </div>
           )}
