@@ -16,6 +16,9 @@ const SERVICES = {
   CATALOG: import.meta.env.VITE_CATALOG_API_URL || 'http://localhost:3001',
 };
 
+// Debug logging for service URLs
+console.log('Service URLs Configuration:', SERVICES);
+
 // Service-specific API clients
 export const customerApi = axios.create({
   baseURL: SERVICES.CUSTOMER,
@@ -303,9 +306,9 @@ export class MultiServiceApiClient {
       if (service) {
         switch (service) {
           case 'auth':
-            // Auth service - keep full path since backend expects /api/v1/auth/*
+            // Auth service - strip /api/v1 prefix to avoid duplication
             client = authApi;
-            fullEndpoint = endpoint;
+            fullEndpoint = endpoint.replace('/api/v1', '') || endpoint;
             break;
           case 'csr':
             // CSR service needs full path including /api/v1
