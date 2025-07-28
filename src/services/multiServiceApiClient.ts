@@ -306,7 +306,7 @@ export class MultiServiceApiClient {
       if (service) {
         switch (service) {
           case 'auth':
-            // Auth service - strip /api/v1 prefix to avoid duplication
+            // Auth service - strip /api/v1 prefix since base URL now includes it
             client = authApi;
             fullEndpoint = endpoint.replace('/api/v1', '') || endpoint;
             break;
