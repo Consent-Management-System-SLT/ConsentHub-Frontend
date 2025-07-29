@@ -1,21 +1,32 @@
 const express = require("express");
 const cors = require("cors");
+require('dotenv').config();
+const connectDB = require('./config/database');
+const User = require('./models/User');
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Connect to MongoDB
+connectDB();
 
 // Production CORS configuration
 const corsOptions = {
   origin: [
     'https://consent-management-system-api.vercel.app',
+    'https://consenthub-backend.onrender.com',
     'http://localhost:3000',
+    'http://localhost:3001',
     'http://localhost:5173',
+    'http://localhost:5174',
     'http://localhost:4173'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: [
     'Content-Type', 
     'Authorization', 
-    'X-Requested-With'
+    'X-Requested-With',
+    'x-requested-with',
+    'Access-Control-Allow-Origin'
   ],
   credentials: true,
   optionsSuccessStatus: 200
@@ -1375,309 +1386,364 @@ app.put("/api/v1/consent/:id", (req, res) => {
 });
 
 // Authentication endpoints
-app.post("/api/v1/auth/login", (req, res) => {
-    const { email, password } = req.body;
-    console.log("Login attempt:", email);
-    
-    if (!email || !password) {
-        return res.status(400).json({ 
-            error: true, 
-            message: "Email and password required" 
-        });
-    }
-    
-    const user = users.find(u => u.email === email && u.password === password);
-    
-    if (!user) {
-        return res.status(401).json({ 
-            error: true, 
-            message: "Invalid credentials" 
-        });
-    }
-    
-    const token = generateToken(user);
-    console.log("Login successful:", user.email, "Role:", user.role);
-    
-    res.json({
-        success: true,
-        token: token,
-        user: { 
-            id: user.id, 
-            email: user.email, 
-            role: user.role, 
-            name: user.name,
-            phone: user.phone,
-            organization: user.organization
+app.post("/api/v1/auth/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        console.log("Login attempt:", email);
+        
+        if (!email || !password) {
+            return res.status(400).json({ 
+                error: true, 
+                message: "Email and password required" 
+            });
         }
-    });
+
+        // Find user in MongoDB
+        const user = await User.findOne({ email: email.toLowerCase() });
+        
+        if (!user || user.password !== password) {
+            return res.status(401).json({ 
+                error: true, 
+                message: "Invalid credentials" 
+            });
+        }
+
+        // Update last login
+        user.lastLoginAt = new Date();
+        await user.save();
+        
+        const token = generateToken({ id: user._id, email: user.email, role: user.role });
+        console.log("Login successful:", user.email, "Role:", user.role);
+        
+        res.json({
+            success: true,
+            token: token,
+            user: { 
+                id: user._id, 
+                email: user.email, 
+                role: user.role, 
+                name: user.name,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phone: user.phone,
+                company: user.company,
+                organization: user.company
+            }
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
 });
 
-app.get("/api/v1/auth/profile", verifyToken, (req, res) => {
-    const user = users.find(u => u.id === req.user.id);
-    
-    if (!user) {
-        return res.status(404).json({
+app.get("/api/v1/auth/profile", verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                message: 'User not found'
+            });
+        }
+        
+        res.json({
+            user: {
+                id: user._id,
+                email: user.email,
+                role: user.role,
+                name: user.name,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                phone: user.phone,
+                company: user.company,
+                department: user.department,
+                jobTitle: user.jobTitle,
+                organization: user.company,
+                address: user.address,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+                status: user.status,
+                emailVerified: user.emailVerified,
+                language: user.language
+            }
+        });
+    } catch (error) {
+        console.error('Profile fetch error:', error);
+        res.status(500).json({
             error: true,
-            message: 'User not found'
+            message: 'Internal server error'
         });
     }
-    
-    res.json({
-        user: {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-            name: user.name,
-            phone: user.phone,
-            organization: user.organization,
-            address: user.address,
-            createdAt: user.createdAt
-        }
-    });
 });
 
 // User registration
-app.post("/api/v1/auth/register", (req, res) => {
-    const { 
-        email, 
-        password, 
-        firstName, 
-        lastName, 
-        name, 
-        phone, 
-        address, 
-        company, 
-        department, 
-        jobTitle 
-    } = req.body;
-    
-    if (!email || !password) {
-        return res.status(400).json({
-            error: true,
-            message: "Email and password are required"
+app.post("/api/v1/auth/register", async (req, res) => {
+    try {
+        const { 
+            email, 
+            password, 
+            firstName, 
+            lastName, 
+            phone, 
+            company, 
+            department, 
+            jobTitle,
+            acceptTerms,
+            acceptPrivacy,
+            language 
+        } = req.body;
+        
+        // Validation
+        if (!email || !password) {
+            return res.status(400).json({
+                error: true,
+                message: "Email and password are required"
+            });
+        }
+        
+        if (!firstName || !lastName) {
+            return res.status(400).json({
+                error: true,
+                message: "First name and last name are required"
+            });
+        }
+
+        if (!phone) {
+            return res.status(400).json({
+                error: true,
+                message: "Phone number is required"
+            });
+        }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        if (existingUser) {
+            return res.status(400).json({
+                error: true,
+                message: "User with this email already exists"
+            });
+        }
+        
+        // Create new user
+        const newUser = new User({
+            email: email.toLowerCase(),
+            password,
+            firstName,
+            lastName,
+            phone,
+            company: company || "SLT-Mobitel",
+            department: department || "",
+            jobTitle: jobTitle || "",
+            role: "customer",
+            status: "active",
+            emailVerified: false,
+            isActive: true,
+            acceptTerms: acceptTerms || false,
+            acceptPrivacy: acceptPrivacy || false,
+            language: language || 'en',
+            lastLoginAt: new Date()
         });
-    }
-    
-    if (!firstName && !lastName && !name) {
-        return res.status(400).json({
-            error: true,
-            message: "Either name or first/last name is required"
-        });
-    }
-    
-    // Check if user already exists
-    if (users.find(u => u.email === email)) {
-        return res.status(400).json({
-            error: true,
-            message: "User with this email already exists"
-        });
-    }
-    
-    // Generate unique user ID
-    const userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-    
-    // Create full name from parts or use provided name
-    const fullName = name || (firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName);
-    
-    const newUser = {
-        id: userId,
-        email: email.toLowerCase(),
-        password,
-        name: fullName,
-        firstName: firstName || fullName?.split(' ')[0] || '',
-        lastName: lastName || fullName?.split(' ').slice(1).join(' ') || '',
-        phone: phone || "",
-        address: address || "",
-        company: company || "SLT-Mobitel",
-        department: department || "",
-        jobTitle: jobTitle || "",
-        role: "customer",
-        organization: company || "SLT-Mobitel",
-        status: "active",
-        emailVerified: false,
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
-        profileData: {
-            preferences: {
-                language: 'en',
-                timezone: 'Asia/Colombo',
-                notifications: {
-                    email: true,
-                    sms: true,
-                    marketing: false
-                }
+
+        // Save to MongoDB
+        const savedUser = await newUser.save();
+        
+        // Create corresponding party record for CSR access
+        const partyId = `party_${savedUser._id}`;
+        const newParty = {
+            id: partyId,
+            name: savedUser.name,
+            email: savedUser.email,
+            phone: savedUser.phone,
+            mobile: savedUser.phone,
+            dateOfBirth: null,
+            type: 'individual',
+            status: 'active',
+            userId: savedUser._id.toString(),
+            address: savedUser.address,
+            organization: savedUser.company,
+            department: savedUser.department,
+            jobTitle: savedUser.jobTitle,
+            createdAt: new Date().toISOString(),
+            lastUpdated: new Date().toISOString()
+        };
+        
+        // Add to parties array for CSR dashboard
+        if (!parties.find(p => p.email === savedUser.email)) {
+            parties.push(newParty);
+        }
+        
+        // Generate token
+        const token = generateToken({ id: savedUser._id, email: savedUser.email, role: savedUser.role });
+        
+        // Create initial consent record
+        const consentId = `consent_${savedUser._id}_${Date.now()}`;
+        const initialConsent = {
+            id: consentId,
+            userId: savedUser._id.toString(),
+            partyId: partyId,
+            purposeId: 'data_processing',
+            purpose: 'Data Processing',
+            description: 'Consent for basic data processing',
+            status: 'granted',
+            grantedAt: new Date().toISOString(),
+            expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
+            legalBasis: 'consent',
+            categories: ['personal_data'],
+            channels: ['account_creation']
+        };
+        
+        consents.push(initialConsent);
+        
+        // Create initial preferences
+        const preferenceId = `pref_${savedUser._id}_${Date.now()}`;
+        const initialPreferences = {
+            id: preferenceId,
+            userId: savedUser._id.toString(),
+            partyId: partyId,
+            communicationChannels: {
+                email: true,
+                sms: false,
+                phone: false,
+                mail: false
             },
-            communication: {
-                preferredChannel: 'email',
-                frequency: 'immediate'
+            topicSubscriptions: {
+                serviceUpdates: true,
+                billing: true,
+                marketing: false,
+                promotions: false,
+                security: true
+            },
+            frequency: 'immediate',
+            language: savedUser.language,
+            timezone: 'Asia/Colombo',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        preferences.push(initialPreferences);
+        
+        // Create audit log entry
+        const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+        const auditEntry = {
+            id: auditId,
+            partyId: partyId,
+            eventType: 'user_registration',
+            description: `New user account created for ${savedUser.name}`,
+            createdAt: new Date().toISOString(),
+            userId: savedUser._id.toString(),
+            userName: savedUser.name,
+            ipAddress: req.ip || '127.0.0.1',
+            userAgent: req.get('User-Agent') || 'Unknown',
+            metadata: {
+                email: savedUser.email,
+                registrationMethod: 'web_form',
+                profileComplete: !!(firstName && lastName && phone)
+            },
+            category: 'Account Management',
+            severity: 'info'
+        };
+        
+        auditEvents.push(auditEntry);
+        
+        console.log("New user registered:", savedUser.email, "ID:", savedUser._id);
+        
+        res.status(201).json({
+            success: true,
+            message: "Account created successfully",
+            token: token,
+            user: {
+                id: savedUser._id,
+                email: savedUser.email,
+                role: savedUser.role,
+                name: savedUser.name,
+                firstName: savedUser.firstName,
+                lastName: savedUser.lastName,
+                phone: savedUser.phone,
+                company: savedUser.company,
+                department: savedUser.department,
+                jobTitle: savedUser.jobTitle,
+                organization: savedUser.company,
+                status: savedUser.status,
+                createdAt: savedUser.createdAt
             }
-        }
-    };
-    
-    // Add user to users array
-    users.push(newUser);
-    
-    // Create corresponding party record for CSR access
-    const partyId = `party_${userId}`;
-    const newParty = {
-        id: partyId,
-        name: newUser.name,
-        email: newUser.email,
-        phone: newUser.phone,
-        mobile: newUser.phone,
-        dateOfBirth: null,
-        type: 'individual',
-        status: 'active',
-        userId: newUser.id,
-        address: newUser.address,
-        organization: newUser.organization,
-        department: newUser.department,
-        jobTitle: newUser.jobTitle,
-        createdAt: new Date().toISOString(),
-        lastUpdated: new Date().toISOString()
-    };
-    
-    // Add to parties array for CSR dashboard
-    if (!parties.find(p => p.email === newUser.email)) {
-        parties.push(newParty);
+        });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
     }
-    
-    // Generate token
-    const token = generateToken(newUser);
-    
-    // Create initial consent record
-    const consentId = `consent_${userId}_${Date.now()}`;
-    const initialConsent = {
-        id: consentId,
-        userId: newUser.id,
-        partyId: partyId,
-        purposeId: 'data_processing',
-        purpose: 'Data Processing',
-        description: 'Consent for basic data processing',
-        status: 'granted',
-        grantedAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
-        legalBasis: 'consent',
-        categories: ['personal_data'],
-        channels: ['account_creation']
-    };
-    
-    consents.push(initialConsent);
-    
-    // Create initial preferences
-    const preferenceId = `pref_${userId}_${Date.now()}`;
-    const initialPreferences = {
-        id: preferenceId,
-        userId: newUser.id,
-        partyId: partyId,
-        communicationChannels: {
-            email: true,
-            sms: false,
-            phone: false,
-            mail: false
-        },
-        topicSubscriptions: {
-            serviceUpdates: true,
-            billing: true,
-            marketing: false,
-            promotions: false,
-            security: true
-        },
-        frequency: 'immediate',
-        language: 'en',
-        timezone: 'Asia/Colombo',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    };
-    
-    preferences.push(initialPreferences);
-    
-    // Create audit log entry
-    const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-    const auditEntry = {
-        id: auditId,
-        partyId: partyId,
-        eventType: 'user_registration',
-        description: `New user account created for ${newUser.name}`,
-        createdAt: new Date().toISOString(),
-        userId: newUser.id,
-        userName: newUser.name,
-        ipAddress: req.ip || '127.0.0.1',
-        userAgent: req.get('User-Agent') || 'Unknown',
-        metadata: {
-            email: newUser.email,
-            registrationMethod: 'web_form',
-            profileComplete: !!(firstName && lastName && phone)
-        },
-        category: 'Account Management',
-        severity: 'info'
-    };
-    
-    auditEvents.push(auditEntry);
-    
-    console.log("New user registered:", newUser.email, "ID:", newUser.id);
-    
-    res.status(201).json({
-        success: true,
-        message: "Account created successfully",
-        token: token,
-        user: {
-            id: newUser.id,
-            email: newUser.email,
-            role: newUser.role,
-            name: newUser.name,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-            phone: newUser.phone,
-            company: newUser.company,
-            department: newUser.department,
-            jobTitle: newUser.jobTitle,
-            organization: newUser.organization,
-            status: newUser.status,
-            createdAt: newUser.createdAt
-        }
-    });
 });
 
 // Customer Dashboard Overview
-app.get("/api/v1/customer/dashboard/overview", verifyToken, (req, res) => {
-    if (req.user.role !== 'customer') {
-        return res.status(403).json({
+app.get("/api/v1/customer/dashboard/overview", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({
+                error: true,
+                message: 'Access denied'
+            });
+        }
+        
+        // Get user from MongoDB
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                message: 'User not found'
+            });
+        }
+        
+        const userConsents = consents.filter(c => c.userId === req.user.id);
+        const userPreferences = preferences.filter(p => p.userId === req.user.id);
+        
+        res.json({
+            success: true,
+            data: {
+                totalConsents: userConsents.length,
+                activeConsents: userConsents.filter(c => c.status === 'granted').length,
+                pendingRequests: 0,
+                lastActivity: user.lastLoginAt || new Date().toISOString(),
+                recentActivity: [
+                    {
+                        type: "consent_granted",
+                        description: "Marketing consent granted",
+                        timestamp: userConsents[0]?.grantedAt || user.createdAt
+                    },
+                    {
+                        type: "profile_updated", 
+                        description: "Profile information updated",
+                        timestamp: user.updatedAt || user.createdAt
+                    }
+                ],
+                stats: {
+                    consentGrants: userConsents.filter(c => c.status === 'granted').length,
+                    consentDenials: userConsents.filter(c => c.status === 'denied').length,
+                    activePreferences: userPreferences.filter(p => p.enabled).length
+                },
+                userProfile: {
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone,
+                    company: user.company,
+                    department: user.department,
+                    jobTitle: user.jobTitle,
+                    memberSince: user.createdAt
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Dashboard overview error:', error);
+        res.status(500).json({
             error: true,
-            message: 'Access denied'
+            message: 'Internal server error'
         });
     }
-    
-    const userConsents = consents.filter(c => c.userId === req.user.id);
-    const userPreferences = preferences.filter(p => p.userId === req.user.id);
-    
-    res.json({
-        success: true,
-        data: {
-            totalConsents: userConsents.length,
-            activeConsents: userConsents.filter(c => c.status === 'granted').length,
-            pendingRequests: 0,
-            lastActivity: new Date().toISOString(),
-            recentActivity: [
-                {
-                    type: "consent_granted",
-                    description: "Marketing consent granted",
-                    timestamp: userConsents[0]?.grantedAt || new Date().toISOString()
-                },
-                {
-                    type: "profile_updated", 
-                    description: "Profile information updated",
-                    timestamp: new Date(Date.now() - 86400000).toISOString()
-                }
-            ],
-            stats: {
-                consentGrants: userConsents.filter(c => c.status === 'granted').length,
-                consentDenials: userConsents.filter(c => c.status === 'denied').length,
-                activePreferences: userPreferences.filter(p => p.enabled).length
-            }
-        }
-    });
 });
 
 // Consent Management
@@ -1842,157 +1908,168 @@ app.post("/api/v1/privacy-notices/:id/acknowledge", verifyToken, (req, res) => {
 });
 
 // User Profile Management - Enhanced
-app.put("/api/v1/auth/profile", verifyToken, (req, res) => {
-    const { 
-        name, 
-        firstName, 
-        lastName, 
-        phone, 
-        address, 
-        company, 
-        department, 
-        jobTitle 
-    } = req.body;
-    
-    const user = users.find(u => u.id === req.user.id);
-    
-    if (!user) {
-        return res.status(404).json({
-            error: true,
-            message: 'User not found'
-        });
-    }
-    
-    // Store old values for audit
-    const oldValues = {
-        name: user.name,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phone: user.phone,
-        address: user.address,
-        company: user.company,
-        department: user.department,
-        jobTitle: user.jobTitle
-    };
-    
-    // Update user profile
-    if (name) user.name = name;
-    if (firstName) user.firstName = firstName;
-    if (lastName) user.lastName = lastName;
-    if (phone) user.phone = phone;
-    if (address) user.address = address;
-    if (company) user.company = company;
-    if (department) user.department = department;
-    if (jobTitle) user.jobTitle = jobTitle;
-    
-    // Update full name if first/last names are provided
-    if (firstName || lastName) {
-        user.name = `${user.firstName || ''} ${user.lastName || ''}`.trim();
-    }
-    
-    // Update last modified timestamp
-    user.lastLoginAt = new Date().toISOString();
-    
-    // Update corresponding party record for CSR visibility
-    const party = parties.find(p => p.userId === user.id || p.email === user.email);
-    if (party) {
-        if (name || firstName || lastName) party.name = user.name;
-        if (phone) party.phone = phone;
-        if (phone) party.mobile = phone;
-        if (address) party.address = address;
-        if (company) party.organization = company;
-        if (department) party.department = department;
-        if (jobTitle) party.jobTitle = jobTitle;
-        party.lastUpdated = new Date().toISOString();
-    }
-    
-    // Create audit log entry
-    const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-    const auditEntry = {
-        id: auditId,
-        partyId: party?.id || `party_${user.id}`,
-        eventType: 'profile_updated',
-        description: `User profile updated by ${user.name}`,
-        createdAt: new Date().toISOString(),
-        userId: user.id,
-        userName: user.name,
-        ipAddress: req.ip || '127.0.0.1',
-        userAgent: req.get('User-Agent') || 'Unknown',
-        metadata: {
-            oldValues,
-            newValues: {
+app.put("/api/v1/auth/profile", verifyToken, async (req, res) => {
+    try {
+        const { 
+            firstName, 
+            lastName, 
+            phone, 
+            address, 
+            company, 
+            department, 
+            jobTitle 
+        } = req.body;
+        
+        const user = await User.findById(req.user.id);
+        
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                message: 'User not found'
+            });
+        }
+        
+        // Store old values for audit
+        const oldValues = {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phone: user.phone,
+            address: user.address,
+            company: user.company,
+            department: user.department,
+            jobTitle: user.jobTitle
+        };
+        
+        // Update user profile
+        if (firstName) user.firstName = firstName;
+        if (lastName) user.lastName = lastName;
+        if (phone) user.phone = phone;
+        if (address) user.address = address;
+        if (company) user.company = company;
+        if (department) user.department = department;
+        if (jobTitle) user.jobTitle = jobTitle;
+        
+        // Save to MongoDB
+        const updatedUser = await user.save();
+        
+        // Update corresponding party record for CSR visibility
+        const party = parties.find(p => p.userId === user._id.toString() || p.email === user.email);
+        if (party) {
+            if (firstName || lastName) party.name = user.name;
+            if (phone) party.phone = phone;
+            if (phone) party.mobile = phone;
+            if (address) party.address = address;
+            if (company) party.organization = company;
+            if (department) party.department = department;
+            if (jobTitle) party.jobTitle = jobTitle;
+            party.lastUpdated = new Date().toISOString();
+        }
+        
+        // Create audit log entry
+        const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+        const auditEntry = {
+            id: auditId,
+            partyId: party?.id || `party_${user._id}`,
+            eventType: 'profile_updated',
+            description: `User profile updated by ${user.name}`,
+            createdAt: new Date().toISOString(),
+            userId: user._id.toString(),
+            userName: user.name,
+            ipAddress: req.ip || '127.0.0.1',
+            userAgent: req.get('User-Agent') || 'Unknown',
+            metadata: {
+                oldValues,
+                newValues: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    phone: user.phone,
+                    address: user.address,
+                    company: user.company,
+                    department: user.department,
+                    jobTitle: user.jobTitle
+                },
+                updatedFields: Object.keys(req.body)
+            },
+            category: 'Profile Management',
+            severity: 'info'
+        };
+        
+        auditEvents.push(auditEntry);
+        
+        console.log("Profile updated for:", user.email, "by user");
+        
+        res.json({
+            success: true,
+            message: "Profile updated successfully",
+            user: {
+                id: user._id,
+                email: user.email,
+                role: user.role,
                 name: user.name,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 phone: user.phone,
-                address: user.address,
                 company: user.company,
                 department: user.department,
-                jobTitle: user.jobTitle
-            },
-            updatedFields: Object.keys(req.body)
-        },
-        category: 'Profile Management',
-        severity: 'info'
-    };
-    
-    auditEvents.push(auditEntry);
-    
-    console.log("Profile updated for:", user.email, "by user");
-    
-    res.json({
-        success: true,
-        message: "Profile updated successfully",
-        user: {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-            name: user.name,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            phone: user.phone,
-            company: user.company,
-            department: user.department,
-            jobTitle: user.jobTitle,
-            organization: user.organization,
-            address: user.address,
-            status: user.status,
-            lastLoginAt: user.lastLoginAt
-        }
-    });
+                jobTitle: user.jobTitle,
+                organization: user.company,
+                address: user.address,
+                status: user.status,
+                lastLoginAt: user.lastLoginAt,
+                updatedAt: user.updatedAt
+            }
+        });
+    } catch (error) {
+        console.error('Profile update error:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
 });
 
 // Customer Dashboard Profile Endpoint - Enhanced
-app.get("/api/v1/customer/dashboard/profile", verifyToken, (req, res) => {
-    const user = users.find(u => u.id === req.user.id);
-    
-    if (!user) {
-        return res.status(404).json({
+app.get("/api/v1/customer/dashboard/profile", verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                message: 'User not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            data: {
+                id: user._id,
+                name: user.name,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                phone: user.phone,
+                company: user.company,
+                department: user.department,
+                jobTitle: user.jobTitle,
+                status: user.status,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+                lastLoginAt: user.lastLoginAt,
+                emailVerified: user.emailVerified,
+                language: user.language,
+                acceptTerms: user.acceptTerms,
+                acceptPrivacy: user.acceptPrivacy,
+                address: user.address
+            }
+        });
+    } catch (error) {
+        console.error('Profile fetch error:', error);
+        res.status(500).json({
             error: true,
-            message: 'User not found'
+            message: 'Internal server error'
         });
     }
-    
-    res.json({
-        success: true,
-        data: {
-            id: user.id,
-            name: user.name,
-            firstName: user.firstName || user.name?.split(' ')[0] || '',
-            lastName: user.lastName || user.name?.split(' ').slice(1).join(' ') || '',
-            email: user.email,
-            phone: user.phone,
-            company: user.company || user.organization || 'SLT-Mobitel',
-            department: user.department || '',
-            jobTitle: user.jobTitle || '',
-            status: user.status || 'active',
-            createdAt: user.createdAt,
-            lastLoginAt: user.lastLoginAt,
-            address: user.address || '',
-            emailVerified: user.emailVerified || false,
-            profileData: user.profileData || {}
-        }
-    });
 });
 
 // Customer Dashboard Profile Update Endpoint - Enhanced

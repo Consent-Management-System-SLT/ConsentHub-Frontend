@@ -62,8 +62,15 @@ class AuthService {
       const registerPayload = {
         email: userData.email,
         password: userData.password,
-        name: `${userData.firstName} ${userData.lastName}`,
-        phone: userData.phone
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phone: userData.phone,
+        company: userData.company,
+        department: userData.department,
+        jobTitle: userData.jobTitle,
+        acceptTerms: userData.acceptTerms,
+        acceptPrivacy: userData.acceptPrivacy,
+        language: userData.language
       };
 
       const response = await multiServiceApiClient.makeRequest(
