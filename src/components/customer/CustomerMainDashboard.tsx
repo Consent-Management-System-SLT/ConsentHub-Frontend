@@ -18,6 +18,7 @@ const CustomerMainDashboard: React.FC<CustomerMainDashboardProps> = ({
 }) => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -45,16 +46,18 @@ const CustomerMainDashboard: React.FC<CustomerMainDashboardProps> = ({
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />
-      
+
       {/* Main content area */}
       <div className="flex-1 lg:ml-0 flex flex-col">
         {/* Header */}
-        <CustomerHeader customerName={customerName} onLogout={onLogout} />
-        
+        <CustomerHeader customerName={customerName} onLogout={onLogout} onProfileClick={() => setShowProfile(true)} />
+
         {/* Page content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
           <div className="max-w-7xl mx-auto">
-            {renderContent()}
+            {activeSection === 'dashboard' ? (
+              <CustomerDashboardOverview customerName={customerName} showProfile={showProfile} setShowProfile={setShowProfile} />
+            ) : renderContent()}
           </div>
         </main>
       </div>
