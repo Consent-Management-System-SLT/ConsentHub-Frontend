@@ -25,13 +25,12 @@ function Write-Status {
     )
     
     $statusIcon = switch ($Status) {
-        "SUCCESS" { "✅"; $Color = "Green" }
-        "ERROR" { "❌"; $Color = "Red" }
-        "WARNING" { "⚠️ "; $Color = "Yellow" }
-        "INFO" { "🔍"; $Color = "Cyan" }
-        default { "ℹ️ "; $Color = "White" }
+        "SUCCESS" { "[SUCCESS]"; $Color = "Green" }
+        "ERROR" { "[ERROR]"; $Color = "Red" }
+        "WARNING" { "[WARNING]"; $Color = "Yellow" }
+        "INFO" { "[INFO]"; $Color = "Cyan" }
+        default { "[INFO]"; $Color = "White" }
     }
-    
     Write-Host "$statusIcon $Message" -ForegroundColor $Color
 }
 
@@ -152,23 +151,23 @@ Write-Host "Services will start in the following order:" -ForegroundColor White
 Write-Host "  1. Backend API Server (Port 3001)" -ForegroundColor Cyan
 Write-Host "  2. Frontend Development Server (Port 5173)" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "📋 Access URLs:" -ForegroundColor White
-Write-Host "  🌐 Frontend Application: " -NoNewline -ForegroundColor White
+Write-Host "Access URLs:" -ForegroundColor White
+Write-Host "  Frontend Application: " -NoNewline -ForegroundColor White
 Write-Host "http://localhost:5173" -ForegroundColor Green
-Write-Host "  🔧 Backend API: " -NoNewline -ForegroundColor White  
+Write-Host "  Backend API: " -NoNewline -ForegroundColor White  
 Write-Host "http://localhost:3001" -ForegroundColor Green
-Write-Host "  📚 API Documentation: " -NoNewline -ForegroundColor White
+Write-Host "  API Documentation: " -NoNewline -ForegroundColor White
 Write-Host "http://localhost:3001/api-docs" -ForegroundColor Green
 Write-Host ""
-Write-Host "👥 Default Login Credentials:" -ForegroundColor White
-Write-Host "  📧 Admin: " -NoNewline -ForegroundColor White
+Write-Host "Default Login Credentials:" -ForegroundColor White
+Write-Host "  Admin: " -NoNewline -ForegroundColor White
 Write-Host "admin@sltmobitel.lk / admin123" -ForegroundColor Yellow
-Write-Host "  📧 CSR: " -NoNewline -ForegroundColor White
+Write-Host "  CSR: " -NoNewline -ForegroundColor White
 Write-Host "csr@sltmobitel.lk / csr123" -ForegroundColor Yellow
-Write-Host "  📧 Customer: " -NoNewline -ForegroundColor White
+Write-Host "  Customer: " -NoNewline -ForegroundColor White
 Write-Host "customer@sltmobitel.lk / customer123" -ForegroundColor Yellow
 Write-Host ""
-Write-Host "⚠️  Press Ctrl+C to stop all services" -ForegroundColor Red
+Write-Host "Press Ctrl+C to stop all services" -ForegroundColor Red
 Write-Host "========================================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -189,7 +188,7 @@ Write-Host ""
 # Set up cleanup on exit
 $cleanup = {
     Write-Host ""
-    Write-Host "🛑 Shutting down services..." -ForegroundColor Yellow
+    Write-Host "Shutting down services..." -ForegroundColor Yellow
     try {
         if (Get-Process -Id $backendProcess.Id -ErrorAction SilentlyContinue) {
             Stop-Process -Id $backendProcess.Id -Force
@@ -198,7 +197,7 @@ $cleanup = {
     } catch {
         Write-Host "   Backend server may have already stopped" -ForegroundColor Yellow
     }
-    Write-Host "👋 ConsentHub system shutdown complete" -ForegroundColor Green
+    Write-Host "ConsentHub system shutdown complete" -ForegroundColor Green
 }
 
 # Register cleanup on Ctrl+C
