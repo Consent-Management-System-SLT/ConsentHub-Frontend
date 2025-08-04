@@ -17,7 +17,6 @@ import {
   Globe,
   Smartphone
 } from 'lucide-react';
-import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface PreferenceEditorFormProps {
   className?: string;
@@ -72,71 +71,92 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
   const [hasChanges, setHasChanges] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  // Load customers
   useEffect(() => {
-    loadCustomers();
-  }, []);
+  loadCustomers();
+}, []);
 
-  // Load preferences when customer is selected
-  useEffect(() => {
-    if (selectedCustomer) {
-      loadPreferences();
+useEffect(() => {
+  if (selectedCustomer) {
+    loadPreferences();
+  }
+}, [selectedCustomer]);
+  
+const loadCustomers = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/v1/party');
+    if (!response.ok) throw new Error('Failed to fetch customers');
+
+    const parties = await response.json();
+
+    // Fetch preferences for each party
+    const customersWithPrefs = await Promise.all(
+      parties.map(async (party: any) => {
+        try {
+          const res = await fetch(`http://localhost:3000/api/v1/preference/party/${party.id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const preference = res.ok ? await res.json() : null;
+          return { ...party, preference };
+        } catch {
+          return { ...party, preference: null };
+        }
+      })
+    );
+
+    setCustomers(customersWithPrefs);
+  } catch (error) {
+    console.error('Error loading customers with preferences:', error);
+    setCustomers([]);
+  }
+};
+
+
+
+const loadPreferences = async () => {
+  if (!selectedCustomer) return;
+
+  setLoading(true);
+  try {
+    const res = await fetch(`http://localhost:3000/api/v1/preference/party/${selectedCustomer}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (!res.ok) throw new Error('Failed to load preferences');
+    const customerPrefs: Preference = await res.json();
+
+    if (customerPrefs) {
+      setPreferences((prev: any) => ({
+        ...prev,
+        ...customerPrefs,
+        channels: {
+          ...prev.channels,
+          ...(customerPrefs.channels || {}),
+          email: customerPrefs.preferredChannels?.email ?? prev.channels?.email,
+          sms: customerPrefs.preferredChannels?.sms ?? prev.channels?.sms,
+          phone: customerPrefs.preferredChannels?.phone ?? prev.channels?.phone,
+          push: customerPrefs.preferredChannels?.push ?? prev.channels?.push
+        },
+        topics: {
+          ...prev.topics,
+          ...(customerPrefs.topics || {}),
+          marketing: customerPrefs.topicSubscriptions?.marketing ?? prev.topics?.marketing,
+          promotions: customerPrefs.topicSubscriptions?.promotions ?? prev.topics?.promotions,
+          serviceAlerts: customerPrefs.topicSubscriptions?.serviceUpdates ?? prev.topics?.serviceAlerts,
+          billing: customerPrefs.topicSubscriptions?.billing ?? prev.topics?.billing,
+          security: customerPrefs.topicSubscriptions?.security ?? prev.topics?.security
+        }
+      }));
     }
-  }, [selectedCustomer]);
+  } catch (error) {
+    console.error('Error loading preferences:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const loadCustomers = async () => {
-    try {
-      const customers = await csrDashboardService.getCustomers();
-      setCustomers(customers);
-      console.log('Loaded customers:', customers.length);
-    } catch (error) {
-      console.error('Error loading customers:', error);
-      setCustomers([]);
-    }
-  };
 
-  const loadPreferences = async () => {
-    if (!selectedCustomer) return;
-    
-    setLoading(true);
-    try {
-      const commPrefs = await csrDashboardService.getCommunicationPreferences();
-      const customerPrefs = commPrefs.find((pref: any) => pref.partyId === selectedCustomer);
-      
-      if (customerPrefs) {
-        // Merge loaded preferences with default structure
-        setPreferences((prev: any) => ({
-          ...prev,
-          ...customerPrefs,
-          channels: {
-            ...prev.channels,
-            ...(customerPrefs.channels || {}),
-            // Map from communication preferences
-            email: customerPrefs.preferredChannels?.email ?? prev.channels.email,
-            sms: customerPrefs.preferredChannels?.sms ?? prev.channels.sms,
-            phone: customerPrefs.preferredChannels?.phone ?? prev.channels.phone,
-            push: customerPrefs.preferredChannels?.push ?? prev.channels.push
-          },
-          topics: {
-            ...prev.topics,
-            ...(customerPrefs.topics || {}),
-            // Map from communication preferences
-            marketing: customerPrefs.topicSubscriptions?.marketing ?? prev.topics.marketing,
-            promotions: customerPrefs.topicSubscriptions?.promotions ?? prev.topics.promotions,
-            serviceAlerts: customerPrefs.topicSubscriptions?.serviceUpdates ?? prev.topics.serviceAlerts,
-            billing: customerPrefs.topicSubscriptions?.billing ?? prev.topics.billing,
-            security: customerPrefs.topicSubscriptions?.security ?? prev.topics.security
-          }
-        }));
-      }
-    } catch (error) {
-      console.error('Error loading preferences:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Helper functions for updating preferences
   const updateChannelPreference = (channel: string, value: boolean) => {
     setPreferences((prev: any) => ({
       ...prev,
@@ -183,7 +203,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
 
   const handleSave = async () => {
     if (!preferences || !selectedCustomer) return;
-    
+
     setSaving(true);
     setSaveStatus('idle');
     try {
@@ -191,19 +211,21 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
         ...preferences,
         partyId: selectedCustomer,
         lastUpdated: new Date().toISOString(),
-        // Maintain backward compatibility
         preferredChannels: preferences.channels,
         topicSubscriptions: preferences.topics
       };
-      
-      // For demo purposes, just update local state
-      console.log('Saving preferences (demo mode):', updatedPreferences);
-      
+
+      const res = await fetch(`http://localhost:3000/api/v1/preference/party/${selectedCustomer}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedPreferences)
+      });
+
+      if (!res.ok) throw new Error('Failed to save preferences');
+
       setIsEditing(false);
       setHasChanges(false);
       setSaveStatus('success');
-      
-      // Clear success message after 3 seconds
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
       console.error('Error saving preferences:', error);
@@ -218,6 +240,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
     customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -256,31 +279,49 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              {searchTerm && (
-                <div className="mt-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
-                  {filteredCustomers.map(customer => (
-                    <div
-                      key={customer.id}
-                      onClick={() => {
-                        setSelectedCustomer(customer.id);
-                        setSearchTerm('');
-                      }}
-                      className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <div>
-                          <div className="font-medium">{customer.name}</div>
-                          <div className="text-sm text-gray-500">{customer.email}</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {filteredCustomers.length === 0 && (
-                    <div className="p-3 text-center text-gray-500">No customers found</div>
-                  )}
+{searchTerm && (
+  <div className="mt-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
+    {filteredCustomers.map(customer => (
+      <div
+        key={customer.id}
+        onClick={() => {
+          setSelectedCustomer(customer.id);
+          setSearchTerm('');
+        }}
+        className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+      >
+        <div className="flex items-center space-x-3">
+          <User className="w-4 h-4 text-gray-500" />
+          <div>
+            <div className="font-medium">{customer.name}</div>
+            <div className="text-sm text-gray-500">{customer.email}</div>
+            <div className="text-xs text-gray-400">Party ID: {customer.id}</div>
+
+            {customer.preference && (
+              <div className="mt-1 text-xs text-gray-600 space-y-1">
+                <div>📬 Channels: {Object.entries(customer.preference.preferredChannels || {})
+                  .filter(([_, v]) => v)
+                  .map(([k]) => k)
+                  .join(', ') || 'None'}
                 </div>
-              )}
+                <div>📢 Topics: {Object.entries(customer.preference.topicSubscriptions || {})
+                  .filter(([_, v]) => v)
+                  .map(([k]) => k)
+                  .join(', ') || 'None'}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    ))}
+    {filteredCustomers.length === 0 && (
+      <div className="p-3 text-center text-gray-500">No customers found</div>
+    )}
+  </div>
+)}
+
+
             </div>
             {selectedCustomer && (
               <div className="flex items-end">

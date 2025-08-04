@@ -23,7 +23,6 @@ import {
   Volume2,
   Globe
 } from 'lucide-react';
-import { csrDashboardService } from '../../services/csrDashboardService';
 
 const CSRHardcodedDataDemo: React.FC = () => {
   const [stats, setStats] = useState<any>({});

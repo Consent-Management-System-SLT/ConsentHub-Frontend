@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Eye, Check, X, AlertCircle, RefreshCw } from 'lucide-react';
-import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface ConsentHistoryTableProps {
   className?: string;
   customerId?: string;
 }
 
-const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({ 
-  className = '', 
-  customerId 
+const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
+  className = '',
+  customerId,
 }) => {
   const [consents, setConsents] = useState<any[]>([]);
   const [selectedConsent, setSelectedConsent] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const BASE_URL = 'http://localhost:5002/api/v1/consent';
 
   useEffect(() => {
     loadConsents();
@@ -25,22 +26,19 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
     try {
       setLoading(true);
       setError(null);
-      
-      // Use CSR dashboard service with comprehensive hardcoded fallback data
-      const consentArray = await csrDashboardService.getConsents();
-      
-      // Filter by customer ID if provided
-      let filteredConsents = consentArray;
-      if (customerId) {
-        filteredConsents = consentArray.filter(consent => consent.customerId === customerId);
+
+      const url = customerId ? `${BASE_URL}/party/${customerId}` : BASE_URL;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch consents');
       }
-      
-      console.log('Loaded consents:', filteredConsents); // Debug log
-      setConsents(filteredConsents);
+
+      const data = await response.json();
+      setConsents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error loading consents:', err);
       setError('Failed to load consent history. Please try again.');
-      setConsents([]); // Ensure consents is always an array even on error
+      setConsents([]);
     } finally {
       setLoading(false);
     }
@@ -48,15 +46,20 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
 
   const updateConsentStatus = async (consentId: string, newStatus: string) => {
     try {
-      // For demo purposes, we'll just update the local state
-      const updatedConsents = consents.map(consent => 
-        consent.id === consentId 
-          ? { ...consent, status: newStatus, updatedAt: new Date().toISOString() }
-          : consent
-      );
-      setConsents(updatedConsents);
-      
-      console.log(`Updated consent ${consentId} to status: ${newStatus}`);
+      const response = await fetch(`${BASE_URL}/${consentId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update consent status');
+      }
+
+      // Refresh after update
+      await loadConsents();
     } catch (err) {
       console.error('Error updating consent:', err);
       setError('Failed to update consent status. Please try again.');
@@ -91,9 +94,11 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
+
+  // --- UI rendering logic below ---
 
   if (loading) {
     return (
@@ -131,7 +136,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
           <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-4 rounded-lg">
             <AlertCircle className="w-5 h-5" />
             <span>{error}</span>
-            <button 
+            <button
               onClick={loadConsents}
               className="ml-auto px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
             >
@@ -152,7 +157,9 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
             <div>
               <h2 className="text-xl font-semibold text-gray-900">Consent History</h2>
               <p className="text-sm text-gray-600">
-                {customerId ? `Showing consents for customer: ${customerId}` : 'View and manage customer consent records'}
+                {customerId
+                  ? `Showing consents for customer: ${customerId}`
+                  : 'View and manage customer consent records'}
               </p>
             </div>
           </div>
@@ -166,12 +173,14 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
         </div>
       </div>
 
-      {consents && consents.length === 0 ? (
+      {consents.length === 0 ? (
         <div className="text-center py-12">
           <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600">No consent records found.</p>
           <p className="text-sm text-gray-500 mt-1">
-            {customerId ? 'This customer has no consent records.' : 'No consent records exist in the system.'}
+            {customerId
+              ? 'This customer has no consent records.'
+              : 'No consent records exist in the system.'}
           </p>
         </div>
       ) : (
@@ -200,7 +209,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {Array.isArray(consents) && consents.map((consent) => (
+              {consents.map((consent) => (
                 <tr key={consent.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{consent.partyId}</div>
@@ -209,7 +218,11 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                     <div className="text-sm text-gray-900">{consent.purpose}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(consent.status)}`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        consent.status
+                      )}`}
+                    >
                       {consent.status}
                     </span>
                   </td>
@@ -217,9 +230,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                     <div className="text-sm text-gray-900">{consent.consentType || 'N/A'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {formatDate(consent.createdAt)}
-                    </div>
+                    <div className="text-sm text-gray-900">{formatDate(consent.createdAt)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
@@ -272,54 +283,61 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                 </button>
               </div>
             </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Consent ID</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedConsent.id}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Customer ID</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedConsent.partyId}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Purpose</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedConsent.purpose}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Status</label>
-                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedConsent.status)}`}>
-                      {selectedConsent.status}
-                    </span>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Type</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedConsent.consentType || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Created</label>
-                    <p className="mt-1 text-sm text-gray-900">{formatDate(selectedConsent.createdAt)}</p>
-                  </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Consent ID</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedConsent.id}</p>
                 </div>
-                {selectedConsent.description && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedConsent.description}</p>
-                  </div>
-                )}
-                {selectedConsent.validFor && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Valid Period</label>
-                    <div className="mt-1 text-sm text-gray-900">
-                      <p>From: {formatDate(selectedConsent.validFor.startDateTime)}</p>
-                      {selectedConsent.validFor.endDateTime && (
-                        <p>To: {formatDate(selectedConsent.validFor.endDateTime)}</p>
-                      )}
-                    </div>
-                  </div>
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Customer ID</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedConsent.partyId}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Purpose</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedConsent.purpose}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Status</label>
+                  <span
+                    className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                      selectedConsent.status
+                    )}`}
+                  >
+                    {selectedConsent.status}
+                  </span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Type</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedConsent.consentType || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Created</label>
+                  <p className="mt-1 text-sm text-gray-900">{formatDate(selectedConsent.createdAt)}</p>
+                </div>
               </div>
+
+              {selectedConsent.description && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Description</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedConsent.description}</p>
+                </div>
+              )}
+
+              {selectedConsent.validFor && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Valid Period</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    From: {formatDate(selectedConsent.validFor.startDateTime)}
+                    {selectedConsent.validFor.endDateTime && (
+                      <>
+                        <br />
+                        To: {formatDate(selectedConsent.validFor.endDateTime)}
+                      </>
+                    )}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

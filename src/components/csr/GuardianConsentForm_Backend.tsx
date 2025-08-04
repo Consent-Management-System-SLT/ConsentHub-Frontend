@@ -18,7 +18,6 @@ import {
   RefreshCw,
   Plus
 } from 'lucide-react';
-import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface GuardianConsentFormProps {
   onClose?: () => void;
@@ -29,8 +28,6 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
   const [activeTab, setActiveTab] = useState<'search' | 'create' | 'manage'>('search');
   const [selectedMinor, setSelectedMinor] = useState<string>(customerId || '');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showDocumentModal, setShowDocumentModal] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [minors, setMinors] = useState<any[]>([]);
@@ -60,45 +57,57 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
       ]);
     } catch (error) {
       console.error('Error loading data:', error);
+      alert('Failed to load data from backend.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch all customers, filter minors by age/type
   const loadMinors = async () => {
     try {
-      const allCustomers = await csrDashboardService.getCustomers();
-      // Filter for minors (assuming we have an age field or type)
-      const minorCustomers = allCustomers.filter((customer: any) => 
-        customer.type === 'minor' || 
+      const res = await fetch('/api/customers');
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const allCustomers = await res.json();
+
+      const minorCustomers = allCustomers.filter((customer: any) =>
+        customer.type === 'minor' ||
         (customer.dateOfBirth && calculateAge(customer.dateOfBirth) < 18)
       );
       setMinors(minorCustomers);
     } catch (error) {
       console.error('Error loading minors:', error);
+      alert('Failed to load minor customers.');
     }
   };
 
+  // Fetch all customers, filter guardians by age/type
   const loadGuardians = async () => {
     try {
-      const allCustomers = await csrDashboardService.getCustomers();
-      // Filter for guardians (adults)
-      const guardianCustomers = allCustomers.filter((customer: any) => 
-        customer.type === 'guardian' || 
+      const res = await fetch('/api/customers');
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const allCustomers = await res.json();
+
+      const guardianCustomers = allCustomers.filter((customer: any) =>
+        customer.type === 'guardian' ||
         (customer.dateOfBirth && calculateAge(customer.dateOfBirth) >= 18)
       );
       setGuardians(guardianCustomers);
     } catch (error) {
       console.error('Error loading guardians:', error);
+      alert('Failed to load guardian customers.');
     }
   };
 
   const loadGuardianConsents = async () => {
     try {
-      const guardianConsentData = await csrDashboardService.getGuardianConsentData();
+      const res = await fetch('/api/guardian-consents');
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const guardianConsentData = await res.json();
       setGuardianConsents(guardianConsentData);
     } catch (error) {
       console.error('Error loading guardian consents:', error);
+      alert('Failed to load guardian consents.');
     }
   };
 
@@ -107,14 +116,15 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     return age;
   };
 
+  // Create a new guardian consent by POSTing to backend
   const handleCreateConsent = async () => {
     if (!formData.minorId || !formData.guardianId || !formData.consentType) {
       alert('Please fill in all required fields');
@@ -124,7 +134,6 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
     setSaving(true);
     try {
       const newConsent = {
-        id: Date.now().toString(),
         partyId: formData.minorId,
         guardianId: formData.guardianId,
         consentType: formData.consentType,
@@ -135,10 +144,17 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
         updatedAt: new Date().toISOString()
       };
 
-      // For demo purposes, just add to local state
-      setGuardianConsents(prev => [...prev, newConsent]);
-      
-      // Reset form
+      const res = await fetch('/api/guardian-consents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newConsent)
+      });
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const createdConsent = await res.json();
+      setGuardianConsents(prev => [...prev, createdConsent]);
+
       setFormData({
         minorId: '',
         guardianId: '',
@@ -147,9 +163,9 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
         documents: [],
         notes: ''
       });
-      
+
       setActiveTab('manage');
-      alert('Guardian consent created successfully! (Demo Mode)');
+      alert('Guardian consent created successfully!');
     } catch (error) {
       console.error('Error creating consent:', error);
       alert('Error creating consent. Please try again.');
@@ -158,18 +174,27 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
     }
   };
 
+  // Update consent status by PATCHing to backend
   const handleUpdateConsentStatus = async (consentId: string, newStatus: string) => {
     try {
-      // Update local state for demo
-      setGuardianConsents(prev => 
-        prev.map(consent => 
-          consent.id === consentId 
+      const res = await fetch(`/api/guardian-consents/${consentId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus, updatedAt: new Date().toISOString() })
+      });
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      // Update local state to reflect status change
+      setGuardianConsents(prev =>
+        prev.map(consent =>
+          consent.id === consentId
             ? { ...consent, status: newStatus, updatedAt: new Date().toISOString() }
             : consent
         )
       );
-      
-      alert('Consent status updated successfully! (Demo Mode)');
+
+      alert('Consent status updated successfully!');
     } catch (error) {
       console.error('Error updating consent status:', error);
       alert('Error updating consent status. Please try again.');

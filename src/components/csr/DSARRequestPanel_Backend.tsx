@@ -1,20 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Clock, AlertCircle, CheckCircle, XCircle, RefreshCw, Download, Calendar } from 'lucide-react';
-import { csrDashboardService } from '../../services/csrDashboardService';
+import {
+  ShieldCheck,
+  Clock,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  RefreshCw,
+  Download,
+  Calendar
+} from 'lucide-react';
 
 interface DSARRequestPanelProps {
   className?: string;
   customerId?: string;
 }
 
-const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({ 
-  className = '', 
-  customerId 
+const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
+  className = '',
+  customerId
 }) => {
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState<string | null>(null);
+
+  const API_BASE_URL = '/api/v1/dsar'; // Change to your actual DSAR API base
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('authToken');
+    return {
+      'Authorization': token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json'
+    };
+  };
 
   useEffect(() => {
     loadDSARRequests();
@@ -24,20 +42,31 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
     try {
       setLoading(true);
       setError(null);
-      
-      const allRequests = await csrDashboardService.getDSARRequests();
-      
-      // Filter by customer if specified
-      let filteredRequests = allRequests;
+
+      // Build URL with optional filter by partyId (customerId)
+      let url = `${API_BASE_URL}/requests`;
       if (customerId) {
-        filteredRequests = allRequests.filter(request => request.partyId === customerId);
+        url += `?partyId=${encodeURIComponent(customerId)}`;
       }
-      
-      console.log('Loaded DSAR requests:', filteredRequests);
-      setRequests(filteredRequests);
-    } catch (err) {
+
+      const res = await fetch(url, {
+        headers: getAuthHeaders()
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch DSAR requests: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid data format received from server');
+      }
+
+      setRequests(data);
+    } catch (err: any) {
       console.error('Error loading DSAR requests:', err);
-      setError('Failed to load DSAR requests. Please try again.');
+      setError(err.message || 'Failed to load DSAR requests. Please try again.');
       setRequests([]);
     } finally {
       setLoading(false);
@@ -47,24 +76,27 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
   const updateRequestStatus = async (requestId: string, newStatus: string) => {
     try {
       setProcessing(requestId);
-      
-      // Update local state for demo purposes
-      setRequests(prevRequests => 
-        prevRequests.map(request => 
-          request.id === requestId 
-            ? { ...request, status: newStatus, updatedAt: new Date().toISOString() }
-            : request
-        )
+
+      // Call backend PATCH endpoint to update status
+      const res = await fetch(`${API_BASE_URL}/requests/${requestId}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to update request status: ${res.statusText}`);
+      }
+
+      const updatedRequest = await res.json();
+
+      // Update local state with updated request
+      setRequests(prev =>
+        prev.map(r => (r.id === requestId ? updatedRequest : r))
       );
-      
-      console.log(`Updated DSAR request ${requestId} status to ${newStatus} (demo mode)`);
-      
-      // Simulate delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating DSAR request:', err);
-      setError('Failed to update request status. Please try again.');
+      setError(err.message || 'Failed to update request status. Please try again.');
     } finally {
       setProcessing(null);
     }
@@ -73,28 +105,32 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
   const downloadRequestData = async (requestId: string) => {
     try {
       const request = requests.find(r => r.id === requestId);
-      if (request) {
-        // Create a simple JSON file with the request data
-        const data = {
-          requestId: requestId,
-          requestType: request.requestType,
-          partyId: request.partyId,
-          status: request.status,
-          submittedAt: request.submittedAt,
-          processedAt: new Date().toISOString(),
-          data: "Sample data export - In production this would contain actual user data"
-        };
-        
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `dsar-${requestId}-${request.requestType}.json`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-        
-        console.log(`Downloaded DSAR data for request ${requestId} (demo mode)`);
-      }
+      if (!request) return;
+
+      // In real app, you might call an endpoint to get export data:
+      // const res = await fetch(`${API_BASE_URL}/requests/${requestId}/export`, { headers: getAuthHeaders() });
+      // const blob = await res.blob();
+
+      // For demo, create JSON blob locally:
+      const data = {
+        requestId,
+        requestType: request.requestType,
+        partyId: request.partyId,
+        status: request.status,
+        submittedAt: request.submittedAt,
+        processedAt: new Date().toISOString(),
+        data: "Sample data export - replace with actual user data"
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json'
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dsar-${requestId}-${request.requestType}.json`;
+      a.click();
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Error downloading DSAR data:', err);
       setError('Failed to download request data. Please try again.');
@@ -146,26 +182,23 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
 
   const calculateDaysRemaining = (submittedDate: string) => {
     const submitted = new Date(submittedDate);
     const deadline = new Date(submitted);
     deadline.setDate(deadline.getDate() + 30); // 30 days to respond
-    
+
     const now = new Date();
     const diffTime = deadline.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    return diffDays;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
   if (loading) {
@@ -204,7 +237,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
           <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-4 rounded-lg">
             <AlertCircle className="w-5 h-5" />
             <span>{error}</span>
-            <button 
+            <button
               onClick={loadDSARRequests}
               className="ml-auto px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
             >
@@ -239,7 +272,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
         </div>
       </div>
 
-      {requests && requests.length === 0 ? (
+      {requests.length === 0 ? (
         <div className="text-center py-12">
           <ShieldCheck className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-600">No DSAR requests found.</p>
@@ -249,19 +282,27 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
         </div>
       ) : (
         <div className="divide-y divide-gray-200">
-          {Array.isArray(requests) && requests.map((request) => {
+          {requests.map(request => {
             const daysRemaining = calculateDaysRemaining(request.submittedAt);
             const isOverdue = daysRemaining < 0;
-            
+
             return (
               <div key={request.id} className="p-6 hover:bg-gray-50">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-3">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRequestTypeColor(request.requestType)}`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRequestTypeColor(
+                          request.requestType
+                        )}`}
+                      >
                         {request.requestType}
                       </span>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                          request.status
+                        )}`}
+                      >
                         {getStatusIcon(request.status)}
                         <span className="ml-1">{request.status}</span>
                       </span>
@@ -272,29 +313,35 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                         </span>
                       )}
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        <span><strong>Request ID:</strong> {request.id}</span>
-                        <span><strong>Customer:</strong> {request.partyId}</span>
+                        <span>
+                          <strong>Request ID:</strong> {request.id}
+                        </span>
+                        <span>
+                          <strong>Customer:</strong> {request.partyId}
+                        </span>
                       </div>
-                      
+
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
                         <span className="flex items-center">
                           <Calendar className="w-4 h-4 mr-1" />
                           Submitted: {formatDate(request.submittedAt)}
                         </span>
-                        <span className={`${isOverdue ? 'text-red-600' : daysRemaining <= 7 ? 'text-yellow-600' : 'text-gray-600'}`}>
+                        <span
+                          className={`${
+                            isOverdue ? 'text-red-600' : daysRemaining <= 7 ? 'text-yellow-600' : 'text-gray-600'
+                          }`}
+                        >
                           {isOverdue ? `${Math.abs(daysRemaining)} days overdue` : `${daysRemaining} days remaining`}
                         </span>
                       </div>
-                      
-                      {request.description && (
-                        <p className="text-sm text-gray-700 mt-2">{request.description}</p>
-                      )}
+
+                      {request.description && <p className="text-sm text-gray-700 mt-2">{request.description}</p>}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2 ml-4">
                     {request.status === 'pending' && (
                       <>
@@ -314,7 +361,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                         </button>
                       </>
                     )}
-                    
+
                     {request.status === 'in_progress' && (
                       <button
                         onClick={() => updateRequestStatus(request.id, 'completed')}
@@ -324,7 +371,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                         Mark Complete
                       </button>
                     )}
-                    
+
                     {request.status === 'completed' && (
                       <button
                         onClick={() => downloadRequestData(request.id)}
@@ -335,7 +382,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                         Download
                       </button>
                     )}
-                    
+
                     {processing === request.id && (
                       <div className="flex items-center space-x-2">
                         <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />

@@ -1,4 +1,4 @@
-# =================================================================
+﻿# =================================================================
 # ConsentHub Privacy Management System - Complete System Startup
 # =================================================================
 # This PowerShell script starts the complete ConsentHub system including:

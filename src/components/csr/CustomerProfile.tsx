@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  Shield, 
-  FileText, 
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Shield,
+  FileText,
   Activity,
   Edit,
   Save,
@@ -17,7 +17,6 @@ import {
   Clock,
   Settings
 } from 'lucide-react';
-import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface CustomerProfileProps {
   customer: any;
@@ -35,44 +34,71 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
   const [dsarRequests, setDsarRequests] = useState<any[]>([]);
   const [preferences, setPreferences] = useState<any>(null);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState(customer);
 
   useEffect(() => {
     if (customer) {
+      setEditedData(customer);
       loadCustomerDetails();
     }
   }, [customer]);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('authToken');
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
   const loadCustomerDetails = async () => {
     try {
       setLoading(true);
-      
-      // Get hardcoded data from service
-      const allConsents = await csrDashboardService.getConsents();
-      const customerConsents = allConsents.filter(c => c.partyId === customer.id);
-      setConsents(customerConsents);
 
-      const allDsarRequests = await csrDashboardService.getDSARRequests();
-      const customerDsarRequests = allDsarRequests.filter(d => d.partyId === customer.id);
-      setDsarRequests(customerDsarRequests);
+      const token = localStorage.getItem('authToken');
+      if (!token) throw new Error('Authentication token missing');
 
-      // Get communication preferences
-      const commPrefs = await csrDashboardService.getCommunicationPreferences();
-      const customerPrefs = commPrefs.find(p => p.partyId === customer.id);
-      setPreferences(customerPrefs);
+      // Fetch consents
+      const consentsRes = await fetch('/api/v1/csr/consents', {
+        headers: getAuthHeaders()
+      });
+      if (!consentsRes.ok) throw new Error('Failed to fetch consents');
+      const allConsents = await consentsRes.json();
+      setConsents(allConsents.filter((c: any) => c.partyId === customer.id));
 
-      // Get audit events for this customer
-      const allEvents = await csrDashboardService.getAuditEvents();
-      const customerEvents = allEvents.filter(e => e.partyId === customer.id);
-      const sortedEvents = customerEvents
+      // Fetch DSAR requests
+      const dsarRes = await fetch('/api/v1/csr/dsar-requests', {
+        headers: getAuthHeaders()
+      });
+      if (!dsarRes.ok) throw new Error('Failed to fetch DSAR requests');
+      const allDsar = await dsarRes.json();
+      setDsarRequests(allDsar.filter((d: any) => d.partyId === customer.id));
+
+      // Fetch preferences
+      const prefsRes = await fetch('/api/v1/csr/preferences', {
+        headers: getAuthHeaders()
+      });
+      if (!prefsRes.ok) throw new Error('Failed to fetch preferences');
+      const allPrefs = await prefsRes.json();
+      setPreferences(allPrefs.find((p: any) => p.partyId === customer.id) || null);
+
+      // Fetch audit events
+      const eventsRes = await fetch('/api/v1/csr/audit-events', {
+        headers: getAuthHeaders()
+      });
+      if (!eventsRes.ok) throw new Error('Failed to fetch audit events');
+      const allEvents = await eventsRes.json();
+      const customerEvents = allEvents
+        .filter((e: any) => e.partyId === customer.id)
         .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 10);
-      setRecentActivities(sortedEvents);
+      setRecentActivities(customerEvents);
 
     } catch (error) {
       console.error('Error loading customer details:', error);
+      alert(`Error loading customer data: ${error instanceof Error ? error.message : error}`);
     } finally {
       setLoading(false);
     }
@@ -81,20 +107,12 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
   const handleSaveEdit = async () => {
     try {
       setLoading(true);
-      
-      // Get auth token
       const token = localStorage.getItem('authToken');
-      if (!token) {
-        throw new Error('Authentication required');
-      }
-      
-      // Make API call to update customer profile
+      if (!token) throw new Error('Authentication required');
+
       const response = await fetch(`/api/v1/csr/customers/${customer.id}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           name: editedData.name,
           email: editedData.email,
@@ -106,22 +124,15 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
           status: editedData.status
         })
       });
-      
-      if (!response.ok) {
-        throw new Error(`Update failed: ${response.status}`);
-      }
-      
+
+      if (!response.ok) throw new Error(`Update failed: ${response.status}`);
+
       const data = await response.json();
-      
+
       if (data.success) {
-        // Update local state with the response
         setCustomerData(editedData);
         setIsEditing(false);
-        
-        // Show success message
-        alert('Customer profile updated successfully! Changes will be reflected in customer dashboard.');
-        
-        // Reload customer details to get updated data
+        alert('Customer profile updated successfully!');
         await loadCustomerDetails();
       } else {
         throw new Error(data.message || 'Update failed');
@@ -150,7 +161,6 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
     if (diffInSeconds < 60) return 'just now';
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
@@ -186,17 +196,19 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
             <>
               <button
                 onClick={handleSaveEdit}
-                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                disabled={loading}
+                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
               >
                 <Save className="w-4 h-4 mr-2" />
-                Save Changes
+                {loading ? 'Saving...' : 'Save Changes'}
               </button>
               <button
                 onClick={() => {
                   setIsEditing(false);
                   setEditedData(customerData);
                 }}
-                className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                disabled={loading}
+                className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50"
               >
                 <X className="w-4 h-4 mr-2" />
                 Cancel
@@ -227,7 +239,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                   <input
                     type="text"
                     value={editedData.name || ''}
-                    onChange={(e) => setEditedData({...editedData, name: e.target.value})}
+                    onChange={(e) => setEditedData({ ...editedData, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 ) : (
@@ -243,7 +255,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                   <input
                     type="email"
                     value={editedData.email || ''}
-                    onChange={(e) => setEditedData({...editedData, email: e.target.value})}
+                    onChange={(e) => setEditedData({ ...editedData, email: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 ) : (
@@ -259,7 +271,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                   <input
                     type="tel"
                     value={editedData.phone || ''}
-                    onChange={(e) => setEditedData({...editedData, phone: e.target.value})}
+                    onChange={(e) => setEditedData({ ...editedData, phone: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 ) : (
@@ -275,7 +287,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                   <input
                     type="text"
                     value={editedData.address || ''}
-                    onChange={(e) => setEditedData({...editedData, address: e.target.value})}
+                    onChange={(e) => setEditedData({ ...editedData, address: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 ) : (
@@ -405,16 +417,16 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                   <AlertTriangle className="w-5 h-5 text-red-600 mr-3" />
                   <div>
                     <p className="font-medium text-red-900">Revoked Consents</p>
-                    <p className="text-sm text-red-700">{consentStatus.revoked} consents revoked</p>
+                    <p className="text-sm text-red-700">{consentStatus.revoked} revoked consents</p>
                   </div>
                 </div>
               )}
-              {dsarStatus.pending === 0 && consentStatus.revoked === 0 && (
-                <div className="flex items-center p-3 bg-green-50 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+              {recentActivities.length === 0 && (
+                <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-gray-600 mr-3" />
                   <div>
-                    <p className="font-medium text-green-900">All Good</p>
-                    <p className="text-sm text-green-700">No issues detected</p>
+                    <p className="font-medium text-gray-900">No alerts</p>
+                    <p className="text-sm text-gray-700">All clear for this customer</p>
                   </div>
                 </div>
               )}
@@ -422,6 +434,14 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
           </div>
         </div>
       </div>
+
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
+          <div className="p-4 bg-white rounded-lg shadow-lg text-gray-700 font-semibold">
+            Loading...
+          </div>
+        </div>
+      )}
     </div>
   );
 };

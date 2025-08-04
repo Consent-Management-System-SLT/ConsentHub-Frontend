@@ -17,7 +17,7 @@ import {
   Activity
 } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
-import { csrDashboardService } from '../services/csrDashboardService';
+// import { csrDashboardService } from '../services/csrDashboardService';
 
 // Import CSR components (using backend-integrated versions)
 import CSRHeader from './csr/CSRHeader';

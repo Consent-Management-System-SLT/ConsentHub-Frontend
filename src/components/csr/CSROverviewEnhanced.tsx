@@ -8,7 +8,6 @@ import {
   Shield,
   RefreshCw
 } from 'lucide-react';
-import { csrDashboardService } from '../../services/csrDashboardService';
 
 interface CSROverviewEnhancedProps {
   className?: string;
@@ -46,11 +45,10 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
     try {
       setLoading(true);
       console.log('🔄 Loading CSR overview stats...');
-      
-      // Use the new CSR dashboard service with comprehensive fallbacks
-      const statsData = await csrDashboardService.getCSRStats();
-      
-      // Update stats with data from service
+
+      const res = await fetch('/api/v1/csr/overview');
+      const statsData = await res.json();
+
       setStats({
         totalCustomers: statsData.totalCustomers || 0,
         pendingRequests: statsData.pendingRequests || 0,
@@ -59,8 +57,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
         todayActions: statsData.todayActions || 0,
         riskAlerts: statsData.riskAlerts || 0
       });
-      
-      // Update insights with real data
+
       setInsights({
         consentRate: statsData.consentRate || 0,
         resolvedRequests: statsData.resolvedRequests || 0,
@@ -68,42 +65,43 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       });
 
       console.log('✅ CSR overview stats loaded:', statsData);
-      await loadQuickActions();
+      await loadQuickActions(statsData);
 
     } catch (error) {
       console.error('❌ Error loading CSR overview stats:', error);
-      
-      // Enhanced fallback data
-      setStats({
+
+      // fallback data
+      const fallbackStats = {
         totalCustomers: 10,
         pendingRequests: 4,
         consentUpdates: 8,
         guardiansManaged: 2,
         todayActions: 15,
         riskAlerts: 2
-      });
-      
-      setInsights({
+      };
+
+      const fallbackInsights = {
         consentRate: 78,
         resolvedRequests: 8,
         newCustomers: 3
-      });
-      
-      await loadQuickActions();
+      };
+
+      setStats(fallbackStats);
+      setInsights(fallbackInsights);
+      await loadQuickActions(fallbackStats);
     } finally {
       setLoading(false);
     }
   };
 
-  const loadQuickActions = async () => {
+  const loadQuickActions = async (data = stats) => {
     try {
-      // Generate quick actions based on current data state
       const actions = [
         {
           id: 1,
           title: 'Review Pending DSAR Requests',
-          description: `${stats.pendingRequests} requests awaiting review`,
-          priority: stats.pendingRequests > 5 ? 'high' : 'medium',
+          description: `${data.pendingRequests} requests awaiting review`,
+          priority: data.pendingRequests > 5 ? 'high' : 'medium',
           action: () => onNavigate?.('dsar'),
           icon: FileText
         },
@@ -118,8 +116,8 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
         {
           id: 3,
           title: 'Review Risk Alerts',
-          description: `${stats.riskAlerts} overdue requests require attention`,
-          priority: stats.riskAlerts > 0 ? 'high' : 'low',
+          description: `${data.riskAlerts} overdue requests require attention`,
+          priority: data.riskAlerts > 0 ? 'high' : 'low',
           action: () => onNavigate?.('audit'),
           icon: AlertTriangle
         },
@@ -180,12 +178,12 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
-          { key: 'customers', label: 'Total Customers', value: stats.totalCustomers, type: 'customers', icon: Users, color: 'blue' },
-          { key: 'requests', label: 'Pending DSAR Requests', value: stats.pendingRequests, type: 'requests', icon: FileText, color: 'amber' },
-          { key: 'consents', label: 'Consent Updates', value: stats.consentUpdates, type: 'consents', icon: Shield, color: 'green' },
-          { key: 'guardians', label: 'Guardians Managed', value: stats.guardiansManaged, type: 'guardians', icon: Users, color: 'purple' },
-          { key: 'actions', label: 'Today\'s Actions', value: stats.todayActions, type: 'actions', icon: Activity, color: 'indigo' },
-          { key: 'alerts', label: 'Risk Alerts', value: stats.riskAlerts, type: 'alerts', icon: AlertTriangle, color: 'red' }
+          { key: 'customers', label: 'Total Customers', value: stats.totalCustomers, icon: Users, color: 'blue' },
+          { key: 'requests', label: 'Pending DSAR Requests', value: stats.pendingRequests, icon: FileText, color: 'amber' },
+          { key: 'consents', label: 'Consent Updates', value: stats.consentUpdates, icon: Shield, color: 'green' },
+          { key: 'guardians', label: 'Guardians Managed', value: stats.guardiansManaged, icon: Users, color: 'purple' },
+          { key: 'actions', label: "Today's Actions", value: stats.todayActions, icon: Activity, color: 'indigo' },
+          { key: 'alerts', label: 'Risk Alerts', value: stats.riskAlerts, icon: AlertTriangle, color: 'red' }
         ].map((stat) => {
           const Icon = stat.icon;
           return (
@@ -243,7 +241,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
           <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Array.isArray(quickActions) && quickActions.map((action) => {
+          {quickActions.map((action) => {
             const Icon = action.icon;
             return (
               <div
