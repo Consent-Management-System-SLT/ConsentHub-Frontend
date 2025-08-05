@@ -24,7 +24,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState<string | null>(null);
 
-  const API_BASE_URL = '/api/v1/dsar'; // Change to your actual DSAR API base
+  const API_BASE_URL = 'http://localhost:3000/api/v1/dsar';
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('authToken');
@@ -43,11 +43,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       setLoading(true);
       setError(null);
 
-      // Build URL with optional filter by partyId (customerId)
-      let url = `${API_BASE_URL}/requests`;
-      if (customerId) {
-        url += `?partyId=${encodeURIComponent(customerId)}`;
-      }
+      const url = `${API_BASE_URL}`;
 
       const res = await fetch(url, {
         headers: getAuthHeaders()
@@ -76,24 +72,48 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
   const updateRequestStatus = async (requestId: string, newStatus: string) => {
     try {
       setProcessing(requestId);
+      setError(null);
 
-      // Call backend PATCH endpoint to update status
-      const res = await fetch(`${API_BASE_URL}/requests/${requestId}`, {
+      console.log('Updating DSAR request:', { requestId, newStatus });
+      console.log('API URL:', `${API_BASE_URL}/${requestId}`);
+
+      // Call backend PATCH endpoint to update status - matching your route /:id
+      const res = await fetch(`http://localhost:3000/api/v1/dsar/party/${requestId}`, {
         method: 'PATCH',
         headers: getAuthHeaders(),
         body: JSON.stringify({ status: newStatus })
       });
 
+      console.log('Response status:', res.status);
+
       if (!res.ok) {
-        throw new Error(`Failed to update request status: ${res.statusText}`);
+        const errorText = await res.text();
+        console.error('Error response:', errorText);
+        
+        let errorMessage;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorData.message || `Server error: ${res.status}`;
+        } catch {
+          errorMessage = `Server error: ${res.status} - ${errorText}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const updatedRequest = await res.json();
+      console.log('Updated request:', updatedRequest);
 
       // Update local state with updated request
       setRequests(prev =>
         prev.map(r => (r.id === requestId ? updatedRequest : r))
       );
+
+      // Show success message briefly
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
+
     } catch (err: any) {
       console.error('Error updating DSAR request:', err);
       setError(err.message || 'Failed to update request status. Please try again.');
@@ -108,7 +128,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       if (!request) return;
 
       // In real app, you might call an endpoint to get export data:
-      // const res = await fetch(`${API_BASE_URL}/requests/${requestId}/export`, { headers: getAuthHeaders() });
+      // const res = await fetch(`${API_BASE_URL}/${requestId}/export`, { headers: getAuthHeaders() });
       // const blob = await res.blob();
 
       // For demo, create JSON blob locally:
@@ -271,6 +291,16 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="p-4 mx-6 mt-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center space-x-2 text-red-600">
+            <AlertCircle className="w-4 h-4" />
+            <span className="text-sm">{error}</span>
+          </div>
+        </div>
+      )}
 
       {requests.length === 0 ? (
         <div className="text-center py-12">

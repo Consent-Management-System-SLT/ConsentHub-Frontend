@@ -19,6 +19,7 @@ const SERVICES = {
 // Debug logging for service URLs
 console.log('Service URLs Configuration:', SERVICES);
 
+
 // Service-specific API clients
 export const customerApi = axios.create({
   baseURL: SERVICES.CUSTOMER,
