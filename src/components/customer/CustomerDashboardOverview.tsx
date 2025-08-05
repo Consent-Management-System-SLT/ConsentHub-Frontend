@@ -14,10 +14,12 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { customerDashboardService, DashboardOverview } from '../../services/customerDashboardService';
-import CustomerProfileSection from './CustomerProfileSection';
+import UserProfile from '../UserProfile';
 
 interface CustomerDashboardOverviewProps {
   customerName: string;
+  showProfile?: boolean;
+  setShowProfile?: (open: boolean) => void;
 }
 
 interface ConsentSummary {
@@ -44,12 +46,11 @@ interface Activity {
   description?: string;
 }
 
-const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ customerName }) => {
+const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ customerName, showProfile, setShowProfile }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardOverview | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showProfile, setShowProfile] = useState(false);
   
   useEffect(() => {
     loadDashboardData();
@@ -218,18 +219,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
     <div className="space-y-6 sm:space-y-8">
       {/* Show Profile Section if requested */}
       {showProfile && (
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">My Profile</h2>
-            <button
-              onClick={() => setShowProfile(false)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              ✕
-            </button>
-          </div>
-          <CustomerProfileSection />
-        </div>
+        <UserProfile isOpen={showProfile} onClose={() => setShowProfile && setShowProfile(false)} />
       )}
       
       {/* Welcome Section */}
@@ -249,13 +239,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
             )}
           </div>
           <div className="flex space-x-3 items-center">
-            <button
-              onClick={() => setShowProfile(true)}
-              className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-            >
-              <User className="w-4 h-4" />
-              <span>Profile</span>
-            </button>
+            {/* Profile button removed; use header icon instead */}
             <button
               onClick={loadDashboardData}
               disabled={isLoading}

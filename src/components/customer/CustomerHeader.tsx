@@ -7,9 +7,11 @@ import NotificationBell from '../shared/NotificationBell';
 interface CustomerHeaderProps {
   customerName: string;
   onLogout: () => void;
+  onProfileClick?: () => void;
+  onProfileClick?: () => void;
 }
 
-const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout }) => {
+const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout, onProfileClick }) => {
   const { t } = useTranslation();
   
   return (
@@ -41,7 +43,9 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout 
                 <p className="text-xs text-gray-500">{t('customerDashboard.userRole')}</p>
               </div>
               <div className="w-8 h-8 sm:w-9 sm:h-9 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                <button type="button" onClick={onProfileClick} className="w-8 h-8 sm:w-9 sm:h-9 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                </button>
               </div>
             </div>
 
