@@ -56,7 +56,28 @@
   },
   "customerDashboard": {
     "title": "පාරිභෝගික ප්‍රධාන පුවරුව",
+    "brand": "සම්මති කේන්ද්‍රය",
+    "subtitle": "පාරිභෝගික ද්වාරය",
+    "userRole": "පාරිභෝගිකයා",
     "welcome": "සාදරයෙන් පිළිගනිමු, {{name}}",
+    "navigation": {
+      "dashboard": "ප්‍රධාන පුවරුව",
+      "dashboardDesc": "ඔබේ සම්මතිවල සහ මනාපයන්ගේ සමාලෝචනය",
+      "consentCenter": "සම්මති කේන්ද්‍රය",
+      "consentCenterDesc": "ඔබේ දත්ත සම්මතිවන් කළමනාකරණය කරන්න",
+      "preferences": "මනාපයන්",
+      "preferencesDesc": "සන්නිවේදන සහ දැනුම්දීම් සැකසුම්",
+      "privacyNotices": "පුද්ගලිකත්ව දැන්වීම්",
+      "privacyNoticesDesc": "පුද්ගලිකත්ව ප්‍රතිපත්ති සහ දැන්වීම් බලන්න",
+      "dsarRequests": "DSAR ඉල්ලීම්",
+      "dsarRequestsDesc": "දත්ත අපනයන සහ මැකීමේ ඉල්ලීම්"
+    },
+    "sidebar": {
+      "title": "සංචාලනය",
+      "subtitle": "ඔබේ පුද්ගලිකත්ව සැකසුම් කළමනාකරණය කරන්න",
+      "privacyTitle": "පුද්ගලිකත්වය ආරක්ෂිතයි",
+      "privacyDesc": "ඔබේ දත්ත ආරක්ෂිත වන අතර ව්‍යාපාරික ශ්‍රේණියේ සංකේතනයකින් ආරක්ෂා කර ඇත"
+    },
     "tabs": {
       "overview": "දළ විශ්ලේෂණය",
       "preferences": "කැමැත්ත මනාප",
@@ -66,16 +87,80 @@
     },
     "overview": {
       "title": "කැමැත්ත දළ විශ්ලේෂණය",
+      "welcomeBack": "නැවත සාදරයෙන් පිළිගනිමු, {{name}}",
+      "welcomeDesc": "එක ස්ථානයකින්ම ඔබේ පුද්ගලිකත්ව සැකසුම් සහ දත්ත සම්මතිවන් කළමනාකරණය කරන්න",
       "totalConsents": "සම්පූර්ණ කැමැත්ත",
       "activeConsents": "සක්‍රීය කැමැත්ත",
+      "revoked": "අවලංගු කළ",
+      "expired": "කල් ඉකුත් වූ",
+      "pendingReview": "සමාලෝචනය බලාපොරොත්තුවෙන්",
       "pendingConsents": "අපේක්ෂාව පවතින කැමැත්ත",
+      "communicationChannels": "සන්නිවේදන මාර්ග",
+      "privacyNotices": "පුද්ගලිකත්ව දැන්වීම්",
+      "dsarRequests": "DSAR ඉල්ලීම්",
+      "monthlyTrend": "මෙම මාසයේ +{{count}}",
+      "channelTypes": "විද්‍යුත් තැපෑල, SMS, Push",
+      "pendingReviewCount": "{{count}} සමාලෝචනය බලාපොරොත්තුවෙන්",
+      "inProgress": "ක්‍රියාත්මක වෙමින්",
       "lastActivity": "අවසාන ක්‍රියාකාරකම",
       "quickActions": "ඉක්මන් ක්‍රියා",
       "updatePreferences": "මනාප යාවත්කාලීන කරන්න",
       "viewHistory": "ඉතිහාසය බලන්න",
       "downloadData": "මගේ දත්ත බාගන්න",
       "recentActivity": "මෑත ක්‍රියාකාරකම්",
-      "noRecentActivity": "මෑත ක්‍රියාකාරකම් නැත"
+      "noRecentActivity": "මෑත ක්‍රියාකාරකම් නැත",
+      "activities": {
+        "grantedConsent": "අලෙවිකරණ සන්නිවේදන සඳහා සම්මතිය ලබා දී ඇත",
+        "updatedPreferences": "සන්නිවේදන මනාපයන් යාවත්කාලීන කර ඇත",
+        "acceptedPolicy": "පුද්ගලිකත්ව ප්‍රතිපත්තිය v2.1 පිළිගත්",
+        "submittedExport": "දත්ත අපනයන ඉල්ලීම ඉදිරිපත් කර ඇත"
+      },
+      "timestamps": {
+        "hoursAgo": "පැය {{count}}කට පෙර",
+        "daysAgo": "දින {{count}}කට පෙර",
+        "daysAgo_plural": "දින {{count}}කට පෙර",
+        "weeksAgo": "සති {{count}}කට පෙර",
+        "weeksAgo_plural": "සති {{count}}කට පෙර"
+      },
+      "actions": {
+        "manageConsents": "සම්මතිවන් කළමනාකරණය කරන්න",
+        "manageConsentsDesc": "ඔබේ දත්ත සම්මතිවන් බලන්න සහ යාවත්කාලීන කරන්න",
+        "communicationPrefs": "සන්නිවේදන මනාපයන්",
+        "communicationPrefsDesc": "ඔබේ දැනුම්දීම් මනාපයන් සකසන්න",
+        "privacyNotices": "පුද්ගලිකත්ව දැන්වීම්",
+        "privacyNoticesDesc": "නවතම පුද්ගලිකත්ව ප්‍රතිපත්ති සමාලෝචනය කරන්න",
+        "requestData": "මගේ දත්ත ඉල්ලන්න",
+        "requestDataDesc": "ඔබේ පුද්ගලික දත්ත අපනයන කරන්න හෝ මකන්න"
+      }
+    },
+    "privacyNotices": {
+      "title": "පුද්ගලිකත්ව දැන්වීම්",
+      "subtitle": "පුද්ගලිකත්ව ප්‍රතිපත්ති සහ නියමයන් සමාලෝචනය කර කළමනාකරණය කරන්න",
+      "accepted": "පිළිගත්",
+      "pendingReview": "සමාලෝචනය බලාපොරොත්තුවෙන්",
+      "languages": "භාෂා",
+      "actionRequired": "ක්‍රියාමාර්ගය අවශ්‍ය",
+      "searchPlaceholder": "පුද්ගලිකත්ව දැන්වීම් සොයන්න...",
+      "filters": {
+        "allStatus": "සියලුම තත්ත්වයන්",
+        "accepted": "පිළිගත්",
+        "pending": "ප්‍රතික්ෂේප වෙමින්",
+        "declined": "ප්‍රතික්ෂේප කළ",
+        "expired": "කල් ඉකුත් වූ",
+        "allLanguages": "සියලුම භාෂා"
+      },
+      "actions": {
+        "view": "බලන්න",
+        "accept": "පිළිගන්න",
+        "decline": "ප්‍රතික්ෂේප කරන්න",
+        "download": "බාගන්න"
+      },
+      "status": {
+        "accepted": "පිළිගත්",
+        "pending": "ප්‍රතික්ෂේප වෙමින්",
+        "declined": "ප්‍රතික්ෂේප කළ",
+        "expired": "කල් ඉකුත් වූ"
+      }
     },
     "preferences": {
       "title": "කැමැත්ත මනාප",

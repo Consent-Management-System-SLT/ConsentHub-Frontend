@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Activity,
   User,
@@ -7,21 +7,52 @@ import {
   Search,
   ArrowRight,
   CircleDot,
+  RefreshCw,
+  AlertTriangle,
 } from 'lucide-react';
-import { mockAuditLogs, mockParties } from '../data/mockData';
 import { AuditLog, Party } from '../types/consent';
+import { useParties } from '../hooks/useApi';
+import { apiClient } from '../services/apiClient';
 
 interface AuditTrailProps {
   selectedCustomer?: Party;
 }
 
 export const AuditTrail: React.FC<AuditTrailProps> = ({ selectedCustomer }) => {
-  const [auditLogs] = useState<AuditLog[]>(mockAuditLogs);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [filterType, setFilterType] = useState<'all' | 'consent' | 'preference' | 'notice'>('all');
   const [filterOperation, setFilterOperation] = useState<'all' | 'create' | 'update' | 'revoke' | 'view'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredLogs = auditLogs.filter((log) => {
+  // Load parties from backend for name resolution
+  const { data: partiesData, loading: partiesLoading } = useParties();
+
+  // Transform data to ensure it's an array
+  const parties = Array.isArray(partiesData) ? partiesData : 
+    (partiesData && (partiesData as any).parties ? (partiesData as any).parties : []);
+
+  useEffect(() => {
+    loadAuditLogs();
+  }, []);
+
+  const loadAuditLogs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient.get('/api/v1/audit?limit=100');
+      const data = response.data as any;
+      setAuditLogs(data.logs || data);
+    } catch (err) {
+      console.error('Error loading audit logs:', err);
+      setError('Failed to load audit logs. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredLogs = auditLogs.filter((log: any) => {
     const matchesType = filterType === 'all' || log.entityType === filterType;
     const matchesOperation = filterOperation === 'all' || log.operation === filterOperation;
     const matchesSearch =
@@ -39,6 +70,44 @@ export const AuditTrail: React.FC<AuditTrailProps> = ({ selectedCustomer }) => {
 
     return matchesType && matchesOperation && matchesSearch;
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Loading audit logs...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="h-8 w-8 mx-auto mb-4 text-red-600" />
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={loadAuditLogs}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (partiesLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">Loading audit logs...</span>
+      </div>
+    );
+  }
 
   const getEntityIcon = (entityType: string) => {
     switch (entityType) {
@@ -82,7 +151,7 @@ export const AuditTrail: React.FC<AuditTrailProps> = ({ selectedCustomer }) => {
   };
 
   const getCustomerName = (partyId: string) => {
-    const party = mockParties.find((p) => p.id === partyId);
+    const party = parties.find((p: any) => p.id === partyId);
     return party ? party.name : partyId;
   };
 

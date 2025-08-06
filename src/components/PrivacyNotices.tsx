@@ -1,13 +1,34 @@
-import React, { useState } from 'react';
-import { FileText, Eye, Download, Globe, Calendar, CheckCircle, XCircle } from 'lucide-react';
-import { mockNotices } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
+import { FileText, Eye, Download, Globe, Calendar, CheckCircle, XCircle, RefreshCw, AlertTriangle } from 'lucide-react';
 import { PrivacyNotice } from '../types/consent';
+import { apiClient } from '../services/apiClient';
 
 export const PrivacyNotices: React.FC = () => {
-  const [notices, setNotices] = useState<PrivacyNotice[]>(mockNotices);
+  const [notices, setNotices] = useState<PrivacyNotice[]>([]);
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredNotices = notices.filter(notice => {
+  useEffect(() => {
+    loadNotices();
+  }, []);
+
+  const loadNotices = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient.get('/api/v1/privacy-notice');
+      const data = response.data as any;
+      setNotices(data.notices || data);
+    } catch (err) {
+      console.error('Error loading privacy notices:', err);
+      setError('Failed to load privacy notices. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredNotices = notices.filter((notice: any) => {
     if (filter === 'active') return notice.active;
     if (filter === 'inactive') return !notice.active;
     return true;
@@ -38,13 +59,52 @@ export const PrivacyNotices: React.FC = () => {
     }
   };
 
-  const toggleNoticeStatus = (id: string) => {
-    setNotices(prev => prev.map(notice => 
-      notice.id === id 
-        ? { ...notice, active: !notice.active }
-        : notice
-    ));
+  const toggleNoticeStatus = async (id: string) => {
+    try {
+      const notice = notices.find(n => n.id === id);
+      if (!notice) return;
+
+      await apiClient.patch(`/api/v1/privacy-notice/${id}`, {
+        active: !notice.active
+      });
+
+      setNotices(prev => prev.map(n => 
+        n.id === id 
+          ? { ...n, active: !n.active }
+          : n
+      ));
+    } catch (err) {
+      console.error('Error updating notice status:', err);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Loading privacy notices...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="h-8 w-8 mx-auto mb-4 text-red-600" />
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={loadNotices}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -55,6 +115,13 @@ export const PrivacyNotices: React.FC = () => {
             Privacy Notices
           </h2>
           <div className="flex space-x-2">
+            <button
+              onClick={loadNotices}
+              className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </button>
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value as any)}

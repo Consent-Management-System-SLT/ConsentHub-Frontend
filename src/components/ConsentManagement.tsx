@@ -1,20 +1,30 @@
 import React, { useState } from 'react';
 import { Shield, Check, X, Clock, AlertCircle, Eye } from 'lucide-react';
-import { mockConsents, mockParties } from '../data/mockData';
 import { PrivacyConsent, Party } from '../types/consent';
+import { useConsents, useParties, useConsentMutation } from '../hooks/useApi';
 
 interface ConsentManagementProps {
   selectedCustomer?: Party;
 }
 
 export const ConsentManagement: React.FC<ConsentManagementProps> = ({ selectedCustomer }) => {
-  const [consents, setConsents] = useState<PrivacyConsent[]>(mockConsents);
   const [selectedConsent, setSelectedConsent] = useState<PrivacyConsent | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredConsents = consents.filter(consent => {
-    const party = mockParties.find(p => p.id === consent.partyId);
+  // Load data from backend
+  const { data: consentsData, loading: consentsLoading, refetch: refetchConsents } = useConsents(selectedCustomer?.id);
+  const { data: partiesData, loading: partiesLoading } = useParties();
+  const { updateConsent, revokeConsent, loading: mutationLoading } = useConsentMutation();
+
+  // Transform data to ensure it's an array
+  const consents = Array.isArray(consentsData) ? consentsData : 
+    (consentsData && (consentsData as any).consents ? (consentsData as any).consents : []);
+  const parties = Array.isArray(partiesData) ? partiesData : 
+    (partiesData && (partiesData as any).parties ? (partiesData as any).parties : []);
+
+  const filteredConsents = consents.filter((consent: any) => {
+    const party = parties.find((p: any) => p.id === consent.partyId);
     const matchesCustomer = selectedCustomer ? consent.partyId === selectedCustomer.id : true;
     const matchesSearch =
       !searchTerm ||
@@ -22,6 +32,16 @@ export const ConsentManagement: React.FC<ConsentManagementProps> = ({ selectedCu
       consent.partyId.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCustomer && matchesSearch;
   });
+
+  // Loading state
+  if (consentsLoading || partiesLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">Loading consents...</span>
+      </div>
+    );
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -54,22 +74,17 @@ export const ConsentManagement: React.FC<ConsentManagementProps> = ({ selectedCu
   };
 
   const getCustomerName = (partyId: string) => {
-    const party = mockParties.find(p => p.id === partyId);
+    const party = parties.find((p: any) => p.id === partyId);
     return party ? party.name : 'Unknown Customer';
   };
 
-  const handleUpdateConsent = (consentId: string, newStatus: string) => {
-    setConsents(prev =>
-      prev.map(consent =>
-        consent.id === consentId
-          ? {
-              ...consent,
-              status: newStatus as any,
-              timestampRevoked: newStatus === 'revoked' ? new Date().toISOString() : consent.timestampRevoked,
-            }
-          : consent
-      )
-    );
+  const handleUpdateConsent = async (consentId: string, newStatus: string) => {
+    try {
+      await updateConsent(consentId, { status: newStatus as any });
+      await refetchConsents(); // Refresh the data
+    } catch (error) {
+      console.error('Failed to update consent:', error);
+    }
   };
 
   const ConsentModal = () => {

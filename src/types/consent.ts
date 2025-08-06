@@ -1,9 +1,28 @@
+// Type definitions for ConsentHub aligned with TM Forum Open APIs
+export type ConsentStatus = 'granted' | 'revoked' | 'pending' | 'expired';
+export type ConsentPurpose = 'marketing' | 'analytics' | 'thirdPartySharing' | 'dataProcessing' | 'location' | 'research' | 'personalization';
+export type ConsentChannel = 'email' | 'sms' | 'push' | 'voice' | 'all';
+export type PartyType = 'individual' | 'organization' | 'guardian';
+
 export interface Party {
   id: string;
   name: string;
   email: string;
   mobile: string;
-  type: 'individual' | 'organization' | 'guardian';
+  type: PartyType;
+  status?: 'active' | 'inactive' | 'suspended';
+  address?: string;
+  organization?: string;
+  department?: string;
+  jobTitle?: string;
+  createdAt?: string;
+  lastUpdated?: string;
+  userDetails?: {
+    status?: string;
+    lastLoginAt?: string;
+    emailVerified?: boolean;
+    createdAt?: string;
+  };
   relationship?: {
     role: string;
     linkedPartyId?: string;
@@ -13,9 +32,9 @@ export interface Party {
 export interface PrivacyConsent {
   id: string;
   partyId: string;
-  purpose: string;
-  status: 'granted' | 'revoked' | 'pending' | 'expired';
-  channel: 'email' | 'sms' | 'push' | 'voice' | 'all';
+  purpose: ConsentPurpose;
+  status: ConsentStatus;
+  channel: ConsentChannel;
   validFrom: string;
   validTo?: string;
   geoLocation: string;

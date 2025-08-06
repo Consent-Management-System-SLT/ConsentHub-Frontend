@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import {
   Database, Download, Trash2, Clock, CheckCircle, XCircle, AlertCircle, Eye, Search,
 } from 'lucide-react';
-import { mockDSARRequests, mockParties } from '../data/mockData';
 import { DSARRequest, Party } from '../types/consent';
+import { useDSARRequests, useParties, useDSARMutation } from '../hooks/useApi';
 
 interface DSARRequestsProps {
   selectedCustomer?: Party;
 }
 
 export const DSARRequests: React.FC<DSARRequestsProps> = ({ selectedCustomer }) => {
-  const [requests, setRequests] = useState<DSARRequest[]>(mockDSARRequests);
   const [selectedRequest, setSelectedRequest] = useState<DSARRequest | null>(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -18,8 +17,19 @@ export const DSARRequests: React.FC<DSARRequestsProps> = ({ selectedCustomer }) 
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredCustomer, setFilteredCustomer] = useState<Party | null>(selectedCustomer || null);
 
+  // Load data from backend
+  const { data: dsarData, loading: dsarLoading, refetch: refetchDSAR } = useDSARRequests(filteredCustomer?.id);
+  const { data: partiesData, loading: partiesLoading } = useParties();
+  const { updateDSARRequest, loading: mutationLoading } = useDSARMutation();
+
+  // Transform data to ensure it's an array
+  const requests = Array.isArray(dsarData) ? dsarData : 
+    (dsarData && (dsarData as any).requests ? (dsarData as any).requests : []);
+  const parties = Array.isArray(partiesData) ? partiesData : 
+    (partiesData && (partiesData as any).parties ? (partiesData as any).parties : []);
+
   const handleCustomerSearch = () => {
-    const match = mockParties.find(p =>
+    const match = parties.find((p: any) =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.id.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -27,11 +37,21 @@ export const DSARRequests: React.FC<DSARRequestsProps> = ({ selectedCustomer }) 
   };
 
   const filteredRequests = filteredCustomer
-    ? requests.filter(request => request.partyId === filteredCustomer.id)
+    ? requests.filter((request: any) => request.partyId === filteredCustomer.id)
     : requests;
 
+  // Loading state
+  if (dsarLoading || partiesLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">Loading DSAR requests...</span>
+      </div>
+    );
+  }
+
   const getCustomerName = (partyId: string) => {
-    const party = mockParties.find(p => p.id === partyId);
+    const party = parties.find((p: any) => p.id === partyId);
     return party ? party.name : 'Unknown Customer';
   };
 
@@ -73,16 +93,13 @@ export const DSARRequests: React.FC<DSARRequestsProps> = ({ selectedCustomer }) 
     }
   };
 
-  const handleUpdateStatus = (requestId: string, newStatus: string) => {
-    setRequests(prev => prev.map(request =>
-      request.id === requestId
-        ? {
-            ...request,
-            status: newStatus as any,
-            completedAt: newStatus === 'completed' ? new Date().toISOString() : request.completedAt,
-          }
-        : request
-    ));
+  const handleUpdateStatus = async (requestId: string, newStatus: string) => {
+    try {
+      await updateDSARRequest(requestId, { status: newStatus as any });
+      await refetchDSAR(); // Refresh the data
+    } catch (error) {
+      console.error('Failed to update DSAR request:', error);
+    }
   };
 
   const formatType = (type: string) =>

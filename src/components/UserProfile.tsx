@@ -11,11 +11,14 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
   const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.name || '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
     email: user?.email || '',
     phone: user?.phone || '',
+    company: user?.company || '',
     department: user?.department || '',
-    role: user?.role || 'customer' as 'admin' | 'customer'
+    jobTitle: user?.jobTitle || '',
+    role: user?.role || 'customer' as 'admin' | 'customer' | 'csr'
   });
 
   const handleSave = () => {
@@ -25,10 +28,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
 
   const handleCancel = () => {
     setFormData({
-      name: user?.name || '',
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
       email: user?.email || '',
       phone: user?.phone || '',
+      company: user?.company || '',
       department: user?.department || '',
+      jobTitle: user?.jobTitle || '',
       role: user?.role || 'customer'
     });
     setIsEditing(false);
@@ -61,23 +67,44 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
 
           {/* Form */}
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              ) : (
-                <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
-                  <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-900">{user?.name || 'Not set'}</span>
-                </div>
-              )}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  First Name
+                </label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                ) : (
+                  <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
+                    <User className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-900">{user?.firstName || 'Not set'}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Last Name
+                </label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                ) : (
+                  <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
+                    <User className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-900">{user?.lastName || 'Not set'}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
@@ -90,6 +117,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled
                 />
               ) : (
                 <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
@@ -120,6 +148,25 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company
+              </label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={formData.company}
+                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              ) : (
+                <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
+                  <Building className="w-4 h-4 text-gray-400" />
+                  <span className="text-gray-900">{user?.company || 'Not set'}</span>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Department
               </label>
               {isEditing ? (
@@ -133,6 +180,25 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                 <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
                   <Building className="w-4 h-4 text-gray-400" />
                   <span className="text-gray-900">{user?.department || 'Not set'}</span>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Job Title
+              </label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={formData.jobTitle}
+                  onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              ) : (
+                <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
+                  <Building className="w-4 h-4 text-gray-400" />
+                  <span className="text-gray-900">{user?.jobTitle || 'Not set'}</span>
                 </div>
               )}
             </div>
