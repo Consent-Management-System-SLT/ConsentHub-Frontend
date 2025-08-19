@@ -148,10 +148,10 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
 
   if (loading) {
     return (
-      <div className={`bg-white rounded-xl shadow-sm border border-gray-200 ${className}`}>
+      <div className={`bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 ${className}`}>
         <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading CSR overview...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-myslt-primary mx-auto mb-4"></div>
+          <p className="text-myslt-text-primary">Loading CSR overview...</p>
         </div>
       </div>
     );
@@ -162,8 +162,8 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">CSR Dashboard</h1>
-          <p className="text-gray-600 mt-2">Customer Service Representative Overview</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">CSR Dashboard</h1>
+          <p className="text-myslt-text-secondary mt-2">Customer Service Representative Overview</p>
         </div>
         <div className="flex items-center space-x-4">
           <button
@@ -189,11 +189,11 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
         ].map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.key} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div key={stat.key} className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-sm font-medium text-myslt-text-secondary">{stat.label}</p>
+                  <p className="text-2xl font-bold text-myslt-text-primary">{stat.value}</p>
                   {stat.key === 'requests' && stat.value > 5 && (
                     <p className="text-xs text-red-600 mt-1">Needs attention</p>
                   )}
@@ -211,36 +211,36 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       </div>
 
       {/* Key Insights */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-6">
         <div className="flex items-center space-x-2 mb-6">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <TrendingUp className="w-5 h-5 text-blue-600" />
+          <div className="p-2 bg-myslt-primary/20 rounded-lg">
+            <TrendingUp className="w-5 h-5 text-myslt-primary" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Key Insights</h3>
+          <h3 className="text-lg font-semibold text-myslt-text-primary">Key Insights</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-green-50 rounded-xl">
-            <div className="text-3xl font-bold text-green-600 mb-1">{insights.consentRate}%</div>
-            <div className="text-sm text-gray-600">Consent Grant Rate</div>
+          <div className="text-center p-4 bg-myslt-success/20 rounded-xl">
+            <div className="text-3xl font-bold text-myslt-success mb-1">{insights.consentRate}%</div>
+            <div className="text-sm text-myslt-text-secondary">Consent Grant Rate</div>
           </div>
-          <div className="text-center p-4 bg-blue-50 rounded-xl">
-            <div className="text-3xl font-bold text-blue-600 mb-1">{insights.resolvedRequests}</div>
-            <div className="text-sm text-gray-600">Resolved DSAR Requests</div>
+          <div className="text-center p-4 bg-myslt-primary/20 rounded-xl">
+            <div className="text-3xl font-bold text-myslt-primary mb-1">{insights.resolvedRequests}</div>
+            <div className="text-sm text-myslt-text-secondary">Resolved DSAR Requests</div>
           </div>
-          <div className="text-center p-4 bg-purple-50 rounded-xl">
-            <div className="text-3xl font-bold text-purple-600 mb-1">{insights.newCustomers}</div>
-            <div className="text-sm text-gray-600">New Customers Today</div>
+          <div className="text-center p-4 bg-myslt-accent/20 rounded-xl">
+            <div className="text-3xl font-bold text-myslt-accent mb-1">{insights.newCustomers}</div>
+            <div className="text-sm text-myslt-text-secondary">New Customers Today</div>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-6">
         <div className="flex items-center space-x-2 mb-6">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <Activity className="w-5 h-5 text-blue-600" />
+          <div className="p-2 bg-myslt-primary/20 rounded-lg">
+            <Activity className="w-5 h-5 text-myslt-primary" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+          <h3 className="text-lg font-semibold text-myslt-text-primary">Quick Actions</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Array.isArray(quickActions) && quickActions.map((action) => {
@@ -251,28 +251,28 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
                 onClick={action.action}
                 className={`p-4 border rounded-xl cursor-pointer transition-all hover:shadow-md ${
                   action.priority === 'high' 
-                    ? 'border-red-200 bg-red-50 hover:border-red-300' 
+                    ? 'border-red-400/50 bg-red-900/30 hover:border-red-400' 
                     : action.priority === 'medium'
-                    ? 'border-amber-200 bg-amber-50 hover:border-amber-300'
-                    : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+                    ? 'border-amber-400/50 bg-amber-900/30 hover:border-amber-400'
+                    : 'border-myslt-accent/30 bg-myslt-service-card hover:border-myslt-accent/50'
                 }`}
               >
                 <div className="flex items-start space-x-3">
                   <div className={`p-2 rounded-lg ${
-                    action.priority === 'high' ? 'bg-red-100' :
-                    action.priority === 'medium' ? 'bg-amber-100' : 'bg-gray-100'
+                    action.priority === 'high' ? 'bg-red-800/50' :
+                    action.priority === 'medium' ? 'bg-amber-800/50' : 'bg-myslt-accent/20'
                   }`}>
                     <Icon className={`w-5 h-5 ${
-                      action.priority === 'high' ? 'text-red-600' :
-                      action.priority === 'medium' ? 'text-amber-600' : 'text-gray-600'
+                      action.priority === 'high' ? 'text-red-400' :
+                      action.priority === 'medium' ? 'text-amber-400' : 'text-myslt-text-secondary'
                     }`} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{action.title}</h4>
-                    <p className="text-sm text-gray-600 mt-1">{action.description}</p>
+                    <h4 className="font-medium text-myslt-text-primary">{action.title}</h4>
+                    <p className="text-sm text-myslt-text-secondary mt-1">{action.description}</p>
                   </div>
                   {action.priority === 'high' && (
-                    <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                    <span className="px-2 py-1 bg-red-800/50 text-red-400 text-xs font-medium rounded-full">
                       Urgent
                     </span>
                   )}

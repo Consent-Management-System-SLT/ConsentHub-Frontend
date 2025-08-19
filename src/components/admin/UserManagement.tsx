@@ -164,11 +164,11 @@ const UserManagement: React.FC = () => {
       case 'Admin':
         return <Shield className="w-4 h-4 text-red-600" />;
       case 'Manager':
-        return <UserCheck className="w-4 h-4 text-blue-600" />;
+        return <UserCheck className="w-4 h-4 text-myslt-primary" />;
       case 'CSR':
         return <Users className="w-4 h-4 text-green-600" />;
       default:
-        return <Users className="w-4 h-4 text-gray-600" />;
+        return <Users className="w-4 h-4 text-myslt-text-secondary" />;
     }
   };
 
@@ -177,24 +177,24 @@ const UserManagement: React.FC = () => {
       case 'Admin':
         return 'bg-red-100 text-red-800';
       case 'Manager':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-myslt-primary/10 text-myslt-primary';
       case 'CSR':
-        return 'bg-green-100 text-green-800';
+        return 'bg-myslt-success/10 text-myslt-success';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-myslt-text-primary';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-myslt-success/10 text-myslt-success';
       case 'inactive':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-myslt-text-muted';
       case 'suspended':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-myslt-text-primary';
     }
   };
 
@@ -202,8 +202,8 @@ const UserManagement: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600 mt-2">Manage user accounts and permissions</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">User Management</h1>
+          <p className="text-myslt-text-secondary mt-2">Manage user accounts and permissions</p>
         </div>
         <div className="flex items-center space-x-3">
           <button 
@@ -222,66 +222,66 @@ const UserManagement: React.FC = () => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-2xl font-bold text-blue-600">{users.length}</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">Total Users</p>
+              <p className="text-2xl font-bold text-myslt-success">{users.length}</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
+              <Users className="w-6 h-6 text-myslt-success" />
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Active Users</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-sm font-medium text-myslt-text-secondary">Active Users</p>
+              <p className="text-2xl font-bold text-myslt-success">
                 {users.filter(u => u.status === 'active').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-              <UserCheck className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
+              <UserCheck className="w-6 h-6 text-myslt-success" />
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Admins</p>
-              <p className="text-2xl font-bold text-red-600">
+              <p className="text-sm font-medium text-myslt-text-secondary">Admins</p>
+              <p className="text-2xl font-bold text-myslt-danger">
                 {users.filter(u => u.role === 'Admin').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-red-600" />
+            <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
+              <Shield className="w-6 h-6 text-myslt-danger" />
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">CSR Staff</p>
-              <p className="text-2xl font-bold text-purple-600">
+              <p className="text-sm font-medium text-myslt-text-secondary">CSR Staff</p>
+              <p className="text-2xl font-bold text-myslt-primary">
                 {users.filter(u => u.role === 'CSR').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-purple-600" />
+            <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
+              <Users className="w-6 h-6 text-myslt-primary" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+      <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6 mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-myslt-text-muted w-4 h-4" />
             <input
               type="text"
               placeholder="Search users..."
@@ -314,30 +314,30 @@ const UserManagement: React.FC = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-myslt-background">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">User</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Role</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Last Login</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Department</th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-myslt-card divide-y divide-myslt-accent/20">
               {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
+                <tr key={user.id} className="hover:bg-myslt-background">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                        <Users className="w-5 h-5 text-gray-600" />
+                      <div className="w-10 h-10 bg-myslt-accent/20 rounded-full flex items-center justify-center">
+                        <Users className="w-5 h-5 text-myslt-text-primary" />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
+                        <div className="text-sm font-medium text-myslt-text-primary">{user.name}</div>
+                        <div className="text-sm text-myslt-text-secondary">{user.email}</div>
                         {user.phone && <div className="text-xs text-gray-400">{user.phone}</div>}
                       </div>
                     </div>
@@ -361,13 +361,13 @@ const UserManagement: React.FC = () => {
                       <option value="suspended">Suspended</option>
                     </select>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.lastLogin}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.department || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">{user.lastLogin}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">{user.department || 'N/A'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button 
                         onClick={() => handleEditUser(user)}
-                        className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded transition-colors"
+                        className="text-myslt-primary hover:text-myslt-primary-dark p-1 hover:bg-myslt-service-card rounded transition-colors"
                         title="Edit User"
                       >
                         <Edit className="w-4 h-4" />
@@ -391,9 +391,9 @@ const UserManagement: React.FC = () => {
       {/* Add User Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Add New User</h3>
+          <div className="bg-myslt-card rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6 border-b border-myslt-accent/20">
+              <h3 className="text-lg font-semibold text-myslt-text-primary">Add New User</h3>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -445,16 +445,16 @@ const UserManagement: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+            <div className="p-6 border-t border-myslt-border flex justify-end space-x-3">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                className="px-4 py-2 text-myslt-text-secondary bg-myslt-service-card rounded-lg hover:bg-myslt-card-gradient transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddUser}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-4 py-2 bg-myslt-success text-white rounded-lg hover:bg-myslt-success/90 transition-colors"
               >
                 Add User
               </button>
@@ -466,9 +466,9 @@ const UserManagement: React.FC = () => {
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Edit User</h3>
+          <div className="bg-myslt-card rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6 border-b border-myslt-accent/20">
+              <h3 className="text-lg font-semibold text-myslt-text-primary">Edit User</h3>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -520,7 +520,7 @@ const UserManagement: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+            <div className="p-6 border-t border-myslt-border flex justify-end space-x-3">
               <button
                 onClick={() => setShowEditModal(false)}
                 className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
@@ -544,16 +544,16 @@ const UserManagement: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Confirm Delete</h3>
+          <div className="bg-myslt-card rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6 border-b border-myslt-accent/20">
+              <h3 className="text-lg font-semibold text-myslt-text-primary">Confirm Delete</h3>
             </div>
             <div className="p-6">
               <p className="text-gray-700">
                 Are you sure you want to delete user <strong>{selectedUser.name}</strong>? This action cannot be undone.
               </p>
             </div>
-            <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+            <div className="p-6 border-t border-myslt-border flex justify-end space-x-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
                 className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"

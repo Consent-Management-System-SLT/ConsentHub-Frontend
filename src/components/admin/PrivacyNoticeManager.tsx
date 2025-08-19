@@ -13,11 +13,11 @@ const PrivacyNoticeManager: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Privacy Notices</h1>
-          <p className="text-gray-600 mt-2">Manage privacy policies and notices</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">Privacy Notices</h1>
+          <p className="text-myslt-text-secondary mt-2">Manage privacy policies and notices</p>
         </div>
         <div className="flex items-center space-x-3">
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
+          <button className="px-4 py-2 bg-myslt-card-solid border border-myslt-border rounded-lg hover:bg-myslt-service-card transition-colors flex items-center space-x-2">
             <Download className="w-4 h-4 text-gray-500" />
             <span className="text-sm font-medium text-gray-700">Export</span>
           </button>
@@ -34,7 +34,7 @@ const PrivacyNoticeManager: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {notices.map((notice) => (
-          <div key={notice.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div key={notice.id} className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                 <FileText className="w-6 h-6 text-blue-600" />
@@ -46,8 +46,8 @@ const PrivacyNoticeManager: React.FC = () => {
               </span>
             </div>
             
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{notice.title}</h3>
-            <p className="text-sm text-gray-600 mb-4">Version {notice.version}</p>
+            <h3 className="text-lg font-semibold text-myslt-text-primary mb-2">{notice.title}</h3>
+            <p className="text-sm text-myslt-text-secondary mb-4">Version {notice.version}</p>
             <p className="text-xs text-gray-500 mb-4">Updated: {notice.lastUpdated}</p>
             
             <div className="flex items-center space-x-2">
@@ -55,7 +55,7 @@ const PrivacyNoticeManager: React.FC = () => {
                 <Eye className="w-4 h-4" />
                 <span className="text-sm">View</span>
               </button>
-              <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+              <button className="p-2 text-myslt-text-secondary hover:text-myslt-text-primary hover:bg-myslt-service-card rounded-lg transition-colors">
                 <Edit className="w-4 h-4" />
               </button>
               <button className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors">

@@ -238,7 +238,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 flex ${className}`}>
+    <div className={`min-h-screen bg-myslt-background flex ${className}`}>
       {/* Server Connection Alert */}
       {showConnectionAlert && (
         <ServerConnectionAlert 
@@ -275,7 +275,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
       {/* Floating Help Button */}
       <button
         onClick={() => setShowHelpModal(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group z-40"
+        className="fixed bottom-6 right-6 w-14 h-14 bg-success-gradient text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group z-40"
         title="Help & Documentation"
       >
         <HelpCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
@@ -317,11 +317,11 @@ const DashboardOverview: React.FC<{
     return (
       <div className="space-y-6">
         {/* Loading Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-6 text-white">
+        <div className="bg-gradient-to-r from-myslt-primary via-myslt-secondary to-myslt-primary-dark rounded-xl shadow-lg p-6 text-white myslt-card-glow">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold mb-2">Loading Dashboard...</h1>
-              <p className="text-blue-100 text-sm sm:text-base">
+              <p className="text-white/90 text-sm sm:text-base">
                 Please wait while we fetch your real-time data.
               </p>
             </div>
@@ -334,13 +334,13 @@ const DashboardOverview: React.FC<{
         {/* Loading Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 animate-pulse">
+            <div key={i} className="bg-myslt-card rounded-xl shadow-sm p-6 border border-myslt-accent/20 animate-pulse">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-myslt-accent/30 rounded w-3/4 mb-2"></div>
+                  <div className="h-8 bg-myslt-accent/30 rounded w-1/2"></div>
                 </div>
-                <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
+                <div className="w-12 h-12 bg-myslt-accent/30 rounded-lg"></div>
               </div>
             </div>
           ))}
@@ -354,24 +354,24 @@ const DashboardOverview: React.FC<{
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
-          <p className="text-gray-600 mt-1">Customer Support Representative Dashboard</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">Dashboard Overview</h1>
+          <p className="text-myslt-text-secondary mt-1">Customer Support Representative Dashboard</p>
         </div>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700">Auto-refresh:</label>
+            <label className="text-sm font-medium text-myslt-text-secondary">Auto-refresh:</label>
             <input
               type="checkbox"
               checked={autoRefresh}
               onChange={(e) => onAutoRefreshChange && onAutoRefreshChange(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-gray-300 text-myslt-primary focus:ring-myslt-primary"
             />
           </div>
           {onRefresh && (
             <button
               onClick={onRefresh}
               disabled={isRefreshing}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center space-x-2 px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 disabled:opacity-50"
               title="Refresh Data"
             >
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -383,80 +383,80 @@ const DashboardOverview: React.FC<{
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Customers</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalCustomers.toLocaleString()}</p>
-              <p className="text-xs text-blue-600 mt-1">Active accounts</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">Total Customers</p>
+              <p className="text-2xl font-bold text-myslt-text-primary">{stats.totalCustomers.toLocaleString()}</p>
+              <p className="text-xs text-myslt-success mt-1">Active accounts</p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <Users className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-myslt-success/20 rounded-full">
+              <Users className="w-6 h-6 text-myslt-success" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Pending Requests</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.pendingRequests}</p>
-              <p className="text-xs text-orange-600 mt-1">Awaiting response</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">Pending Requests</p>
+              <p className="text-2xl font-bold text-myslt-text-primary">{stats.pendingRequests}</p>
+              <p className="text-xs text-orange-400 mt-1">Awaiting response</p>
             </div>
-            <div className="p-3 bg-orange-100 rounded-full">
-              <Clock className="w-6 h-6 text-orange-600" />
+            <div className="p-3 bg-orange-400/20 rounded-full">
+              <Clock className="w-6 h-6 text-orange-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Consent Updates</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.consentUpdates}</p>
-              <p className="text-xs text-green-600 mt-1">This period</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">Consent Updates</p>
+              <p className="text-2xl font-bold text-myslt-text-primary">{stats.consentUpdates}</p>
+              <p className="text-xs text-myslt-success mt-1">This period</p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="p-3 bg-myslt-success/20 rounded-full">
+              <CheckCircle className="w-6 h-6 text-myslt-success" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Guardian Managed</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.guardiansManaged}</p>
-              <p className="text-xs text-purple-600 mt-1">Under supervision</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">Guardian Managed</p>
+              <p className="text-2xl font-bold text-myslt-text-primary">{stats.guardiansManaged}</p>
+              <p className="text-xs text-purple-400 mt-1">Under supervision</p>
             </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <Shield className="w-6 h-6 text-purple-600" />
+            <div className="p-3 bg-purple-400/20 rounded-full">
+              <Shield className="w-6 h-6 text-purple-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Today's Actions</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.todayActions}</p>
-              <p className="text-xs text-indigo-600 mt-1">Completed tasks</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">Today's Actions</p>
+              <p className="text-2xl font-bold text-myslt-text-primary">{stats.todayActions}</p>
+              <p className="text-xs text-indigo-400 mt-1">Completed tasks</p>
             </div>
-            <div className="p-3 bg-indigo-100 rounded-full">
-              <TrendingUp className="w-6 h-6 text-indigo-600" />
+            <div className="p-3 bg-indigo-400/20 rounded-full">
+              <TrendingUp className="w-6 h-6 text-indigo-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Risk Alerts</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.riskAlerts}</p>
-              <p className="text-xs text-red-600 mt-1">Requires attention</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">Risk Alerts</p>
+              <p className="text-2xl font-bold text-myslt-text-primary">{stats.riskAlerts}</p>
+              <p className="text-xs text-red-400 mt-1">Requires attention</p>
             </div>
-            <div className="p-3 bg-red-100 rounded-full">
-              <AlertTriangle className="w-6 h-6 text-red-600" />
+            <div className="p-3 bg-red-400/20 rounded-full">
+              <AlertTriangle className="w-6 h-6 text-red-400" />
             </div>
           </div>
         </div>
@@ -465,56 +465,56 @@ const DashboardOverview: React.FC<{
       {/* Quick Actions and Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Quick Actions */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+          <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Quick Actions</h3>
           <div className="space-y-3">
             <button
               onClick={() => onSectionChange('customer-search')}
-              className="w-full flex items-center space-x-3 p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+              className="w-full flex items-center space-x-3 p-3 bg-myslt-accent/30 hover:bg-myslt-accent/50 rounded-lg transition-colors"
             >
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-myslt-success/20 rounded-lg">
+                <Users className="w-5 h-5 text-myslt-success" />
               </div>
               <div className="text-left">
-                <p className="font-medium text-gray-900">Search Customers</p>
-                <p className="text-sm text-gray-600">Find and manage customer accounts</p>
+                <p className="font-medium text-myslt-text-primary">Search Customers</p>
+                <p className="text-sm text-myslt-text-secondary">Find and manage customer accounts</p>
               </div>
             </button>
             
             <button
               onClick={() => onSectionChange('dsar-requests')}
-              className="w-full flex items-center space-x-3 p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
+              className="w-full flex items-center space-x-3 p-3 bg-orange-400/20 hover:bg-orange-400/30 rounded-lg transition-colors"
             >
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <FileText className="w-5 h-5 text-orange-600" />
+              <div className="p-2 bg-orange-400/30 rounded-lg">
+                <FileText className="w-5 h-5 text-orange-400" />
               </div>
               <div className="text-left">
-                <p className="font-medium text-gray-900">DSAR Requests</p>
-                <p className="text-sm text-gray-600">Process data subject requests</p>
+                <p className="font-medium text-myslt-text-primary">DSAR Requests</p>
+                <p className="text-sm text-myslt-text-secondary">Process data subject requests</p>
               </div>
             </button>
             
             <button
               onClick={() => onSectionChange('consent-history')}
-              className="w-full flex items-center space-x-3 p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
+              className="w-full flex items-center space-x-3 p-3 bg-myslt-success/20 hover:bg-myslt-success/30 rounded-lg transition-colors"
             >
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Shield className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-myslt-success/30 rounded-lg">
+                <Shield className="w-5 h-5 text-myslt-success" />
               </div>
               <div className="text-left">
-                <p className="font-medium text-gray-900">Consent Management</p>
-                <p className="text-sm text-gray-600">Review and update consents</p>
+                <p className="font-medium text-myslt-text-primary">Consent Management</p>
+                <p className="text-sm text-myslt-text-secondary">Review and update consents</p>
               </div>
             </button>
           </div>
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+            <h3 className="text-lg font-semibold text-myslt-text-primary">Recent Activity</h3>
             {isRefreshing && (
-              <div className="flex items-center text-blue-600 text-sm">
+              <div className="flex items-center text-myslt-success text-sm">
                 <RefreshCw className="w-4 h-4 animate-spin mr-2" />
                 Refreshing...
               </div>
@@ -523,11 +523,11 @@ const DashboardOverview: React.FC<{
           <div className="space-y-4">
             {activities.length > 0 ? (
               activities.slice(0, 5).map((activity, index) => (
-                <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="flex items-start space-x-3 p-3 bg-myslt-service-card rounded-lg">
                   <div className={`p-2 rounded-lg ${
                     activity.type === 'consent' ? 'bg-green-100' :
                     activity.type === 'dsar' ? 'bg-orange-100' :
-                    'bg-blue-100'
+                    'bg-myslt-service-card'
                   }`}>
                     {activity.type === 'consent' ? (
                       <Shield className={`w-4 h-4 ${
@@ -550,14 +550,14 @@ const DashboardOverview: React.FC<{
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{activity.message}</p>
-                    <p className="text-xs text-gray-500 mt-1">{activity.timestamp}</p>
+                    <p className="text-sm font-medium text-myslt-text-primary">{activity.message}</p>
+                    <p className="text-xs text-myslt-text-muted mt-1">{activity.timestamp}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Activity className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <div className="text-center py-8 text-myslt-text-muted">
+                <Activity className="w-12 h-12 mx-auto mb-3 text-myslt-text-muted/50" />
                 <p>No recent activity</p>
               </div>
             )}
@@ -566,24 +566,24 @@ const DashboardOverview: React.FC<{
       </div>
 
       {/* Recent Insights */}
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+      <div className="bg-myslt-card rounded-xl shadow-sm p-6 border border-myslt-accent/20">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Today's Insights</h3>
+          <h3 className="text-lg font-semibold text-myslt-text-primary">Today's Insights</h3>
           {isRefreshing && (
-            <div className="flex items-center text-blue-600 text-sm">
+            <div className="flex items-center text-myslt-success text-sm">
               <RefreshCw className="w-4 h-4 animate-spin mr-2" />
               Refreshing...
             </div>
           )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+          <div className="bg-myslt-gradient p-4 rounded-lg border border-myslt-accent/30">
             <div className="flex items-center space-x-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium text-blue-800">Consent Rate</span>
+              <TrendingUp className="w-5 h-5 text-myslt-primary" />
+              <span className="text-sm font-medium text-myslt-text-primary">Consent Rate</span>
             </div>
-            <p className="text-2xl font-bold text-blue-900 mt-2">{insights?.consentRate || 0}%</p>
-            <p className="text-sm text-blue-600">Based on active consents</p>
+            <p className="text-2xl font-bold text-myslt-text-primary mt-2">{insights?.consentRate || 0}%</p>
+            <p className="text-sm text-myslt-primary">Based on active consents</p>
           </div>
           <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
             <div className="flex items-center space-x-2">

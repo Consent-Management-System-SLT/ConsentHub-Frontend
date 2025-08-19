@@ -25,7 +25,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ className = '' }) =
       <div className="group">
         <button
           type="button"
-          className="inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="inline-flex items-center justify-center w-full rounded-md border border-myslt-accent/30 shadow-sm px-4 py-2 bg-myslt-card text-sm font-medium text-myslt-text-primary hover:bg-myslt-accent/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-myslt-success"
           id="language-menu"
           aria-expanded="true"
           aria-haspopup="true"
@@ -37,9 +37,9 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ className = '' }) =
           </svg>
         </button>
 
-        <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+        <div className="opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-myslt-card ring-1 ring-myslt-accent/20 ring-opacity-5 focus:outline-none z-50">
           <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="language-menu">
-            <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+            <div className="px-4 py-2 text-sm text-myslt-text-secondary border-b border-myslt-accent/20">
               <div className="font-medium">{t('language.selectLanguage')}</div>
             </div>
             {languages.map((language) => (
@@ -48,8 +48,8 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ className = '' }) =
                 onClick={() => handleLanguageChange(language.code)}
                 className={`${
                   i18n.language === language.code
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-myslt-card-gradient text-myslt-primary'
+                    : 'text-myslt-text-secondary hover:bg-myslt-service-card'
                 } group flex items-center px-4 py-2 text-sm w-full text-left transition-colors duration-150`}
                 role="menuitem"
               >

@@ -14,12 +14,12 @@ const AuditLogViewer: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Audit Logs</h1>
-          <p className="text-gray-600 mt-2">View system activity and compliance logs</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">Audit Logs</h1>
+          <p className="text-myslt-text-secondary mt-2">View system activity and compliance logs</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6 mb-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="relative">
@@ -30,18 +30,18 @@ const AuditLogViewer: React.FC = () => {
                 className="pl-10 pr-4 py-2 w-full sm:w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
-            <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center space-x-2">
-              <Filter className="w-4 h-4 text-gray-600" />
+            <button className="px-4 py-2 bg-myslt-service-card hover:bg-gray-200 rounded-lg transition-colors flex items-center space-x-2">
+              <Filter className="w-4 h-4 text-myslt-text-secondary" />
               <span className="text-sm font-medium text-gray-700">Filters</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-myslt-service-card">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
@@ -52,10 +52,10 @@ const AuditLogViewer: React.FC = () => {
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-myslt-card-solid divide-y divide-gray-200">
               {logs.map((log) => (
-                <tr key={log.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <tr key={log.id} className="hover:bg-myslt-service-card">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 text-gray-400 mr-2" />
                       {log.timestamp}
@@ -64,7 +64,7 @@ const AuditLogViewer: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <User className="w-4 h-4 text-gray-400 mr-2" />
-                      <span className="text-sm text-gray-900">{log.user}</span>
+                      <span className="text-sm text-myslt-text-primary">{log.user}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -72,7 +72,7 @@ const AuditLogViewer: React.FC = () => {
                       {log.action}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">
                     <div className="flex items-center">
                       {log.entity === 'Customer Consent' && <Shield className="w-4 h-4 text-green-600 mr-2" />}
                       {log.entity === 'Data Request' && <Database className="w-4 h-4 text-blue-600 mr-2" />}
@@ -82,7 +82,7 @@ const AuditLogViewer: React.FC = () => {
                       {log.entity}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{log.details}</td>
+                  <td className="px-6 py-4 text-sm text-myslt-text-primary">{log.details}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{log.ipAddress}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded">

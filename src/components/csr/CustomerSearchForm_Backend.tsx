@@ -50,44 +50,44 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
       case 'individual':
         return <User className="w-4 h-4 text-blue-600" />;
       default:
-        return <User className="w-4 h-4 text-gray-600" />;
+        return <User className="w-4 h-4 text-myslt-text-secondary" />;
     }
   };
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 ${className}`}>
+    <div className={`bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 ${className}`}>
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100">
+      <div className="p-6 border-b border-myslt-accent/20 bg-gradient-to-r from-myslt-primary/10 to-myslt-accent/10">
         <div className="flex items-center space-x-3">
           <Search className="w-6 h-6 text-blue-600" />
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Customer Search</h2>
-            <p className="text-sm text-gray-600">Search for customers by email, phone, name, or ID</p>
+            <h2 className="text-xl font-semibold text-myslt-text-primary">Customer Search</h2>
+            <p className="text-sm text-myslt-text-secondary">Search for customers by email, phone, name, or ID</p>
           </div>
         </div>
       </div>
 
       {/* Search Form */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-myslt-accent/20">
         <div className="flex space-x-4">
           <div className="flex-1">
             <div className="flex space-x-2">
               <select
                 value={searchType}
                 onChange={(e) => setSearchType(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-myslt-primary bg-myslt-input-bg text-myslt-text-primary"
               >
-                <option value="email">Email</option>
-                <option value="phone">Phone</option>
-                <option value="name">Name</option>
-                <option value="id">Customer ID</option>
+                <option value="email" className="bg-myslt-input-bg text-myslt-text-primary">Email</option>
+                <option value="phone" className="bg-myslt-input-bg text-myslt-text-primary">Phone</option>
+                <option value="name" className="bg-myslt-input-bg text-myslt-text-primary">Name</option>
+                <option value="id" className="bg-myslt-input-bg text-myslt-text-primary">Customer ID</option>
               </select>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={`Search by ${searchType}...`}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-4 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-myslt-primary bg-myslt-input-bg text-myslt-text-primary placeholder-myslt-text-muted"
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
@@ -118,11 +118,11 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
         {isSearching ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-2 text-gray-600">Searching customers...</span>
+            <span className="ml-2 text-myslt-text-secondary">Searching customers...</span>
           </div>
         ) : searchResults.length > 0 ? (
           <div className="space-y-3">
-            <h3 className="text-lg font-medium text-gray-900">
+            <h3 className="text-lg font-medium text-myslt-text-primary">
               Search Results ({searchResults.length})
             </h3>
             <div className="grid gap-3">
@@ -130,25 +130,25 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
                 <div
                   key={customer.id}
                   onClick={() => handleCustomerSelect(customer)}
-                  className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all duration-200"
+                  className="p-4 border border-myslt-accent/30 rounded-lg hover:border-myslt-primary hover:bg-myslt-service-card cursor-pointer transition-all duration-200"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3">
                       {getCustomerIcon(customer.type || customer.partyType)}
                       <div>
-                        <div className="font-medium text-gray-900">{customer.name}</div>
-                        <div className="text-sm text-gray-600">ID: {customer.id}</div>
+                        <div className="font-medium text-myslt-text-primary">{customer.name}</div>
+                        <div className="text-sm text-myslt-text-secondary">ID: {customer.id}</div>
                         <div className="flex items-center space-x-4 mt-2">
                           {customer.email && (
                             <div className="flex items-center space-x-1">
-                              <Mail className="w-4 h-4 text-gray-500" />
-                              <span className="text-sm text-gray-600">{customer.email}</span>
+                              <Mail className="w-4 h-4 text-myslt-text-muted" />
+                              <span className="text-sm text-myslt-text-secondary">{customer.email}</span>
                             </div>
                           )}
                           {(customer.phone || customer.mobile) && (
                             <div className="flex items-center space-x-1">
-                              <Phone className="w-4 h-4 text-gray-500" />
-                              <span className="text-sm text-gray-600">{customer.phone || customer.mobile}</span>
+                              <Phone className="w-4 h-4 text-myslt-text-muted" />
+                              <span className="text-sm text-myslt-text-secondary">{customer.phone || customer.mobile}</span>
                             </div>
                           )}
                         </div>
@@ -157,8 +157,8 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
                     <div className="flex items-center space-x-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         customer.status === 'active' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
+                          ? 'bg-myslt-success/20 text-myslt-success' 
+                          : 'bg-myslt-service-card text-myslt-text-secondary'
                       }`}>
                         {customer.status || 'active'}
                       </span>
@@ -176,13 +176,13 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
         ) : searchTerm ? (
           <div className="text-center py-8">
             <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">No customers found matching your search criteria.</p>
-            <p className="text-sm text-gray-500 mt-1">Try adjusting your search terms or search type.</p>
+            <p className="text-myslt-text-secondary">No customers found matching your search criteria.</p>
+            <p className="text-sm text-myslt-text-muted mt-1">Try adjusting your search terms or search type.</p>
           </div>
         ) : (
           <div className="text-center py-8">
             <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">Enter search criteria to find customers.</p>
+            <p className="text-myslt-text-secondary">Enter search criteria to find customers.</p>
           </div>
         )}
       </div>

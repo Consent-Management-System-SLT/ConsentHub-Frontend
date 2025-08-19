@@ -184,7 +184,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="bg-myslt-card-solid rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center space-x-3">
@@ -193,7 +193,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/60 rounded-full transition-colors"
+            className="p-2 hover:bg-myslt-service-card/60 rounded-full transition-colors"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -201,7 +201,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
 
         <div className="flex h-[calc(90vh-80px)]">
           {/* Sidebar */}
-          <div className="w-64 bg-gray-50 border-r border-gray-200 overflow-y-auto">
+          <div className="w-64 bg-myslt-service-card border-r border-myslt-border overflow-y-auto">
             <div className="p-4">
               <div className="relative">
                 <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -223,7 +223,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                   className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
                     activeCategory === category.id
                       ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      : 'text-myslt-text-secondary hover:bg-myslt-card-solid'
                   }`}
                 >
                   <category.icon className="w-5 h-5" />
@@ -243,7 +243,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
 
               <div className="space-y-6">
                 {filteredContent.content.map((section, index) => (
-                  <div key={index} className="bg-white border border-gray-200 rounded-lg p-6">
+                  <div key={index} className="bg-myslt-card-solid border border-myslt-border rounded-lg p-6">
                     <h4 className="text-lg font-semibold text-gray-900 mb-3">{section.title}</h4>
                     <p className="text-gray-600 mb-4">{section.description}</p>
                     <div className="space-y-2">

@@ -70,7 +70,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 flex ${className}`}>
+    <div className={`min-h-screen bg-myslt-background flex ${className}`}>
       {/* Server Connection Alert */}
       {showConnectionAlert && (
         <ServerConnectionAlert 

@@ -34,7 +34,7 @@ const ToastNotification: React.FC<ToastNotificationProps> = ({ message, onDismis
       case 'warning':
         return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
       case 'info':
-        return <Info className="h-5 w-5 text-blue-600" />;
+        return <Info className="h-5 w-5 text-myslt-primary" />;
       default:
         return <Info className="h-5 w-5 text-gray-600" />;
     }
@@ -51,7 +51,7 @@ const ToastNotification: React.FC<ToastNotificationProps> = ({ message, onDismis
       case 'info':
         return 'bg-blue-50 border-blue-200';
       default:
-        return 'bg-gray-50 border-gray-200';
+        return 'bg-myslt-service-card border-gray-200';
     }
   };
 
@@ -70,7 +70,7 @@ const ToastNotification: React.FC<ToastNotificationProps> = ({ message, onDismis
           {getIcon()}
         </div>
         <div className="ml-3 flex-1">
-          <p className="text-sm font-medium text-gray-900">
+          <p className="text-sm font-medium text-myslt-text-primary">
             {message.message}
           </p>
         </div>

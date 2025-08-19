@@ -13,8 +13,8 @@ const ComplianceRulesManager: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Compliance Rules</h1>
-          <p className="text-gray-600 mt-2">Configure and manage compliance automation rules</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">Compliance Rules</h1>
+          <p className="text-myslt-text-secondary mt-2">Configure and manage compliance automation rules</p>
         </div>
         <div className="flex items-center space-x-3">
           <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2">
@@ -30,7 +30,7 @@ const ComplianceRulesManager: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {rules.map((rule) => (
-          <div key={rule.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div key={rule.id} className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
                 <AlertTriangle className="w-6 h-6 text-orange-600" />
@@ -49,8 +49,8 @@ const ComplianceRulesManager: React.FC = () => {
               </div>
             </div>
             
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{rule.name}</h3>
-            <p className="text-sm text-gray-600 mb-4">{rule.description}</p>
+            <h3 className="text-lg font-semibold text-myslt-text-primary mb-2">{rule.name}</h3>
+            <p className="text-sm text-myslt-text-secondary mb-4">{rule.description}</p>
             
             <div className="flex items-center justify-between mb-4">
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -68,7 +68,7 @@ const ComplianceRulesManager: React.FC = () => {
                 <Settings className="w-4 h-4" />
                 <span className="text-sm">Configure</span>
               </button>
-              <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+              <button className="p-2 text-myslt-text-secondary hover:text-myslt-text-primary hover:bg-myslt-service-card rounded-lg transition-colors">
                 <Edit className="w-4 h-4" />
               </button>
               <button className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors">

@@ -169,7 +169,7 @@ CUST002,Jane Smith,jane.smith@example.com,analytics,active,2024-01-20,,mobile`;
       case 'processing':
         return 'bg-blue-100 text-blue-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-myslt-text-secondary';
     }
   };
   return (
@@ -182,7 +182,7 @@ CUST002,Jane Smith,jane.smith@example.com,analytics,active,2024-01-20,,mobile`;
         <div className="flex items-center space-x-3">
           <button 
             onClick={handleDownloadTemplate}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2"
+            className="px-4 py-2 bg-myslt-card-solid border border-myslt-border rounded-lg hover:bg-myslt-service-card transition-colors flex items-center space-x-2"
           >
             <Download className="w-4 h-4 text-gray-500" />
             <span className="text-sm font-medium text-gray-700">Download Template</span>
@@ -195,8 +195,8 @@ CUST002,Jane Smith,jane.smith@example.com,analytics,active,2024-01-20,,mobile`;
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Data</h3>
+        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
+          <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Upload Data</h3>
           
           <div 
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
@@ -210,7 +210,7 @@ CUST002,Jane Smith,jane.smith@example.com,analytics,active,2024-01-20,,mobile`;
             <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             {selectedFile ? (
               <div className="space-y-4">
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-myslt-service-card rounded-lg p-4">
                   <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
                   <p className="text-xs text-gray-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
                 </div>
@@ -277,8 +277,8 @@ CUST002,Jane Smith,jane.smith@example.com,analytics,active,2024-01-20,,mobile`;
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Import History</h3>
+        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
+          <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Import History</h3>
           <div className="space-y-4">
             {importHistory.map((item) => (
               <div key={item.id} className="border border-gray-200 rounded-lg p-4">
@@ -346,13 +346,13 @@ CUST002,Jane Smith,jane.smith@example.com,analytics,active,2024-01-20,,mobile`;
       {/* Error Details Modal */}
       {showErrorModal && selectedImport && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-myslt-card-solid rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Import Errors - {selectedImport.filename}</h3>
                 <button 
                   onClick={() => setShowErrorModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-myslt-service-card rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>

@@ -122,11 +122,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = () => {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Consents</p>
-              <p className="text-2xl font-bold text-gray-900">{totalConsents}</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">Total Consents</p>
+              <p className="text-2xl font-bold text-myslt-text-primary">{totalConsents}</p>
               <p className="text-xs text-green-600 mt-1">
                 {grantedConsents} granted, {revokedConsents} revoked
               </p>
@@ -137,11 +137,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Parties</p>
-              <p className="text-2xl font-bold text-gray-900">{totalParties}</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">Total Parties</p>
+              <p className="text-2xl font-bold text-myslt-text-primary">{totalParties}</p>
               <p className="text-xs text-blue-600 mt-1">Registered users</p>
             </div>
             <div className="p-3 bg-green-100 rounded-full">
@@ -150,11 +150,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Preferences</p>
-              <p className="text-2xl font-bold text-gray-900">{totalPreferences}</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">Preferences</p>
+              <p className="text-2xl font-bold text-myslt-text-primary">{totalPreferences}</p>
               <p className="text-xs text-purple-600 mt-1">Communication settings</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-full">
@@ -163,11 +163,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">DSAR Requests</p>
-              <p className="text-2xl font-bold text-gray-900">{totalDSAR}</p>
+              <p className="text-sm font-medium text-myslt-text-secondary">DSAR Requests</p>
+              <p className="text-2xl font-bold text-myslt-text-primary">{totalDSAR}</p>
               <p className="text-xs text-orange-600 mt-1">
                 {pendingDSAR} pending
               </p>
@@ -180,9 +180,9 @@ const DashboardHome: React.FC<DashboardHomeProps> = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+          <h2 className="text-lg font-semibold text-myslt-text-primary">Recent Activity</h2>
           <button className="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1">
             <Eye className="w-4 h-4" />
             <span>View all</span>
@@ -190,7 +190,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = () => {
         </div>
         <div className="space-y-3">
           {Array.isArray(consentsData) && consentsData.slice(0, 5).map((consent: any) => (
-            <div key={consent.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+            <div key={consent.id} className="flex items-center space-x-3 p-3 bg-myslt-service-card rounded-lg">
               <div className="p-2 bg-blue-100 rounded-full">
                 <Shield className="w-4 h-4 text-blue-600" />
               </div>
@@ -215,8 +215,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = () => {
       </div>
 
       {/* System Status */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">System Status</h2>
+      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
+        <h2 className="text-lg font-semibold text-myslt-text-primary mb-4">System Status</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center space-x-3">
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -234,10 +234,10 @@ const DashboardHome: React.FC<DashboardHomeProps> = () => {
       </div>
 
       {/* Time Range Filter */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Time Range</h2>
+      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
+        <h2 className="text-lg font-semibold text-myslt-text-primary mb-4">Time Range</h2>
         <div className="flex items-center space-x-4">
-          <label className="text-sm font-medium text-gray-700">View data for:</label>
+          <label className="text-sm font-medium text-myslt-text-secondary">View data for:</label>
           <select
             value={selectedTimeRange}
             onChange={(e) => setSelectedTimeRange(e.target.value)}

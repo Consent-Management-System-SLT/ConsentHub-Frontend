@@ -12,8 +12,8 @@ const EventListenerManager: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Event Listeners</h1>
-          <p className="text-gray-600 mt-2">Manage webhooks and event notifications</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">Event Listeners</h1>
+          <p className="text-myslt-text-secondary mt-2">Manage webhooks and event notifications</p>
         </div>
         <div className="flex items-center space-x-3">
           <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2">
@@ -29,7 +29,7 @@ const EventListenerManager: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {webhooks.map((webhook) => (
-          <div key={webhook.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div key={webhook.id} className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
                 <Webhook className="w-6 h-6 text-purple-600" />
@@ -48,8 +48,8 @@ const EventListenerManager: React.FC = () => {
               </div>
             </div>
             
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{webhook.name}</h3>
-            <p className="text-sm text-gray-600 mb-4 break-all">{webhook.url}</p>
+            <h3 className="text-lg font-semibold text-myslt-text-primary mb-2">{webhook.name}</h3>
+            <p className="text-sm text-myslt-text-secondary mb-4 break-all">{webhook.url}</p>
             
             <div className="mb-4">
               <p className="text-sm font-medium text-gray-700 mb-2">Events:</p>
@@ -67,7 +67,7 @@ const EventListenerManager: React.FC = () => {
                 <Activity className="w-4 h-4" />
                 <span className="text-sm">Test</span>
               </button>
-              <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+              <button className="p-2 text-myslt-text-secondary hover:text-myslt-text-primary hover:bg-myslt-service-card rounded-lg transition-colors">
                 <Settings className="w-4 h-4" />
               </button>
             </div>

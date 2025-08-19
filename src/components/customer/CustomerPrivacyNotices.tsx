@@ -235,7 +235,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
 
   const NoticeDetailModal = ({ notice, onClose }: { notice: PrivacyNotice; onClose: () => void }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-myslt-card rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -257,10 +257,10 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Document Information</h3>
+              <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Document Information</h3>
               <div className="space-y-3">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Status:</span>
+                  <span className="text-sm font-medium text-myslt-text-muted">Status:</span>
                   <div className="flex items-center space-x-2 mt-1">
                     {getStatusIcon(notice.acceptanceStatus)}
                     <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(notice.acceptanceStatus)}`}>
@@ -269,37 +269,37 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                   </div>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Published:</span>
-                  <p className="text-gray-900">{new Date(notice.publishedDate).toLocaleDateString()}</p>
+                  <span className="text-sm font-medium text-myslt-text-muted">Published:</span>
+                  <p className="text-myslt-text-primary">{new Date(notice.publishedDate).toLocaleDateString()}</p>
                 </div>
                 {notice.acceptedDate && (
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Accepted:</span>
-                    <p className="text-gray-900">{new Date(notice.acceptedDate).toLocaleDateString()}</p>
+                    <span className="text-sm font-medium text-myslt-text-muted">Accepted:</span>
+                    <p className="text-myslt-text-primary">{new Date(notice.acceptedDate).toLocaleDateString()}</p>
                   </div>
                 )}
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Language:</span>
-                  <p className="text-gray-900">{notice.language.toUpperCase()}</p>
+                  <span className="text-sm font-medium text-myslt-text-muted">Language:</span>
+                  <p className="text-myslt-text-primary">{notice.language.toUpperCase()}</p>
                 </div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Details</h3>
+              <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Details</h3>
               <div className="space-y-3">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Jurisdiction:</span>
-                  <p className="text-gray-900">{notice.jurisdiction}</p>
+                  <span className="text-sm font-medium text-myslt-text-muted">Jurisdiction:</span>
+                  <p className="text-myslt-text-primary">{notice.jurisdiction}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Mandatory:</span>
-                  <p className="text-gray-900">{notice.mandatory ? 'Yes' : 'No'}</p>
+                  <span className="text-sm font-medium text-myslt-text-muted">Mandatory:</span>
+                  <p className="text-myslt-text-primary">{notice.mandatory ? 'Yes' : 'No'}</p>
                 </div>
                 {notice.expiryDate && (
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Expires:</span>
-                    <p className="text-gray-900">{new Date(notice.expiryDate).toLocaleDateString()}</p>
+                    <span className="text-sm font-medium text-myslt-text-muted">Expires:</span>
+                    <p className="text-myslt-text-primary">{new Date(notice.expiryDate).toLocaleDateString()}</p>
                   </div>
                 )}
               </div>
@@ -307,17 +307,17 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-900">{notice.description}</p>
+            <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Description</h3>
+            <div className="bg-myslt-service-card p-4 rounded-lg">
+              <p className="text-myslt-text-primary">{notice.description}</p>
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Content</h3>
-            <div className="bg-white border border-gray-200 rounded-lg p-6 max-h-96 overflow-y-auto">
+            <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Content</h3>
+            <div className="bg-myslt-service-card border border-myslt-accent/20 rounded-lg p-6 max-h-96 overflow-y-auto">
               <div className="prose prose-sm max-w-none">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">{notice.content}</p>
+                <p className="text-myslt-text-primary leading-relaxed whitespace-pre-line">{notice.content}</p>
               </div>
             </div>
           </div>
@@ -359,65 +359,65 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('customerDashboard.privacyNotices.title')}</h1>
-          <p className="text-gray-600 mt-2">{t('customerDashboard.privacyNotices.subtitle')}</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">{t('customerDashboard.privacyNotices.title')}</h1>
+          <p className="text-myslt-text-muted mt-2">{t('customerDashboard.privacyNotices.subtitle')}</p>
         </div>
         <LanguageSelector />
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-myslt-card rounded-lg border border-myslt-accent/20 p-4">
           <div className="flex items-center space-x-3">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+            <CheckCircle className="w-8 h-8 text-myslt-success" />
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-myslt-text-primary">
                 {privacyNotices.filter(n => n.acceptanceStatus === 'accepted').length}
               </p>
-              <p className="text-sm text-gray-500">{t('customerDashboard.privacyNotices.accepted')}</p>
+              <p className="text-sm text-myslt-text-muted">{t('customerDashboard.privacyNotices.accepted')}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-myslt-card rounded-lg border border-myslt-accent/20 p-4">
           <div className="flex items-center space-x-3">
             <Clock className="w-8 h-8 text-yellow-600" />
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-myslt-text-primary">
                 {privacyNotices.filter(n => n.acceptanceStatus === 'pending').length}
               </p>
-              <p className="text-sm text-gray-500">{t('customerDashboard.privacyNotices.pendingReview')}</p>
+              <p className="text-sm text-myslt-text-muted">{t('customerDashboard.privacyNotices.pendingReview')}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-myslt-card rounded-lg border border-myslt-accent/20 p-4">
           <div className="flex items-center space-x-3">
-            <Globe className="w-8 h-8 text-blue-600" />
+            <Globe className="w-8 h-8 text-myslt-primary" />
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-myslt-text-primary">
                 {new Set(privacyNotices.map(n => n.language)).size}
               </p>
-              <p className="text-sm text-gray-500">{t('customerDashboard.privacyNotices.languages')}</p>
+              <p className="text-sm text-myslt-text-muted">{t('customerDashboard.privacyNotices.languages')}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-myslt-card rounded-lg border border-myslt-accent/20 p-4">
           <div className="flex items-center space-x-3">
             <AlertTriangle className="w-8 h-8 text-orange-600" />
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-myslt-text-primary">
                 {privacyNotices.filter(n => n.mandatory && n.acceptanceStatus === 'pending').length}
               </p>
-              <p className="text-sm text-gray-500">{t('customerDashboard.privacyNotices.actionRequired')}</p>
+              <p className="text-sm text-myslt-text-muted">{t('customerDashboard.privacyNotices.actionRequired')}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-myslt-text-muted w-5 h-5" />
             <input
               type="text"
               placeholder={t('customerDashboard.privacyNotices.searchPlaceholder')}
@@ -456,14 +456,14 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
       {/* Privacy Notices List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredNotices.map((notice) => (
-          <div key={notice.id} className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div key={notice.id} className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 hover:shadow-md transition-shadow">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   {getStatusIcon(notice.acceptanceStatus)}
                   <div>
-                    <h3 className="font-semibold text-gray-900">{notice.title}</h3>
-                    <p className="text-sm text-gray-500">Version {notice.version} • {notice.category}</p>
+                    <h3 className="font-semibold text-myslt-text-primary">{notice.title}</h3>
+                    <p className="text-sm text-myslt-text-muted">Version {notice.version} • {notice.category}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -478,24 +478,24 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                 </div>
               </div>
               
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{notice.description}</p>
+              <p className="text-sm text-myslt-text-muted mb-4 line-clamp-2">{notice.description}</p>
               
               <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-myslt-text-muted">
                   <Calendar className="w-4 h-4 mr-2" />
                   Published: {new Date(notice.publishedDate).toLocaleDateString()}
                 </div>
                 {notice.acceptedDate && (
-                  <div className="flex items-center text-sm text-gray-500">
+                  <div className="flex items-center text-sm text-myslt-text-muted">
                     <User className="w-4 h-4 mr-2" />
                     Accepted: {new Date(notice.acceptedDate).toLocaleDateString()}
                   </div>
                 )}
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-myslt-text-muted">
                   <MapPin className="w-4 h-4 mr-2" />
                   {notice.jurisdiction}
                 </div>
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-myslt-text-muted">
                   <Globe className="w-4 h-4 mr-2" />
                   {notice.language.toUpperCase()}
                 </div>
@@ -504,7 +504,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
               <div className="flex space-x-2">
                 <button
                   onClick={() => setSelectedNotice(notice)}
-                  className="flex-1 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium flex items-center justify-center space-x-1"
+                  className="flex-1 px-3 py-2 bg-myslt-primary/10 text-myslt-primary rounded-lg hover:bg-myslt-primary/20 transition-colors text-sm font-medium flex items-center justify-center space-x-1"
                 >
                   <Eye className="w-4 h-4" />
                   <span>View</span>
@@ -513,7 +513,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                 {notice.acceptanceStatus === 'pending' && (
                   <button
                     onClick={() => handleAcceptNotice(notice.id)}
-                    className="flex-1 px-3 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium flex items-center justify-center space-x-1"
+                    className="flex-1 px-3 py-2 bg-myslt-success/10 text-myslt-success rounded-lg hover:bg-myslt-success/20 transition-colors text-sm font-medium flex items-center justify-center space-x-1"
                   >
                     <CheckCircle className="w-4 h-4" />
                     <span>Accept</span>

@@ -112,7 +112,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       case 'rejected':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-myslt-text-secondary';
     }
   };
 
@@ -142,7 +142,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       case 'rectification':
         return 'bg-yellow-100 text-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-myslt-text-secondary';
     }
   };
 
@@ -170,19 +170,19 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
 
   if (loading) {
     return (
-      <div className={`bg-white rounded-lg shadow-lg ${className}`}>
+      <div className={`bg-myslt-card-solid rounded-lg shadow-lg ${className}`}>
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <ShieldCheck className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">DSAR Requests</h2>
-              <p className="text-sm text-gray-600">Data Subject Access Requests</p>
+              <h2 className="text-xl font-semibold text-myslt-text-primary">DSAR Requests</h2>
+              <p className="text-sm text-myslt-text-secondary">Data Subject Access Requests</p>
             </div>
           </div>
         </div>
         <div className="flex items-center justify-center py-12">
           <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
-          <span className="ml-2 text-gray-600">Loading DSAR requests...</span>
+          <span className="ml-2 text-myslt-text-secondary">Loading DSAR requests...</span>
         </div>
       </div>
     );
@@ -190,13 +190,13 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
 
   if (error) {
     return (
-      <div className={`bg-white rounded-lg shadow-lg ${className}`}>
+      <div className={`bg-myslt-card-solid rounded-lg shadow-lg ${className}`}>
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <ShieldCheck className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">DSAR Requests</h2>
-              <p className="text-sm text-gray-600">Data Subject Access Requests</p>
+              <h2 className="text-xl font-semibold text-myslt-text-primary">DSAR Requests</h2>
+              <p className="text-sm text-myslt-text-secondary">Data Subject Access Requests</p>
             </div>
           </div>
         </div>
@@ -217,14 +217,14 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg ${className}`}>
+    <div className={`bg-myslt-card-solid rounded-lg shadow-lg ${className}`}>
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <ShieldCheck className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">DSAR Requests</h2>
-              <p className="text-sm text-gray-600">
+              <h2 className="text-xl font-semibold text-myslt-text-primary">DSAR Requests</h2>
+              <p className="text-sm text-myslt-text-secondary">
                 {customerId ? `DSAR requests for customer: ${customerId}` : 'Data Subject Access Requests'}
               </p>
             </div>
@@ -242,7 +242,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       {requests && requests.length === 0 ? (
         <div className="text-center py-12">
           <ShieldCheck className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600">No DSAR requests found.</p>
+          <p className="text-myslt-text-secondary">No DSAR requests found.</p>
           <p className="text-sm text-gray-500 mt-1">
             {customerId ? 'This customer has no DSAR requests.' : 'No DSAR requests exist in the system.'}
           </p>
@@ -254,7 +254,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
             const isOverdue = daysRemaining < 0;
             
             return (
-              <div key={request.id} className="p-6 hover:bg-gray-50">
+              <div key={request.id} className="p-6 hover:bg-myslt-service-card">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-3">
@@ -274,17 +274,17 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                     </div>
                     
                     <div className="space-y-2">
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center space-x-4 text-sm text-myslt-text-secondary">
                         <span><strong>Request ID:</strong> {request.id}</span>
                         <span><strong>Customer:</strong> {request.partyId}</span>
                       </div>
                       
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center space-x-4 text-sm text-myslt-text-secondary">
                         <span className="flex items-center">
                           <Calendar className="w-4 h-4 mr-1" />
                           Submitted: {formatDate(request.submittedAt)}
                         </span>
-                        <span className={`${isOverdue ? 'text-red-600' : daysRemaining <= 7 ? 'text-yellow-600' : 'text-gray-600'}`}>
+                        <span className={`${isOverdue ? 'text-red-600' : daysRemaining <= 7 ? 'text-yellow-600' : 'text-myslt-text-secondary'}`}>
                           {isOverdue ? `${Math.abs(daysRemaining)} days overdue` : `${daysRemaining} days remaining`}
                         </span>
                       </div>
@@ -339,7 +339,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                     {processing === request.id && (
                       <div className="flex items-center space-x-2">
                         <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />
-                        <span className="text-sm text-gray-600">Processing...</span>
+                        <span className="text-sm text-myslt-text-secondary">Processing...</span>
                       </div>
                     )}
                   </div>

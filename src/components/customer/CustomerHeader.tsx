@@ -8,21 +8,20 @@ interface CustomerHeaderProps {
   customerName: string;
   onLogout: () => void;
   onProfileClick?: () => void;
-  onProfileClick?: () => void;
 }
 
 const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout, onProfileClick }) => {
   const { t } = useTranslation();
   
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-200">
+    <header className="bg-myslt-primary shadow-lg sticky top-0 z-40 border-b border-myslt-accent/20">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Text - Logo moved to sidebar */}
           <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-shrink-0">
             <div className="min-w-0">
-              <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">{t('customerDashboard.brand')}</h1>
-              <p className="text-xs sm:text-sm text-gray-500">{t('customerDashboard.subtitle')}</p>
+              <h1 className="text-lg sm:text-xl font-bold text-myslt-text-primary truncate">{t('customerDashboard.brand')}</h1>
+              <p className="text-xs sm:text-sm text-myslt-text-secondary">{t('customerDashboard.subtitle')}</p>
             </div>
           </div>
 
@@ -39,12 +38,12 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout,
             {/* User Profile */}
             <div className="flex items-center gap-2">
               <div className="hidden sm:flex flex-col text-right min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate max-w-[8rem] lg:max-w-[12rem]">{customerName}</p>
-                <p className="text-xs text-gray-500">{t('customerDashboard.userRole')}</p>
+                <p className="text-sm font-medium text-myslt-text-primary truncate max-w-[8rem] lg:max-w-[12rem]">{customerName}</p>
+                <p className="text-xs text-myslt-text-secondary">{t('customerDashboard.userRole')}</p>
               </div>
-              <div className="w-8 h-8 sm:w-9 sm:h-9 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <button type="button" onClick={onProfileClick} className="w-8 h-8 sm:w-9 sm:h-9 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              <div className="w-8 h-8 sm:w-9 sm:h-9 bg-myslt-accent rounded-full flex items-center justify-center flex-shrink-0">
+                <button type="button" onClick={onProfileClick} className="w-8 h-8 sm:w-9 sm:h-9 bg-myslt-accent rounded-full flex items-center justify-center flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-myslt-success hover:bg-myslt-accent/80 transition-all duration-200">
+                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-myslt-text-primary" />
                 </button>
               </div>
             </div>
@@ -53,7 +52,7 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout,
             <div className="flex items-center">
               <button
                 onClick={onLogout}
-                className="flex items-center gap-1 sm:gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex items-center gap-1 sm:gap-2 px-3 py-2 text-sm font-medium text-myslt-text-primary bg-myslt-card hover:bg-myslt-accent rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-myslt-success"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">{t('common.logout')}</span>

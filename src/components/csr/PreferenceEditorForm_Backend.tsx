@@ -224,20 +224,20 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Communication Preferences</h1>
-          <p className="text-gray-600 mt-2">Manage customer communication preferences and settings</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">Communication Preferences</h1>
+          <p className="text-myslt-text-secondary mt-2">Manage customer communication preferences and settings</p>
         </div>
       </div>
 
       {/* Customer Selection */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20">
+        <div className="p-6 border-b border-myslt-accent/20">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <User className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Customer Selection</h2>
+              <h2 className="text-lg font-semibold text-myslt-text-primary">Customer Selection</h2>
               <p className="text-sm text-gray-500">Search and select a customer to manage preferences</p>
             </div>
           </div>
@@ -257,7 +257,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 />
               </div>
               {searchTerm && (
-                <div className="mt-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
+                <div className="mt-2 max-h-60 overflow-y-auto border border-myslt-accent/20 rounded-lg">
                   {filteredCustomers.map(customer => (
                     <div
                       key={customer.id}
@@ -265,7 +265,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                         setSelectedCustomer(customer.id);
                         setSearchTerm('');
                       }}
-                      className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      className="p-3 hover:bg-myslt-service-card cursor-pointer border-b border-myslt-border last:border-b-0"
                     >
                       <div className="flex items-center space-x-3">
                         <User className="w-4 h-4 text-gray-500" />
@@ -319,14 +319,14 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       {selectedCustomer && !loading ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Communication Channels */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20">
+            <div className="p-6 border-b border-myslt-accent/20">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                   <Bell className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Communication Channels</h2>
+                  <h2 className="text-lg font-semibold text-myslt-text-primary">Communication Channels</h2>
                   <p className="text-sm text-gray-500">Choose how the customer receives notifications</p>
                 </div>
               </div>
@@ -343,9 +343,9 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 return (
                   <div key={channel.key} className={`flex items-center justify-between py-4 ${index < 4 ? 'border-b border-gray-100' : ''}`}>
                     <div className="flex items-center space-x-3">
-                      <Icon className="w-5 h-5 text-gray-600" />
+                      <Icon className="w-5 h-5 text-myslt-text-secondary" />
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{channel.label}</p>
+                        <p className="text-sm font-medium text-myslt-text-primary">{channel.label}</p>
                         <p className="text-xs text-gray-500">{channel.desc}</p>
                       </div>
                     </div>
@@ -357,7 +357,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                       } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                     >
                       <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        className={`inline-block h-4 w-4 transform rounded-full bg-myslt-card-solid transition-transform ${
                           preferences.channels[channel.key] ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
@@ -369,14 +369,14 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
           </div>
 
           {/* Topic Subscriptions */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20">
+            <div className="p-6 border-b border-myslt-accent/20">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                   <Settings className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Topic Preferences</h2>
+                  <h2 className="text-lg font-semibold text-myslt-text-primary">Topic Preferences</h2>
                   <p className="text-sm text-gray-500">Control what types of content the customer receives</p>
                 </div>
               </div>
@@ -392,7 +392,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
               ].map((topic, index) => (
                 <div key={topic.key} className={`flex items-center justify-between py-4 ${index < 5 ? 'border-b border-gray-100' : ''}`}>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{topic.label}</p>
+                    <p className="text-sm font-medium text-myslt-text-primary">{topic.label}</p>
                     <p className="text-xs text-gray-500">{topic.desc}</p>
                   </div>
                   <button
@@ -403,7 +403,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      className={`inline-block h-4 w-4 transform rounded-full bg-myslt-card-solid transition-transform ${
                         preferences.topics[topic.key] ? 'translate-x-6' : 'translate-x-1'
                       }`}
                     />
@@ -414,19 +414,19 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
           </div>
         </div>
       ) : selectedCustomer && loading ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading preferences...</p>
+            <p className="text-myslt-text-secondary">Loading preferences...</p>
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-12">
           <div className="text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-myslt-service-card rounded-full flex items-center justify-center mx-auto mb-4">
               <Settings className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Customer Selected</h3>
+            <h3 className="text-lg font-medium text-myslt-text-primary mb-2">No Customer Selected</h3>
             <p className="text-gray-500">Select a customer to view and edit their communication preferences</p>
           </div>
         </div>
@@ -436,8 +436,8 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       {selectedCustomer && !loading && (
         <div className="space-y-6">
           {/* Do Not Disturb Settings */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20">
+            <div className="p-6 border-b border-myslt-accent/20">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                   {preferences.dndSettings.enabled ? (
@@ -447,7 +447,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   )}
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Do Not Disturb</h2>
+                  <h2 className="text-lg font-semibold text-myslt-text-primary">Do Not Disturb</h2>
                   <p className="text-sm text-gray-500">Control quiet hours for non-urgent notifications</p>
                 </div>
               </div>
@@ -456,7 +456,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
               <div className="space-y-4">
                 <div className="flex items-center justify-between py-4 border-b border-gray-100">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Enable Do Not Disturb</p>
+                    <p className="text-sm font-medium text-myslt-text-primary">Enable Do Not Disturb</p>
                     <p className="text-xs text-gray-500">Pause non-urgent notifications during specified hours</p>
                   </div>
                   <button
@@ -467,7 +467,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      className={`inline-block h-4 w-4 transform rounded-full bg-myslt-card-solid transition-transform ${
                         preferences.dndSettings.enabled ? 'translate-x-6' : 'translate-x-1'
                       }`}
                     />
@@ -486,7 +486,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                         value={preferences.dndSettings.startTime}
                         onChange={(e) => isEditing && updateDndSettings('startTime', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-myslt-service-card"
                       />
                     </div>
                     <div>
@@ -499,7 +499,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                         value={preferences.dndSettings.endTime}
                         onChange={(e) => isEditing && updateDndSettings('endTime', e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-myslt-service-card"
                       />
                     </div>
                   </div>
@@ -511,14 +511,14 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
           {/* Frequency Control & Language Settings */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Frequency Control */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
+            <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20">
+              <div className="p-6 border-b border-myslt-accent/20">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                     <RefreshCw className="w-5 h-5 text-orange-600" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Frequency Control</h2>
+                    <h2 className="text-lg font-semibold text-myslt-text-primary">Frequency Control</h2>
                     <p className="text-sm text-gray-500">Manage communication limits</p>
                   </div>
                 </div>
@@ -533,7 +533,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     value={preferences.frequency.maxEmailsPerDay}
                     onChange={(e) => isEditing && updateFrequencySettings('maxEmailsPerDay', parseInt(e.target.value))}
                     disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-myslt-service-card"
                   />
                 </div>
                 <div>
@@ -545,13 +545,13 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     value={preferences.frequency.maxSmsPerDay}
                     onChange={(e) => isEditing && updateFrequencySettings('maxSmsPerDay', parseInt(e.target.value))}
                     disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-myslt-service-card"
                   />
                 </div>
                 
                 <div className="flex items-center justify-between py-4 border-t border-gray-100">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Digest Mode</p>
+                    <p className="text-sm font-medium text-myslt-text-primary">Digest Mode</p>
                     <p className="text-xs text-gray-500">Bundle notifications into daily summaries</p>
                   </div>
                   <button
@@ -562,7 +562,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      className={`inline-block h-4 w-4 transform rounded-full bg-myslt-card-solid transition-transform ${
                         preferences.frequency.digestMode ? 'translate-x-6' : 'translate-x-1'
                       }`}
                     />
@@ -572,14 +572,14 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
             </div>
 
             {/* Language & Timezone */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
+            <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20">
+              <div className="p-6 border-b border-myslt-accent/20">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
                     <Globe className="w-5 h-5 text-indigo-600" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Language & Region</h2>
+                    <h2 className="text-lg font-semibold text-myslt-text-primary">Language & Region</h2>
                     <p className="text-sm text-gray-500">Localization preferences</p>
                   </div>
                 </div>
@@ -591,7 +591,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     value={preferences.language}
                     onChange={(e) => isEditing && setPreferences((prev: any) => ({ ...prev, language: e.target.value }))}
                     disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-myslt-service-card"
                   >
                     <option value="en">English</option>
                     <option value="si">Sinhala</option>
@@ -604,7 +604,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     value={preferences.timezone}
                     onChange={(e) => isEditing && setPreferences((prev: any) => ({ ...prev, timezone: e.target.value }))}
                     disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-myslt-service-card"
                   >
                     <option value="Asia/Colombo">Asia/Colombo (UTC+05:30)</option>
                     <option value="UTC">UTC (UTC+00:00)</option>
@@ -624,7 +624,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   setHasChanges(false);
                   loadPreferences(); // Reload to reset changes
                 }}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="px-6 py-2 border border-gray-300 text-myslt-text-secondary rounded-lg hover:bg-myslt-service-card"
               >
                 Cancel
               </button>

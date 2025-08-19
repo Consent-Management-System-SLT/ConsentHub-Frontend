@@ -1,3 +1,121 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* SLT Mobitel Theme Styles */
+@layer components {
+  /* Card Components */
+  .myslt-card {
+    @apply bg-myslt-card rounded-xl shadow-lg border border-myslt-accent/20;
+  }
+  
+  .myslt-card-hover {
+    @apply myslt-card hover:shadow-xl transition-all duration-200;
+  }
+
+  /* Button Components */
+  .myslt-btn-primary {
+    @apply bg-success-gradient text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-myslt-success/50;
+  }
+  
+  .myslt-btn-secondary {
+    @apply bg-myslt-card text-myslt-text-primary px-4 py-2 rounded-lg font-medium hover:bg-myslt-accent transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-myslt-success/50;
+  }
+
+  /* Text Components */
+  .myslt-heading {
+    @apply text-myslt-text-primary font-bold;
+  }
+  
+  .myslt-subheading {
+    @apply text-myslt-text-secondary font-medium;
+  }
+  
+  .myslt-text {
+    @apply text-myslt-text-muted;
+  }
+
+  /* Status Indicators */
+  .myslt-status-active {
+    @apply bg-myslt-success/10 text-myslt-success px-2 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .myslt-status-pending {
+    @apply bg-myslt-accent/30 text-myslt-text-primary px-2 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .myslt-status-inactive {
+    @apply bg-myslt-text-muted/20 text-myslt-text-muted px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  /* Gradient Backgrounds */
+  .myslt-gradient-bg {
+    @apply bg-myslt-gradient;
+  }
+  
+  .myslt-success-bg {
+    @apply bg-success-gradient;
+  }
+
+  /* Input Components */
+  .myslt-input {
+    @apply bg-myslt-card border border-myslt-accent/30 rounded-lg px-3 py-2 text-myslt-text-primary placeholder-myslt-text-muted focus:outline-none focus:ring-2 focus:ring-myslt-success/50 focus:border-myslt-success/50 transition-all duration-200;
+  }
+
+  /* Layout Components */
+  .myslt-container {
+    @apply bg-myslt-background min-h-screen;
+  }
+  
+  .myslt-sidebar {
+    @apply bg-myslt-card border-r border-myslt-accent/20;
+  }
+  
+  .myslt-header {
+    @apply bg-myslt-primary shadow-lg border-b border-myslt-accent/20;
+  }
+}
+
+/* SLT Mobitel Theme Utilities - Matching Screenshot Colors */
+@layer utilities {
+  /* Background Colors */
+  .bg-myslt-background { background-color: #1a365d; }
+  .bg-myslt-card { background-color: rgba(59, 130, 246, 0.15); }
+  .bg-myslt-card-solid { background-color: #2d5aa0; }
+  .bg-myslt-primary { background-color: #1e90ff; }
+  .bg-myslt-primary-dark { background-color: #1a365d; }
+  .bg-myslt-accent { background-color: #3b82f6; }
+  .bg-myslt-success { background-color: #00d084; }
+  
+  /* Text Colors */
+  .text-myslt-text-primary { color: #ffffff; }
+  .text-myslt-text-secondary { color: #e2e8f0; }
+  .text-myslt-text-muted { color: #94a3b8; }
+  .text-myslt-text-accent { color: #60a5fa; }
+  
+  /* Border Colors */
+  .border-myslt-accent { border-color: #3b82f6; }
+  .border-myslt-primary { border-color: #1e90ff; }
+  
+  /* SLT Style Card Effects */
+  .myslt-card-glow {
+    box-shadow: 0 4px 20px rgba(30, 144, 255, 0.1), 
+                0 8px 32px rgba(59, 130, 246, 0.05);
+  }
+  
+  .myslt-card-hover-effect:hover {
+    background-color: rgba(59, 130, 246, 0.2);
+    box-shadow: 0 8px 32px rgba(30, 144, 255, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  /* Gradient Backgrounds matching SLT screenshots */
+  .bg-myslt-card-gradient {
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
+  }
+  
+  .bg-myslt-service-card {
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.2) 0%, rgba(37, 99, 235, 0.15) 100%);
+    backdrop-filter: blur(10px);
+  }
+}

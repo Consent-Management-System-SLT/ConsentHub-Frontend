@@ -66,13 +66,13 @@ const UserManagement: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border">
+    <div className="bg-myslt-card rounded-lg shadow-sm border border-myslt-accent/20">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Users className="h-6 w-6 text-blue-600" />
+            <Users className="h-6 w-6 text-myslt-primary" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Registered Users</h2>
+              <h2 className="text-xl font-semibold text-myslt-text-primary">Registered Users</h2>
               <p className="text-sm text-gray-600">All users who have created accounts in the system</p>
             </div>
           </div>
@@ -98,12 +98,12 @@ const UserManagement: React.FC = () => {
           </div>
         ) : (
           users.map((user) => (
-            <div key={user.id} className="p-6 hover:bg-gray-50 transition-colors">
+            <div key={user.id} className="p-6 hover:bg-myslt-service-card transition-colors">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-3">
-                    <div className="bg-blue-100 rounded-full p-2">
-                      <Users className="h-5 w-5 text-blue-600" />
+                    <div className="bg-myslt-service-card rounded-full p-2">
+                      <Users className="h-5 w-5 text-myslt-primary" />
                     </div>
                     <div>
                       <h3 className="text-lg font-medium text-gray-900">{user.name}</h3>
@@ -140,7 +140,7 @@ const UserManagement: React.FC = () => {
                 
                 <button
                   onClick={() => window.open(`/dashboard`, '_blank')}
-                  className="ml-4 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="ml-4 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-myslt-card hover:bg-myslt-service-card focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-myslt-primary"
                 >
                   <Eye className="h-4 w-4 mr-1" />
                   View Dashboard
@@ -151,7 +151,7 @@ const UserManagement: React.FC = () => {
         )}
       </div>
 
-      <div className="p-6 bg-gray-50 border-t">
+      <div className="p-6 bg-myslt-background border-t">
         <div className="text-center">
           <p className="text-sm text-gray-600 mb-2">
             <strong>Multi-User System Active</strong> - Each user has their own secure account and dashboard

@@ -227,7 +227,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
   );
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 ${className}`}>
+    <div className={`bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border ${className}`}>
       {/* Header */}
       <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-purple-100">
         <div className="flex items-center space-x-3">
@@ -263,7 +263,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                       setSelectedCustomer(customer.id);
                       setSearchTerm('');
                     }}
-                    className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                    className="p-3 hover:bg-myslt-service-card cursor-pointer border-b border-myslt-border last:border-b-0"
                   >
                     <div className="flex items-center space-x-3">
                       <User className="w-4 h-4 text-gray-500" />
@@ -548,7 +548,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   setHasChanges(false);
                   loadPreferences(); // Reload to reset changes
                 }}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="px-6 py-2 border border-gray-300 text-myslt-text-secondary rounded-lg hover:bg-myslt-service-card"
               >
                 Cancel
               </button>

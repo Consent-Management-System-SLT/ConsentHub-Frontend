@@ -187,7 +187,7 @@ const DSARManager: React.FC = () => {
       case 'rejected':
         return <XCircle className="w-4 h-4 text-red-600" />;
       default:
-        return <AlertCircle className="w-4 h-4 text-gray-600" />;
+        return <AlertCircle className="w-4 h-4 text-myslt-text-secondary" />;
     }
   };
 
@@ -202,7 +202,7 @@ const DSARManager: React.FC = () => {
       case 'rejected':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-gray-800';
     }
   };
 
@@ -217,7 +217,7 @@ const DSARManager: React.FC = () => {
       case 'low':
         return 'bg-green-100 text-green-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-gray-800';
     }
   };
 
@@ -234,7 +234,7 @@ const DSARManager: React.FC = () => {
       case 'restriction':
         return 'bg-yellow-100 text-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-gray-800';
     }
   };
 
@@ -249,7 +249,7 @@ const DSARManager: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden w-full">
+    <div className="min-h-screen bg-myslt-service-card overflow-x-hidden w-full">
       {/* Server Connection Alert */}
       {showConnectionAlert && (
         <ServerConnectionAlert 
@@ -264,22 +264,22 @@ const DSARManager: React.FC = () => {
         <div className="flex flex-col space-y-4 mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">DSAR Requests</h1>
-              <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Manage Data Subject Access Requests</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-myslt-text-primary">DSAR Requests</h1>
+              <p className="text-myslt-text-secondary mt-1 sm:mt-2 text-sm sm:text-base">Manage Data Subject Access Requests</p>
             </div>
             
             {/* Desktop Actions */}
             <div className="hidden sm:flex items-center space-x-3">
               <button 
                 onClick={handleExportRequests}
-                className="px-3 sm:px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2"
+                className="px-3 sm:px-4 py-2 bg-myslt-card-solid border border-myslt-border rounded-lg hover:bg-myslt-service-card transition-colors flex items-center space-x-2"
               >
                 <Download className="w-4 h-4 text-gray-500" />
                 <span className="text-sm font-medium text-gray-700 hidden sm:inline">Export</span>
               </button>
               {selectedRequests.size > 0 && (
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600 hidden lg:inline">{selectedRequests.size} selected</span>
+                  <span className="text-sm text-myslt-text-secondary hidden lg:inline">{selectedRequests.size} selected</span>
                   <select 
                     onChange={(e) => {
                       if (e.target.value) {
@@ -308,7 +308,7 @@ const DSARManager: React.FC = () => {
             <div className="flex items-center space-x-1 flex-1 min-w-0">
               <button 
                 onClick={handleExportRequests}
-                className="flex-1 px-2 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center space-x-1 min-w-0"
+                className="flex-1 px-2 py-2 bg-myslt-card-solid border border-myslt-border rounded-lg hover:bg-myslt-service-card transition-colors flex items-center justify-center space-x-1 min-w-0"
               >
                 <Download className="w-4 h-4 text-gray-500 flex-shrink-0" />
                 <span className="text-xs font-medium text-gray-700 truncate">Export</span>
@@ -321,7 +321,7 @@ const DSARManager: React.FC = () => {
                       e.target.value = '';
                     }
                   }}
-                  className="px-2 py-2 border border-gray-300 rounded-lg text-xs bg-white min-w-0 max-w-24"
+                  className="px-2 py-2 border border-myslt-border rounded-lg text-xs bg-myslt-card-solid min-w-0 max-w-24"
                 >
                   <option value="">Assign ({selectedRequests.size})</option>
                   {staffMembers.map(member => (
@@ -338,10 +338,10 @@ const DSARManager: React.FC = () => {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-6 mb-6 sm:mb-8 w-full overflow-hidden">
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 lg:p-6 min-w-0">
+          <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border p-3 sm:p-4 lg:p-6 min-w-0">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Pending</p>
+                <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Pending</p>
                 <p className="text-lg sm:text-2xl font-bold text-yellow-600 truncate">
                   {requests.filter(r => r.status === 'pending').length}
                 </p>
@@ -352,10 +352,10 @@ const DSARManager: React.FC = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 lg:p-6 min-w-0">
+          <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border p-3 sm:p-4 lg:p-6 min-w-0">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">In Progress</p>
+                <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">In Progress</p>
                 <p className="text-lg sm:text-2xl font-bold text-blue-600 truncate">
                   {requests.filter(r => r.status === 'in-progress').length}
                 </p>
@@ -366,10 +366,10 @@ const DSARManager: React.FC = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 lg:p-6 min-w-0">
+          <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border p-3 sm:p-4 lg:p-6 min-w-0">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Completed</p>
+                <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Completed</p>
                 <p className="text-lg sm:text-2xl font-bold text-green-600 truncate">
                   {requests.filter(r => r.status === 'completed').length}
                 </p>
@@ -380,10 +380,10 @@ const DSARManager: React.FC = () => {
             </div>
           </div>
           
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 lg:p-6 min-w-0">
+          <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border p-3 sm:p-4 lg:p-6 min-w-0">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Urgent</p>
+                <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Urgent</p>
                 <p className="text-lg sm:text-2xl font-bold text-red-600 truncate">
                   {requests.filter(r => r.priority === 'urgent').length}
                 </p>
@@ -396,7 +396,7 @@ const DSARManager: React.FC = () => {
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8 w-full overflow-hidden">
+        <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border p-4 sm:p-6 mb-6 sm:mb-8 w-full overflow-hidden">
           {/* Search Bar */}
           <div className="mb-4">
             <div className="relative w-full">
@@ -418,7 +418,7 @@ const DSARManager: React.FC = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-3 py-3 sm:py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent text-base sm:text-sm min-w-0"
+                  className="w-full appearance-none bg-myslt-card-solid border border-gray-300 rounded-lg px-3 py-3 sm:py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent text-base sm:text-sm min-w-0"
                 >
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
@@ -433,7 +433,7 @@ const DSARManager: React.FC = () => {
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
-                  className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-3 py-3 sm:py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent text-base sm:text-sm min-w-0"
+                  className="w-full appearance-none bg-myslt-card-solid border border-gray-300 rounded-lg px-3 py-3 sm:py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent text-base sm:text-sm min-w-0"
                 >
                   <option value="all">All Types</option>
                   <option value="access">Access</option>
@@ -449,7 +449,7 @@ const DSARManager: React.FC = () => {
                 <select
                   value={priorityFilter}
                   onChange={(e) => setPriorityFilter(e.target.value)}
-                  className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-3 py-3 sm:py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent text-base sm:text-sm min-w-0"
+                  className="w-full appearance-none bg-myslt-card-solid border border-gray-300 rounded-lg px-3 py-3 sm:py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent text-base sm:text-sm min-w-0"
                 >
                   <option value="all">All Priorities</option>
                   <option value="urgent">Urgent</option>
@@ -462,8 +462,8 @@ const DSARManager: React.FC = () => {
             </div>
             
             <div className="mt-3 sm:mt-0 sm:ml-4 flex-shrink-0">
-              <button className="w-full sm:w-auto px-4 py-3 sm:py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center space-x-2 text-base sm:text-sm">
-                <Filter className="w-4 h-4 text-gray-600" />
+              <button className="w-full sm:w-auto px-4 py-3 sm:py-2 bg-myslt-service-card hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center space-x-2 text-base sm:text-sm">
+                <Filter className="w-4 h-4 text-myslt-text-secondary" />
                 <span className="font-medium text-gray-700">More Filters</span>
               </button>
             </div>
@@ -471,12 +471,12 @@ const DSARManager: React.FC = () => {
         </div>
 
         {/* Requests Display - Desktop Table and Mobile Cards */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full">
+        <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border overflow-hidden w-full">
           {/* Desktop Table View */}
           <div className="hidden lg:block w-full overflow-hidden">
             <div className="w-full">
               <table className="w-full table-fixed">
-                <thead className="bg-gray-50">
+                <thead className="bg-myslt-service-card">
                   <tr>
                     <th className="w-24 px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
                       ID
@@ -504,22 +504,22 @@ const DSARManager: React.FC = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-myslt-card-solid divide-y divide-gray-200">
                   {filteredRequests.map((request) => (
-                    <tr key={request.id} className="hover:bg-gray-50">
+                    <tr key={request.id} className="hover:bg-myslt-service-card">
                       <td className="px-3 py-4 w-24 overflow-hidden">
-                        <div className="text-sm font-medium text-gray-900 truncate">{request.id}</div>
+                        <div className="text-sm font-medium text-myslt-text-primary truncate">{request.id}</div>
                         <div className="text-xs text-gray-500 truncate">
                           {new Date(request.requestDate).toLocaleDateString()}
                         </div>
                       </td>
                       <td className="px-3 py-4 w-52 overflow-hidden">
                         <div className="flex items-center min-w-0">
-                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <User className="w-4 h-4 text-gray-600" />
+                          <div className="w-8 h-8 bg-myslt-service-card rounded-full flex items-center justify-center flex-shrink-0">
+                            <User className="w-4 h-4 text-myslt-text-secondary" />
                           </div>
                           <div className="ml-2 min-w-0 flex-1">
-                            <div className="text-sm font-medium text-gray-900 truncate">{request.customerName}</div>
+                            <div className="text-sm font-medium text-myslt-text-primary truncate">{request.customerName}</div>
                             <div className="text-xs text-gray-500 truncate">{request.email}</div>
                           </div>
                         </div>
@@ -542,13 +542,13 @@ const DSARManager: React.FC = () => {
                           {request.priority}
                         </span>
                       </td>
-                      <td className="px-3 py-4 w-24 overflow-hidden text-sm text-gray-900">
+                      <td className="px-3 py-4 w-24 overflow-hidden text-sm text-myslt-text-primary">
                         <div className="flex items-center min-w-0">
                           <Calendar className="w-3 h-3 text-gray-400 mr-1 flex-shrink-0" />
                           <span className="text-xs truncate">{new Date(request.dueDate).toLocaleDateString()}</span>
                         </div>
                       </td>
-                      <td className="px-3 py-4 w-28 overflow-hidden text-sm text-gray-900">
+                      <td className="px-3 py-4 w-28 overflow-hidden text-sm text-myslt-text-primary">
                         <span className="truncate block">
                           {request.assignedTo || (
                             <span className="text-gray-400">Unassigned</span>
@@ -563,7 +563,7 @@ const DSARManager: React.FC = () => {
                           <button className="text-green-600 hover:text-green-900 p-1 hover:bg-green-50 rounded">
                             <MessageSquare className="w-3 h-3" />
                           </button>
-                          <button className="text-gray-600 hover:text-gray-900 p-1 hover:bg-gray-50 rounded">
+                          <button className="text-myslt-text-secondary hover:text-myslt-text-primary p-1 hover:bg-myslt-service-card rounded">
                             <Archive className="w-3 h-3" />
                           </button>
                         </div>
@@ -582,11 +582,11 @@ const DSARManager: React.FC = () => {
                 {/* Header Row */}
                 <div className="flex items-center justify-between min-w-0">
                   <div className="flex items-center space-x-3 min-w-0 flex-1">
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <User className="w-5 h-5 text-gray-600" />
+                    <div className="w-10 h-10 bg-myslt-service-card rounded-full flex items-center justify-center flex-shrink-0">
+                      <User className="w-5 h-5 text-myslt-text-secondary" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-base sm:text-lg font-semibold text-gray-900 truncate">{request.id}</div>
+                      <div className="text-base sm:text-lg font-semibold text-myslt-text-primary truncate">{request.id}</div>
                       <div className="text-sm text-gray-500 truncate">{request.customerName}</div>
                     </div>
                   </div>
@@ -613,31 +613,31 @@ const DSARManager: React.FC = () => {
                 {/* Details Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm w-full">
                   <div className="min-w-0">
-                    <span className="font-medium text-gray-600">Email:</span>
-                    <span className="ml-2 text-gray-900 break-all">{request.email}</span>
+                    <span className="font-medium text-myslt-text-secondary">Email:</span>
+                    <span className="ml-2 text-myslt-text-primary break-all">{request.email}</span>
                   </div>
                   <div className="min-w-0">
-                    <span className="font-medium text-gray-600">Type:</span>
+                    <span className="font-medium text-myslt-text-secondary">Type:</span>
                     <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${getTypeColor(request.requestType)}`}>
                       {request.requestType}
                     </span>
                   </div>
                   <div className="min-w-0">
-                    <span className="font-medium text-gray-600">Request Date:</span>
-                    <span className="ml-2 text-gray-900">
+                    <span className="font-medium text-myslt-text-secondary">Request Date:</span>
+                    <span className="ml-2 text-myslt-text-primary">
                       {new Date(request.requestDate).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="min-w-0">
-                    <span className="font-medium text-gray-600">Due Date:</span>
-                    <span className="ml-2 text-gray-900 flex items-center">
+                    <span className="font-medium text-myslt-text-secondary">Due Date:</span>
+                    <span className="ml-2 text-myslt-text-primary flex items-center">
                       <Calendar className="w-4 h-4 text-gray-400 mr-1 flex-shrink-0" />
                       <span className="truncate">{new Date(request.dueDate).toLocaleDateString()}</span>
                     </span>
                   </div>
                   <div className="sm:col-span-2 min-w-0">
-                    <span className="font-medium text-gray-600">Assigned To:</span>
-                    <span className="ml-2 text-gray-900 truncate">
+                    <span className="font-medium text-myslt-text-secondary">Assigned To:</span>
+                    <span className="ml-2 text-myslt-text-primary truncate">
                       {request.assignedTo || <span className="text-gray-400">Unassigned</span>}
                     </span>
                   </div>
@@ -646,7 +646,7 @@ const DSARManager: React.FC = () => {
                 {/* Description */}
                 {request.description && (
                   <div className="min-w-0">
-                    <span className="font-medium text-gray-600">Description:</span>
+                    <span className="font-medium text-myslt-text-secondary">Description:</span>
                     <p className="mt-1 text-sm text-gray-700 break-words">{request.description}</p>
                   </div>
                 )}
@@ -665,7 +665,7 @@ const DSARManager: React.FC = () => {
                       <MessageSquare className="w-4 h-4 flex-shrink-0" />
                       <span className="hidden sm:inline">Comment</span>
                     </button>
-                    <button className="flex items-center space-x-1 text-gray-600 hover:text-gray-700 text-sm font-medium">
+                    <button className="flex items-center space-x-1 text-myslt-text-secondary hover:text-gray-700 text-sm font-medium">
                       <Archive className="w-4 h-4 flex-shrink-0" />
                       <span className="hidden sm:inline">Archive</span>
                     </button>
@@ -682,13 +682,13 @@ const DSARManager: React.FC = () => {
             Showing {filteredRequests.length} of {requests.length} requests
           </div>
           <div className="flex items-center space-x-2 flex-shrink-0">
-            <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
+            <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-myslt-service-card transition-colors text-sm font-medium">
               Previous
             </button>
             <button className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
               1
             </button>
-            <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
+            <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-myslt-service-card transition-colors text-sm font-medium">
               Next
             </button>
           </div>

@@ -109,15 +109,15 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'granted':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-myslt-success/10 text-myslt-success border-myslt-success/20';
       case 'revoked':
         return 'bg-red-100 text-red-800 border-red-200';
       case 'expired':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-myslt-service-card text-myslt-text-muted border-myslt-accent/30';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-myslt-service-card text-myslt-text-muted border-myslt-accent/30';
     }
   };
 
@@ -145,8 +145,8 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
 
   const ConsentDetailModal = ({ consent, onClose }: { consent: Consent; onClose: () => void }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-2xl">
+      <div className="bg-myslt-card rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-myslt-accent/20 shadow-xl">
+        <div className="p-6 border-b border-myslt-accent/20 bg-myslt-gradient text-white rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Shield className="w-8 h-8" />
@@ -167,10 +167,10 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Basic Information</h3>
+              <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Basic Information</h3>
               <div className="space-y-3">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Status:</span>
+                  <span className="text-sm font-medium text-myslt-text-muted">Status:</span>
                   <div className="flex items-center space-x-2 mt-1">
                     {getStatusIcon(consent.status)}
                     <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(consent.status)}`}>
@@ -179,45 +179,45 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                   </div>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Channel:</span>
-                  <p className="text-gray-900">{consent.channel}</p>
+                  <span className="text-sm font-medium text-myslt-text-muted">Channel:</span>
+                  <p className="text-myslt-text-primary">{consent.channel}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Jurisdiction:</span>
-                  <p className="text-gray-900">{consent.jurisdiction}</p>
+                  <span className="text-sm font-medium text-myslt-text-muted">Jurisdiction:</span>
+                  <p className="text-myslt-text-primary">{consent.jurisdiction}</p>
                 </div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Validity Period</h3>
+              <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Validity Period</h3>
               <div className="space-y-3">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Valid From:</span>
-                  <p className="text-gray-900">{new Date(consent.validFrom).toLocaleDateString()}</p>
+                  <span className="text-sm font-medium text-myslt-text-muted">Valid From:</span>
+                  <p className="text-myslt-text-primary">{new Date(consent.validFrom).toLocaleDateString()}</p>
                 </div>
                 {consent.validUntil && (
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Valid Until:</span>
-                    <p className="text-gray-900">{new Date(consent.validUntil).toLocaleDateString()}</p>
+                    <span className="text-sm font-medium text-myslt-text-muted">Valid Until:</span>
+                    <p className="text-myslt-text-primary">{new Date(consent.validUntil).toLocaleDateString()}</p>
                   </div>
                 )}
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Last Updated:</span>
-                  <p className="text-gray-900">{new Date(consent.lastUpdated).toLocaleDateString()}</p>
+                  <span className="text-sm font-medium text-myslt-text-muted">Last Updated:</span>
+                  <p className="text-myslt-text-primary">{new Date(consent.lastUpdated).toLocaleDateString()}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-900">{consent.description}</p>
+            <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Description</h3>
+            <div className="bg-myslt-service-card p-4 rounded-lg">
+              <p className="text-myslt-text-primary">{consent.description}</p>
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+          <div className="flex justify-end space-x-3 pt-4 border-t border-myslt-accent/20">
             {consent.status === 'granted' && (
               <button
                 onClick={() => handleConsentAction(consent.id, 'revoke')}
@@ -236,7 +236,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
             )}
             <button
               onClick={() => console.log('View history for', consent.id)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors"
             >
               View History
             </button>
@@ -249,29 +249,29 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Consent Center</h1>
-        <p className="text-gray-600 mt-2">Manage your data processing consents and preferences</p>
+        <h1 className="text-3xl font-bold text-myslt-text-primary">Consent Center</h1>
+        <p className="text-myslt-text-muted mt-2">Manage your data processing consents and preferences</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-myslt-text-muted w-5 h-5" />
             <input
               type="text"
               placeholder="Search consents..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-myslt-service-card text-myslt-text-primary"
             />
           </div>
           <div className="flex items-center space-x-2">
-            <Filter className="text-gray-400 w-5 h-5" />
+            <Filter className="text-myslt-text-muted w-5 h-5" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-3 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-myslt-service-card text-myslt-text-primary"
             >
               <option value="all">All Status</option>
               <option value="granted">Granted</option>
@@ -282,7 +282,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-3 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-myslt-service-card text-myslt-text-primary"
             >
               <option value="all">All Categories</option>
               <option value="Marketing">Marketing</option>
@@ -298,14 +298,14 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
       {/* Consents List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredConsents.map((consent) => (
-          <div key={consent.id} className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div key={consent.id} className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 hover:shadow-md transition-shadow">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   {getStatusIcon(consent.status)}
                   <div>
-                    <h3 className="font-semibold text-gray-900">{consent.purpose}</h3>
-                    <p className="text-sm text-gray-500">{consent.category}</p>
+                    <h3 className="font-semibold text-myslt-text-primary">{consent.purpose}</h3>
+                    <p className="text-sm text-myslt-text-muted">{consent.category}</p>
                   </div>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(consent.status)}`}>
@@ -313,19 +313,19 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                 </span>
               </div>
               
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{consent.description}</p>
+              <p className="text-sm text-myslt-text-muted mb-4 line-clamp-2">{consent.description}</p>
               
               <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-myslt-text-muted">
                   <Tag className="w-4 h-4 mr-2" />
                   {consent.channel}
                 </div>
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-myslt-text-muted">
                   <Calendar className="w-4 h-4 mr-2" />
                   {new Date(consent.validFrom).toLocaleDateString()}
                   {consent.validUntil && ` - ${new Date(consent.validUntil).toLocaleDateString()}`}
                 </div>
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-myslt-text-muted">
                   <MapPin className="w-4 h-4 mr-2" />
                   {consent.jurisdiction}
                 </div>
@@ -334,7 +334,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
               <div className="flex space-x-2">
                 <button
                   onClick={() => setSelectedConsent(consent)}
-                  className="flex-1 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium flex items-center justify-center space-x-1"
+                  className="flex-1 px-3 py-2 bg-myslt-primary/10 text-myslt-primary rounded-lg hover:bg-myslt-primary/20 transition-colors text-sm font-medium flex items-center justify-center space-x-1"
                 >
                   <Eye className="w-4 h-4" />
                   <span>View</span>

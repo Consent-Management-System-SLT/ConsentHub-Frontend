@@ -6,19 +6,19 @@ interface CardProps {
 }
 
 export const Card: React.FC<CardProps> = ({ children, className = '' }) => (
-  <div className={`bg-white rounded-lg shadow border border-gray-200 ${className}`}>
+  <div className={`bg-myslt-card rounded-lg shadow border border-myslt-accent/20 ${className}`}>
     {children}
   </div>
 );
 
 export const CardHeader: React.FC<CardProps> = ({ children, className = '' }) => (
-  <div className={`px-6 py-4 border-b border-gray-200 ${className}`}>
+  <div className={`px-6 py-4 border-b border-myslt-accent/20 ${className}`}>
     {children}
   </div>
 );
 
 export const CardTitle: React.FC<CardProps> = ({ children, className = '' }) => (
-  <h3 className={`text-lg font-semibold text-gray-900 ${className}`}>
+  <h3 className={`text-lg font-semibold text-myslt-text-primary ${className}`}>
     {children}
   </h3>
 );

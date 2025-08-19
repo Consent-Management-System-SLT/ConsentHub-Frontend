@@ -126,12 +126,12 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
       {isOpen && (
         <div 
           ref={dropdownRef}
-          className="absolute right-0 top-12 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[80vh] flex flex-col"
+          className="absolute right-0 top-12 w-96 bg-myslt-card rounded-xl shadow-2xl border border-myslt-accent/20 z-50 max-h-[80vh] flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <div className="flex items-center justify-between p-4 border-b border-myslt-accent/20">
             <div className="flex items-center space-x-2">
-              <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+              <h3 className="text-lg font-semibold text-myslt-text-primary">Notifications</h3>
               {unreadCount > 0 && (
                 <span className="px-2 py-1 text-xs font-medium text-white bg-red-500 rounded-full">
                   {unreadCount}
@@ -142,14 +142,14 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-sm text-myslt-success hover:text-myslt-success/80 font-medium"
                 >
                   Mark all read
                 </button>
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-1 hover:bg-myslt-service-card rounded-full transition-colors"
               >
                 <X className="w-4 h-4 text-gray-500" />
               </button>
@@ -169,8 +169,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
                 {displayedNotifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer group ${
-                      !notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                    className={`p-4 hover:bg-myslt-service-card transition-colors cursor-pointer group ${
+                      !notification.read ? 'bg-myslt-card-gradient border-l-4 border-l-myslt-primary' : ''
                     }`}
                     onClick={() => handleNotificationClick(notification.id)}
                   >
@@ -180,7 +180,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
-                          <p className="text-sm font-medium text-gray-900 truncate pr-2">
+                          <p className="text-sm font-medium text-myslt-text-primary truncate pr-2">
                             {notification.title}
                           </p>
                           <button
@@ -188,16 +188,16 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
                               e.stopPropagation();
                               removeNotification(notification.id);
                             }}
-                            className="flex-shrink-0 p-1 hover:bg-gray-200 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                            className="flex-shrink-0 p-1 hover:bg-myslt-accent/30 rounded-full transition-colors opacity-0 group-hover:opacity-100"
                           >
-                            <Trash2 className="w-3 h-3 text-gray-400" />
+                            <Trash2 className="w-3 h-3 text-myslt-text-muted" />
                           </button>
                         </div>
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                        <p className="text-sm text-myslt-text-secondary mt-1 line-clamp-2">
                           {notification.message}
                         </p>
                         <div className="flex items-center justify-between mt-2">
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-myslt-text-muted">
                             {formatTimestamp(notification.timestamp)}
                           </p>
                           <div className="flex items-center space-x-2">
@@ -210,7 +210,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
                               {notification.category}
                             </span>
                             {!notification.read && (
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              <div className="w-2 h-2 bg-myslt-primary rounded-full"></div>
                             )}
                           </div>
                         </div>
@@ -225,7 +225,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
           {/* Footer */}
           {notifications.length > maxDisplayed && (
             <div className="p-3 border-t border-gray-100 text-center">
-              <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+              <button className="text-sm text-myslt-primary hover:text-myslt-text-primary font-medium">
                 View all {notifications.length} notifications
               </button>
             </div>

@@ -190,9 +190,9 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
       case 'expired':
         return 'bg-red-100 text-red-800';
       case 'revoked':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-myslt-text-secondary';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-myslt-service-card text-myslt-text-secondary';
     }
   };
 
@@ -205,39 +205,39 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
       case 'expired':
         return <AlertCircle className="w-4 h-4 text-red-600" />;
       case 'revoked':
-        return <X className="w-4 h-4 text-gray-600" />;
+        return <X className="w-4 h-4 text-myslt-text-secondary" />;
       default:
-        return <Clock className="w-4 h-4 text-gray-600" />;
+        return <Clock className="w-4 h-4 text-myslt-text-secondary" />;
     }
   };
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-myslt-card-solid rounded-lg shadow-lg p-6">
         <div className="flex items-center justify-center py-12">
           <RefreshCw className="w-6 h-6 animate-spin text-indigo-600" />
-          <span className="ml-2 text-gray-600">Loading guardian consent data...</span>
+          <span className="ml-2 text-myslt-text-secondary">Loading guardian consent data...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg">
+    <div className="bg-myslt-card-solid rounded-lg shadow-lg">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-myslt-accent/20">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Shield className="w-6 h-6 text-purple-600" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Guardian Consent Management</h2>
-              <p className="text-sm text-gray-600">Manage consent for minor customers</p>
+              <h2 className="text-xl font-semibold text-myslt-text-primary">Guardian Consent Management</h2>
+              <p className="text-sm text-myslt-text-secondary">Manage consent for minor customers</p>
             </div>
           </div>
           {onClose && (
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-myslt-text-secondary transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
@@ -246,7 +246,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-myslt-accent/20">
         <div className="flex space-x-8 px-6">
           <button
             onClick={() => setActiveTab('search')}
@@ -301,25 +301,25 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredMinors.map(minor => (
-                <div key={minor.id} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                <div key={minor.id} className="bg-myslt-service-card rounded-lg p-4 hover:bg-myslt-card-solid transition-colors">
                   <div className="flex items-center space-x-3 mb-3">
                     <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
                       <User className="w-5 h-5 text-purple-600" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-gray-900">{minor.name}</h3>
-                      <p className="text-sm text-gray-600">{minor.email}</p>
+                      <h3 className="font-medium text-myslt-text-primary">{minor.name}</h3>
+                      <p className="text-sm text-myslt-text-secondary">{minor.email}</p>
                     </div>
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Age:</span>
+                      <span className="text-myslt-text-secondary">Age:</span>
                       <span className="font-medium">
                         {minor.dateOfBirth ? calculateAge(minor.dateOfBirth) : 'N/A'}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Guardian:</span>
+                      <span className="text-myslt-text-secondary">Guardian:</span>
                       <span className="font-medium">{minor.guardianName || 'Not assigned'}</span>
                     </div>
                   </div>
@@ -435,7 +435,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setActiveTab('search')}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 text-myslt-text-secondary bg-myslt-service-card rounded-lg hover:bg-myslt-card-solid transition-colors"
               >
                 Cancel
               </button>
@@ -455,7 +455,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
         {activeTab === 'manage' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium text-gray-900">Guardian Consents</h3>
+              <h3 className="text-lg font-medium text-myslt-text-primary">Guardian Consents</h3>
               <button
                 onClick={loadGuardianConsents}
                 className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
@@ -466,8 +466,8 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full border border-gray-200 rounded-lg">
-                <thead className="bg-gray-50">
+              <table className="w-full border border-myslt-accent/20 rounded-lg">
+                <thead className="bg-myslt-service-card">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Minor</th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Guardian</th>
@@ -483,14 +483,14 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
                     const guardian = guardians.find(g => g.id === consent.guardianId);
                     
                     return (
-                      <tr key={consent.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-gray-900">
+                      <tr key={consent.id} className="hover:bg-myslt-service-card">
+                        <td className="px-4 py-3 text-sm text-myslt-text-primary">
                           {minor?.name || 'Unknown'}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
+                        <td className="px-4 py-3 text-sm text-myslt-text-primary">
                           {guardian?.name || 'Unknown'}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900 capitalize">
+                        <td className="px-4 py-3 text-sm text-myslt-text-primary capitalize">
                           {consent.consentType?.replace(/_/g, ' ') || 'N/A'}
                         </td>
                         <td className="px-4 py-3">
@@ -499,7 +499,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
                             <span className="ml-1 capitalize">{consent.status}</span>
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
+                        <td className="px-4 py-3 text-sm text-myslt-text-primary">
                           {consent.createdAt ? new Date(consent.createdAt).toLocaleDateString() : 'N/A'}
                         </td>
                         <td className="px-4 py-3">

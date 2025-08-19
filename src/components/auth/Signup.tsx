@@ -182,7 +182,7 @@ const Signup: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0072CE] to-[#4CAF50] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-8">
-        <div className="bg-white rounded-xl shadow-xl p-8">
+        <div className="bg-myslt-card rounded-xl shadow-xl p-8">
           <div className="text-center mb-8">
             <img 
               src="/SLTMobitel_Logo.svg.png" 

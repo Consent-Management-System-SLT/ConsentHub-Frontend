@@ -80,9 +80,9 @@ export const PrivacyNotices: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-myslt-background flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-myslt-primary" />
           <p className="text-gray-600">Loading privacy notices...</p>
         </div>
       </div>
@@ -91,13 +91,13 @@ export const PrivacyNotices: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-myslt-background flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="h-8 w-8 mx-auto mb-4 text-red-600" />
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={loadNotices}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            className="bg-myslt-primary text-white px-4 py-2 rounded-md hover:bg-myslt-primary-dark transition-colors"
           >
             Retry
           </button>
@@ -108,16 +108,16 @@ export const PrivacyNotices: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-myslt-card p-6 rounded-lg shadow-sm border border-myslt-accent/20">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-            <FileText className="h-5 w-5 mr-2 text-blue-600" />
+          <h2 className="text-lg font-semibold text-myslt-text-primary flex items-center">
+            <FileText className="h-5 w-5 mr-2 text-myslt-primary" />
             Privacy Notices
           </h2>
           <div className="flex space-x-2">
             <button
               onClick={loadNotices}
-              className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="bg-myslt-primary text-white px-3 py-1 rounded-md hover:bg-myslt-primary-dark transition-colors flex items-center gap-2"
             >
               <RefreshCw className="h-4 w-4" />
               Refresh
@@ -183,14 +183,14 @@ export const PrivacyNotices: React.FC = () => {
               <div className="flex space-x-2">
                 <button
                   onClick={() => window.open(notice.documentUrl, '_blank')}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-myslt-card hover:bg-myslt-service-card transition-colors"
                 >
                   <Eye className="h-4 w-4 mr-2" />
                   View
                 </button>
                 <button
                   onClick={() => window.open(notice.documentUrl, '_blank')}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-myslt-card hover:bg-myslt-service-card transition-colors"
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Download
