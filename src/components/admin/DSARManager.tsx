@@ -1,699 +1,513 @@
-import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
   Download, 
   Eye,
-  CheckCircle,
   XCircle,
   AlertCircle,
-  Clock,
   Calendar,
   User,
   ChevronDown,
   RefreshCw,
   Archive,
-  MessageSquare
+  MessageSquare,
+  ChevronLeft,
+  ChevronRight,
+  X
 } from 'lucide-react';
 import ServerConnectionAlert from '../shared/ServerConnectionAlert';
 
-interface DSARRequest {
-  id: string;
-  customerId: string;
-  customerName: string;
-  email: string;
-  requestType: 'access' | 'portability' | 'deletion' | 'rectification' | 'restriction';
-  status: 'pending' | 'in-progress' | 'completed' | 'rejected';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  requestDate: string;
-  dueDate: string;
-  assignedTo?: string;
-  description: string;
-  attachments: number;
-}
-
 const DSARManager: React.FC = () => {
-  // Add global style to prevent horizontal scrolling
-  React.useEffect(() => {
-    document.body.style.overflowX = 'hidden';
-    document.documentElement.style.overflowX = 'hidden';
-    
-    return () => {
-      document.body.style.overflowX = 'auto';
-      document.documentElement.style.overflowX = 'auto';
-    };
+  const [requests, setRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
+
+  const loadDSARRequests = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      console.log('Loading DSAR requests...');
+      
+      // Get token from localStorage (this is where the auth context stores it)
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      // Direct API call to match our working test
+      const response = await fetch('http://localhost:3001/api/v1/dsar/requests', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('DSAR response:', data);
+      
+      // Handle the direct backend response structure
+      let requestsArray: any[] = [];
+      if (data && data.requests && Array.isArray(data.requests)) {
+        requestsArray = data.requests;
+      } else {
+        console.warn('Unexpected response structure:', data);
+        requestsArray = [];
+      }
+      
+      console.log('Setting requests:', requestsArray);
+      setRequests(requestsArray);
+    } catch (err) {
+      console.error('Failed to load DSAR requests:', err);
+      setError(`Failed to load DSAR requests: ${(err as Error).message || 'Unknown error'}`);
+      setRequests([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDSARRequests();
   }, []);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [priorityFilter, setPriorityFilter] = useState<string>('all');
-  const [selectedRequests, setSelectedRequests] = useState<Set<string>>(new Set());
-  const [showModal, setShowModal] = useState(false);
-  const [modalData, setModalData] = useState<DSARRequest | null>(null);
-  const [showAssignModal, setShowAssignModal] = useState(false);
-  const [assignmentData, setAssignmentData] = useState<DSARRequest | null>(null);
-  const [showConnectionAlert, setShowConnectionAlert] = useState(true);
+  // Reset to page 1 when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
-  const handleViewRequest = (request: DSARRequest) => {
-    setModalData(request);
-    setShowModal(true);
-  };
+  // Force refresh when component mounts to ensure latest data
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (requests.length === 0 && !loading && !error) {
+        loadDSARRequests();
+      }
+    }, 1000);
 
-  const handleAssignRequest = (request: DSARRequest) => {
-    setAssignmentData(request);
-    setShowAssignModal(true);
-  };
+    return () => clearTimeout(timer);
+  }, [requests.length, loading, error]);
 
-  const handleStatusChange = async (requestId: string, newStatus: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    alert(`Request ${requestId} status changed to ${newStatus}`);
-  };
-
-  const handleBulkAssign = async (assignee: string) => {
-    if (selectedRequests.size === 0) return;
+  const filteredRequests = Array.isArray(requests) ? requests.filter(request => {
+    const email = request.requesterEmail || request.customerEmail || '';
+    const name = request.requesterName || request.customerName || '';
+    const requestId = request.requestId || '';
+    const subject = request.subject || '';
+    const requestType = request.requestType || '';
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    alert(`Assigned ${selectedRequests.size} requests to ${assignee}`);
-    setSelectedRequests(new Set());
-  };
-
-  const handleExportRequests = () => {
-    const dataToExport = filteredRequests.map(request => ({
-      id: request.id,
-      customerName: request.customerName,
-      email: request.email,
-      requestType: request.requestType,
-      status: request.status,
-      priority: request.priority,
-      requestDate: request.requestDate,
-      dueDate: request.dueDate,
-      assignedTo: request.assignedTo,
-      description: request.description
-    }));
+    const matchesSearch = !searchTerm || 
+      email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      requestId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      requestType.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `dsar-requests-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleSelectRequest = (id: string) => {
-    const newSelected = new Set(selectedRequests);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
-    setSelectedRequests(newSelected);
-  };
-
-  const staffMembers = [
-    'Sarah Wilson', 'Mike Johnson', 'Alice Brown', 'David Chen', 'Emma Davis'
-  ];
-
-  // Mock data
-  const requests: DSARRequest[] = [
-    {
-      id: 'DSAR-001',
-      customerId: 'CUST001',
-      customerName: 'John Doe',
-      email: 'john.doe@example.com',
-      requestType: 'access',
-      status: 'pending',
-      priority: 'high',
-      requestDate: '2024-01-25',
-      dueDate: '2024-02-25',
-      assignedTo: 'Sarah Wilson',
-      description: 'Request for all personal data held by the company',
-      attachments: 2
-    },
-    {
-      id: 'DSAR-002',
-      customerId: 'CUST002',
-      customerName: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      requestType: 'deletion',
-      status: 'in-progress',
-      priority: 'medium',
-      requestDate: '2024-01-20',
-      dueDate: '2024-02-20',
-      assignedTo: 'Mike Johnson',
-      description: 'Request to delete all personal data',
-      attachments: 0
-    },
-    {
-      id: 'DSAR-003',
-      customerId: 'CUST003',
-      customerName: 'Bob Wilson',
-      email: 'bob.wilson@example.com',
-      requestType: 'portability',
-      status: 'completed',
-      priority: 'low',
-      requestDate: '2024-01-15',
-      dueDate: '2024-02-15',
-      assignedTo: 'Alice Brown',
-      description: 'Request for data export in machine-readable format',
-      attachments: 1
-    },
-    {
-      id: 'DSAR-004',
-      customerId: 'CUST004',
-      customerName: 'Emma Davis',
-      email: 'emma.davis@example.com',
-      requestType: 'rectification',
-      status: 'pending',
-      priority: 'urgent',
-      requestDate: '2024-01-28',
-      dueDate: '2024-02-28',
-      description: 'Request to correct incorrect personal information',
-      attachments: 3
-    }
-  ];
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return <Clock className="w-4 h-4 text-yellow-600" />;
-      case 'in-progress':
-        return <AlertCircle className="w-4 h-4 text-blue-600" />;
-      case 'completed':
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 'rejected':
-        return <XCircle className="w-4 h-4 text-red-600" />;
-      default:
-        return <AlertCircle className="w-4 h-4 text-myslt-text-secondary" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'in-progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'rejected':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-myslt-service-card text-gray-800';
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent':
-        return 'bg-red-100 text-red-800';
-      case 'high':
-        return 'bg-orange-100 text-orange-800';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'low':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-myslt-service-card text-gray-800';
-    }
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'access':
-        return 'bg-blue-100 text-blue-800';
-      case 'portability':
-        return 'bg-purple-100 text-purple-800';
-      case 'deletion':
-        return 'bg-red-100 text-red-800';
-      case 'rectification':
-        return 'bg-green-100 text-green-800';
-      case 'restriction':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-myslt-service-card text-gray-800';
-    }
-  };
-
-  const filteredRequests = requests.filter(request => {
-    const matchesSearch = request.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         request.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         request.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
-    const matchesType = typeFilter === 'all' || request.requestType === typeFilter;
-    const matchesPriority = priorityFilter === 'all' || request.priority === priorityFilter;
-    return matchesSearch && matchesStatus && matchesType && matchesPriority;
-  });
+    
+    return matchesSearch && matchesStatus;
+  }) : [];
 
-  return (
-    <div className="min-h-screen bg-myslt-service-card overflow-x-hidden w-full">
-      {/* Server Connection Alert */}
-      {showConnectionAlert && (
-        <ServerConnectionAlert 
-          onClose={() => setShowConnectionAlert(false)}
-          autoHide={true}
-          autoHideDelay={4000}
-        />
-      )}
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedRequests = filteredRequests.slice(startIndex, endIndex);
 
-      <div className="max-w-full mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-8 w-full box-border">
-        {/* Header */}
-        <div className="flex flex-col space-y-4 mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-myslt-text-primary">DSAR Requests</h1>
-              <p className="text-myslt-text-secondary mt-1 sm:mt-2 text-sm sm:text-base">Manage Data Subject Access Requests</p>
-            </div>
-            
-            {/* Desktop Actions */}
-            <div className="hidden sm:flex items-center space-x-3">
-              <button 
-                onClick={handleExportRequests}
-                className="px-3 sm:px-4 py-2 bg-myslt-card-solid border border-myslt-border rounded-lg hover:bg-myslt-service-card transition-colors flex items-center space-x-2"
-              >
-                <Download className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700 hidden sm:inline">Export</span>
-              </button>
-              {selectedRequests.size > 0 && (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-myslt-text-secondary hidden lg:inline">{selectedRequests.size} selected</span>
-                  <select 
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        handleBulkAssign(e.target.value);
-                        e.target.value = '';
-                      }
-                    }}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                  >
-                    <option value="">Assign</option>
-                    {staffMembers.map(member => (
-                      <option key={member} value={member}>{member}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-              <button className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2">
-                <RefreshCw className="w-4 h-4" />
-                <span className="text-sm font-medium hidden sm:inline">Refresh</span>
-              </button>
-            </div>
-          </div>
+    // Add manual refresh function
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await loadDSARRequests();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
-          {/* Mobile Actions */}
-          <div className="flex sm:hidden items-center justify-between space-x-1 w-full overflow-hidden">
-            <div className="flex items-center space-x-1 flex-1 min-w-0">
-              <button 
-                onClick={handleExportRequests}
-                className="flex-1 px-2 py-2 bg-myslt-card-solid border border-myslt-border rounded-lg hover:bg-myslt-service-card transition-colors flex items-center justify-center space-x-1 min-w-0"
-              >
-                <Download className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                <span className="text-xs font-medium text-gray-700 truncate">Export</span>
-              </button>
-              {selectedRequests.size > 0 && (
-                <select 
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      handleBulkAssign(e.target.value);
-                      e.target.value = '';
-                    }
-                  }}
-                  className="px-2 py-2 border border-myslt-border rounded-lg text-xs bg-myslt-card-solid min-w-0 max-w-24"
-                >
-                  <option value="">Assign ({selectedRequests.size})</option>
-                  {staffMembers.map(member => (
-                    <option key={member} value={member}>{member}</option>
-                  ))}
-                </select>
-              )}
-            </div>
-            <button className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex-shrink-0">
-              <RefreshCw className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+  const handleExport = async () => {
+    try {
+      const token = localStorage.getItem('authToken'); // Fixed: use 'authToken' not 'token'
+      console.log('Export: checking token...', token ? 'Token found' : 'No token found');
+      
+      if (!token) {
+        alert('Please log in again to export data');
+        throw new Error('No authentication token found');
+      }
+      
+      console.log('Export: Making request to CSV endpoint...');
+      const response = await fetch('http://localhost:3001/api/v1/dsar/export/csv', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Export: Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Export: Error response:', errorData);
+        throw new Error(`Export failed (${response.status}): ${errorData || response.statusText}`);
+      }
+      
+      const csvData = await response.text();
+      console.log('Export: CSV data length:', csvData.length);
+      
+      // Check if we actually got CSV data
+      if (!csvData || csvData.trim().length === 0) {
+        throw new Error('No data available for export');
+      }
+      
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `dsar-requests-${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      // Show success message
+      console.log('Export: Download completed successfully');
+      alert('DSAR requests exported successfully!');
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert(`Export failed: ${(error as Error).message}`);
+    }
+  };
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-6 mb-6 sm:mb-8 w-full overflow-hidden">
-          <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border p-3 sm:p-4 lg:p-6 min-w-0">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Pending</p>
-                <p className="text-lg sm:text-2xl font-bold text-yellow-600 truncate">
-                  {requests.filter(r => r.status === 'pending').length}
-                </p>
-              </div>
-              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-yellow-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
-                <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-600" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border p-3 sm:p-4 lg:p-6 min-w-0">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">In Progress</p>
-                <p className="text-lg sm:text-2xl font-bold text-blue-600 truncate">
-                  {requests.filter(r => r.status === 'in-progress').length}
-                </p>
-              </div>
-              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
-                <AlertCircle className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border p-3 sm:p-4 lg:p-6 min-w-0">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Completed</p>
-                <p className="text-lg sm:text-2xl font-bold text-green-600 truncate">
-                  {requests.filter(r => r.status === 'completed').length}
-                </p>
-              </div>
-              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
-                <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border p-3 sm:p-4 lg:p-6 min-w-0">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Urgent</p>
-                <p className="text-lg sm:text-2xl font-bold text-red-600 truncate">
-                  {requests.filter(r => r.priority === 'urgent').length}
-                </p>
-              </div>
-              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-red-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
-                <AlertCircle className="w-4 h-4 sm:w-6 sm:h-6 text-red-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters and Search */}
-        <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border p-4 sm:p-6 mb-6 sm:mb-8 w-full overflow-hidden">
-          {/* Search Bar */}
-          <div className="mb-4">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search requests..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-3 sm:py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-base sm:text-sm min-w-0"
-              />
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 flex-1 min-w-0">
-              <div className="relative min-w-0">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full appearance-none bg-myslt-card-solid border border-gray-300 rounded-lg px-3 py-3 sm:py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent text-base sm:text-sm min-w-0"
-                >
-                  <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                  <option value="rejected">Rejected</option>
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-              </div>
-              
-              <div className="relative min-w-0">
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                  className="w-full appearance-none bg-myslt-card-solid border border-gray-300 rounded-lg px-3 py-3 sm:py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent text-base sm:text-sm min-w-0"
-                >
-                  <option value="all">All Types</option>
-                  <option value="access">Access</option>
-                  <option value="portability">Portability</option>
-                  <option value="deletion">Deletion</option>
-                  <option value="rectification">Rectification</option>
-                  <option value="restriction">Restriction</option>
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-              </div>
-              
-              <div className="relative min-w-0">
-                <select
-                  value={priorityFilter}
-                  onChange={(e) => setPriorityFilter(e.target.value)}
-                  className="w-full appearance-none bg-myslt-card-solid border border-gray-300 rounded-lg px-3 py-3 sm:py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent text-base sm:text-sm min-w-0"
-                >
-                  <option value="all">All Priorities</option>
-                  <option value="urgent">Urgent</option>
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-              </div>
-            </div>
-            
-            <div className="mt-3 sm:mt-0 sm:ml-4 flex-shrink-0">
-              <button className="w-full sm:w-auto px-4 py-3 sm:py-2 bg-myslt-service-card hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center space-x-2 text-base sm:text-sm">
-                <Filter className="w-4 h-4 text-myslt-text-secondary" />
-                <span className="font-medium text-gray-700">More Filters</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Requests Display - Desktop Table and Mobile Cards */}
-        <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-border overflow-hidden w-full">
-          {/* Desktop Table View */}
-          <div className="hidden lg:block w-full overflow-hidden">
-            <div className="w-full">
-              <table className="w-full table-fixed">
-                <thead className="bg-myslt-service-card">
-                  <tr>
-                    <th className="w-24 px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
-                      ID
-                    </th>
-                    <th className="w-52 px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
-                      Customer
-                    </th>
-                    <th className="w-20 px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
-                      Type
-                    </th>
-                    <th className="w-24 px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
-                      Status
-                    </th>
-                    <th className="w-20 px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
-                      Priority
-                    </th>
-                    <th className="w-24 px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
-                      Due Date
-                    </th>
-                    <th className="w-28 px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
-                      Assigned
-                    </th>
-                    <th className="w-20 px-3 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-myslt-card-solid divide-y divide-gray-200">
-                  {filteredRequests.map((request) => (
-                    <tr key={request.id} className="hover:bg-myslt-service-card">
-                      <td className="px-3 py-4 w-24 overflow-hidden">
-                        <div className="text-sm font-medium text-myslt-text-primary truncate">{request.id}</div>
-                        <div className="text-xs text-gray-500 truncate">
-                          {new Date(request.requestDate).toLocaleDateString()}
-                        </div>
-                      </td>
-                      <td className="px-3 py-4 w-52 overflow-hidden">
-                        <div className="flex items-center min-w-0">
-                          <div className="w-8 h-8 bg-myslt-service-card rounded-full flex items-center justify-center flex-shrink-0">
-                            <User className="w-4 h-4 text-myslt-text-secondary" />
-                          </div>
-                          <div className="ml-2 min-w-0 flex-1">
-                            <div className="text-sm font-medium text-myslt-text-primary truncate">{request.customerName}</div>
-                            <div className="text-xs text-gray-500 truncate">{request.email}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-3 py-4 w-20 overflow-hidden">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize truncate ${getTypeColor(request.requestType)}`}>
-                          {request.requestType}
-                        </span>
-                      </td>
-                      <td className="px-3 py-4 w-24 overflow-hidden">
-                        <div className="flex items-center min-w-0">
-                          {getStatusIcon(request.status)}
-                          <span className={`ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize truncate ${getStatusColor(request.status)}`}>
-                            {request.status}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-4 w-20 overflow-hidden">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize truncate ${getPriorityColor(request.priority)}`}>
-                          {request.priority}
-                        </span>
-                      </td>
-                      <td className="px-3 py-4 w-24 overflow-hidden text-sm text-myslt-text-primary">
-                        <div className="flex items-center min-w-0">
-                          <Calendar className="w-3 h-3 text-gray-400 mr-1 flex-shrink-0" />
-                          <span className="text-xs truncate">{new Date(request.dueDate).toLocaleDateString()}</span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-4 w-28 overflow-hidden text-sm text-myslt-text-primary">
-                        <span className="truncate block">
-                          {request.assignedTo || (
-                            <span className="text-gray-400">Unassigned</span>
-                          )}
-                        </span>
-                      </td>
-                      <td className="px-3 py-4 w-20 overflow-hidden text-sm font-medium">
-                        <div className="flex items-center space-x-1">
-                          <button className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded">
-                            <Eye className="w-3 h-3" />
-                          </button>
-                          <button className="text-green-600 hover:text-green-900 p-1 hover:bg-green-50 rounded">
-                            <MessageSquare className="w-3 h-3" />
-                          </button>
-                          <button className="text-myslt-text-secondary hover:text-myslt-text-primary p-1 hover:bg-myslt-service-card rounded">
-                            <Archive className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Mobile/Tablet Card View */}
-          <div className="lg:hidden divide-y divide-gray-200 w-full">
-            {filteredRequests.map((request) => (
-              <div key={request.id} className="p-4 sm:p-6 space-y-4 w-full min-w-0">
-                {/* Header Row */}
-                <div className="flex items-center justify-between min-w-0">
-                  <div className="flex items-center space-x-3 min-w-0 flex-1">
-                    <div className="w-10 h-10 bg-myslt-service-card rounded-full flex items-center justify-center flex-shrink-0">
-                      <User className="w-5 h-5 text-myslt-text-secondary" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-base sm:text-lg font-semibold text-myslt-text-primary truncate">{request.id}</div>
-                      <div className="text-sm text-gray-500 truncate">{request.customerName}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(request.priority)} hidden sm:inline-flex`}>
-                      {request.priority}
-                    </span>
-                    <div className="flex items-center">
-                      {getStatusIcon(request.status)}
-                      <span className={`ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(request.status)}`}>
-                        {request.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Priority Badge for Mobile */}
-                <div className="sm:hidden">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getPriorityColor(request.priority)}`}>
-                    Priority: {request.priority}
-                  </span>
-                </div>
-
-                {/* Details Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm w-full">
-                  <div className="min-w-0">
-                    <span className="font-medium text-myslt-text-secondary">Email:</span>
-                    <span className="ml-2 text-myslt-text-primary break-all">{request.email}</span>
-                  </div>
-                  <div className="min-w-0">
-                    <span className="font-medium text-myslt-text-secondary">Type:</span>
-                    <span className={`ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${getTypeColor(request.requestType)}`}>
-                      {request.requestType}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <span className="font-medium text-myslt-text-secondary">Request Date:</span>
-                    <span className="ml-2 text-myslt-text-primary">
-                      {new Date(request.requestDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <span className="font-medium text-myslt-text-secondary">Due Date:</span>
-                    <span className="ml-2 text-myslt-text-primary flex items-center">
-                      <Calendar className="w-4 h-4 text-gray-400 mr-1 flex-shrink-0" />
-                      <span className="truncate">{new Date(request.dueDate).toLocaleDateString()}</span>
-                    </span>
-                  </div>
-                  <div className="sm:col-span-2 min-w-0">
-                    <span className="font-medium text-myslt-text-secondary">Assigned To:</span>
-                    <span className="ml-2 text-myslt-text-primary truncate">
-                      {request.assignedTo || <span className="text-gray-400">Unassigned</span>}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Description */}
-                {request.description && (
-                  <div className="min-w-0">
-                    <span className="font-medium text-myslt-text-secondary">Description:</span>
-                    <p className="mt-1 text-sm text-gray-700 break-words">{request.description}</p>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100 min-w-0">
-                  <div className="text-xs text-gray-500 truncate">
-                    {request.attachments} attachment{request.attachments !== 1 ? 's' : ''}
-                  </div>
-                  <div className="flex items-center space-x-3 sm:space-x-4 flex-shrink-0">
-                    <button className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm font-medium">
-                      <Eye className="w-4 h-4 flex-shrink-0" />
-                      <span className="hidden sm:inline">View</span>
-                    </button>
-                    <button className="flex items-center space-x-1 text-green-600 hover:text-green-700 text-sm font-medium">
-                      <MessageSquare className="w-4 h-4 flex-shrink-0" />
-                      <span className="hidden sm:inline">Comment</span>
-                    </button>
-                    <button className="flex items-center space-x-1 text-myslt-text-secondary hover:text-gray-700 text-sm font-medium">
-                      <Archive className="w-4 h-4 flex-shrink-0" />
-                      <span className="hidden sm:inline">Archive</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded"></div>
+          <div className="h-16 bg-gray-200 rounded"></div>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-20 bg-gray-200 rounded"></div>
             ))}
           </div>
         </div>
+      </div>
+    );
+  }
 
-        {/* Pagination */}
-        <div className="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0 mt-6 w-full min-w-0">
-          <div className="text-sm text-gray-500 truncate">
-            Showing {filteredRequests.length} of {requests.length} requests
-          </div>
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-myslt-service-card transition-colors text-sm font-medium">
-              Previous
-            </button>
-            <button className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
-              1
-            </button>
-            <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-myslt-service-card transition-colors text-sm font-medium">
-              Next
+  return (
+    <div className="p-6 space-y-6">
+      <ServerConnectionAlert />
+      
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">DSAR Management</h1>
+          <p className="text-gray-600 mt-1">Manage Data Subject Access Requests</p>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleRefresh}
+            disabled={loading || refreshing}
+            className={`flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+          </button>
+          
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+          >
+            <Download className="h-4 w-4" />
+            <span>Export CSV</span>
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+            <p className="text-red-700">{error}</p>
+            <button 
+              onClick={loadDSARRequests}
+              className="ml-auto px-3 py-1 text-sm bg-red-100 hover:bg-red-200 text-red-700 rounded"
+            >
+              Retry
             </button>
           </div>
         </div>
+      )}
+
+      {/* Search and Filter */}
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by request ID, email, name, type, or subject..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+          
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="in-review">In Review</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="rejected">Rejected</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </div>
       </div>
+
+      {/* Results */}
+      <div className="text-sm text-gray-600 mb-4">
+        {filteredRequests.length > 0 ? (
+          <>
+            Showing {Math.min(startIndex + 1, filteredRequests.length)} to {Math.min(endIndex, filteredRequests.length)} of {filteredRequests.length} requests
+            {filteredRequests.length < requests.length && (
+              <span className="ml-2 text-blue-600">({requests.length} total)</span>
+            )}
+          </>
+        ) : (
+          `${requests.length} total requests`
+        )}
+      </div>
+
+      {/* Request List */}
+      <div className="space-y-4">
+        {filteredRequests.length === 0 ? (
+          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <Archive className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No requests found</h3>
+            <p className="text-gray-500">
+              {searchTerm || statusFilter !== 'all'
+                ? "Try adjusting your search criteria or filters."
+                : "No DSAR requests have been submitted yet."}
+            </p>
+          </div>
+        ) : (
+          paginatedRequests.map((request) => (
+            <div key={request._id} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <h3 className="font-semibold text-gray-900">{request.requestId}</h3>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          request.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : request.status === 'in_progress'
+                            ? 'bg-blue-100 text-blue-800'
+                            : request.status === 'completed'
+                            ? 'bg-green-100 text-green-800'
+                            : request.status === 'rejected'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {request.status.replace('_', ' ').toUpperCase()}
+                      </span>
+                      
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          request.priority === 'high'
+                            ? 'bg-red-100 text-red-800'
+                            : request.priority === 'medium'
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {request.priority.toUpperCase()}
+                      </span>
+
+                      {request.sensitiveData && (
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                          SENSITIVE
+                        </span>
+                      )}
+                      
+                      {request.isOverdue && (
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                          OVERDUE
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm">
+                        <span className="font-medium">{request.requesterName || request.customerName || 'N/A'}</span>
+                        <span className="text-gray-500 ml-2">({request.requesterEmail || request.customerEmail})</span>
+                      </span>
+                    </div>
+                    
+                    <p className="text-sm text-gray-700">{request.description}</p>
+                    
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        <span>Due: {new Date(request.dueDate).toLocaleDateString()}</span>
+                        {request.daysRemaining !== null && (
+                          <span className={`ml-1 ${request.daysRemaining < 0 ? 'text-red-600' : request.daysRemaining <= 7 ? 'text-yellow-600' : 'text-gray-500'}`}>
+                            ({request.daysRemaining < 0 ? `${Math.abs(request.daysRemaining)} days overdue` : `${request.daysRemaining} days left`})
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span>Type: </span>
+                        <span className="font-medium">
+                          {request.requestType === 'data_access' ? 'Data Access (Art. 15)' :
+                           request.requestType === 'data_rectification' ? 'Data Rectification (Art. 16)' :
+                           request.requestType === 'data_erasure' ? 'Data Erasure (Art. 17)' :
+                           request.requestType === 'data_portability' ? 'Data Portability (Art. 20)' :
+                           request.requestType === 'restrict_processing' ? 'Restrict Processing (Art. 18)' :
+                           request.requestType === 'object_processing' ? 'Object to Processing (Art. 21)' :
+                           request.requestType.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                        </span>
+                      </div>
+                      {request.applicableLaws && request.applicableLaws.length > 0 && (
+                        <div className="flex items-center gap-1">
+                          <span>Laws: {request.applicableLaws.join(', ')}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => setSelectedRequest(request)}
+                  className="flex items-center gap-2 px-3 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg"
+                >
+                  <Eye className="h-4 w-4" />
+                  <span className="text-sm">View</span>
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Pagination */}
+      {filteredRequests.length > 0 && (
+        <div className="flex items-center justify-between mt-6">
+          <div className="text-sm text-gray-500">
+            Showing {filteredRequests.length === 0 ? 0 : Math.min(startIndex + 1, filteredRequests.length)} to {Math.min(endIndex, filteredRequests.length)} of {filteredRequests.length} requests
+          </div>
+          <div className="flex items-center space-x-2">
+            <button 
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-2 rounded-lg transition-colors text-sm ${
+                  currentPage === page
+                    ? 'bg-blue-600 text-white'
+                    : 'border border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+            <button 
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Detail Modal */}
+      {selectedRequest && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Request Details - {selectedRequest.requestId}
+                </h2>
+                <button
+                  onClick={() => setSelectedRequest(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-2">Request Information</h3>
+                  <div className="space-y-1 text-sm">
+                    <div><span className="font-medium">Type:</span> {selectedRequest.requestType.replace('-', ' ')}</div>
+                    <div><span className="font-medium">Status:</span> {selectedRequest.status}</div>
+                    <div><span className="font-medium">Priority:</span> {selectedRequest.priority}</div>
+                    <div><span className="font-medium">Submitted:</span> {new Date(selectedRequest.submittedAt).toLocaleString()}</div>
+                    <div><span className="font-medium">Due Date:</span> {new Date(selectedRequest.dueDate).toLocaleString()}</div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-2">Customer Information</h3>
+                  <div className="space-y-1 text-sm">
+                    <div><span className="font-medium">Name:</span> {selectedRequest.requesterName || selectedRequest.customerName || 'N/A'}</div>
+                    <div><span className="font-medium">Email:</span> {selectedRequest.requesterEmail || selectedRequest.customerEmail}</div>
+                    {selectedRequest.assignedTo && (
+                      <div><span className="font-medium">Assigned To:</span> {selectedRequest.assignedTo}</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-medium text-gray-900 mb-2">Description</h3>
+                <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{selectedRequest.description}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

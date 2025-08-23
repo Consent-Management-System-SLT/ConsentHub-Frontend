@@ -7,7 +7,7 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import RoleBasedDashboard from './components/RoleBasedDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import ToastContainer from './components/ToastContainer';
-import UserManagement from './components/UserManagement';
+import UserManagement from './components/admin/UserManagement';
 
 function App() {
   return (

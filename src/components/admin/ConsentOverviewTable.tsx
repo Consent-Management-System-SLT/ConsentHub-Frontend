@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
@@ -13,8 +13,12 @@ import {
   User,
   ChevronDown,
   RefreshCw,
-  X
+  X,
+  Plus
 } from 'lucide-react';
+import { useConsents, useParties, useConsentMutation } from '../../hooks/useApi';
+import { ConsentCreateRequest } from '../../services/consentService';
+import { ConsentPurpose, ConsentStatus } from '../../types/consent';
 
 interface Consent {
   id: string;
@@ -26,8 +30,9 @@ interface Consent {
   grantedDate: string;
   expiryDate?: string;
   lastUpdated: string;
-  source: 'website' | 'mobile' | 'email' | 'phone' | 'in-person';
+  source: 'website' | 'mobile' | 'email' | 'phone' | 'in-person' | 'sms' | 'push' | 'all' | 'customer_service' | 'mobile_app' | 'registration';
   version: string;
+  isRealUser?: boolean;
 }
 
 interface ConsentOverviewTableProps {}
@@ -40,10 +45,200 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [selectedConsents, setSelectedConsents] = useState<Set<string>>(new Set());
   const [showModal, setShowModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [modalData, setModalData] = useState<Consent | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(5);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingConsent, setEditingConsent] = useState<Consent | null>(null);
+
+  // API hooks
+  const { data: partiesData } = useParties();
+  const { data: consentsData, loading: consentsLoading, error: consentsError, refetch: refetchConsents } = useConsents();
+  const { createConsent, updateConsent } = useConsentMutation();
+  
+  // Form state for creating new consent
+  const [newConsentForm, setNewConsentForm] = useState<{
+    partyId: string;
+    purpose: ConsentPurpose;
+    status: ConsentStatus;
+    channel: string;
+    geoLocation: string;
+    privacyNoticeId: string;
+    versionAccepted: string;
+  }>({
+    partyId: '',
+    purpose: 'marketing',
+    status: 'granted',
+    channel: 'email',
+    geoLocation: 'Sri Lanka',
+    privacyNoticeId: 'PN-001',
+    versionAccepted: '1.0'
+  });
+  
+  // Form state for editing existing consent
+  const [editConsentForm, setEditConsentForm] = useState<{
+    status: ConsentStatus;
+    purpose: ConsentPurpose;
+    channel: string;
+    geoLocation: string;
+  }>({
+    status: 'granted',
+    purpose: 'marketing',
+    channel: 'email',
+    geoLocation: 'Sri Lanka'
+  });
+  
+  // Transform parties data
+  const parties = Array.isArray(partiesData) ? partiesData : 
+    (partiesData && (partiesData as any).parties ? (partiesData as any).parties : []);
+
+  // Reset to page 1 when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, consentTypeFilter]);
+
+  // Create party lookup map for efficient customer data lookup
+  const partyLookup = new Map();
+  parties.forEach((party: any) => {
+    partyLookup.set(party.id, party);
+  });
+
+  // Transform consents data from API
+  const rawConsents = Array.isArray(consentsData) ? consentsData : 
+    (consentsData && (consentsData as any).consents ? (consentsData as any).consents : []);
+
+  // Transform API consent data to match UI interface
+  const consents: Consent[] = rawConsents.map((consent: any) => {
+    const party = partyLookup.get(consent.partyId) || {};
+    
+    // Map consent types to UI-friendly names
+    const mapConsentType = (purpose: string) => {
+      const purposeMap: { [key: string]: string } = {
+        'marketing': 'marketing',
+        'analytics': 'analytics', 
+        'functional': 'functional',
+        'necessary': 'necessary',
+        'dataprocessing': 'functional',
+        'data_processing': 'functional',
+        'personalization': 'functional',
+        'thirdpartysharing': 'analytics',
+        'third_party_sharing': 'analytics',
+        'cookies': 'necessary',
+        'service': 'necessary',
+        'sms_marketing': 'marketing',
+        'location_tracking': 'analytics',
+        'push_notifications': 'functional',
+        'research': 'analytics',
+        'social_media': 'functional',
+        'newsletter': 'marketing',
+        'guardian_consent': 'necessary'
+      };
+      return purposeMap[purpose?.toLowerCase()] || 'marketing';
+    };
+
+    // Map status values to UI expectations
+    const mapStatus = (status: string) => {
+      const statusMap: { [key: string]: string } = {
+        'granted': 'active',
+        'denied': 'withdrawn',
+        'revoked': 'withdrawn',
+        'active': 'active',
+        'withdrawn': 'withdrawn',
+        'expired': 'expired',
+        'pending': 'pending'
+      };
+      return statusMap[status?.toLowerCase()] || 'pending';
+    };
+
+    // Check if this is a real MongoDB user (24-character hex string)
+    const isRealUser = /^[a-f0-9]{24}$/i.test(consent.partyId);
+
+    // Generate customer name and email - prioritize real MongoDB users
+    const getCustomerInfo = () => {
+      if (party.name && party.email) {
+        // Real MongoDB user found
+        return {
+          name: party.name,
+          email: party.email,
+          isRealUser: true
+        };
+      } else if (isRealUser) {
+        // Real MongoDB ID but user not found in lookup (should not happen)
+        return {
+          name: `User ${consent.partyId.substr(0, 8)}...`,
+          email: `user${consent.partyId.substr(0, 8)}@example.com`,
+          isRealUser: true
+        };
+      } else {
+        // Legacy data with simple numeric IDs - create placeholder names
+        const legacyNames: { [key: string]: string } = {
+          '1': 'John Doe Legacy',
+          '2': 'Jane Smith Legacy', 
+          '3': 'Mike Johnson Legacy',
+          '4': 'Sarah Wilson Legacy',
+          '5': 'David Brown Legacy'
+        };
+        const legacyEmails: { [key: string]: string } = {
+          '1': 'john.doe@example.com',
+          '2': 'jane.smith@example.com',
+          '3': 'mike.johnson@example.com', 
+          '4': 'sarah.wilson@example.com',
+          '5': 'david.brown@example.com'
+        };
+        return {
+          name: legacyNames[consent.partyId] || `Customer ${consent.partyId}`,
+          email: legacyEmails[consent.partyId] || `customer${consent.partyId}@example.com`,
+          isRealUser: false
+        };
+      }
+    };
+
+    const customerInfo = getCustomerInfo();
+    
+    return {
+      id: consent.id || consent._id,
+      customerId: consent.partyId || '',
+      customerName: customerInfo.name,
+      email: customerInfo.email,
+      consentType: mapConsentType(consent.purpose || consent.type),
+      status: mapStatus(consent.status),
+      grantedDate: consent.grantedAt ? new Date(consent.grantedAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }) : (consent.validFrom ? new Date(consent.validFrom).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }) : ''),
+      expiryDate: consent.expiresAt ? new Date(consent.expiresAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }) : undefined,
+      lastUpdated: consent.updatedAt ? new Date(consent.updatedAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }) : '',
+      source: consent.channel || consent.source || 'website',
+      version: consent.versionAccepted || 'v1.0',
+      isRealUser: customerInfo.isRealUser // Add flag for sorting
+    };
+  })
+  
+  // Sort to prioritize real MongoDB users first, then by date
+  .sort((a: Consent, b: Consent) => {
+    // First, sort by whether they are real users (real users first)
+    if (a.isRealUser && !b.isRealUser) return -1;
+    if (!a.isRealUser && b.isRealUser) return 1;
+    
+    // Then sort by date (most recent first)
+    const dateA = new Date(a.grantedDate).getTime();
+    const dateB = new Date(b.grantedDate).getTime();
+    return dateB - dateA;
+  });
 
   // Handle consent actions
   const handleViewConsent = (consent: Consent) => {
@@ -51,9 +246,107 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     setShowModal(true);
   };
 
+  // Reverse mapping from UI status to database status
+  const reverseMapStatus = (uiStatus: string): ConsentStatus => {
+    const reverseStatusMap: { [key: string]: ConsentStatus } = {
+      'active': 'granted',
+      'withdrawn': 'revoked',
+      'expired': 'expired',
+      'pending': 'pending'
+    };
+    return reverseStatusMap[uiStatus] || 'granted';
+  };
+
   const handleEditConsent = (consent: Consent) => {
-    // Simulate edit action
-    alert(`Editing consent for ${consent.customerName}`);
+    setEditingConsent(consent);
+    setEditConsentForm({
+      status: reverseMapStatus(consent.status),
+      purpose: (consent.consentType === 'marketing' ? 'marketing' : 'analytics') as ConsentPurpose,
+      channel: consent.source || 'email',
+      geoLocation: 'Sri Lanka'
+    });
+    setShowEditModal(true);
+  };
+
+  const handleCreateConsent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newConsentForm.partyId) {
+      alert('Please select a customer');
+      return;
+    }
+
+    try {
+      const consentData: ConsentCreateRequest = {
+        partyId: newConsentForm.partyId,
+        purpose: newConsentForm.purpose,
+        status: newConsentForm.status,
+        channel: newConsentForm.channel,
+        geoLocation: newConsentForm.geoLocation,
+        privacyNoticeId: newConsentForm.privacyNoticeId,
+        versionAccepted: newConsentForm.versionAccepted,
+        validFor: {
+          startDateTime: new Date().toISOString()
+        }
+      };
+
+      await createConsent(consentData);
+      setShowCreateModal(false);
+      
+      // Reset form
+      setNewConsentForm({
+        partyId: '',
+        purpose: 'marketing',
+        status: 'granted',
+        channel: 'email',
+        geoLocation: 'Sri Lanka',
+        privacyNoticeId: 'PN-001',
+        versionAccepted: '1.0'
+      });
+      
+      alert('Consent created successfully!');
+      // Refresh the consents data
+      await refetchConsents();
+    } catch (error) {
+      console.error('Failed to create consent:', error);
+      alert('Failed to create consent. Please try again.');
+    }
+  };
+
+  const handleUpdateConsent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingConsent) {
+      alert('No consent selected for editing');
+      return;
+    }
+
+    try {
+      const updates = {
+        status: editConsentForm.status,
+        purpose: editConsentForm.purpose,
+        channel: editConsentForm.channel,
+        geoLocation: editConsentForm.geoLocation,
+        lastUpdated: new Date().toISOString()
+      };
+
+      await updateConsent(editingConsent.id, updates);
+      setShowEditModal(false);
+      setEditingConsent(null);
+      
+      // Reset form
+      setEditConsentForm({
+        status: 'granted',
+        purpose: 'marketing',
+        channel: 'email',
+        geoLocation: 'Sri Lanka'
+      });
+      
+      alert('Consent updated successfully!');
+      // Refresh the consents data
+      await refetchConsents();
+    } catch (error) {
+      console.error('Failed to update consent:', error);
+      alert('Failed to update consent. Please try again.');
+    }
   };
 
   const handleBulkAction = async (action: 'export' | 'delete' | 'update') => {
@@ -62,7 +355,6 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       return;
     }
     
-    setIsLoading(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
@@ -78,8 +370,6 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
         alert(`Updating ${selectedConsents.size} consents...`);
         break;
     }
-    
-    setIsLoading(false);
   };
 
   const handleSelectAll = () => {
@@ -121,72 +411,6 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     a.click();
     URL.revokeObjectURL(url);
   };
-
-  // Mock data
-  const consents: Consent[] = [
-    {
-      id: '1',
-      customerId: 'CUST001',
-      customerName: 'John Doe',
-      email: 'john.doe@example.com',
-      consentType: 'marketing',
-      status: 'active',
-      grantedDate: '2024-01-15',
-      expiryDate: '2025-01-15',
-      lastUpdated: '2024-01-15',
-      source: 'website',
-      version: 'v2.1'
-    },
-    {
-      id: '2',
-      customerId: 'CUST002',
-      customerName: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      consentType: 'analytics',
-      status: 'active',
-      grantedDate: '2024-01-20',
-      lastUpdated: '2024-01-20',
-      source: 'mobile',
-      version: 'v2.1'
-    },
-    {
-      id: '3',
-      customerId: 'CUST003',
-      customerName: 'Mike Johnson',
-      email: 'mike.johnson@example.com',
-      consentType: 'marketing',
-      status: 'withdrawn',
-      grantedDate: '2024-01-10',
-      lastUpdated: '2024-01-25',
-      source: 'email',
-      version: 'v2.0'
-    },
-    {
-      id: '4',
-      customerId: 'CUST004',
-      customerName: 'Sarah Wilson',
-      email: 'sarah.wilson@example.com',
-      consentType: 'functional',
-      status: 'expired',
-      grantedDate: '2023-12-01',
-      expiryDate: '2024-01-01',
-      lastUpdated: '2024-01-01',
-      source: 'website',
-      version: 'v1.9'
-    },
-    {
-      id: '5',
-      customerId: 'CUST005',
-      customerName: 'David Brown',
-      email: 'david.brown@example.com',
-      consentType: 'necessary',
-      status: 'active',
-      grantedDate: '2024-01-22',
-      lastUpdated: '2024-01-22',
-      source: 'in-person',
-      version: 'v2.1'
-    }
-  ];
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -260,8 +484,32 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     return sortOrder === 'asc' ? comparison : -comparison;
   });
 
+  // Pagination calculation
+  const totalPages = Math.ceil(sortedConsents.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedConsents = sortedConsents.slice(startIndex, endIndex);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Loading State */}
+      {consentsLoading && (
+        <div className="flex items-center justify-center py-12">
+          <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
+          <span className="ml-2 text-myslt-text-secondary">Loading consents...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {consentsError && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <p>Error loading consents: {consentsError}</p>
+        </div>
+      )}
+
+      {/* Main Content - Only show when not loading */}
+      {!consentsLoading && (
+      <>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
@@ -269,6 +517,13 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           <p className="text-myslt-text-secondary mt-2">Manage and monitor all customer consents</p>
         </div>
         <div className="flex items-center space-x-3">
+          <button 
+            onClick={() => setShowCreateModal(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="text-sm font-medium">Create New Consent</span>
+          </button>
           <button 
             onClick={handleExportData}
             className="px-4 py-2 bg-myslt-card-solid border border-gray-300 rounded-lg hover:bg-myslt-service-card transition-colors flex items-center space-x-2"
@@ -479,7 +734,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
               </tr>
             </thead>
             <tbody className="bg-myslt-card-solid divide-y divide-gray-200">
-              {sortedConsents.map((consent) => (
+              {paginatedConsents.map((consent) => (
                 <tr key={consent.id} className="hover:bg-myslt-service-card">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
@@ -563,7 +818,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       {/* Pagination */}
       <div className="flex items-center justify-between mt-6">
         <div className="text-sm text-gray-500">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, sortedConsents.length)} to {Math.min(currentPage * itemsPerPage, sortedConsents.length)} of {sortedConsents.length} consents
+          Showing {sortedConsents.length === 0 ? 0 : Math.min(startIndex + 1, sortedConsents.length)} to {Math.min(endIndex, sortedConsents.length)} of {sortedConsents.length} consents
         </div>
         <div className="flex items-center space-x-2">
           <button 
@@ -573,7 +828,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           >
             Previous
           </button>
-          {Array.from({ length: Math.ceil(sortedConsents.length / itemsPerPage) }, (_, i) => i + 1).map(page => (
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
@@ -587,8 +842,8 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
             </button>
           ))}
           <button 
-            onClick={() => setCurrentPage(Math.min(Math.ceil(sortedConsents.length / itemsPerPage), currentPage + 1))}
-            disabled={currentPage === Math.ceil(sortedConsents.length / itemsPerPage)}
+            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
             className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-myslt-service-card transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
@@ -663,6 +918,259 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Create Consent Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Create New Consent</h3>
+              <button onClick={() => setShowCreateModal(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateConsent}>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Customer *</label>
+                  <select
+                    value={newConsentForm.partyId}
+                    onChange={(e) => setNewConsentForm({ ...newConsentForm, partyId: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="">Select Customer</option>
+                    {parties.map((party: any) => (
+                      <option key={party.id} value={party.id}>
+                        {party.name} - {party.email}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Purpose *</label>
+                  <select
+                    value={newConsentForm.purpose}
+                    onChange={(e) => setNewConsentForm({ ...newConsentForm, purpose: e.target.value as ConsentPurpose })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="marketing">Marketing</option>
+                    <option value="analytics">Analytics</option>
+                    <option value="thirdPartySharing">Third Party Sharing</option>
+                    <option value="dataProcessing">Data Processing</option>
+                    <option value="location">Location</option>
+                    <option value="research">Research</option>
+                    <option value="personalization">Personalization</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Status *</label>
+                  <select
+                    value={newConsentForm.status}
+                    onChange={(e) => setNewConsentForm({ ...newConsentForm, status: e.target.value as ConsentStatus })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="granted">Granted</option>
+                    <option value="pending">Pending</option>
+                    <option value="revoked">Revoked</option>
+                    <option value="expired">Expired</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Channel *</label>
+                  <select
+                    value={newConsentForm.channel}
+                    onChange={(e) => setNewConsentForm({ ...newConsentForm, channel: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="email">Email</option>
+                    <option value="sms">SMS</option>
+                    <option value="push">Push</option>
+                    <option value="voice">Voice</option>
+                    <option value="all">All</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Geo Location</label>
+                  <input
+                    type="text"
+                    value={newConsentForm.geoLocation}
+                    onChange={(e) => setNewConsentForm({ ...newConsentForm, geoLocation: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Sri Lanka"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Privacy Notice ID</label>
+                  <input
+                    type="text"
+                    value={newConsentForm.privacyNoticeId}
+                    onChange={(e) => setNewConsentForm({ ...newConsentForm, privacyNoticeId: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="PN-001"
+                  />
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Version</label>
+                  <input
+                    type="text"
+                    value={newConsentForm.versionAccepted}
+                    onChange={(e) => setNewConsentForm({ ...newConsentForm, versionAccepted: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="1.0"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Create Consent
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Consent Modal */}
+      {showEditModal && editingConsent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Edit Consent - {editingConsent.customerName}</h3>
+              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateConsent}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Customer</label>
+                <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-600">
+                  {editingConsent.customerName} - {editingConsent.email}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Purpose *</label>
+                  <select
+                    value={editConsentForm.purpose}
+                    onChange={(e) => setEditConsentForm({ ...editConsentForm, purpose: e.target.value as ConsentPurpose })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="marketing">Marketing</option>
+                    <option value="analytics">Analytics</option>
+                    <option value="thirdPartySharing">Third Party Sharing</option>
+                    <option value="dataProcessing">Data Processing</option>
+                    <option value="location">Location</option>
+                    <option value="research">Research</option>
+                    <option value="personalization">Personalization</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Status *</label>
+                  <select
+                    value={editConsentForm.status}
+                    onChange={(e) => setEditConsentForm({ ...editConsentForm, status: e.target.value as ConsentStatus })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="granted">Granted</option>
+                    <option value="pending">Pending</option>
+                    <option value="revoked">Revoked</option>
+                    <option value="expired">Expired</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Channel *</label>
+                  <select
+                    value={editConsentForm.channel}
+                    onChange={(e) => setEditConsentForm({ ...editConsentForm, channel: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="email">Email</option>
+                    <option value="sms">SMS</option>
+                    <option value="push">Push</option>
+                    <option value="voice">Voice</option>
+                    <option value="all">All</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Geo Location</label>
+                  <input
+                    type="text"
+                    value={editConsentForm.geoLocation}
+                    onChange={(e) => setEditConsentForm({ ...editConsentForm, geoLocation: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Sri Lanka"
+                  />
+                </div>
+              </div>
+
+              <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Consent Information</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-600">Consent ID:</span>
+                    <div className="font-mono text-gray-900">{editingConsent.id}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Original Date:</span>
+                    <div className="text-gray-900">{editingConsent.grantedDate}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Update Consent
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      </>
       )}
     </div>
   );

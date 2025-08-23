@@ -83,14 +83,14 @@ class ConsentService {
    * TMF632 - Update existing consent
    */
   async updateConsent(id: string, updates: ConsentUpdateRequest): Promise<ApiResponse<PrivacyConsent>> {
-    return apiClient.patch<PrivacyConsent>(`${this.basePath}/privacyConsent/${id}`, updates);
+    return apiClient.put<PrivacyConsent>(`${this.basePath}/consent/${id}`, updates);
   }
 
   /**
    * TMF632 - Revoke consent
    */
   async revokeConsent(id: string, reason?: string): Promise<ApiResponse<PrivacyConsent>> {
-    return apiClient.patch<PrivacyConsent>(`${this.basePath}/privacyConsent/${id}`, {
+    return apiClient.put<PrivacyConsent>(`${this.basePath}/consent/${id}`, {
       status: 'revoked',
       timestampRevoked: new Date().toISOString(),
       metadata: { revocationReason: reason }
@@ -101,7 +101,7 @@ class ConsentService {
    * TMF632 - Delete consent (hard delete)
    */
   async deleteConsent(id: string): Promise<ApiResponse<void>> {
-    return apiClient.delete<void>(`${this.basePath}/privacyConsent/${id}`);
+    return apiClient.delete<void>(`${this.basePath}/consent/${id}`);
   }
 
   /**

@@ -40,32 +40,33 @@ class DashboardService {
       const [
         consentsResponse,
         partiesResponse,
-        privacyNoticesResponse,
+        preferencesResponse,
         dsarResponse,
-        auditResponse,
-        bulkImportResponse,
-        eventListenerResponse,
-        complianceRuleResponse
+        auditResponse
       ] = await Promise.all([
-        apiClient.get(`${this.basePath}/consent`),
-        apiClient.get(`${this.basePath}/party`),
-        apiClient.get(`${this.basePath}/privacy-notice`),
-        apiClient.get(`${this.basePath}/dsar`),
-        apiClient.get(`${this.basePath}/audit?limit=10`),
-        apiClient.get(`${this.basePath}/bulk-import?limit=5`),
-        apiClient.get(`${this.basePath}/event-listener`),
-        apiClient.get(`${this.basePath}/compliance-rule`)
+        apiClient.get(`${this.basePath}/api/v1/consent`),
+        apiClient.get(`${this.basePath}/api/v1/party`),
+        apiClient.get(`${this.basePath}/api/v1/preferences`), // Use preferences instead of privacy-notice
+        apiClient.get(`${this.basePath}/api/v1/dsar`),
+        apiClient.get(`${this.basePath}/api/v1/event?limit=10`),
+        // Note: bulk-import, event-listener, and compliance-rule endpoints don't exist yet
+        // apiClient.get(`${this.basePath}/bulk-import?limit=5`),
+        // apiClient.get(`${this.basePath}/event-listener`),
+        // apiClient.get(`${this.basePath}/compliance-rule`)
       ]);
 
       // Extract data
       const consents = consentsResponse.data as any[];
       const parties = partiesResponse.data as any[];
-      const privacyNotices = (privacyNoticesResponse.data as any).notices || privacyNoticesResponse.data as any[];
+      const preferences = preferencesResponse.data as any[];
       const dsars = dsarResponse.data as any[];
       const auditLogs = (auditResponse.data as any).logs || auditResponse.data as any[];
-      const bulkImports = (bulkImportResponse.data as any).imports || bulkImportResponse.data as any[];
-      const eventListeners = (eventListenerResponse.data as any).listeners || eventListenerResponse.data as any[];
-      const complianceRules = (complianceRuleResponse.data as any).rules || complianceRuleResponse.data as any[];
+      
+      // Mock data for missing endpoints
+      const privacyNotices: any[] = [];
+      const bulkImports: any[] = [];
+      const eventListeners: any[] = [];
+      const complianceRules: any[] = [];
 
       // Calculate consent breakdown
       const marketingConsents = consents.filter(c => c.purpose === 'marketing' || c.consentType === 'marketing');

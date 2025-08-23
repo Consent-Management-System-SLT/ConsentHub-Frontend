@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
-import { Users, Plus, Search, Edit, Trash2, Shield, UserCheck, RefreshCw, X, Mail, Phone, Calendar, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, Plus, Search, Edit, Trash2, Shield, UserCheck, RefreshCw, Eye, EyeOff } from 'lucide-react';
 
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone?: string;
-  role: 'Admin' | 'Manager' | 'CSR' | 'Customer';
+  role: 'admin' | 'csr' | 'customer';
   status: 'active' | 'inactive' | 'suspended';
-  lastLogin: string;
+  lastLogin: string | null;
   createdAt: string;
   department?: string;
+  jobTitle?: string;
+  company?: string;
+  emailVerified?: boolean;
   permissions: string[];
 }
 
@@ -24,65 +27,23 @@ const UserManagement: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  const [users, setUsers] = useState<User[]>([
-    { 
-      id: 1, 
-      name: 'John Smith', 
-      email: 'john.smith@company.com', 
-      phone: '+1 (555) 123-4567',
-      role: 'Admin', 
-      status: 'active', 
-      lastLogin: '2024-01-28',
-      createdAt: '2023-06-15',
-      department: 'IT',
-      permissions: ['user_management', 'system_config', 'audit_logs', 'data_export']
-    },
-    { 
-      id: 2, 
-      name: 'Sarah Wilson', 
-      email: 'sarah.wilson@company.com', 
-      phone: '+1 (555) 234-5678',
-      role: 'CSR', 
-      status: 'active', 
-      lastLogin: '2024-01-27',
-      createdAt: '2023-08-22',
-      department: 'Customer Service',
-      permissions: ['customer_support', 'consent_management', 'dsar_handling']
-    },
-    { 
-      id: 3, 
-      name: 'Mike Johnson', 
-      email: 'mike.johnson@company.com', 
-      phone: '+1 (555) 345-6789',
-      role: 'CSR', 
-      status: 'active', 
-      lastLogin: '2024-01-26',
-      createdAt: '2023-09-10',
-      department: 'Customer Service',
-      permissions: ['customer_support', 'consent_management']
-    },
-    { 
-      id: 4, 
-      name: 'Alice Brown', 
-      email: 'alice.brown@company.com', 
-      phone: '+1 (555) 456-7890',
-      role: 'Manager', 
-      status: 'inactive', 
-      lastLogin: '2024-01-20',
-      createdAt: '2023-05-03',
-      department: 'Operations',
-      permissions: ['team_management', 'reporting', 'consent_management']
-    }
-  ]);
-
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
     phone: '',
-    role: 'CSR' as User['role'],
+    password: '',
+    confirmPassword: '',
+    role: 'csr' as User['role'],
     department: '',
     permissions: [] as string[]
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const availablePermissions = [
     'user_management',
@@ -96,26 +57,121 @@ const UserManagement: React.FC = () => {
     'reporting'
   ];
 
-  const handleAddUser = () => {
-    const user: User = {
-      id: Math.max(...users.map(u => u.id)) + 1,
-      ...newUser,
-      status: 'active',
-      lastLogin: 'Never',
-      createdAt: new Date().toISOString().split('T')[0]
-    };
-    
-    setUsers([...users, user]);
-    setNewUser({
-      name: '',
-      email: '',
-      phone: '',
-      role: 'CSR',
-      department: '',
-      permissions: []
-    });
-    setShowAddModal(false);
+  // API Functions
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:3001/api/v1/users', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch users: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      setUsers(data.users || []);
+      setTotalCount(data.totalCount || 0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch users');
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const validateUserForm = () => {
+    if (!newUser.name.trim()) {
+      setError('Name is required');
+      return false;
+    }
+    if (!newUser.email.trim()) {
+      setError('Email is required');
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(newUser.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    if (!newUser.password) {
+      setError('Password is required');
+      return false;
+    }
+    if (newUser.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+    if (newUser.password !== newUser.confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    return true;
+  };
+
+  const handleAddUser = async () => {
+    if (!validateUserForm()) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:3001/api/v1/users', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: newUser.name,
+          email: newUser.email,
+          password: newUser.password,
+          phone: newUser.phone,
+          role: newUser.role,
+          department: newUser.department
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create user');
+      }
+      
+      // Add the new user to the list
+      setUsers([...users, data.user]);
+      setTotalCount(prev => prev + 1);
+      
+      // Reset form
+      setNewUser({
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
+        role: 'csr',
+        department: '',
+        permissions: []
+      });
+      
+      setShowAddModal(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create user');
+      console.error('Error creating user:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load users on component mount
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
@@ -143,7 +199,7 @@ const UserManagement: React.FC = () => {
     setUserToDelete(null);
   };
 
-  const handleStatusChange = (userId: number, newStatus: User['status']) => {
+  const handleStatusChange = (userId: string, newStatus: User['status']) => {
     setUsers(users.map(u => 
       u.id === userId 
         ? { ...u, status: newStatus }
@@ -160,26 +216,26 @@ const UserManagement: React.FC = () => {
   });
 
   const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'Admin':
+    switch (role.toLowerCase()) {
+      case 'admin':
         return <Shield className="w-4 h-4 text-red-600" />;
-      case 'Manager':
-        return <UserCheck className="w-4 h-4 text-myslt-primary" />;
-      case 'CSR':
+      case 'csr':
         return <Users className="w-4 h-4 text-green-600" />;
+      case 'customer':
+        return <Users className="w-4 h-4 text-blue-600" />;
       default:
         return <Users className="w-4 h-4 text-myslt-text-secondary" />;
     }
   };
 
   const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'Admin':
+    switch (role.toLowerCase()) {
+      case 'admin':
         return 'bg-red-100 text-red-800';
-      case 'Manager':
-        return 'bg-myslt-primary/10 text-myslt-primary';
-      case 'CSR':
+      case 'csr':
         return 'bg-myslt-success/10 text-myslt-success';
+      case 'customer':
+        return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-myslt-service-card text-myslt-text-primary';
     }
@@ -203,18 +259,28 @@ const UserManagement: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-myslt-text-primary">User Management</h1>
-          <p className="text-myslt-text-secondary mt-2">Manage user accounts and permissions</p>
+          <p className="text-myslt-text-secondary mt-2">
+            Manage user accounts and permissions {totalCount > 0 && `(${totalCount} total users)`}
+          </p>
         </div>
         <div className="flex items-center space-x-3">
           <button 
-            onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+            onClick={() => {
+              setShowAddModal(true);
+              setError(null);
+            }}
+            disabled={loading}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
           >
             <Plus className="w-4 h-4" />
             <span className="text-sm font-medium">Add User</span>
           </button>
-          <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2">
-            <RefreshCw className="w-4 h-4" />
+          <button 
+            onClick={fetchUsers}
+            disabled={loading}
+            className="px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors flex items-center space-x-2 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             <span className="text-sm font-medium">Refresh</span>
           </button>
         </div>
@@ -253,7 +319,7 @@ const UserManagement: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-myslt-text-secondary">Admins</p>
               <p className="text-2xl font-bold text-myslt-danger">
-                {users.filter(u => u.role === 'Admin').length}
+                {users.filter(u => u.role === 'admin').length}
               </p>
             </div>
             <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
@@ -267,7 +333,7 @@ const UserManagement: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-myslt-text-secondary">CSR Staff</p>
               <p className="text-2xl font-bold text-myslt-primary">
-                {users.filter(u => u.role === 'CSR').length}
+                {users.filter(u => u.role === 'csr').length}
               </p>
             </div>
             <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
@@ -296,9 +362,9 @@ const UserManagement: React.FC = () => {
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
           >
             <option value="all">All Roles</option>
-            <option value="Admin">Admin</option>
-            <option value="Manager">Manager</option>
-            <option value="CSR">CSR</option>
+            <option value="admin">Admin</option>
+            <option value="csr">CSR</option>
+            <option value="customer">Customer</option>
           </select>
           <select
             value={statusFilter}
@@ -314,21 +380,55 @@ const UserManagement: React.FC = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-myslt-background">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">User</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Role</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Last Login</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Department</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-myslt-card divide-y divide-myslt-accent/20">
-              {filteredUsers.map((user) => (
+      {loading && users.length === 0 ? (
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-myslt-primary mx-auto mb-4"></div>
+            <p className="text-myslt-text-secondary">Loading users...</p>
+          </div>
+        </div>
+      ) : error && users.length === 0 ? (
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-8">
+          <div className="text-center">
+            <div className="text-red-500 text-4xl mb-4">⚠️</div>
+            <h3 className="text-lg font-medium text-myslt-text-primary mb-2">Error Loading Users</h3>
+            <p className="text-myslt-text-secondary mb-4">{error}</p>
+            <button
+              onClick={fetchUsers}
+              className="px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-myslt-background">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">User</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Last Login</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Department</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-myslt-card divide-y divide-myslt-accent/20">
+                {filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-8 text-center">
+                      <div className="text-myslt-text-secondary">
+                        {searchTerm || roleFilter !== 'all' || statusFilter !== 'all' 
+                          ? 'No users found matching your search criteria.'
+                          : 'No users found. Create your first user to get started.'
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-myslt-background">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -346,7 +446,7 @@ const UserManagement: React.FC = () => {
                     <div className="flex items-center">
                       {getRoleIcon(user.role)}
                       <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
-                        {user.role}
+                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </span>
                     </div>
                   </td>
@@ -382,22 +482,24 @@ const UserManagement: React.FC = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Add User Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-myslt-card rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-myslt-accent/20">
-              <h3 className="text-lg font-semibold text-myslt-text-primary">Add New User</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-10 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full border border-gray-200">
+            <div className="p-6 border-b border-gray-200 bg-white rounded-t-xl">
+              <h3 className="text-lg font-semibold text-gray-900">Add New User</h3>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-4 bg-white">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Name</label>
                 <input
                   type="text"
                   value={newUser.name}
@@ -406,7 +508,7 @@ const UserManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Email</label>
                 <input
                   type="email"
                   value={newUser.email}
@@ -415,7 +517,7 @@ const UserManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Phone</label>
                 <input
                   type="tel"
                   value={newUser.phone}
@@ -424,19 +526,57 @@ const UserManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={newUser.password}
+                    onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Enter password (min 6 characters)"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Confirm Password</label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={newUser.confirmPassword}
+                    onChange={(e) => setNewUser({...newUser, confirmPassword: e.target.value})}
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Confirm password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Role</label>
                 <select
                   value={newUser.role}
                   onChange={(e) => setNewUser({...newUser, role: e.target.value as User['role']})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 >
-                  <option value="CSR">CSR</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Admin">Admin</option>
+                  <option value="csr">CSR</option>
+                  <option value="admin">Admin</option>
+                  <option value="customer">Customer</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1">Department</label>
                 <input
                   type="text"
                   value={newUser.department}
@@ -445,18 +585,37 @@ const UserManagement: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="p-6 border-t border-myslt-border flex justify-end space-x-3">
+            {error && (
+              <div className="p-6 pt-0 bg-white">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
+              </div>
+            )}
+            <div className="p-6 border-t border-gray-200 bg-white rounded-b-xl flex justify-end space-x-3">
               <button
-                onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-myslt-text-secondary bg-myslt-service-card rounded-lg hover:bg-myslt-card-gradient transition-colors"
+                onClick={() => {
+                  setShowAddModal(false);
+                  setError(null);
+                }}
+                disabled={loading}
+                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddUser}
-                className="px-4 py-2 bg-myslt-success text-white rounded-lg hover:bg-myslt-success/90 transition-colors"
+                disabled={loading || !newUser.name || !newUser.email || !newUser.password || newUser.password !== newUser.confirmPassword}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
-                Add User
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Creating...
+                  </>
+                ) : (
+                  'Add User'
+                )}
               </button>
             </div>
           </div>
@@ -465,7 +624,7 @@ const UserManagement: React.FC = () => {
 
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-25 z-50 flex items-center justify-center p-4">
           <div className="bg-myslt-card rounded-xl shadow-xl max-w-md w-full">
             <div className="p-6 border-b border-myslt-accent/20">
               <h3 className="text-lg font-semibold text-myslt-text-primary">Edit User</h3>
@@ -543,7 +702,7 @@ const UserManagement: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-25 z-50 flex items-center justify-center p-4">
           <div className="bg-myslt-card rounded-xl shadow-xl max-w-md w-full">
             <div className="p-6 border-b border-myslt-accent/20">
               <h3 className="text-lg font-semibold text-myslt-text-primary">Confirm Delete</h3>

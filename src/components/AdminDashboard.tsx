@@ -1,30 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  BarChart3, 
-  Shield, 
-  Settings, 
-  FileText, 
-  Database, 
-  Activity, 
-  Upload, 
-  Webhook, 
-  Users, 
-  AlertTriangle,
-  TrendingUp,
-  CheckCircle,
-  Clock,
-  Eye,
-  Download,
-  Filter
-} from 'lucide-react';
 
 // Import admin components
 import AdminHeader from './admin/AdminHeader';
 import AdminSidebar from './admin/AdminSidebar';
 import DashboardHome from './admin/DashboardHome';
 import ConsentOverviewTable from './admin/ConsentOverviewTable';
-import PreferenceManager from './admin/PreferenceManager';
-import PrivacyNoticeManager from './admin/PrivacyNoticeManager';
+import PreferenceManagerNew from './admin/PreferenceManagerNew';
+import { PrivacyNotices } from './PrivacyNotices';
 import DSARManager from './admin/DSARManager';
 import AuditLogViewer from './admin/AuditLogViewer';
 import BulkImportManager from './admin/BulkImportManager';
@@ -49,9 +31,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
       case 'consents':
         return <ConsentOverviewTable />;
       case 'preferences':
-        return <PreferenceManager />;
+        return <PreferenceManagerNew />;
       case 'privacy-notices':
-        return <PrivacyNoticeManager />;
+        return <PrivacyNotices />;
       case 'dsar-requests':
         return <DSARManager />;
       case 'audit-logs':

@@ -8,7 +8,8 @@ import {
   authService,
   customerService,
   privacyNoticeService,
-  auditService
+  auditService,
+  adminService
 } from '../services';
 import { 
   PrivacyPreference
@@ -490,5 +491,159 @@ export function useAuditStats(startDate?: string, endDate?: string) {
   return useApi(
     () => auditService.getAuditStats(startDate, endDate).then(r => r.data),
     [startDate, endDate]
+  );
+}
+
+// ============================================
+// ADMIN DASHBOARD HOOKS
+// ============================================
+
+/**
+ * Hook for admin dashboard overview
+ * Aggregates system-wide metrics from all microservices
+ */
+export function useAdminDashboardOverview() {
+  return useApi(
+    async () => {
+      try {
+        const response = await fetch('/api/v1/admin/dashboard/overview', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) throw new Error('Failed to fetch admin dashboard');
+        const data = await response.json();
+        return data.data;
+      } catch (error) {
+        console.error('Admin dashboard fetch error:', error);
+        // Return fallback data if admin service is not available
+        return {
+          systemOverview: {
+            totalConsents: 0,
+            grantedConsents: 0,
+            revokedConsents: 0,
+            totalPreferences: 0,
+            totalParties: 0,
+            pendingDSAR: 0
+          },
+          complianceMetrics: {
+            complianceScore: 85,
+            overdueItems: 0,
+            upcomingDeadlines: []
+          },
+          systemHealth: {
+            servicesOnline: [],
+            systemUptime: 0,
+            lastBackup: new Date().toISOString()
+          },
+          recentActivity: []
+        };
+      }
+    }
+  );
+}
+
+/**
+ * Hook for admin user management
+ */
+export function useAdminUserManagement(params: {
+  page?: number;
+  limit?: number;
+  role?: string;
+  status?: string;
+  search?: string;
+} = {}) {
+  return useApi(
+    async () => {
+      try {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.set('page', params.page.toString());
+        if (params.limit) queryParams.set('limit', params.limit.toString());
+        if (params.role) queryParams.set('role', params.role);
+        if (params.status) queryParams.set('status', params.status);
+        if (params.search) queryParams.set('search', params.search);
+
+        const response = await fetch(`/api/v1/admin/users?${queryParams}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) throw new Error('Failed to fetch users');
+        const data = await response.json();
+        return data.data;
+      } catch (error) {
+        console.error('User management fetch error:', error);
+        return { users: [], totalCount: 0 };
+      }
+    },
+    [params.page, params.limit, params.role, params.status, params.search]
+  );
+}
+
+/**
+ * Hook for admin consent analytics
+ */
+export function useAdminConsentAnalytics(params: {
+  timeframe?: string;
+  jurisdiction?: string;
+  purpose?: string;
+} = {}) {
+  return useApi(
+    async () => {
+      try {
+        const queryParams = new URLSearchParams();
+        if (params.timeframe) queryParams.set('timeframe', params.timeframe);
+        if (params.jurisdiction) queryParams.set('jurisdiction', params.jurisdiction);
+        if (params.purpose) queryParams.set('purpose', params.purpose);
+
+        const response = await fetch(`/api/v1/admin/analytics/consents?${queryParams}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) throw new Error('Failed to fetch consent analytics');
+        const data = await response.json();
+        return data.data;
+      } catch (error) {
+        console.error('Consent analytics fetch error:', error);
+        return { summary: {}, byPurpose: [], trends: [] };
+      }
+    },
+    [params.timeframe, params.jurisdiction, params.purpose]
+  );
+}
+
+/**
+ * Hook for admin compliance dashboard
+ */
+export function useAdminComplianceDashboard(params: {
+  timeframe?: string;
+  framework?: string;
+} = {}) {
+  return useApi(
+    async () => {
+      try {
+        const queryParams = new URLSearchParams();
+        if (params.timeframe) queryParams.set('timeframe', params.timeframe);
+        if (params.framework) queryParams.set('framework', params.framework);
+
+        const response = await fetch(`/api/v1/admin/compliance/dashboard?${queryParams}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) throw new Error('Failed to fetch compliance dashboard');
+        const data = await response.json();
+        return data.data;
+      } catch (error) {
+        console.error('Compliance dashboard fetch error:', error);
+        return { complianceScore: 85, dsarRequests: {}, consentCompliance: {} };
+      }
+    },
+    [params.timeframe, params.framework]
   );
 }
