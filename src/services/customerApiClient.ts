@@ -18,7 +18,7 @@ class CustomerApiClient {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3011';
+    this.baseURL = import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001';
     
     this.axiosInstance = axios.create({
       baseURL: this.baseURL,
@@ -194,7 +194,7 @@ class CustomerApiClient {
     if (params?.purpose) queryParams.append('purpose', params.purpose);
     if (params?.consentType) queryParams.append('consentType', params.consentType);
     
-    return this.get<any>(`/api/v1/consent?${queryParams.toString()}`);
+    return this.get<any>(`/api/v1/customer/consents?${queryParams.toString()}`);
   }
 
   async getConsentById(id: string) {
@@ -226,7 +226,7 @@ class CustomerApiClient {
     if (params?.channelType) queryParams.append('channelType', params.channelType);
     if (params?.isAllowed !== undefined) queryParams.append('isAllowed', params.isAllowed.toString());
     
-    return this.get<any>(`/api/v1/preference?${queryParams.toString()}`);
+    return this.get<any>(`/api/v1/customer/preferences?${queryParams.toString()}`);
   }
 
   async getPreferenceById(id: string) {
@@ -262,7 +262,7 @@ class CustomerApiClient {
     if (params?.requestType) queryParams.append('requestType', params.requestType);
     if (params?.category) queryParams.append('category', params.category);
     
-    return this.get<any>(`/api/v1/dsar?${queryParams.toString()}`);
+    return this.get<any>(`/api/v1/customer/dsar?${queryParams.toString()}`);
   }
 
   async getDSARRequestById(id: string) {
@@ -287,6 +287,21 @@ class CustomerApiClient {
 
   async getDSARRequestTypes() {
     return this.get<any>('/api/v1/dsar/types');
+  }
+
+  // Privacy Notice APIs
+  async getPrivacyNotices(params?: { page?: number; limit?: number; category?: string; language?: string }) {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.category) queryParams.append('category', params.category);
+    if (params?.language) queryParams.append('language', params.language);
+    
+    return this.get<any>(`/api/v1/customer/privacy-notices?${queryParams.toString()}`);
+  }
+
+  async getPrivacyNoticeById(id: string) {
+    return this.get<any>(`/api/v1/privacy-notices/${id}`);
   }
 }
 

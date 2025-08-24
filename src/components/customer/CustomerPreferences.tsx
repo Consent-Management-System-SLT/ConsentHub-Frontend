@@ -93,16 +93,19 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
       
       // Map backend preference data to UI format
       preferencesData.preferences.forEach((pref: any) => {
-        if (pref.channelType === 'email') {
-          loadedPreferences.channels.email = pref.isAllowed;
-        } else if (pref.channelType === 'sms') {
-          loadedPreferences.channels.sms = pref.isAllowed;
-        } else if (pref.channelType === 'push') {
-          loadedPreferences.channels.push = pref.isAllowed;
-        }
-        
-        if (pref.preferenceType === 'marketing') {
-          loadedPreferences.topics.offers = pref.isAllowed;
+        if (pref.value && pref.value.category === 'communication') {
+          const channelType = pref.value.type;
+          const isEnabled = pref.value.enabled;
+          
+          if (channelType === 'email') {
+            loadedPreferences.channels.email = isEnabled;
+          } else if (channelType === 'sms') {
+            loadedPreferences.channels.sms = isEnabled;
+          } else if (channelType === 'push') {
+            // Map push to both push and inApp for UI compatibility
+            loadedPreferences.channels.push = isEnabled;
+            loadedPreferences.channels.inApp = isEnabled;
+          }
         }
       });
       
@@ -158,9 +161,35 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Saving preferences:', preferences);
+      // First, fetch current preferences to get their IDs
+      const currentPrefsResponse = await customerApiClient.getPreferences();
+      const currentPrefs = currentPrefsResponse.data?.preferences || [];
+      
+      // Map frontend preference structure to backend updates
+      const updatePromises: Promise<any>[] = [];
+      
+      // Update each channel preference
+      Object.entries(preferences.channels).forEach(([channel, enabled]) => {
+        const backendChannel = channel === 'inApp' ? 'push' : channel; // Map inApp to push
+        const existingPref = currentPrefs.find((p: any) => 
+          p.value?.type === backendChannel && p.value?.category === 'communication'
+        );
+        
+        if (existingPref) {
+          const updateData = {
+            value: {
+              ...existingPref.value,
+              enabled: enabled
+            }
+          };
+          updatePromises.push(customerApiClient.updatePreference(existingPref._id, updateData));
+        }
+      });
+      
+      // Execute all updates
+      await Promise.all(updatePromises);
+      
+      console.log('Preferences saved successfully');
       setSaveStatus('success');
       setHasChanges(false);
       
@@ -174,6 +203,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
       
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
+      console.error('Failed to save preferences:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {

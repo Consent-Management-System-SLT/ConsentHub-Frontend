@@ -16,6 +16,7 @@ import {
   Database
 } from 'lucide-react';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { customerApiClient } from '../../services/customerApiClient';
 
 interface DSARRequest {
   id: string;
@@ -135,9 +136,6 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
       const newRequest = {
         type: requestType,
         reason: requestReason,
@@ -145,6 +143,10 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
       };
       
       console.log('Submitting DSAR request:', newRequest);
+      
+      // Make real API call to create DSAR request
+      await customerApiClient.createDSARRequest(newRequest);
+      
       setSubmitStatus('success');
       
       // Add notification for admin/CSR users about the new DSAR request

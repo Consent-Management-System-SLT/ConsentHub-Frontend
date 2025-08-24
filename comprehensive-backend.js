@@ -226,6 +226,461 @@ function verifyToken(req, res, next) {
     }
 }
 
+// Helper Functions for Default Data Creation
+async function createDefaultConsents(userId, partyId) {
+    const defaultConsents = [
+        {
+            id: `consent_${userId}_essential_${Date.now()}`,
+            partyId: partyId,
+            userId: userId.toString(),
+            purpose: "essential_services",
+            description: "Process your account data for service delivery and account management",
+            status: "granted",
+            legalBasis: "contract",
+            category: "essential",
+            channel: "web",
+            geoLocation: "Sri Lanka",
+            versionAccepted: "1.0",
+            recordSource: "registration",
+            type: "essential",
+            consentType: "essential",
+            validFrom: new Date().toISOString(),
+            expiresAt: null, // Essential consents don't expire
+            grantedDate: new Date().toISOString(),
+            lastModified: new Date().toISOString(),
+            required: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        },
+        {
+            id: `consent_${userId}_security_${Date.now()}`,
+            partyId: partyId,
+            userId: userId.toString(),
+            purpose: "account_security",
+            description: "Monitor account for security, fraud prevention and compliance",
+            status: "granted",
+            legalBasis: "legitimate_interest",
+            category: "security",
+            channel: "web",
+            geoLocation: "Sri Lanka",
+            versionAccepted: "1.0",
+            recordSource: "registration",
+            type: "security",
+            consentType: "security",
+            validFrom: new Date().toISOString(),
+            expiresAt: null, // Security consents don't expire
+            grantedDate: new Date().toISOString(),
+            lastModified: new Date().toISOString(),
+            required: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        },
+        {
+            id: `consent_${userId}_service_comms_${Date.now()}`,
+            partyId: partyId,
+            userId: userId.toString(),
+            purpose: "service_communications",
+            description: "Send you important service updates, billing information and account notifications",
+            status: "granted",
+            legalBasis: "contract",
+            category: "service",
+            channel: "email",
+            geoLocation: "Sri Lanka",
+            versionAccepted: "1.0",
+            recordSource: "registration",
+            type: "service",
+            consentType: "service",
+            validFrom: new Date().toISOString(),
+            expiresAt: null, // Service communications are essential
+            grantedDate: new Date().toISOString(),
+            lastModified: new Date().toISOString(),
+            required: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        },
+        {
+            id: `consent_${userId}_marketing_${Date.now()}`,
+            partyId: partyId,
+            userId: userId.toString(),
+            purpose: "marketing",
+            description: "Send promotional offers, product updates and marketing communications",
+            status: "pending",
+            legalBasis: "consent",
+            category: "marketing",
+            channel: "email",
+            geoLocation: "Sri Lanka",
+            versionAccepted: "1.0",
+            recordSource: "registration",
+            type: "marketing",
+            consentType: "marketing",
+            validFrom: new Date().toISOString(),
+            expiresAt: new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000).toISOString(), // 2 years
+            lastModified: new Date().toISOString(),
+            required: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        },
+        {
+            id: `consent_${userId}_analytics_${Date.now()}`,
+            partyId: partyId,
+            userId: userId.toString(),
+            purpose: "analytics",
+            description: "Improve your experience with personalized content and service optimization",
+            status: "pending",
+            legalBasis: "consent",
+            category: "analytics",
+            channel: "web",
+            geoLocation: "Sri Lanka",
+            versionAccepted: "1.0",
+            recordSource: "registration",
+            type: "analytics",
+            consentType: "analytics",
+            validFrom: new Date().toISOString(),
+            expiresAt: new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000).toISOString(), // 2 years
+            lastModified: new Date().toISOString(),
+            required: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        }
+    ];
+
+    // Add consents to both in-memory and MongoDB
+    for (const consent of defaultConsents) {
+        consents.push(consent);
+        
+        // Also save to MongoDB
+        try {
+            const mongoConsent = new Consent(consent);
+            await mongoConsent.save();
+            console.log(`Created default consent: ${consent.purpose} for user ${userId}`);
+        } catch (error) {
+            console.log(`Failed to save consent to MongoDB: ${error.message}`);
+        }
+    }
+}
+
+async function createDefaultUserPreferences(userId, partyId, language = 'en') {
+    const defaultPreferences = [
+        {
+            id: `user_pref_${userId}_email`,
+            userId: userId.toString(),
+            partyId: partyId,
+            preferenceId: "pref_email_notifications",
+            preferenceType: "communication_channel",
+            channelType: "email",
+            value: true,
+            source: "registration",
+            metadata: {
+                channelType: "email",
+                frequency: "immediate",
+                lastModified: new Date().toISOString(),
+                preferences: {
+                    serviceUpdates: true,
+                    billing: true,
+                    security: true,
+                    marketing: false,
+                    promotions: false
+                }
+            },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        },
+        {
+            id: `user_pref_${userId}_sms`,
+            userId: userId.toString(),
+            partyId: partyId,
+            preferenceId: "pref_sms_notifications",
+            preferenceType: "communication_channel",
+            channelType: "sms",
+            value: false,
+            source: "registration",
+            metadata: {
+                channelType: "sms",
+                frequency: "never",
+                lastModified: new Date().toISOString(),
+                preferences: {
+                    serviceUpdates: false,
+                    billing: false,
+                    security: true, // Security SMS always enabled
+                    marketing: false,
+                    promotions: false
+                }
+            },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        },
+        {
+            id: `user_pref_${userId}_push`,
+            userId: userId.toString(),
+            partyId: partyId,
+            preferenceId: "pref_push_notifications",
+            preferenceType: "communication_channel",
+            channelType: "push",
+            value: true,
+            source: "registration",
+            metadata: {
+                channelType: "push",
+                frequency: "immediate",
+                lastModified: new Date().toISOString(),
+                preferences: {
+                    serviceUpdates: true,
+                    billing: false,
+                    security: true,
+                    marketing: false,
+                    promotions: false
+                }
+            },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        },
+        {
+            id: `user_pref_${userId}_language`,
+            userId: userId.toString(),
+            partyId: partyId,
+            preferenceId: "pref_language",
+            preferenceType: "system_setting",
+            channelType: "system",
+            value: language,
+            source: "registration",
+            metadata: {
+                language: language,
+                timezone: "Asia/Colombo",
+                dateFormat: "DD/MM/YYYY",
+                lastModified: new Date().toISOString()
+            },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        },
+        {
+            id: `user_pref_${userId}_topics`,
+            userId: userId.toString(),
+            partyId: partyId,
+            preferenceId: "pref_topic_subscriptions",
+            preferenceType: "content_topics",
+            channelType: "all",
+            value: true,
+            source: "registration",
+            metadata: {
+                topics: {
+                    serviceUpdates: true,
+                    billing: true,
+                    security: true,
+                    maintenance: true,
+                    productUpdates: false,
+                    promotions: false,
+                    surveys: false,
+                    newsletter: false
+                },
+                lastModified: new Date().toISOString()
+            },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        }
+    ];
+
+    // Add preferences to both in-memory and MongoDB
+    for (const preference of defaultPreferences) {
+        preferences.push(preference);
+        
+        // Also save to MongoDB
+        try {
+            const mongoPreference = new UserPreference(preference);
+            await mongoPreference.save();
+            console.log(`Created default preference: ${preference.preferenceId} for user ${userId}`);
+        } catch (error) {
+            console.log(`Failed to save preference to MongoDB: ${error.message}`);
+        }
+    }
+}
+
+// Function to ensure default privacy notices exist
+async function ensureDefaultPrivacyNotices() {
+    const defaultNotices = [
+        {
+            noticeId: "PN-GEN-001",
+            title: "SLT Mobitel Privacy Policy",
+            content: "This privacy policy describes how SLT Mobitel collects, uses, and protects your personal information in accordance with applicable privacy laws and regulations.",
+            contentType: "text/html",
+            version: "3.2",
+            category: "general",
+            purposes: ["service_delivery", "legal_compliance", "customer_support"],
+            legalBasis: "contract",
+            dataCategories: ["personal_data", "communication_data", "financial_data"],
+            recipients: [
+                {
+                    name: "SLT Mobitel",
+                    category: "internal",
+                    purpose: "Service Delivery"
+                }
+            ],
+            retentionPeriod: {
+                duration: "7 years",
+                criteria: "Legal requirement for telecommunications records"
+            },
+            rights: ["access", "rectification", "erasure", "portability"],
+            contactInfo: {
+                organization: {
+                    name: "SLT Mobitel",
+                    email: "privacy@sltmobitel.lk",
+                    phone: "+94112575000"
+                }
+            },
+            effectiveDate: new Date("2024-01-01T00:00:00Z"),
+            expirationDate: null,
+            status: "active",
+            language: "en",
+            jurisdiction: "Sri Lanka",
+            applicableRegions: ["sri_lanka"],
+            applicableLaws: ["Personal Data Protection Act"],
+            nextReviewDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+            metadata: {
+                author: "legal@sltmobitel.lk",
+                changeLog: [
+                    {
+                        version: "3.2",
+                        changes: "Updated for Personal Data Protection Act compliance",
+                        author: "legal@sltmobitel.lk",
+                        date: new Date("2024-01-01T00:00:00Z")
+                    }
+                ],
+                tags: ["gdpr", "pdp", "privacy"]
+            },
+            requiresAcceptance: true,
+            createdAt: new Date("2024-01-01T00:00:00Z"),
+            updatedAt: new Date()
+        },
+        {
+            noticeId: "PN-COOKIE-001",
+            title: "Cookie Usage Policy",
+            content: "This policy explains how SLT Mobitel uses cookies and similar technologies on our websites and mobile applications.",
+            contentType: "text/html",
+            version: "2.1",
+            category: "cookies",
+            purposes: ["analytics", "personalization", "marketing"],
+            legalBasis: "consent",
+            dataCategories: ["behavioral_data", "device_data"],
+            recipients: [
+                {
+                    name: "Analytics Providers",
+                    category: "third_party",
+                    purpose: "Website Analytics"
+                }
+            ],
+            retentionPeriod: {
+                duration: "2 years",
+                criteria: "Analytics data retention policy"
+            },
+            rights: ["access", "rectification", "erasure"],
+            contactInfo: {
+                organization: {
+                    name: "SLT Mobitel",
+                    email: "privacy@sltmobitel.lk"
+                }
+            },
+            effectiveDate: new Date("2024-06-01T00:00:00Z"),
+            expirationDate: null,
+            status: "active",
+            language: "en",
+            jurisdiction: "Sri Lanka",
+            applicableRegions: ["sri_lanka"],
+            nextReviewDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            requiresAcceptance: false,
+            createdAt: new Date("2024-06-01T00:00:00Z"),
+            updatedAt: new Date()
+        },
+        {
+            noticeId: "PN-TERMS-001",
+            title: "Terms of Service",
+            content: "These terms govern your use of SLT Mobitel services and outline the rights and responsibilities of both parties.",
+            contentType: "text/html",
+            version: "4.0",
+            category: "general",
+            purposes: ["service_delivery", "legal_compliance"],
+            legalBasis: "contract",
+            dataCategories: ["personal_data", "financial_data"],
+            recipients: [
+                {
+                    name: "SLT Mobitel",
+                    category: "internal",
+                    purpose: "Service Management"
+                }
+            ],
+            retentionPeriod: {
+                duration: "Contract duration + 7 years"
+            },
+            rights: ["access", "rectification"],
+            contactInfo: {
+                organization: {
+                    name: "SLT Mobitel",
+                    email: "legal@sltmobitel.lk"
+                }
+            },
+            effectiveDate: new Date("2024-03-15T00:00:00Z"),
+            expirationDate: null,
+            status: "active",
+            language: "en",
+            jurisdiction: "Sri Lanka",
+            applicableRegions: ["sri_lanka"],
+            nextReviewDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            requiresAcceptance: true,
+            createdAt: new Date("2024-03-15T00:00:00Z"),
+            updatedAt: new Date()
+        },
+        {
+            noticeId: "PN-MARKETING-001",
+            title: "Marketing Communications Policy",
+            content: "This policy describes how we use your information for marketing purposes and your rights regarding marketing communications.",
+            contentType: "text/html",
+            version: "1.5",
+            category: "marketing",
+            purposes: ["marketing", "personalization"],
+            legalBasis: "consent",
+            dataCategories: ["personal_data", "behavioral_data", "communication_data"],
+            recipients: [
+                {
+                    name: "Marketing Partners",
+                    category: "third_party",
+                    purpose: "Joint Marketing"
+                }
+            ],
+            retentionPeriod: {
+                duration: "Until consent withdrawal + 1 year"
+            },
+            rights: ["access", "rectification", "erasure", "objection"],
+            contactInfo: {
+                organization: {
+                    name: "SLT Mobitel",
+                    email: "marketing@sltmobitel.lk"
+                }
+            },
+            effectiveDate: new Date("2024-05-01T00:00:00Z"),
+            expirationDate: null,
+            status: "active",
+            language: "en",
+            jurisdiction: "Sri Lanka",
+            applicableRegions: ["sri_lanka"],
+            nextReviewDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            requiresAcceptance: false,
+            createdAt: new Date("2024-05-01T00:00:00Z"),
+            updatedAt: new Date()
+        }
+    ];
+
+    // Check and create default notices if they don't exist
+    for (const notice of defaultNotices) {
+        try {
+            const existingNotice = await PrivacyNotice.findOne({ noticeId: notice.noticeId });
+            if (!existingNotice) {
+                const newNotice = new PrivacyNotice(notice);
+                await newNotice.save();
+                console.log(`✅ Created default privacy notice: ${notice.title}`);
+            }
+        } catch (error) {
+            console.log(`❌ Failed to create privacy notice ${notice.title}: ${error.message}`);
+        }
+    }
+}
+
 // Health check
 app.get("/api/v1/health", (req, res) => {
     res.json({ 
@@ -1286,8 +1741,8 @@ app.get("/api/v1/party", async (req, res) => {
     }
 });
 
-// GET /api/v1/consent - Get all consents for CSR  
-app.get("/api/v1/consent", async (req, res) => {
+// GET /api/v1/csr/consent - Get all consents for CSR (different path to avoid conflicts)  
+app.get("/api/v1/csr/consent", async (req, res) => {
     try {
         console.log('✅ CSR Dashboard: Fetching consent data');
         
@@ -4904,52 +5359,26 @@ app.post("/api/v1/auth/register", async (req, res) => {
         // Generate token
         const token = generateToken({ id: savedUser._id, email: savedUser.email, role: savedUser.role });
         
-        // Create initial consent record
-        const consentId = `consent_${savedUser._id}_${Date.now()}`;
-        const initialConsent = {
-            id: consentId,
-            userId: savedUser._id.toString(),
-            partyId: partyId,
-            purposeId: 'data_processing',
-            purpose: 'Data Processing',
-            description: 'Consent for basic data processing',
-            status: 'granted',
-            grantedAt: new Date().toISOString(),
-            expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
-            legalBasis: 'consent',
-            categories: ['personal_data'],
-            channels: ['account_creation']
-        };
+        console.log(`🔧 Creating default data for new user: ${savedUser.email} (ID: ${savedUser._id})`);
         
-        consents.push(initialConsent);
+        // Use enhanced customer data provisioning
+        const { provisionDefaultDataForNewCustomer } = require('./customer-data-provisioning');
         
-        // Create initial preferences
-        const preferenceId = `pref_${savedUser._id}_${Date.now()}`;
-        const initialPreferences = {
-            id: preferenceId,
-            userId: savedUser._id.toString(),
-            partyId: partyId,
-            communicationChannels: {
-                email: true,
-                sms: false,
-                phone: false,
-                mail: false
-            },
-            topicSubscriptions: {
-                serviceUpdates: true,
-                billing: true,
-                marketing: false,
-                promotions: false,
-                security: true
-            },
-            frequency: 'immediate',
-            language: savedUser.language,
-            timezone: 'Asia/Colombo',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-        
-        preferences.push(initialPreferences);
+        try {
+            const provisioningResult = await provisionDefaultDataForNewCustomer(
+                savedUser._id, 
+                savedUser.email, 
+                savedUser.name
+            );
+            
+            if (provisioningResult.success) {
+                console.log(`✅ Successfully provisioned data for ${savedUser.email}:`, provisioningResult.data);
+            } else {
+                console.error(`❌ Provisioning failed for ${savedUser.email}:`, provisioningResult.error);
+            }
+        } catch (error) {
+            console.error(`❌ Critical error in data provisioning:`, error.message);
+        }
         
         // Create audit log entry
         const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
@@ -5024,21 +5453,131 @@ app.get("/api/v1/customer/dashboard/overview", verifyToken, async (req, res) => 
             });
         }
         
-        const userConsents = consents.filter(c => c.userId === req.user.id);
-        const userPreferences = preferences.filter(p => p.userId === req.user.id);
+        // Get user consents, preferences, privacy notices, and DSAR requests using isolated data retrieval
+        const { getCustomerIsolatedData } = require('./customer-data-provisioning');
+        const userConsents = await getCustomerIsolatedData(req.user.id, 'consents');
+        const userPreferences = await getCustomerIsolatedData(req.user.id, 'preferences');
+        const userPrivacyNotices = await getCustomerIsolatedData(req.user.id, 'privacy_notices');
+        const userDSARRequests = await getCustomerIsolatedData(req.user.id, 'dsar_requests');
         
+        // Get communication preferences directly from collections
+        // Use UserPreference model instead of PreferenceItem since PreferenceItem doesn't have userId
+        const { UserPreference } = require('./models/Preference');
+        let communicationPrefs = await UserPreference.find({ 
+            userId: req.user.id.toString()
+        });
+        
+        // If no communication preferences exist, create default ones for this customer
+        if (communicationPrefs.length === 0) {
+            console.log('🔧 Creating default communication preferences for customer');
+            const defaultPrefs = [
+                {
+                    id: `user_pref_${req.user.id}_email_${Date.now()}`,
+                    userId: req.user.id.toString(),
+                    partyId: req.user.id.toString(),
+                    preferenceId: `pref_email_communication`,
+                    value: { type: 'email', enabled: true, category: 'communication' },
+                    source: 'system'
+                },
+                {
+                    id: `user_pref_${req.user.id}_sms_${Date.now() + 1}`,
+                    userId: req.user.id.toString(),
+                    partyId: req.user.id.toString(),
+                    preferenceId: `pref_sms_communication`,
+                    value: { type: 'sms', enabled: true, category: 'communication' },
+                    source: 'system'
+                },
+                {
+                    id: `user_pref_${req.user.id}_push_${Date.now() + 2}`,
+                    userId: req.user.id.toString(),
+                    partyId: req.user.id.toString(),
+                    preferenceId: `pref_push_communication`,
+                    value: { type: 'push', enabled: true, category: 'communication' },
+                    source: 'system'
+                }
+            ];
+            
+            try {
+                for (const prefData of defaultPrefs) {
+                    const pref = new UserPreference(prefData);
+                    await pref.save();
+                }
+                console.log('✅ Created 3 default communication preferences');
+                
+                // Re-fetch the preferences
+                communicationPrefs = await UserPreference.find({ 
+                    userId: req.user.id.toString()
+                });
+            } catch (prefError) {
+                console.warn('⚠️ Could not create default preferences:', prefError.message);
+            }
+        }
+        
+        // Calculate actual counts for this specific customer
+        const totalConsents = userConsents.length;
+        const activeConsents = userConsents.filter(c => c.status === 'granted').length;
+        const totalPreferences = Math.max(userPreferences.length, communicationPrefs.length);
+        
+        // Fix: Count active preferences by checking value.enabled in communicationPrefs
+        const activeCommunicationPrefs = communicationPrefs.filter(p => 
+            p.value && p.value.enabled === true
+        ).length;
+        const activeUserPrefs = userPreferences.filter(p => p.enabled).length;
+        const activePreferences = Math.max(activeUserPrefs, activeCommunicationPrefs);
+        const totalPrivacyNotices = userPrivacyNotices.length;
+        const acknowledgedPrivacyNotices = userPrivacyNotices.filter(p => p.acknowledged).length;
+        const totalDSARRequests = userDSARRequests.length;
+        const pendingDSARRequests = userDSARRequests.filter(d => d.status === 'pending').length;
+        
+        console.log(`📊 Dashboard Overview for ${user.name} (${user.email}):`);
+        console.log(`   Consents: ${totalConsents} (${activeConsents} active)`);
+        console.log(`   Preferences: ${totalPreferences} (${activePreferences} active)`);
+        console.log(`   Privacy Notices: ${totalPrivacyNotices} (${acknowledgedPrivacyNotices} acknowledged)`);
+        console.log(`   DSAR Requests: ${totalDSARRequests} (${pendingDSARRequests} pending)`);
+        
+        // Debug: Show raw data counts
+        console.log(`🔧 Raw Data Arrays:`);
+        console.log(`   userConsents.length: ${userConsents.length}`);
+        console.log(`   userPreferences.length: ${userPreferences.length}`);  
+        console.log(`   userPrivacyNotices.length: ${userPrivacyNotices.length}`);
+        console.log(`   userDSARRequests.length: ${userDSARRequests.length}`);
+        
+        // Debug: Show preference details
+        if (userPreferences.length > 0) {
+            console.log(`🔧 Preferences Details:`);
+            userPreferences.forEach((pref, idx) => {
+                console.log(`   ${idx + 1}. ${pref.type || pref.category}: enabled=${pref.enabled}, userId=${pref.userId}`);
+            });
+        }
         res.json({
             success: true,
             data: {
-                totalConsents: userConsents.length,
-                activeConsents: userConsents.filter(c => c.status === 'granted').length,
-                pendingRequests: 0,
+                // Main overview counts - all customer-specific
+                totalConsents: totalConsents,
+                activeConsents: activeConsents,
+                totalPreferences: totalPreferences,
+                activePreferences: activePreferences,
+                totalPrivacyNotices: totalPrivacyNotices,
+                acknowledgedPrivacyNotices: acknowledgedPrivacyNotices,
+                totalDSARRequests: totalDSARRequests,
+                pendingDSARRequests: pendingDSARRequests,
+                
+                // Data arrays for detailed views
+                consents: userConsents,
+                preferences: userPreferences,
+                privacyNotices: userPrivacyNotices,
+                dsarRequests: userDSARRequests,
+                
+                // Legacy fields for backward compatibility
+                pendingRequests: pendingDSARRequests,
                 lastActivity: user.lastLoginAt || new Date().toISOString(),
                 recentActivity: [
                     {
                         type: "consent_granted",
-                        description: "Marketing consent granted",
-                        timestamp: userConsents[0]?.grantedAt || user.createdAt
+                        description: userConsents.find(c => c.status === 'granted') ? 
+                            `${userConsents.find(c => c.status === 'granted').purpose} consent granted` : 
+                            "Consent granted",
+                        timestamp: userConsents.find(c => c.status === 'granted')?.grantedAt || user.createdAt
                     },
                     {
                         type: "profile_updated", 
@@ -5047,9 +5586,11 @@ app.get("/api/v1/customer/dashboard/overview", verifyToken, async (req, res) => 
                     }
                 ],
                 stats: {
-                    consentGrants: userConsents.filter(c => c.status === 'granted').length,
+                    consentGrants: activeConsents,
                     consentDenials: userConsents.filter(c => c.status === 'denied').length,
-                    activePreferences: userPreferences.filter(p => p.enabled).length
+                    activePreferences: activePreferences,
+                    totalPrivacyNotices: totalPrivacyNotices,
+                    totalDSARRequests: totalDSARRequests
                 },
                 userProfile: {
                     name: user.name,
@@ -5071,136 +5612,370 @@ app.get("/api/v1/customer/dashboard/overview", verifyToken, async (req, res) => 
     }
 });
 
+// Customer Consent Endpoints - MongoDB Based
+app.get("/api/v1/customer/consents", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({
+                error: true,
+                message: 'Access denied'
+            });
+        }
+        
+        console.log('✅ Fetching consents for customer:', req.user.id);
+        
+        const consents = await Consent.find({ 
+            $or: [
+                { userId: req.user.id },
+                { partyId: req.user.id }
+            ]
+        }).sort({ createdAt: -1 }).lean();
+        
+        console.log(`Found ${consents.length} consents for customer`);
+        
+        res.json({
+            success: true,
+            data: {
+                consents: consents
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching customer consents:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+});
+
+app.get("/api/v1/customer/preferences", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({
+                error: true,
+                message: 'Access denied'
+            });
+        }
+        
+        console.log('✅ Fetching preferences for customer:', req.user.id);
+        
+        // Import UserPreference model here to avoid issues
+        const mongoose = require('mongoose');
+        const UserPreference = mongoose.model('UserPreference');
+        
+        const preferences = await UserPreference.find({ 
+            $or: [
+                { userId: req.user.id },
+                { partyId: req.user.id }
+            ]
+        }).sort({ updatedAt: -1 }).lean();
+        
+        console.log(`Found ${preferences.length} preferences for customer`);
+        
+        res.json({
+            success: true,
+            data: {
+                preferences: preferences
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching customer preferences:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+});
+
+app.get("/api/v1/customer/privacy-notices", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({
+                error: true,
+                message: 'Access denied'
+            });
+        }
+        
+        console.log('✅ Fetching privacy notices for customer:', req.user.id);
+        
+        // Get customer-specific privacy notices
+        const { getCustomerIsolatedData } = require('./customer-data-provisioning');
+        const notices = await getCustomerIsolatedData(req.user.id, 'privacy_notices');
+        
+        console.log(`Found ${notices.length} privacy notices for customer ${req.user.id}`);
+        
+        res.json({
+            success: true,
+            data: {
+                notices: notices
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching privacy notices:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+});
+
+app.get("/api/v1/customer/dsar", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({
+                error: true,
+                message: 'Access denied'
+            });
+        }
+        
+        console.log('✅ Fetching DSAR requests for customer:', req.user.id);
+        
+        // Get customer-specific DSAR requests
+        const { getCustomerIsolatedData } = require('./customer-data-provisioning');
+        const dsarRequests = await getCustomerIsolatedData(req.user.id, 'dsar_requests');
+        
+        console.log(`Found ${dsarRequests.length} DSAR requests for customer ${req.user.id}`);
+        
+        res.json({
+            success: true,
+            data: {
+                requests: dsarRequests
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching DSAR requests:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+});
+
 // Consent Management
-app.get("/api/v1/consent", verifyToken, (req, res) => {
-    const userConsents = consents.filter(c => c.userId === req.user.id);
-    
-    res.json({
-        success: true,
-        consents: userConsents
-    });
-});
-
-app.get("/api/v1/consents", verifyToken, (req, res) => {
-    const userConsents = consents.filter(c => c.userId === req.user.id);
-    
-    res.json({
-        success: true,
-        consents: userConsents
-    });
-});
-
-app.post("/api/v1/consent", verifyToken, (req, res) => {
-    const { type, purpose, status } = req.body;
-    
-    if (!type || !purpose || !status) {
-        return res.status(400).json({
+app.get("/api/v1/consent", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role === 'customer') {
+            // Customer gets their own consents only
+            const { getCustomerIsolatedData } = require('./customer-data-provisioning');
+            const userConsents = await getCustomerIsolatedData(req.user.id, 'consents');
+            
+            console.log(`👤 Customer ${req.user.email} requested consents: ${userConsents.length} found`);
+            res.json(userConsents); // Direct array for easier access
+        } else {
+            // CSR/Admin gets all consents
+            const allConsents = await Consent.find({}).sort({ createdAt: -1 });
+            console.log(`👨‍💼 CSR/Admin requested consents: ${allConsents.length} found`);
+            res.json(allConsents);
+        }
+    } catch (error) {
+        console.error('Error fetching consents:', error);
+        res.status(500).json({
             error: true,
-            message: "Type, purpose, and status are required"
+            message: 'Internal server error'
         });
     }
-    
-    const newConsent = {
-        id: (consents.length + 1).toString(),
-        userId: req.user.id,
-        type,
-        purpose,
-        status,
-        grantedAt: status === 'granted' ? new Date().toISOString() : null,
-        deniedAt: status === 'denied' ? new Date().toISOString() : null,
-        expiresAt: status === 'granted' ? new Date(Date.now() + 31536000000).toISOString() : null
-    };
-    
-    consents.push(newConsent);
-    console.log("Consent created:", newConsent);
-    
-    res.json({
-        success: true,
-        consent: newConsent
-    });
 });
 
-app.put("/api/v1/consent/:id", verifyToken, (req, res) => {
-    const consentId = req.params.id;
-    const { status } = req.body;
-    
-    const consent = consents.find(c => c.id === consentId && c.userId === req.user.id);
-    
-    if (!consent) {
-        return res.status(404).json({
+app.get("/api/v1/consents", verifyToken, async (req, res) => {
+    try {
+        const { getCustomerIsolatedData } = require('./customer-data-provisioning');
+        const userConsents = await getCustomerIsolatedData(req.user.id, 'consents');
+        
+        res.json({
+            success: true,
+            consents: userConsents
+        });
+    } catch (error) {
+        console.error('Error fetching consents:', error);
+        res.status(500).json({
             error: true,
-            message: "Consent not found"
+            message: 'Internal server error'
         });
     }
-    
-    consent.status = status;
-    consent.grantedAt = status === 'granted' ? new Date().toISOString() : null;
-    consent.deniedAt = status === 'denied' ? new Date().toISOString() : null;
-    
-    res.json({
-        success: true,
-        consent
-    });
+});
+
+app.post("/api/v1/consent", verifyToken, async (req, res) => {
+    try {
+        const { type, purpose, status } = req.body;
+        
+        if (!type || !purpose || !status) {
+            return res.status(400).json({
+                error: true,
+                message: "Type, purpose, and status are required"
+            });
+        }
+        
+        const newConsent = new Consent({
+            id: Date.now().toString(), // Generate unique ID
+            partyId: req.user.id,
+            customerId: req.user.id,
+            type,
+            purpose,
+            status,
+            channel: 'all',
+            grantedAt: status === 'granted' ? new Date() : null,
+            deniedAt: status === 'denied' ? new Date() : null,
+            expiresAt: status === 'granted' ? new Date(Date.now() + 31536000000) : null
+        });
+        
+        await newConsent.save();
+        console.log("Consent created:", newConsent);
+        
+        res.json({
+            success: true,
+            consent: newConsent
+        });
+    } catch (error) {
+        console.error('Error creating consent:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+});
+
+app.put("/api/v1/consent/:id", verifyToken, async (req, res) => {
+    try {
+        const consentId = req.params.id;
+        const { status } = req.body;
+        
+        // Ensure customer can only update their own consents
+        const consent = await Consent.findOne({ 
+            _id: consentId,
+            $or: [
+                { partyId: req.user.id },
+                { customerId: req.user.id }
+            ]
+        });
+        
+        if (!consent) {
+            return res.status(404).json({
+                error: true,
+                message: "Consent not found or access denied"
+            });
+        }
+        
+        consent.status = status;
+        consent.grantedAt = status === 'granted' ? new Date() : null;
+        consent.deniedAt = status === 'denied' ? new Date() : null;
+        consent.revokedAt = status === 'revoked' ? new Date() : null;
+        
+        await consent.save();
+        
+        console.log(`🔄 User ${req.user.id} updated consent ${consentId} to ${status}`);
+        
+        res.json({
+            success: true,
+            consent,
+            message: `Consent ${status} successfully`
+        });
+    } catch (error) {
+        console.error('Error updating consent:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
 });
 
 // Preferences Management
-app.get("/api/v1/preference", verifyToken, (req, res) => {
-    const userPreferences = preferences.filter(p => p.userId === req.user.id);
-    
-    res.json({
-        success: true,
-        preferences: userPreferences
-    });
-});
-
-app.get("/api/v1/preferences", verifyToken, (req, res) => {
-    const userPreferences = preferences.filter(p => p.userId === req.user.id);
-    
-    res.json({
-        success: true,
-        preferences: userPreferences
-    });
-});
-
-app.post("/api/v1/preference", verifyToken, (req, res) => {
-    const { category, type, enabled, frequency } = req.body;
-    
-    const newPreference = {
-        id: (preferences.length + 1).toString(),
-        userId: req.user.id,
-        category,
-        type,
-        enabled: enabled || false,
-        frequency: frequency || 'never'
-    };
-    
-    preferences.push(newPreference);
-    
-    res.json({
-        success: true,
-        preference: newPreference
-    });
-});
-
-app.put("/api/v1/preference/:id", verifyToken, (req, res) => {
-    const prefId = req.params.id;
-    const updates = req.body;
-    
-    const preference = preferences.find(p => p.id === prefId && p.userId === req.user.id);
-    
-    if (!preference) {
-        return res.status(404).json({
+app.get("/api/v1/preference", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role === 'customer') {
+            // Customer gets their own preferences only
+            const { getCustomerIsolatedData } = require('./customer-data-provisioning');
+            const userPreferences = await getCustomerIsolatedData(req.user.id, 'preferences');
+            
+            console.log(`👤 Customer ${req.user.email} requested preferences: ${userPreferences.length} found`);
+            res.json(userPreferences); // Direct array for easier access
+        } else {
+            // CSR/Admin gets all preferences
+            const allPreferences = await UserPreference.find({}).sort({ createdAt: -1 });
+            console.log(`👨‍💼 CSR/Admin requested preferences: ${allPreferences.length} found`);
+            res.json(allPreferences);
+        }
+    } catch (error) {
+        console.error('Error fetching preferences:', error);
+        res.status(500).json({
             error: true,
-            message: "Preference not found"
+            message: 'Internal server error'
         });
     }
-    
-    Object.assign(preference, updates);
-    
-    res.json({
-        success: true,
-        preference
-    });
+});
+
+app.get("/api/v1/preferences", verifyToken, async (req, res) => {
+    try {
+        const { getCustomerIsolatedData } = require('./customer-data-provisioning');
+        const userPreferences = await getCustomerIsolatedData(req.user.id, 'preferences');
+        
+        res.json({
+            success: true,
+            preferences: userPreferences
+        });
+    } catch (error) {
+        console.error('Error fetching preferences:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+});
+
+app.post("/api/v1/preference", verifyToken, async (req, res) => {
+    try {
+        const { category, type, enabled, frequency } = req.body;
+        
+        const newPreference = new UserPreference({
+            userId: req.user.id,
+            category,
+            type,
+            enabled: enabled || false,
+            frequency: frequency || 'never'
+        });
+        
+        await newPreference.save();
+        
+        res.json({
+            success: true,
+            preference: newPreference
+        });
+    } catch (error) {
+        console.error('Error creating preference:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+});
+
+app.put("/api/v1/preference/:id", verifyToken, async (req, res) => {
+    try {
+        const prefId = req.params.id;
+        const updates = req.body;
+        
+        const preference = await UserPreference.findOne({ _id: prefId, userId: req.user.id });
+        
+        if (!preference) {
+            return res.status(404).json({
+                error: true,
+                message: "Preference not found"
+            });
+        }
+        
+        Object.assign(preference, updates);
+        await preference.save();
+        
+        res.json({
+            success: true,
+            preference
+        });
+    } catch (error) {
+        console.error('Error updating preference:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
 });
 
 // Privacy Notices - Full CRUD with MongoDB
@@ -5477,9 +6252,20 @@ app.delete("/api/v1/privacy-notices/:id", verifyToken, async (req, res) => {
 app.post("/api/v1/privacy-notices/:id/acknowledge", verifyToken, async (req, res) => {
     try {
         const noticeId = req.params.id;
-        const { ipAddress, userAgent } = req.body;
+        const { decision } = req.body; // 'accept' or 'decline'
         
-        const notice = await PrivacyNotice.findOne({ noticeId: noticeId });
+        // Find the customer-specific privacy notice
+        const notice = await PrivacyNotice.findOne({ 
+            $or: [
+                { _id: noticeId },
+                { noticeId: noticeId }
+            ],
+            $or: [
+                { customerId: req.user.id },
+                { status: 'active', customerId: { $exists: false } } // Global notices
+            ]
+        });
+        
         if (!notice) {
             return res.status(404).json({
                 success: false,
@@ -5487,23 +6273,46 @@ app.post("/api/v1/privacy-notices/:id/acknowledge", verifyToken, async (req, res
             });
         }
 
-        // Check if user already acknowledged this notice
-        const userId = req.user?.id || req.user?._id;
-        const userEmail = req.user?.email;
-        
-        if (notice.isAcknowledgedBy(userId)) {
-            return res.status(400).json({
-                success: false,
-                error: "Privacy notice already acknowledged by this user"
+        // Update the notice with customer's decision
+        if (notice.customerId) {
+            // Customer-specific notice
+            notice.acknowledged = true;
+            notice.acknowledgedAt = new Date();
+            notice.status = decision === 'accept' ? 'accepted' : 'declined';
+            notice.customerDecision = decision;
+            
+            await notice.save();
+        } else {
+            // Create customer-specific acknowledgment for global notice
+            const customerNotice = new PrivacyNotice({
+                noticeId: `${notice.noticeId}_customer_${req.user.id}`,
+                title: notice.title,
+                content: notice.content,
+                category: notice.category,
+                status: decision === 'accept' ? 'accepted' : 'declined',
+                priority: notice.priority,
+                version: notice.version,
+                effectiveDate: notice.effectiveDate,
+                language: notice.language,
+                customerId: req.user.id,
+                acknowledged: true,
+                acknowledgedAt: new Date(),
+                customerDecision: decision,
+                metadata: {
+                    globalNoticeId: notice._id,
+                    customerAction: decision,
+                    actionTimestamp: new Date()
+                }
             });
+            
+            await customerNotice.save();
         }
 
-        // Add acknowledgment
-        await notice.acknowledge(userId, userEmail, { ipAddress, userAgent });
+        console.log(`📋 Privacy notice ${noticeId} ${decision}ed by customer ${req.user.id}`);
 
         res.json({
             success: true,
-            message: "Privacy notice acknowledged successfully"
+            message: `Privacy notice ${decision}ed successfully`
         });
     } catch (error) {
         console.error('❌ Error acknowledging privacy notice:', error);
@@ -6334,23 +7143,106 @@ app.get("/api/v1/dsar/requests", verifyToken, (req, res) => {
     });
 });
 
-app.post("/api/v1/dsar/request", verifyToken, (req, res) => {
-    const { type, description } = req.body;
-    
-    const newRequest = {
-        id: Date.now().toString(),
-        userId: req.user.id,
-        type,
-        description,
-        status: "pending",
-        requestedAt: new Date().toISOString()
-    };
-    
-    res.json({
-        success: true,
-        message: "DSAR request submitted successfully",
-        request: newRequest
-    });
+app.post("/api/v1/dsar/request", verifyToken, async (req, res) => {
+    try {
+        const { type, description } = req.body;
+        
+        if (!type || !description) {
+            return res.status(400).json({
+                error: true,
+                message: "Type and description are required"
+            });
+        }
+        
+        // Get user details for the request
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                message: "User not found"
+            });
+        }
+        
+        // Create DSAR request in MongoDB
+        const newRequest = new DSARRequest({
+            requesterId: req.user.id,
+            requesterEmail: user.email,
+            requesterName: user.name,
+            type: type,
+            description: description,
+            status: "pending",
+            submittedAt: new Date(),
+            priority: "medium",
+            metadata: {
+                customerInfo: {
+                    id: req.user.id,
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone
+                },
+                requestSource: "customer_portal"
+            }
+        });
+        
+        const savedRequest = await newRequest.save();
+        
+        console.log(`🔍 DSAR request created for customer ${user.email}: ${type}`);
+        
+        res.json({
+            success: true,
+            message: "DSAR request submitted successfully",
+            request: savedRequest
+        });
+    } catch (error) {
+        console.error('Error creating DSAR request:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+});
+
+// Delete DSAR request (customer can delete their own pending requests)
+app.delete("/api/v1/dsar/request/:id", verifyToken, async (req, res) => {
+    try {
+        const requestId = req.params.id;
+        
+        // Find the request and ensure it belongs to the customer
+        const dsarRequest = await DSARRequest.findOne({
+            _id: requestId,
+            requesterId: req.user.id
+        });
+        
+        if (!dsarRequest) {
+            return res.status(404).json({
+                error: true,
+                message: "DSAR request not found or access denied"
+            });
+        }
+        
+        // Only allow deletion of pending requests
+        if (dsarRequest.status !== 'pending') {
+            return res.status(400).json({
+                error: true,
+                message: "Only pending requests can be deleted"
+            });
+        }
+        
+        await DSARRequest.findByIdAndDelete(requestId);
+        
+        console.log(`🗑️ DSAR request ${requestId} deleted by customer ${req.user.id}`);
+        
+        res.json({
+            success: true,
+            message: "DSAR request deleted successfully"
+        });
+    } catch (error) {
+        console.error('Error deleting DSAR request:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
 });
 
 // CSR ENDPOINTS FOR CUSTOMER MANAGEMENT
@@ -6632,6 +7524,14 @@ app.listen(PORT, async () => {
         await seedGuardians();
     } catch (error) {
         console.error('⚠️ Guardian seeding failed:', error.message);
+    }
+    
+    // Ensure default privacy notices exist
+    try {
+        await ensureDefaultPrivacyNotices();
+        console.log('✅ Default privacy notices initialized');
+    } catch (error) {
+        console.error('⚠️ Privacy notice initialization failed:', error.message);
     }
     
     console.log('📋 Available endpoints:');

@@ -121,26 +121,55 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
     }
   };
 
-  const handleConsentAction = (consentId: string, action: 'revoke' | 'renew' | 'grant') => {
-    console.log(`${action} consent ${consentId}`);
-    
-    // Find the consent being modified
-    const consent = consents.find(c => c.id === consentId);
-    
-    // Add notification for admin/CSR users about the consent change
-    addNotification({
-      title: 'Customer Consent Updated',
-      message: `Customer has ${action}d consent for "${consent?.purpose || 'unknown purpose'}" at ${new Date().toLocaleString()}`,
-      type: 'consent',
-      category: action === 'revoke' ? 'warning' : 'info',
-      metadata: {
-        consentId,
-        action,
-        purpose: consent?.purpose
+  const handleConsentAction = async (consentId: string, action: 'revoke' | 'renew' | 'grant') => {
+    try {
+      console.log(`${action} consent ${consentId}`);
+      
+      // Find the consent being modified
+      const consent = consents.find(c => c.id === consentId);
+      
+      // Call the appropriate backend API method
+      if (action === 'revoke') {
+        await customerApiClient.revokeConsent(consentId);
+      } else if (action === 'grant' || action === 'renew') {
+        await customerApiClient.grantConsent({ 
+          consentId, 
+          status: 'granted',
+          grantedAt: new Date().toISOString()
+        });
       }
-    });
-    
-    // Implement consent action logic here
+      
+      // Update local state
+      setConsents(prevConsents => 
+        prevConsents.map(c => 
+          c.id === consentId 
+            ? { ...c, status: action === 'revoke' ? 'revoked' : 'granted' }
+            : c
+        )
+      );
+      
+      // Add notification for admin/CSR users about the consent change
+      addNotification({
+        title: 'Customer Consent Updated',
+        message: `Customer has ${action}d consent for "${consent?.purpose || 'unknown purpose'}" at ${new Date().toLocaleString()}`,
+        type: 'consent',
+        category: action === 'revoke' ? 'warning' : 'info',
+        metadata: {
+          consentId,
+          action,
+          purpose: consent?.purpose
+        }
+      });
+      
+    } catch (error) {
+      console.error(`Failed to ${action} consent:`, error);
+      addNotification({
+        title: 'Consent Update Failed',
+        message: `Failed to ${action} consent. Please try again.`,
+        type: 'consent',
+        category: 'error'
+      });
+    }
   };
 
   const ConsentDetailModal = ({ consent, onClose }: { consent: Consent; onClose: () => void }) => (
