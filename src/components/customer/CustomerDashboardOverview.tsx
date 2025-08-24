@@ -53,65 +53,79 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
+    console.log('CustomerDashboardOverview: Component mounted, loading dashboard data...');
     loadDashboardData();
   }, []);
 
   const loadDashboardData = async () => {
     try {
+      console.log('CustomerDashboardOverview: Starting to load dashboard data...');
       setIsLoading(true);
       const data = await customerDashboardService.getDashboardOverview();
+      console.log('CustomerDashboardOverview: Dashboard data received:', data);
       setDashboardData(data);
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      console.error('CustomerDashboardOverview: Failed to load dashboard data:', error);
       // Use fallback data
       setDashboardData(null);
     } finally {
       setIsLoading(false);
+      console.log('CustomerDashboardOverview: Loading complete, isLoading set to false');
     }
   };
 
   // Use real data if available, otherwise use fallback data
   const consentSummary = dashboardData?.consentStats || {
-    granted: 8,
-    revoked: 2,
-    expired: 1,
-    pending: 3
+    granted: dashboardData?.activeConsents || 0,
+    revoked: 0,
+    expired: 0,
+    pending: 0
   };
 
-  const currentCustomerName = dashboardData?.customer?.name || user?.name || customerName;
+  const currentCustomerName = dashboardData?.userProfile?.name || user?.name || customerName;
 
   const quickStats: QuickStat[] = [
     {
       label: t('customerDashboard.overview.activeConsents'),
-      value: String(dashboardData?.consentStats?.granted || 8),
+      value: String(dashboardData?.activeConsents || 0),
       icon: <CheckCircle className="w-6 h-6" />,
       color: 'text-green-600 bg-green-50 border-green-200',
-      trend: t('customerDashboard.overview.monthlyTrend', { count: 2 })
+      trend: t('customerDashboard.overview.monthlyTrend', { count: dashboardData?.activeConsents || 0 })
     },
     {
       label: t('customerDashboard.overview.communicationChannels'),
-      value: String(dashboardData?.preferenceStats?.enabled || 3),
+      value: String(dashboardData?.activePreferences || 0),
       icon: <Settings className="w-6 h-6" />,
       color: 'text-myslt-primary bg-myslt-service-card border-myslt-primary/30',
       trend: t('customerDashboard.overview.channelTypes')
     },
     {
       label: t('customerDashboard.overview.privacyNotices'),
-      value: '5',
+      value: String(dashboardData?.totalPrivacyNotices || 0),
       icon: <FileText className="w-6 h-6" />,
       color: 'text-purple-600 bg-purple-50 border-purple-200',
-      trend: t('customerDashboard.overview.pendingReviewCount', { count: 2 })
+      trend: t('customerDashboard.overview.pendingReviewCount', { count: dashboardData?.acknowledgedPrivacyNotices || 0 })
     },
     {
       label: t('customerDashboard.overview.dsarRequests'),
-      value: String(dashboardData?.dsarStats?.total || 1),
+      value: String(dashboardData?.totalDSARRequests || 0),
       icon: <Download className="w-6 h-6" />,
       color: 'text-orange-600 bg-orange-50 border-orange-200',
-      trend: dashboardData?.dsarStats?.pending ? t('customerDashboard.overview.inProgress') : t('customerDashboard.overview.completed')
+      trend: (dashboardData?.pendingDSARRequests || 0) > 0 ? t('customerDashboard.overview.inProgress') : t('customerDashboard.overview.completed')
     }
   ];
 
-  const recentActivity = dashboardData?.recentActivity || [
+  const recentActivity = dashboardData?.recentActivity?.map((activity, index) => ({
+    id: activity.id || index,
+    action: activity.action || activity.description,
+    timestamp: new Date(activity.timestamp).toLocaleDateString(),
+    type: activity.type,
+    icon: activity.type === 'consent_granted' ? <CheckCircle className="w-4 h-4 text-green-600" /> :
+          activity.type === 'profile_updated' ? <User className="w-4 h-4 text-myslt-primary" /> :
+          activity.type === 'preference' ? <Settings className="w-4 h-4 text-myslt-primary" /> :
+          activity.type === 'privacy' ? <FileText className="w-4 h-4 text-purple-600" /> :
+          <Download className="w-4 h-4 text-orange-600" />
+  })) || [
     {
       id: 1,
       action: t('customerDashboard.overview.activities.grantedConsent'),

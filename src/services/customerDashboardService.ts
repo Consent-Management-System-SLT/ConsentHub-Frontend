@@ -1,7 +1,51 @@
 import { multiServiceApiClient } from './multiServiceApiClient';
 
 export interface DashboardOverview {
-  customer: {
+  // Direct stats from backend
+  totalConsents: number;
+  activeConsents: number;
+  totalPreferences: number;
+  activePreferences: number;
+  totalPrivacyNotices: number;
+  acknowledgedPrivacyNotices: number;
+  totalDSARRequests: number;
+  pendingDSARRequests: number;
+  
+  // User profile from backend
+  userProfile?: {
+    name: string;
+    email: string;
+    phone: string;
+    company: string;
+    memberSince: string;
+  };
+  
+  // Arrays from backend
+  consents?: any[];
+  preferences?: any[];
+  privacyNotices?: any[];
+  dsarRequests?: any[];
+  
+  // Activity and other data
+  recentActivity?: Array<{
+    id?: string;
+    type: string;
+    action?: string;
+    description: string;
+    timestamp: string;
+  }>;
+  
+  // Calculated stats
+  stats?: {
+    consentGrants: number;
+    consentDenials: number;
+    activePreferences: number;
+    totalPrivacyNotices: number;
+    totalDSARRequests: number;
+  };
+  
+  // Legacy fields for backward compatibility
+  customer?: {
     id: string;
     name: string;
     email: string;
@@ -9,32 +53,25 @@ export interface DashboardOverview {
     joinDate: string;
     lastLogin: string;
   };
-  consentStats: {
+  consentStats?: {
     total: number;
     granted: number;
     revoked: number;
     expired: number;
     pending: number;
   };
-  preferenceStats: {
+  preferenceStats?: {
     total: number;
     enabled: number;
     disabled: number;
   };
-  dsarStats: {
+  dsarStats?: {
     total: number;
     pending: number;
     completed: number;
     inProgress: number;
   };
-  recentActivity: Array<{
-    id: string;
-    type: string;
-    action: string;
-    description: string;
-    timestamp: string;
-  }>;
-  notifications: Array<{
+  notifications?: Array<{
     id: string;
     type: string;
     message: string;
@@ -145,6 +182,7 @@ class CustomerDashboardService {
    */
   async getDashboardOverview(): Promise<DashboardOverview> {
     try {
+      console.log('Fetching dashboard overview from:', `${this.baseUrl}/overview`);
       const response = await multiServiceApiClient.makeRequest(
         'GET',
         `${this.baseUrl}/overview`,
@@ -152,14 +190,28 @@ class CustomerDashboardService {
         'customer'
       );
 
+      console.log('Dashboard API response:', response);
+
       if (response.success && response.data) {
+        console.log('Dashboard data received:', response.data);
         return response.data;
       }
 
-      throw new Error('Failed to fetch dashboard overview');
+      if (response && !response.success) {
+        console.error('API returned success=false:', response);
+        throw new Error('API returned success=false');
+      }
+
+      throw new Error('Failed to fetch dashboard overview - no data');
     } catch (error: any) {
       console.error('Dashboard overview error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        stack: error.stack
+      });
       // Return mock data as fallback
+      console.log('Returning mock data as fallback');
       return this.getMockDashboardData();
     }
   }
@@ -575,6 +627,25 @@ class CustomerDashboardService {
    */
   private getMockDashboardData(): DashboardOverview {
     return {
+      // Backend format fields
+      totalConsents: 12,
+      activeConsents: 8,
+      totalPreferences: 6,
+      activePreferences: 4,
+      totalPrivacyNotices: 5,
+      acknowledgedPrivacyNotices: 3,
+      totalDSARRequests: 3,
+      pendingDSARRequests: 1,
+      
+      userProfile: {
+        name: 'Robert Johnson',
+        email: 'robert.johnson@example.com',
+        phone: '+94123456789',
+        company: 'Individual',
+        memberSince: '2024-01-15'
+      },
+      
+      // Legacy format for backward compatibility
       customer: {
         id: 'customer_123',
         name: 'Robert Johnson',
