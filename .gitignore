@@ -30,10 +30,12 @@ test-*.js
 auth-test.js
 fix-*.js
 fixGuardianNames.js
-seedGuardians.js
 testGuardianAPI.js
 quick-test.js
 simple-test.js
 
 # Development utilities
 openapi-tmf-spec.yaml
+
+# Keep essential backend files
+!seedGuardians.js
