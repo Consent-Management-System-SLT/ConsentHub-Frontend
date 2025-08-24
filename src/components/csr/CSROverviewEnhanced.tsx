@@ -15,6 +15,100 @@ interface CSROverviewEnhancedProps {
   onNavigate?: (section: string) => void;
 }
 
+// Helper functions
+const calculateAverageResponseTime = (dsarRequests: any[]): string => {
+  if (!dsarRequests.length) return '0 days';
+  
+  const completedRequests = dsarRequests.filter(r => r.completedAt && r.submittedAt);
+  if (!completedRequests.length) return 'N/A';
+  
+  const totalDays = completedRequests.reduce((sum, req) => {
+    const submitted = new Date(req.submittedAt);
+    const completed = new Date(req.completedAt);
+    return sum + Math.floor((completed.getTime() - submitted.getTime()) / (1000 * 60 * 60 * 24));
+  }, 0);
+  
+  return `${Math.round(totalDays / completedRequests.length)} days`;
+};
+
+const calculateComplianceRate = (dsarRequests: any[]): number => {
+  if (!dsarRequests.length) return 100;
+  
+  const onTimeRequests = dsarRequests.filter(req => {
+    const submitted = new Date(req.submittedAt || req.createdAt);
+    const daysSince = (Date.now() - submitted.getTime()) / (1000 * 60 * 60 * 24);
+    return daysSince <= 30 || req.status === 'completed';
+  });
+  
+  return Math.round((onTimeRequests.length / dsarRequests.length) * 100);
+};
+
+const generateQuickActions = (dashboardData: any, onNavigate?: (section: string) => void) => {
+  const actions = [];
+  
+  // High priority: Overdue DSAR requests
+  const overdueRequests = dashboardData.dsarRequests?.filter((req: any) => {
+    const submitted = new Date(req.submittedAt || req.createdAt);
+    const daysSince = (Date.now() - submitted.getTime()) / (1000 * 60 * 60 * 24);
+    return daysSince > 25 && req.status !== 'completed';
+  }) || [];
+  
+  if (overdueRequests.length > 0) {
+    actions.push({
+      id: 'overdue-dsar',
+      title: 'Critical: Overdue DSAR Requests',
+      description: `${overdueRequests.length} requests are overdue (>25 days)`,
+      priority: 'high',
+      action: () => onNavigate?.('dsar'),
+      icon: AlertTriangle
+    });
+  }
+  
+  // Medium priority: Pending requests
+  if (dashboardData.stats.pendingRequests > 0) {
+    actions.push({
+      id: 'pending-dsar',
+      title: 'Review Pending DSAR Requests',
+      description: `${dashboardData.stats.pendingRequests} requests awaiting review`,
+      priority: dashboardData.stats.pendingRequests > 5 ? 'high' : 'medium',
+      action: () => onNavigate?.('dsar'),
+      icon: FileText
+    });
+  }
+  
+  // Recent consent changes
+  const recentConsents = dashboardData.consents?.filter((c: any) => {
+    const granted = new Date(c.grantedAt || c.createdAt);
+    const daysSince = (Date.now() - granted.getTime()) / (1000 * 60 * 60 * 24);
+    return daysSince <= 7;
+  }) || [];
+  
+  if (recentConsents.length > 0) {
+    actions.push({
+      id: 'recent-consents',
+      title: 'Review Recent Consent Changes',
+      description: `${recentConsents.length} consent updates this week`,
+      priority: 'medium',
+      action: () => onNavigate?.('consents'),
+      icon: Shield
+    });
+  }
+  
+  // Guardian management
+  if (dashboardData.stats.guardiansManaged > 0) {
+    actions.push({
+      id: 'guardians',
+      title: 'Guardian Account Review',
+      description: `${dashboardData.stats.guardiansManaged} guardian accounts to review`,
+      priority: 'low',
+      action: () => onNavigate?.('guardians'),
+      icon: Users
+    });
+  }
+  
+  return actions;
+};
+
 const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({ 
   className = '',
   onNavigate 
@@ -45,97 +139,85 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
   const loadDetailedStats = async () => {
     try {
       setLoading(true);
-      console.log('🔄 Loading CSR overview stats...');
+      console.log('🔄 Loading detailed CSR dashboard stats...');
       
-      // Use the new CSR dashboard service with comprehensive fallbacks
-      const statsData = await csrDashboardService.getCSRStats();
+      // Load comprehensive dashboard data
+      const dashboardData = await csrDashboardService.getComprehensiveDashboardData();
       
-      // Update stats with data from service
-      setStats({
-        totalCustomers: statsData.totalCustomers || 0,
-        pendingRequests: statsData.pendingRequests || 0,
-        consentUpdates: statsData.consentUpdates || 0,
-        guardiansManaged: statsData.guardiansManaged || 0,
-        todayActions: statsData.todayActions || 0,
-        riskAlerts: statsData.riskAlerts || 0
-      });
-      
-      // Update insights with real data
-      setInsights({
-        consentRate: statsData.consentRate || 0,
-        resolvedRequests: statsData.resolvedRequests || 0,
-        newCustomers: statsData.newCustomers || 0
+      console.log('📊 Dashboard data loaded:', {
+        statsKeys: Object.keys(dashboardData.stats),
+        customersCount: dashboardData.customers?.length,
+        consentsCount: dashboardData.consents?.length,
+        dsarCount: dashboardData.dsarRequests?.length,
+        eventsCount: dashboardData.auditEvents?.length,
+        offlineMode: dashboardData.offlineMode
       });
 
-      await loadQuickActions();
+      // Calculate enhanced statistics from real data
+      const enhancedStats = {
+        ...dashboardData.stats,
+        activeConsents: dashboardData.consents?.filter(c => c.status === 'granted').length || 0,
+        withdrawnConsents: dashboardData.consents?.filter(c => c.status === 'denied' || c.status === 'withdrawn').length || 0,
+        completedRequests: dashboardData.dsarRequests?.filter(r => r.status === 'completed').length || 0,
+        averageResponseTime: calculateAverageResponseTime(dashboardData.dsarRequests || []),
+        complianceRate: calculateComplianceRate(dashboardData.dsarRequests || []),
+        dataBreaches: dashboardData.auditEvents?.filter(e => 
+          e.eventType?.toLowerCase().includes('breach') || 
+          e.eventType?.toLowerCase().includes('violation') ||
+          e.severity === 'critical'
+        ).length || 0
+      };
 
+      setStats(enhancedStats);
+      
+      // Calculate insights from real data
+      const realInsights = {
+        consentRate: enhancedStats.consentRate || Math.round(
+          (enhancedStats.activeConsents / Math.max(1, enhancedStats.activeConsents + enhancedStats.withdrawnConsents)) * 100
+        ),
+        resolvedRequests: enhancedStats.completedRequests || enhancedStats.resolvedRequests || 0,
+        newCustomers: dashboardData.customers?.filter(c => {
+          const created = new Date(c.createdAt);
+          const daysSince = (Date.now() - created.getTime()) / (1000 * 60 * 60 * 24);
+          return daysSince <= 1;
+        }).length || enhancedStats.newCustomers || 0
+      };
+      
+      setInsights(realInsights);
+      
+      // Generate intelligent quick actions based on real data
+      const intelligentActions = generateQuickActions(dashboardData, onNavigate);
+      setQuickActions(intelligentActions);
+      
+      // Show data status
+      if (dashboardData.offlineMode) {
+        console.log('⚠️ Running in offline mode with fallback data');
+      } else {
+        console.log('✅ Using real data from backend APIs');
+      }
+      
     } catch (error) {
-      console.error('❌ Error loading CSR overview stats:', error);
+      console.error('❌ Error loading CSR dashboard data:', error);
       
-      // Enhanced fallback data
+      // Load fallback stats if there's an error
       setStats({
-        totalCustomers: 10,
-        pendingRequests: 4,
-        consentUpdates: 8,
-        guardiansManaged: 2,
-        todayActions: 15,
-        riskAlerts: 2
+        totalCustomers: 0,
+        pendingRequests: 0,
+        consentUpdates: 0,
+        guardiansManaged: 0,
+        todayActions: 0,
+        riskAlerts: 0
       });
       
       setInsights({
-        consentRate: 78,
-        resolvedRequests: 8,
-        newCustomers: 3
+        consentRate: 0,
+        resolvedRequests: 0,
+        newCustomers: 0
       });
       
-      await loadQuickActions();
+      setQuickActions([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadQuickActions = async () => {
-    try {
-      // Generate quick actions based on current data state
-      const actions = [
-        {
-          id: 1,
-          title: 'Review Pending DSAR Requests',
-          description: `${stats.pendingRequests} requests awaiting review`,
-          priority: stats.pendingRequests > 5 ? 'high' : 'medium',
-          action: () => onNavigate?.('dsar'),
-          icon: FileText
-        },
-        {
-          id: 2,
-          title: 'Update Customer Preferences',
-          description: 'Manage communication preferences',
-          priority: 'medium',
-          action: () => onNavigate?.('preferences'),
-          icon: Shield
-        },
-        {
-          id: 3,
-          title: 'Review Risk Alerts',
-          description: `${stats.riskAlerts} overdue requests require attention`,
-          priority: stats.riskAlerts > 0 ? 'high' : 'low',
-          action: () => onNavigate?.('audit'),
-          icon: AlertTriangle
-        },
-        {
-          id: 4,
-          title: 'Search Customers',
-          description: 'Find and manage customer records',
-          priority: 'low',
-          action: () => onNavigate?.('search'),
-          icon: Users
-        }
-      ];
-
-      setQuickActions(actions);
-    } catch (error) {
-      console.error('Error loading quick actions:', error);
-      setQuickActions([]);
     }
   };
 

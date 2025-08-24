@@ -12,6 +12,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
   customerId 
 }) => {
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +33,11 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       setLoading(true);
       setError(null);
       
-      const allEvents = await csrDashboardService.getAuditEvents();
+      // Load both audit events and customers
+      const [allEvents, customerArray] = await Promise.all([
+        csrDashboardService.getAuditEvents(),
+        csrDashboardService.getCustomers()
+      ]);
       
       // Filter by customer if specified
       let filteredEvents = allEvents;
@@ -41,12 +46,18 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       }
       
       setAuditLogs(filteredEvents);
+      setCustomers(customerArray);
     } catch (err) {
       console.error('Error loading audit logs:', err);
       setError('Failed to load audit logs. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const getCustomerName = (partyId: string): string => {
+    const customer = customers.find(c => c.id === partyId);
+    return customer ? customer.name : `Customer ${partyId}`;
   };
 
   const filterLogs = () => {
@@ -171,7 +182,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
             <div>
               <h2 className="text-xl font-semibold text-myslt-text-primary">Audit Trail</h2>
               <p className="text-sm text-myslt-text-secondary">
-                {customerId ? `Activity logs for customer: ${customerId}` : 'System activity and event logs'}
+                {customerId ? `Activity logs for customer: ${getCustomerName(customerId)}` : 'System activity and event logs'}
               </p>
             </div>
           </div>

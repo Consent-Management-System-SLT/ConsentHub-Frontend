@@ -12,22 +12,26 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
   customerId 
 }) => {
   const [consents, setConsents] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [selectedConsent, setSelectedConsent] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadConsents();
+    loadConsentsAndCustomers();
   }, [customerId]);
 
-  const loadConsents = async () => {
+  const loadConsentsAndCustomers = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      // Use CSR dashboard service with comprehensive hardcoded fallback data
-      const consentArray = await csrDashboardService.getConsents();
+      // Load both consents and customers
+      const [consentArray, customerArray] = await Promise.all([
+        csrDashboardService.getConsents(),
+        csrDashboardService.getCustomers()
+      ]);
       
       // Filter by customer ID if provided
       let filteredConsents = consentArray;
@@ -35,15 +39,23 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
         filteredConsents = consentArray.filter(consent => consent.customerId === customerId);
       }
       
-      console.log('Loaded consents:', filteredConsents); // Debug log
+      console.log('Loaded consents:', filteredConsents);
+      console.log('Loaded customers:', customerArray.length);
       setConsents(filteredConsents);
+      setCustomers(customerArray);
     } catch (err) {
-      console.error('Error loading consents:', err);
+      console.error('Error loading consents and customers:', err);
       setError('Failed to load consent history. Please try again.');
-      setConsents([]); // Ensure consents is always an array even on error
+      setConsents([]);
+      setCustomers([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getCustomerName = (partyId: string): string => {
+    const customer = customers.find(c => c.id === partyId);
+    return customer ? customer.name : `Customer ${partyId}`;
   };
 
   const updateConsentStatus = async (consentId: string, newStatus: string) => {
@@ -132,7 +144,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
             <AlertCircle className="w-5 h-5" />
             <span>{error}</span>
             <button 
-              onClick={loadConsents}
+              onClick={loadConsentsAndCustomers}
               className="ml-auto px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
             >
               Retry
@@ -152,12 +164,12 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
             <div>
               <h2 className="text-xl font-semibold text-myslt-text-primary">Consent History</h2>
               <p className="text-sm text-myslt-text-secondary">
-                {customerId ? `Showing consents for customer: ${customerId}` : 'View and manage customer consent records'}
+                {customerId ? `Showing consents for customer: ${getCustomerName(customerId)}` : 'View and manage customer consent records'}
               </p>
             </div>
           </div>
           <button
-            onClick={loadConsents}
+            onClick={loadConsentsAndCustomers}
             className="px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
           >
             <RefreshCw className="w-4 h-4" />
@@ -180,7 +192,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
             <thead className="bg-myslt-service-card">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer ID
+                  Customer Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Purpose
@@ -203,7 +215,9 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
               {Array.isArray(consents) && consents.map((consent) => (
                 <tr key={consent.id} className="hover:bg-myslt-service-card">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-myslt-text-primary">{consent.partyId}</div>
+                    <div className="text-sm font-medium text-myslt-text-primary">
+                      {getCustomerName(consent.partyId)}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-myslt-text-primary">{consent.purpose}</div>
@@ -280,8 +294,10 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                     <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.id}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Customer ID</label>
-                    <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.partyId}</p>
+                    <label className="block text-sm font-medium text-gray-700">Customer</label>
+                    <p className="mt-1 text-sm text-myslt-text-primary">
+                      {getCustomerName(selectedConsent.partyId)}
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Purpose</label>

@@ -71,6 +71,9 @@ export interface DSARRequest {
   status: string;
   submittedAt: string;
   completedAt?: string;
+  approvedAt?: string;
+  rejectedAt?: string;
+  startedAt?: string;
   description: string;
   requestorName: string;
   requestorEmail: string;
@@ -79,6 +82,8 @@ export interface DSARRequest {
   category?: string;
   legalBasis?: string;
   notes?: string;
+  processingNotes?: string;
+  processedBy?: string;
 }
 
 export interface AuditEvent {
@@ -122,11 +127,9 @@ class CSRDashboardService {
    */
   async getCustomers(): Promise<CustomerData[]> {
     try {
-      if (this.useOfflineMode) {
-        return this.getFallbackCustomers();
-      }
-      
+      console.log('🔍 Fetching customers from /api/v1/party...');
       const response = await apiClient.get(`${this.baseUrl}/party`);
+      console.log('✅ Customers loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
       return Array.isArray(response.data) ? response.data : this.getFallbackCustomers();
     } catch (error) {
       console.warn('⚠️ Backend customers unavailable, using fallback data:', error);
@@ -135,15 +138,13 @@ class CSRDashboardService {
   }
 
   /**
-   * Get all consents with fallback data
+   * Get all consents with real data from backend
    */
   async getConsents(): Promise<ConsentData[]> {
     try {
-      if (this.useOfflineMode) {
-        return this.getFallbackConsents();
-      }
-      
-      const response = await apiClient.get(`${this.baseUrl}/consent`);
+      console.log('🔍 Fetching consents from /api/v1/csr/consent...');
+      const response = await apiClient.get(`${this.baseUrl}/csr/consent`);
+      console.log('✅ Consents loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
       return Array.isArray(response.data) ? response.data : this.getFallbackConsents();
     } catch (error) {
       console.warn('⚠️ Backend consents unavailable, using fallback data:', error);
@@ -152,16 +153,21 @@ class CSRDashboardService {
   }
 
   /**
-   * Get all DSAR requests with fallback data
+   * Get all DSAR requests with real data from backend
    */
   async getDSARRequests(): Promise<DSARRequest[]> {
     try {
-      if (this.useOfflineMode) {
+      console.log('🔍 Fetching DSAR requests from /api/dsar-requests...');
+      const response = await apiClient.get('/api/dsar-requests');
+      console.log('✅ DSAR requests loaded successfully:', response.data);
+      
+      // Handle response - it should be directly an array with enhanced data
+      if (Array.isArray(response.data)) {
+        return response.data.map((req: any) => this.normalizeDBDSARRequest(req));
+      } else {
+        console.warn('Unexpected DSAR response structure, using fallback');
         return this.getFallbackDSARRequests();
       }
-      
-      const response = await apiClient.get(`${this.baseUrl}/dsar`);
-      return Array.isArray(response.data) ? response.data : this.getFallbackDSARRequests();
     } catch (error) {
       console.warn('⚠️ Backend DSAR requests unavailable, using fallback data:', error);
       return this.getFallbackDSARRequests();
@@ -169,15 +175,13 @@ class CSRDashboardService {
   }
 
   /**
-   * Get audit events with fallback data
+   * Get audit events with real data from backend
    */
   async getAuditEvents(): Promise<AuditEvent[]> {
     try {
-      if (this.useOfflineMode) {
-        return this.getFallbackAuditEvents();
-      }
-      
+      console.log('🔍 Fetching audit events from /api/v1/event...');
       const response = await apiClient.get(`${this.baseUrl}/event`);
+      console.log('✅ Audit events loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
       return Array.isArray(response.data) ? response.data : this.getFallbackAuditEvents();
     } catch (error) {
       console.warn('⚠️ Backend audit events unavailable, using fallback data:', error);
@@ -277,6 +281,33 @@ class CSRDashboardService {
         offlineMode: true
       };
     }
+  }
+
+  // =================== DATA NORMALIZATION METHODS ===================
+
+  private normalizeDBDSARRequest(req: any): DSARRequest {
+    return {
+      id: req.id || req._id || req.requestId,
+      partyId: req.requesterId || req.partyId || req.customerId,
+      customerId: req.requesterId || req.partyId || req.customerId,
+      requestType: req.type || req.requestType,
+      status: req.status,
+      submittedAt: req.submittedAt || req.createdAt,
+      completedAt: req.completedAt,
+      approvedAt: req.approvedAt,
+      rejectedAt: req.rejectedAt,
+      startedAt: req.startedAt,
+      description: req.description,
+      requestorName: req.requesterName || req.requestorName || `Customer ${req.requesterId || req.partyId}`,
+      requestorEmail: req.requesterEmail || req.requestorEmail || '',
+      priority: req.priority || 'medium',
+      assignedTo: req.assignedTo,
+      category: req.category,
+      legalBasis: req.legalBasis,
+      notes: req.notes,
+      processingNotes: req.processingNotes,
+      processedBy: req.processedBy
+    };
   }
 
   // =================== FALLBACK DATA METHODS ===================
@@ -694,7 +725,7 @@ class CSRDashboardService {
         requestType: "data_access",
         status: "pending",
         submittedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-        description: "Request to access all personal data collected and processed",
+        description: "I need to see what personal data you have about me for my mortgage application",
         requestorName: "John Doe",
         requestorEmail: "john.doe@email.com",
         priority: "medium",
@@ -707,16 +738,17 @@ class CSRDashboardService {
         partyId: "2",
         customerId: "2",
         requestType: "data_deletion",
-        status: "completed",
+        status: "approved",
         submittedAt: new Date(Date.now() - 86400000 * 15).toISOString(),
-        completedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        description: "Request to delete marketing profile data and analytics cookies",
+        approvedAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+        description: "I want to delete my marketing data as I'm no longer interested in promotional content",
         requestorName: "Jane Smith",
         requestorEmail: "jane.smith@email.com",
         priority: "high",
         assignedTo: "Sarah Wilson",
         category: "Right to Erasure",
-        legalBasis: "GDPR Article 17"
+        legalBasis: "GDPR Article 17",
+        processingNotes: "Approved by CSR Manager - Ready for processing"
       },
       {
         id: "3",
@@ -725,7 +757,7 @@ class CSRDashboardService {
         requestType: "data_portability",
         status: "pending",
         submittedAt: new Date(Date.now() - 86400000 * 28).toISOString(),
-        description: "Request to export complete account data for transfer",
+        description: "I'm switching banks and need all my account data in a portable format",
         requestorName: "Robert Johnson",
         requestorEmail: "robert.j@email.com",
         priority: "high",
@@ -741,7 +773,7 @@ class CSRDashboardService {
         requestType: "data_rectification",
         status: "in_progress",
         submittedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
-        description: "Request to update incorrect address and phone information",
+        description: "My address and phone number changed after my recent move, please update my records",
         requestorName: "Emily Davis",
         requestorEmail: "emily.davis@email.com",
         priority: "medium",
@@ -757,7 +789,7 @@ class CSRDashboardService {
         status: "completed",
         submittedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
         completedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
-        description: "Request to withdraw consent for location tracking",
+        description: "I no longer want you to track my location for promotional purposes",
         requestorName: "Michael Chen",
         requestorEmail: "michael.chen@email.com",
         priority: "low",
@@ -772,7 +804,7 @@ class CSRDashboardService {
         requestType: "data_access",
         status: "in_progress",
         submittedAt: new Date(Date.now() - 86400000 * 12).toISOString(),
-        description: "Request for complete personal data report including third-party data",
+        description: "I need a complete copy of my data including what you've shared with partners",
         requestorName: "Priya Perera",
         requestorEmail: "priya.perera@email.com",
         priority: "medium",
@@ -788,7 +820,7 @@ class CSRDashboardService {
         requestType: "data_restriction",
         status: "pending",
         submittedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        description: "Request to restrict processing of biometric data pending review",
+        description: "Please stop processing my fingerprint data while I review your new privacy policy",
         requestorName: "David Wilson",
         requestorEmail: "david.wilson@email.com",
         priority: "high",
@@ -803,7 +835,7 @@ class CSRDashboardService {
         requestType: "guardian_data_access",
         status: "pending",
         submittedAt: new Date(Date.now() - 86400000 * 8).toISOString(),
-        description: "Guardian request to access child's account data and consent history",
+        description: "As my daughter's guardian, I need to see what data you have on her account",
         requestorName: "Sarah Fernando",
         requestorEmail: "sarah.fernando@email.com",
         priority: "medium",
@@ -820,7 +852,7 @@ class CSRDashboardService {
         status: "rejected",
         submittedAt: new Date(Date.now() - 86400000 * 20).toISOString(),
         completedAt: new Date(Date.now() - 86400000 * 18).toISOString(),
-        description: "Request to correct employment information - insufficient documentation",
+        description: "My employment status changed - please correct my job title and income bracket",
         requestorName: "John Doe",
         requestorEmail: "john.doe@email.com",
         priority: "low",
@@ -836,7 +868,7 @@ class CSRDashboardService {
         requestType: "objection_processing",
         status: "in_progress",
         submittedAt: new Date(Date.now() - 86400000 * 6).toISOString(),
-        description: "Objection to direct marketing processing based on legitimate interests",
+        description: "I object to receiving marketing calls and emails - please stop all promotional outreach",
         requestorName: "Robert Johnson",
         requestorEmail: "robert.j@email.com",
         priority: "medium",

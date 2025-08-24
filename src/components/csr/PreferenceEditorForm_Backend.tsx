@@ -15,7 +15,8 @@ import {
   CheckCircle,
   AlertCircle,
   Globe,
-  Smartphone
+  Smartphone,
+  X
 } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
 
@@ -216,7 +217,9 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
 
   const filteredCustomers = customers.filter(customer =>
     customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.phone?.includes(searchTerm) ||
+    customer.id?.includes(searchTerm)
   );
 
   return (
@@ -238,7 +241,10 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
             </div>
             <div>
               <h2 className="text-lg font-semibold text-myslt-text-primary">Customer Selection</h2>
-              <p className="text-sm text-gray-500">Search and select a customer to manage preferences</p>
+              <p className="text-sm text-gray-500">Search and select a customer to manage their communication preferences</p>
+              <div className="mt-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block">
+                💡 Tip: Search by name, email, phone number, or customer ID
+              </div>
             </div>
           </div>
         </div>
@@ -252,9 +258,15 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search customers..."
-                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Search by name, email, phone, or customer ID..."
+                  className="pl-10 pr-16 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
+                <button
+                  onClick={() => setSearchTerm(' ')}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs px-2 py-1 text-blue-600 hover:text-blue-800 bg-blue-50 rounded"
+                >
+                  Show All
+                </button>
               </div>
               {searchTerm && (
                 <div className="mt-2 max-h-60 overflow-y-auto border border-myslt-accent/20 rounded-lg">
@@ -265,13 +277,30 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                         setSelectedCustomer(customer.id);
                         setSearchTerm('');
                       }}
-                      className="p-3 hover:bg-myslt-service-card cursor-pointer border-b border-myslt-border last:border-b-0"
+                      className="p-3 hover:bg-myslt-service-card cursor-pointer border-b border-myslt-border last:border-b-0 transition-colors"
                     >
-                      <div className="flex items-center space-x-3">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <div>
-                          <div className="font-medium">{customer.name}</div>
-                          <div className="text-sm text-gray-500">{customer.email}</div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <User className="w-5 h-5 text-gray-500" />
+                          <div>
+                            <div className="font-medium text-myslt-text-primary">{customer.name}</div>
+                            <div className="text-sm text-gray-500">{customer.email}</div>
+                            <div className="text-xs text-gray-400">ID: {customer.id} • {customer.phone}</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-xs px-2 py-1 rounded-full ${
+                            customer.status === 'active' ? 'bg-green-100 text-green-800' :
+                            customer.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {customer.status}
+                          </div>
+                          {customer.totalConsents && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              {customer.totalConsents} consents
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -282,16 +311,36 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 </div>
               )}
             </div>
-            {selectedCustomer && (
-              <div className="flex items-end">
+            <div className="flex items-end space-x-2">
+              {selectedCustomer && (
+                <div className="flex items-center space-x-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                  <User className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-800">
+                    {customers.find(c => c.id === selectedCustomer)?.name || `Customer ${selectedCustomer}`}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setSelectedCustomer('');
+                      setIsEditing(false);
+                      setHasChanges(false);
+                    }}
+                    className="text-blue-600 hover:text-blue-800"
+                    title="Clear selection"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+              {selectedCustomer && (
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
                 >
-                  {isEditing ? 'Cancel' : 'Edit Preferences'}
+                  <Settings className="w-4 h-4" />
+                  <span>{isEditing ? 'Cancel Edit' : 'Edit Preferences'}</span>
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

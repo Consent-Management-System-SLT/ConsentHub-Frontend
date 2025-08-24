@@ -204,7 +204,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
       case 'customer-search':
         return <CustomerSearchForm onCustomerSelect={handleCustomerSelect} />;
       case 'consent-history':
-        return <ConsentHistoryTable customerId={selectedCustomer?.id} />;
+        return <ConsentHistoryTable />;
       case 'preference-editor':
         return <PreferenceEditorForm customerId={selectedCustomer?.id} />;
       case 'dsar-requests':

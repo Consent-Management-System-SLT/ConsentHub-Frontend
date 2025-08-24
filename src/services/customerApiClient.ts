@@ -270,7 +270,7 @@ class CustomerApiClient {
   }
 
   async createDSARRequest(data: any) {
-    return this.post<any>('/api/v1/dsar', data);
+    return this.post<any>('/api/v1/dsar/request', data);
   }
 
   async cancelDSARRequest(id: string, reason: string) {

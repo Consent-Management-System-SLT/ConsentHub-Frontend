@@ -1639,50 +1639,127 @@ let customerPreferences = [
 
 // CSR Dashboard API Routes (No authentication required)
 
-// GET /api/csr/stats - Get CSR Dashboard Statistics
-app.get("/api/csr/stats", (req, res) => {
-    console.log('📊 CSR Dashboard: Fetching dashboard statistics');
-    
-    // Calculate dynamic stats
-    const totalCustomers = parties.length;
-    const pendingRequests = dsarRequests.filter(r => r.status === 'pending').length;
-    const consentUpdates = csrConsents.filter(c => {
-        const grantedDate = new Date(c.grantedAt || c.createdAt);
-        const daysSince = (Date.now() - grantedDate.getTime()) / (1000 * 60 * 60 * 24);
-        return daysSince <= 7; // Consents updated in last 7 days
-    }).length;
-    const guardiansManaged = parties.filter(p => p.type === 'guardian').length;
-    const todayActions = auditEvents.filter(e => {
-        const eventDate = new Date(e.createdAt);
-        const today = new Date();
-        return eventDate.toDateString() === today.toDateString();
-    }).length;
-    
-    // Risk alerts: DSAR requests over 25 days old
-    const riskAlerts = dsarRequests.filter(r => {
-        const submitted = new Date(r.submittedAt);
-        const daysSince = (Date.now() - submitted.getTime()) / (1000 * 60 * 60 * 24);
-        return daysSince > 25 && r.status !== 'completed';
-    }).length;
-    
-    const stats = {
-        totalCustomers,
-        pendingRequests,
-        consentUpdates,
-        guardiansManaged,
-        todayActions,
-        riskAlerts,
-        // Additional insights
-        consentRate: Math.round((csrConsents.filter(c => c.status === 'granted').length / csrConsents.length) * 100),
-        resolvedRequests: dsarRequests.filter(r => r.status === 'completed').length,
-        newCustomers: parties.filter(p => {
-            const created = new Date(p.createdAt);
+// GET /api/csr/stats - Get CSR Dashboard Statistics with Real MongoDB Data
+app.get("/api/csr/stats", async (req, res) => {
+    try {
+        console.log('📊 CSR Dashboard: Fetching dashboard statistics from MongoDB');
+        
+        // Fetch real data from MongoDB collections
+        const [users, consents, dsarRequests, auditLogs] = await Promise.all([
+            User.find({ role: 'customer', status: 'active' }).lean(),
+            Consent.find({}).lean(),
+            DSARRequest.find({}).lean(),
+            AuditLog.find({}).lean()
+        ]);
+        
+        console.log('📋 Real data counts from MongoDB:', {
+            users: users.length,
+            consents: consents.length,
+            dsarRequests: dsarRequests.length,
+            auditLogs: auditLogs.length
+        });
+
+        // Calculate dynamic stats from REAL MongoDB data
+        const totalCustomers = users.length;
+        const pendingRequests = dsarRequests.filter(r => r.status === 'pending').length;
+        
+        // Consent updates in last 7 days from real data
+        const consentUpdates = consents.filter(c => {
+            const grantedDate = new Date(c.grantedAt || c.createdAt || c.updatedAt);
+            const daysSince = (Date.now() - grantedDate.getTime()) / (1000 * 60 * 60 * 24);
+            return daysSince <= 7;
+        }).length;
+        
+        // Guardian customers from real data
+        const guardiansManaged = users.filter(u => 
+            u.accountType === 'guardian' || 
+            (u.profile && u.profile.accountType === 'guardian')
+        ).length;
+        
+        // Today's actions from real audit logs
+        const todayActions = auditLogs.filter(e => {
+            const eventDate = new Date(e.createdAt || e.timestamp);
+            const today = new Date();
+            return eventDate.toDateString() === today.toDateString();
+        }).length;
+        
+        // Risk alerts: DSAR requests over 25 days old from real data
+        const riskAlerts = dsarRequests.filter(r => {
+            const submitted = new Date(r.submittedAt || r.createdAt);
+            const daysSince = (Date.now() - submitted.getTime()) / (1000 * 60 * 60 * 24);
+            return daysSince > 25 && r.status !== 'completed';
+        }).length;
+        
+        // Calculate insights from real consent data
+        const grantedConsents = consents.filter(c => c.status === 'granted').length;
+        const consentRate = consents.length > 0 ? Math.round((grantedConsents / consents.length) * 100) : 0;
+        const resolvedRequests = dsarRequests.filter(r => r.status === 'completed').length;
+        
+        // New customers in last 24 hours from real data
+        const newCustomers = users.filter(u => {
+            const created = new Date(u.createdAt);
             const daysSince = (Date.now() - created.getTime()) / (1000 * 60 * 60 * 24);
             return daysSince <= 1;
-        }).length
-    };
-    
-    res.json(stats);
+        }).length;
+        
+        const stats = {
+            totalCustomers,
+            pendingRequests,
+            consentUpdates,
+            guardiansManaged,
+            todayActions,
+            riskAlerts,
+            consentRate,
+            resolvedRequests,
+            newCustomers
+        };
+        
+        console.log('✅ Real MongoDB stats calculated:', stats);
+        res.json(stats);
+        
+    } catch (error) {
+        console.error('❌ Error fetching real MongoDB stats:', error);
+        
+        // Fallback to in-memory data if MongoDB fails
+        console.log('🔄 Falling back to in-memory data');
+        const totalCustomers = parties.length;
+        const pendingRequests = dsarRequests.filter(r => r.status === 'pending').length;
+        const consentUpdates = csrConsents.filter(c => {
+            const grantedDate = new Date(c.grantedAt || c.createdAt);
+            const daysSince = (Date.now() - grantedDate.getTime()) / (1000 * 60 * 60 * 24);
+            return daysSince <= 7;
+        }).length;
+        const guardiansManaged = parties.filter(p => p.type === 'guardian').length;
+        const todayActions = auditEvents.filter(e => {
+            const eventDate = new Date(e.createdAt);
+            const today = new Date();
+            return eventDate.toDateString() === today.toDateString();
+        }).length;
+        
+        const riskAlerts = dsarRequests.filter(r => {
+            const submitted = new Date(r.submittedAt);
+            const daysSince = (Date.now() - submitted.getTime()) / (1000 * 60 * 60 * 24);
+            return daysSince > 25 && r.status !== 'completed';
+        }).length;
+        
+        const stats = {
+            totalCustomers,
+            pendingRequests,
+            consentUpdates,
+            guardiansManaged,
+            todayActions,
+            riskAlerts,
+            consentRate: Math.round((csrConsents.filter(c => c.status === 'granted').length / csrConsents.length) * 100),
+            resolvedRequests: dsarRequests.filter(r => r.status === 'completed').length,
+            newCustomers: parties.filter(p => {
+                const created = new Date(p.createdAt);
+                const daysSince = (Date.now() - created.getTime()) / (1000 * 60 * 60 * 24);
+                return daysSince <= 1;
+            }).length
+        };
+        
+        res.json(stats);
+    }
 });
 
 // GET /api/v1/party - Get all customers/parties for CSR
@@ -1753,7 +1830,36 @@ app.get("/api/v1/csr/consent", async (req, res) => {
         // Combine MongoDB data with in-memory data and remove duplicates
         const allConsents = [...mongoConsents, ...csrConsents];
         const uniqueConsents = allConsents.reduce((unique, consent) => {
-            if (!unique.find(c => c.id === consent.id)) {
+            if (!unique.find(c => c.id === consent.id || c._id?.toString() === consent._id?.toString())) {
+                unique.push(consent);
+            }
+            return unique;
+        }, []);
+        
+        console.log(`Returning ${uniqueConsents.length} total consents`);
+        res.json(uniqueConsents);
+        
+    } catch (error) {
+        console.error('❌ Error fetching consents:', error);
+        // Fallback to in-memory data
+        console.log('Falling back to in-memory consent data');
+        res.json(csrConsents);
+    }
+});
+
+// GET /api/v1/consent (Non-auth version for CSR dashboard)
+app.get("/api/v1/consent", async (req, res) => {
+    try {
+        console.log('✅ CSR Dashboard: Fetching all consents (non-auth)');
+        
+        // Fetch from MongoDB
+        const mongoConsents = await Consent.find().sort({ createdAt: -1 }).lean();
+        console.log(`Found ${mongoConsents.length} consents in MongoDB`);
+        
+        // Combine MongoDB data with in-memory data and remove duplicates
+        const allConsents = [...mongoConsents, ...csrConsents];
+        const uniqueConsents = allConsents.reduce((unique, consent) => {
+            if (!unique.find(c => c.id === consent.id || c._id?.toString() === consent._id?.toString())) {
                 unique.push(consent);
             }
             return unique;
@@ -1823,7 +1929,118 @@ app.get("/api/v1/dsar", verifyToken, async (req, res) => {
 // GET /api/v1/event - Get all audit events for CSR
 app.get("/api/v1/event", (req, res) => {
     console.log('📝 CSR Dashboard: Fetching event/audit data');
-    res.json(auditEvents);
+    
+    // Add some context to audit events
+    const eventsWithContext = auditEvents.map(event => ({
+        ...event,
+        severity: event.eventType.includes('error') || event.eventType.includes('fail') ? 'high' :
+                 event.eventType.includes('warning') || event.eventType.includes('alert') ? 'medium' : 'low',
+        category: event.eventType.includes('consent') ? 'consent' :
+                 event.eventType.includes('dsar') ? 'dsar' :
+                 event.eventType.includes('auth') ? 'authentication' :
+                 event.eventType.includes('user') ? 'user_management' : 'system'
+    }));
+    
+    console.log(`Returning ${eventsWithContext.length} audit events`);
+    res.json(eventsWithContext);
+});
+
+// GET /api/v1/dsar/requests (Non-auth version for CSR dashboard)
+app.get("/api/v1/dsar/requests", async (req, res) => {
+    try {
+        console.log('📋 CSR Dashboard: Fetching DSAR requests from MongoDB (non-auth)');
+        const { 
+            status, 
+            requestType, 
+            priority, 
+            page = 1, 
+            limit = 50 
+        } = req.query;
+
+        // Build query
+        const query = {};
+        if (status) query.status = status;
+        if (requestType) query.requestType = requestType;
+        if (priority) query.priority = priority;
+
+        // Execute query with pagination
+        const mongoRequests = await DSARRequest.find(query)
+            .sort({ submittedAt: -1 })
+            .limit(parseInt(limit))
+            .skip((parseInt(page) - 1) * parseInt(limit));
+
+        const total = await DSARRequest.countDocuments(query);
+        
+        // Combine with in-memory data if needed
+        let allRequests = mongoRequests.length > 0 ? mongoRequests : dsarRequests;
+        
+        // Add risk indicators
+        const requestsWithRisk = allRequests.map(request => ({
+            ...request,
+            id: request.id || request._id?.toString(),
+            daysSinceSubmission: Math.floor(
+                (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+            ),
+            isOverdue: (() => {
+                const days = Math.floor(
+                    (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+                );
+                return days > 30 && !['completed', 'closed'].includes(request.status);
+            })(),
+            riskLevel: (() => {
+                const days = Math.floor(
+                    (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+                );
+                if (days >= 25) return 'critical';
+                if (days >= 20) return 'high';
+                if (days >= 15) return 'medium';
+                return 'low';
+            })()
+        }));
+
+        console.log(`Returning ${requestsWithRisk.length} DSAR requests with risk indicators`);
+        
+        res.json({
+            success: true,
+            requests: requestsWithRisk,
+            total: mongoRequests.length > 0 ? total : dsarRequests.length,
+            page: parseInt(page),
+            limit: parseInt(limit)
+        });
+        
+    } catch (error) {
+        console.error('❌ Error fetching DSAR requests:', error);
+        // Fallback to in-memory data
+        const requestsWithRisk = dsarRequests.map(request => ({
+            ...request,
+            daysSinceSubmission: Math.floor(
+                (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+            ),
+            isOverdue: (() => {
+                const days = Math.floor(
+                    (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+                );
+                return days > 30 && !['completed', 'closed'].includes(request.status);
+            })(),
+            riskLevel: (() => {
+                const days = Math.floor(
+                    (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+                );
+                if (days >= 25) return 'critical';
+                if (days >= 20) return 'high';
+                if (days >= 15) return 'medium';
+                return 'low';
+            })()
+        }));
+        
+        res.json({
+            success: true,
+            requests: requestsWithRisk,
+            total: dsarRequests.length,
+            page: 1,
+            limit: 50
+        });
+    }
 });
 
 // Test endpoint without authentication
@@ -7145,14 +7362,58 @@ app.get("/api/v1/dsar/requests", verifyToken, (req, res) => {
 
 app.post("/api/v1/dsar/request", verifyToken, async (req, res) => {
     try {
-        const { type, description } = req.body;
+        const { type, description, reason, additionalDetails } = req.body;
         
-        if (!type || !description) {
+        // Map frontend request types to backend enum values
+        const requestTypeMapping = {
+            'export': 'data_access',
+            'delete': 'data_erasure',
+            'correct': 'data_rectification',
+            'portability': 'data_portability',
+            'restrict': 'restrict_processing',
+            'object': 'object_processing',
+            'withdraw': 'withdraw_consent',
+            'automated': 'automated_decision',
+            // Also accept backend enum values directly
+            'data_access': 'data_access',
+            'data_rectification': 'data_rectification',
+            'data_erasure': 'data_erasure',
+            'data_portability': 'data_portability',
+            'restrict_processing': 'restrict_processing',
+            'object_processing': 'object_processing',
+            'withdraw_consent': 'withdraw_consent',
+            'automated_decision': 'automated_decision'
+        };
+        
+        // Handle both frontend formats
+        const requestDescription = description || reason || "No description provided";
+        const additionalInfo = additionalDetails || "";
+        const fullDescription = additionalInfo ? `${requestDescription}. Additional details: ${additionalInfo}` : requestDescription;
+        
+        // Map the request type
+        const mappedRequestType = requestTypeMapping[type];
+        
+        if (!type) {
             return res.status(400).json({
                 error: true,
-                message: "Type and description are required"
+                message: "Type is required"
             });
         }
+        
+        if (!mappedRequestType) {
+            return res.status(400).json({
+                error: true,
+                message: `Invalid request type: ${type}. Valid types are: ${Object.keys(requestTypeMapping).join(', ')}`
+            });
+        }
+        
+        console.log(`🔧 DSAR Request Data:`, {
+            originalType: type,
+            mappedType: mappedRequestType,
+            description: requestDescription,
+            additionalDetails: additionalInfo,
+            finalDescription: fullDescription
+        });
         
         // Get user details for the request
         const user = await User.findById(req.user.id);
@@ -7167,26 +7428,34 @@ app.post("/api/v1/dsar/request", verifyToken, async (req, res) => {
         const newRequest = new DSARRequest({
             requesterId: req.user.id,
             requesterEmail: user.email,
-            requesterName: user.name,
-            type: type,
-            description: description,
+            requesterName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
+            requestType: mappedRequestType,
+            subject: `DSAR Request: ${mappedRequestType}`,
+            description: fullDescription,
             status: "pending",
             submittedAt: new Date(),
             priority: "medium",
             metadata: {
                 customerInfo: {
                     id: req.user.id,
-                    name: user.name,
+                    name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
                     email: user.email,
                     phone: user.phone
                 },
-                requestSource: "customer_portal"
+                requestSource: "customer_portal",
+                originalFields: {
+                    originalType: type,
+                    mappedType: mappedRequestType,
+                    description,
+                    reason,
+                    additionalDetails
+                }
             }
         });
         
         const savedRequest = await newRequest.save();
         
-        console.log(`🔍 DSAR request created for customer ${user.email}: ${type}`);
+        console.log(`🔍 DSAR request created for customer ${user.email}: ${mappedRequestType} (original: ${type})`);
         
         res.json({
             success: true,
@@ -7195,9 +7464,12 @@ app.post("/api/v1/dsar/request", verifyToken, async (req, res) => {
         });
     } catch (error) {
         console.error('Error creating DSAR request:', error);
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
         res.status(500).json({
             error: true,
-            message: 'Internal server error'
+            message: 'Internal server error',
+            details: error.message
         });
     }
 });
@@ -8243,7 +8515,39 @@ app.post('/api/v1/dsar/:id/auto-process', verifyToken, async (req, res) => {
 // Get DSAR requests (enhanced for automation dashboard)
 app.get('/api/dsar-requests', async (req, res) => {
   try {
+    console.log('🔍 CSR Dashboard: Fetching DSAR requests from MongoDB');
+    
+    // Fetch from MongoDB first
+    const mongoRequests = await DSARRequest.find({}).sort({ submittedAt: -1 }).lean();
+    console.log(`Found ${mongoRequests.length} DSAR requests in MongoDB`);
+    
+    // Combine with in-memory requests
+    const allRequests = [...mongoRequests, ...dsarRequests];
+    
     // Return enhanced DSAR requests with automation metadata
+    const enhancedRequests = allRequests.map(request => ({
+      ...request,
+      daysSinceCreation: Math.floor(
+        (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+      ),
+      automationEligible: request.status === 'pending' && 
+        ['export', 'portability', 'data_access'].includes(request.requestType),
+      riskLevel: (() => {
+        const days = Math.floor(
+          (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+        );
+        if (days >= 25) return 'critical';
+        if (days >= 20) return 'high';
+        if (days >= 15) return 'medium';
+        return 'low';
+      })()
+    }));
+    
+    console.log(`Returning ${enhancedRequests.length} enhanced DSAR requests`);
+    res.json(enhancedRequests);
+  } catch (error) {
+    console.error('Error fetching DSAR requests:', error);
+    // Fallback to in-memory data
     const enhancedRequests = dsarRequests.map(request => ({
       ...request,
       daysSinceCreation: Math.floor(
@@ -8261,11 +8565,7 @@ app.get('/api/dsar-requests', async (req, res) => {
         return 'low';
       })()
     }));
-    
     res.json(enhancedRequests);
-  } catch (error) {
-    console.error('Error fetching DSAR requests:', error);
-    res.status(500).json({ error: 'Failed to fetch DSAR requests' });
   }
 });
 
