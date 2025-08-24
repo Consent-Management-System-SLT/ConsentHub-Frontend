@@ -83,7 +83,33 @@ const userSchema = new mongoose.Schema({
   address: {
     type: String,
     default: ''
-  }
+  },
+  // Guardian/Minor relationship support
+  hasMinorDependents: {
+    type: Boolean,
+    default: false
+  },
+  minorDependents: [{
+    id: String,
+    name: String,
+    firstName: String,
+    lastName: String,
+    age: Number,
+    dateOfBirth: String,
+    relationship: {
+      type: String,
+      enum: ['child', 'ward', 'stepchild'],
+      default: 'child'
+    },
+    legalDocuments: {
+      birthCertificate: { type: Boolean, default: false },
+      guardianshipPapers: { type: Boolean, default: false }
+    }
+  }],
+  guardianOf: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 }, {
   timestamps: true, // This adds createdAt and updatedAt automatically
   collection: 'users'

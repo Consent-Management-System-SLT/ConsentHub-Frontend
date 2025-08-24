@@ -17,7 +17,19 @@ const consentSchema = new mongoose.Schema({
   purpose: {
     type: String,
     required: true,
-    enum: ['marketing', 'analytics', 'thirdPartySharing', 'dataProcessing', 'location', 'research', 'personalization']
+    enum: [
+      'marketing', 
+      'analytics', 
+      'thirdPartySharing', 
+      'dataProcessing', 
+      'location', 
+      'research', 
+      'personalization',
+      'Marketing Communications',
+      'Service Updates',
+      'Educational Content',
+      'Account Management'
+    ]
   },
   status: {
     type: String,
@@ -27,7 +39,7 @@ const consentSchema = new mongoose.Schema({
   channel: {
     type: String,
     required: true,
-    enum: ['email', 'sms', 'push', 'voice', 'all']
+    enum: ['email', 'sms', 'push', 'voice', 'all', 'guardian_portal']
   },
   validFrom: {
     type: Date,
