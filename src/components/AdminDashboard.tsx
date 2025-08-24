@@ -15,6 +15,7 @@ import AuditLogViewer from './admin/AuditLogViewer';
 import BulkImportManager from './admin/BulkImportManager';
 import EventListenerManager from './admin/EventListenerManager';
 import UserManagement from './admin/UserManagement';
+import CustomerManagement from './admin/CustomerManagement';
 import ComplianceRulesManager from './admin/ComplianceRulesManager';
 import ServerConnectionAlert from './shared/ServerConnectionAlert';
 
@@ -53,6 +54,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
         return <EventListenerManager />;
       case 'user-management':
         return <UserManagement />;
+      case 'customer-management':
+        return <CustomerManagement />;
       case 'compliance-rules':
         return <ComplianceRulesManager />;
       default:

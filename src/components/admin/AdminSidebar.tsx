@@ -44,6 +44,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { id: 'bulk-import', label: 'Bulk Import', icon: Upload, description: 'Import customer data' },
     { id: 'event-listeners', label: 'Event Listeners', icon: Webhook, description: 'Manage webhooks' },
     { id: 'user-management', label: 'User Management', icon: Users, description: 'Manage users and roles' },
+    { id: 'customer-management', label: 'Customer Management', icon: UserCheck, description: 'Manage customer accounts and data' },
     { id: 'compliance-rules', label: 'Compliance Rules', icon: AlertTriangle, description: 'Configure compliance settings' }
   ];
 
