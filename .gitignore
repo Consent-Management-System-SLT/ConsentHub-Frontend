@@ -34,6 +34,37 @@ testGuardianAPI.js
 quick-test.js
 simple-test.js
 
+# Debugging and development scripts
+add-consents-via-api.js
+check-atlas-database.js
+check-customer-data.js
+check-database.js
+check-dinuka-account.js
+check-dinuka-mongodb.js
+check-user-roles.js
+comprehensive-debug.js
+create-additional-data.js
+create-pramodh-preferences.js
+create-user-preferences.js
+customer-dashboard-test.html
+customer-data-provisioning.js
+debug-dashboard-endpoint.js
+debug-dinuka-data.js
+debug-privacy-notices.js
+debug-user-check.js
+debug-user-id-formats.js
+debug-user-preferences.js
+dinuka-final-status.js
+final-diagnosis.js
+force-fix-consents.js
+migrate-existing-users-fixed.js
+migrate-existing-users.js
+public/debug-customer-api.html
+register-dinuka-new.js
+register-dinuka-with-defaults.js
+seed-customer-data.js
+verify-dinuka-account.js
+
 # Development utilities
 openapi-tmf-spec.yaml
 
