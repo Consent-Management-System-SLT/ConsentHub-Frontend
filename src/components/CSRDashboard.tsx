@@ -122,13 +122,6 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
         }));
 
       setRecentActivities(recentEvents);
-      
-      console.log('✅ CSR dashboard data loaded successfully');
-      console.log('📊 Stats:', dashboardData.stats);
-      console.log('👥 Customers:', dashboardData.customers.length);
-      console.log('🛡️ Consents:', dashboardData.consents.length);
-      console.log('📋 DSAR Requests:', dashboardData.dsarRequests.length);
-      console.log('📝 Audit Events:', dashboardData.auditEvents.length);
 
     } catch (error) {
       console.error('❌ Error loading CSR dashboard data:', error);

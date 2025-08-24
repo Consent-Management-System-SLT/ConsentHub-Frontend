@@ -5,9 +5,12 @@ import AdminHeader from './admin/AdminHeader';
 import AdminSidebar from './admin/AdminSidebar';
 import DashboardHome from './admin/DashboardHome';
 import ConsentOverviewTable from './admin/ConsentOverviewTable';
+import GuardianConsent from './admin/GuardianConsent';
 import PreferenceManagerNew from './admin/PreferenceManagerNew';
+import TopicPreferences from './admin/TopicPreferences';
 import { PrivacyNotices } from './PrivacyNotices';
 import DSARManager from './admin/DSARManager';
+import DSARAutomation from './admin/DSARAutomation';
 import AuditLogViewer from './admin/AuditLogViewer';
 import BulkImportManager from './admin/BulkImportManager';
 import EventListenerManager from './admin/EventListenerManager';
@@ -30,12 +33,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
         return <DashboardHome />;
       case 'consents':
         return <ConsentOverviewTable />;
+      case 'guardian-consent':
+        return <GuardianConsent />;
       case 'preferences':
         return <PreferenceManagerNew />;
+      case 'topic-preferences':
+        return <TopicPreferences />;
       case 'privacy-notices':
         return <PrivacyNotices />;
       case 'dsar-requests':
         return <DSARManager />;
+      case 'dsar-automation':
+        return <DSARAutomation />;
       case 'audit-logs':
         return <AuditLogViewer />;
       case 'bulk-import':

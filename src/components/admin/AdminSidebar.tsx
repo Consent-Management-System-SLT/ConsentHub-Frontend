@@ -12,7 +12,10 @@ import {
   AlertTriangle,
   Menu,
   X,
-  ChevronRight
+  ChevronRight,
+  UserCheck,
+  MessageSquare,
+  Zap
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -31,9 +34,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, description: 'Overview and analytics' },
     { id: 'consents', label: 'Consents', icon: Shield, description: 'Manage all customer consents' },
+    { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Manage guardian consent for minors' },
     { id: 'preferences', label: 'Preferences', icon: Settings, description: 'View customer preferences' },
+    { id: 'topic-preferences', label: 'Topic Preferences', icon: MessageSquare, description: 'Manage topic-based communications' },
     { id: 'privacy-notices', label: 'Privacy Notices', icon: FileText, description: 'Manage privacy policies' },
     { id: 'dsar-requests', label: 'DSAR Requests', icon: Database, description: 'Data subject access requests' },
+    { id: 'dsar-automation', label: 'DSAR Automation', icon: Zap, description: 'Automated DSAR processing' },
     { id: 'audit-logs', label: 'Audit Logs', icon: Activity, description: 'System audit trail' },
     { id: 'bulk-import', label: 'Bulk Import', icon: Upload, description: 'Import customer data' },
     { id: 'event-listeners', label: 'Event Listeners', icon: Webhook, description: 'Manage webhooks' },

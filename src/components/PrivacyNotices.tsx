@@ -516,8 +516,6 @@ export const PrivacyNotices: React.FC = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
       
-      console.log('✅ Export completed successfully');
-      
     } catch (err) {
       console.error('❌ Export error:', err);
       alert('Failed to export notices: ' + (err instanceof Error ? err.message : 'Unknown error'));

@@ -67,7 +67,6 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
         newCustomers: statsData.newCustomers || 0
       });
 
-      console.log('✅ CSR overview stats loaded:', statsData);
       await loadQuickActions();
 
     } catch (error) {
