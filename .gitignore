@@ -23,3 +23,17 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Testing and debugging files
+test-*.js
+*-test.js
+auth-test.js
+fix-*.js
+fixGuardianNames.js
+seedGuardians.js
+testGuardianAPI.js
+quick-test.js
+simple-test.js
+
+# Development utilities
+openapi-tmf-spec.yaml
