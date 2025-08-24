@@ -12,9 +12,11 @@ import {
   RefreshCw,
   Calendar,
   FileText,
-  BarChart3
+  BarChart3,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCRUDNotifications } from '../shared/withNotifications';
 
 interface DashboardData {
   systemOverview: {
@@ -54,11 +56,33 @@ interface DashboardData {
 
 const DashboardHome: React.FC = () => {
   const { getAuthToken } = useAuth();
+  const { notifyCustom } = useCRUDNotifications();
+  
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [selectedPeriod, setSelectedPeriod] = useState('7d');
+
+  // Test notification function
+  const testNotification = () => {
+    const notifications = [
+      { type: 'success', title: 'System Update', message: 'Dashboard data refreshed successfully' },
+      { type: 'info', title: 'New Feature', message: 'Notification system is now active!' },
+      { type: 'warning', title: 'Maintenance Alert', message: 'System maintenance scheduled for tonight' },
+      { type: 'urgent', title: 'Action Required', message: 'High priority DSAR request needs attention' }
+    ] as const;
+
+    const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
+    
+    notifyCustom(
+      'system',
+      randomNotification.type,
+      randomNotification.title,
+      randomNotification.message,
+      { source: 'dashboard_test' }
+    );
+  };
 
   useEffect(() => {
     fetchDashboardData();
@@ -187,6 +211,13 @@ const DashboardHome: React.FC = () => {
           >
             <RefreshCw className="w-4 h-4" />
             <span>Refresh</span>
+          </button>
+          <button 
+            onClick={testNotification}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Bell className="w-4 h-4" />
+            <span>Test</span>
           </button>
         </div>
       </div>

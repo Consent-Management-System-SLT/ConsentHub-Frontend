@@ -3,6 +3,7 @@ import { Shield, Check, X, Clock, AlertCircle, Eye, Plus } from 'lucide-react';
 import { PrivacyConsent, Party, ConsentPurpose, ConsentStatus } from '../types/consent';
 import { ConsentCreateRequest } from '../services/consentService';
 import { useConsents, useParties, useConsentMutation } from '../hooks/useApi';
+import { useCRUDNotifications } from './shared/withNotifications';
 
 interface ConsentManagementProps {
   selectedCustomer?: Party;
@@ -37,6 +38,9 @@ export const ConsentManagement: React.FC<ConsentManagementProps> = ({ selectedCu
   const { data: consentsData, loading: consentsLoading, refetch: refetchConsents } = useConsents(selectedCustomer?.id);
   const { data: partiesData, loading: partiesLoading } = useParties();
   const { createConsent, updateConsent, revokeConsent, loading: mutationLoading } = useConsentMutation();
+
+  // Notification hooks
+  const { notifyCreate, notifyUpdate, notifyCustom } = useCRUDNotifications();
 
   // Transform data to ensure it's an array
   const consents = Array.isArray(consentsData) ? consentsData : 
@@ -103,6 +107,23 @@ export const ConsentManagement: React.FC<ConsentManagementProps> = ({ selectedCu
     try {
       await updateConsent(consentId, { status: newStatus as any });
       await refetchConsents(); // Refresh the data
+      
+      // Send notification
+      const updatedConsent = consents.find((c: any) => c.id === consentId);
+      if (updatedConsent) {
+        const party = parties.find((p: any) => p.id === updatedConsent.partyId);
+        const customerName = party ? 
+          (party.characteristic?.find((c: any) => c.name === 'firstName')?.value + ' ' + 
+           party.characteristic?.find((c: any) => c.name === 'lastName')?.value) || party.id :
+          updatedConsent.partyId;
+        
+        notifyUpdate('consent', customerName, {
+          consentId: consentId,
+          oldStatus: updatedConsent.status,
+          newStatus: newStatus,
+          purpose: updatedConsent.purpose
+        });
+      }
     } catch (error) {
       console.error('Failed to update consent:', error);
     }
@@ -132,6 +153,19 @@ export const ConsentManagement: React.FC<ConsentManagementProps> = ({ selectedCu
       await createConsent(consentData);
       await refetchConsents(); // Refresh the data
       setShowCreateModal(false);
+      
+      // Send notification
+      const selectedParty = parties.find(p => p.id === newConsentForm.partyId);
+      const customerName = selectedParty ? 
+        (selectedParty.characteristic?.find(c => c.name === 'firstName')?.value + ' ' + 
+         selectedParty.characteristic?.find(c => c.name === 'lastName')?.value) || selectedParty.id :
+        newConsentForm.partyId;
+      
+      notifyCreate('consent', customerName, {
+        purpose: newConsentForm.purpose,
+        status: newConsentForm.status,
+        channel: newConsentForm.channel
+      });
       
       // Reset form
       setNewConsentForm({

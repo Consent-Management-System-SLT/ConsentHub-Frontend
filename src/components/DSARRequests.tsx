@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { DSARRequest, Party } from '../types/consent';
 import { useDSARRequests, useParties, useDSARMutation } from '../hooks/useApi';
+import { useCRUDNotifications } from './shared/withNotifications';
 
 interface DSARRequestsProps {
   selectedCustomer?: Party;
@@ -21,6 +22,9 @@ export const DSARRequests: React.FC<DSARRequestsProps> = ({ selectedCustomer }) 
   const { data: dsarData, loading: dsarLoading, refetch: refetchDSAR } = useDSARRequests(filteredCustomer?.id);
   const { data: partiesData, loading: partiesLoading } = useParties();
   const { updateDSARRequest, loading: mutationLoading } = useDSARMutation();
+
+  // Notification hooks
+  const { notifyUpdate, notifyApprove, notifyReject } = useCRUDNotifications();
 
   // Transform data to ensure it's an array
   const requests = Array.isArray(dsarData) ? dsarData : 
@@ -95,8 +99,37 @@ export const DSARRequests: React.FC<DSARRequestsProps> = ({ selectedCustomer }) 
 
   const handleUpdateStatus = async (requestId: string, newStatus: string) => {
     try {
+      // Find the request being updated
+      const request = requests.find((r: any) => r.id === requestId);
+      const party = parties.find((p: any) => p.id === request?.partyId);
+      const entityName = `${request?.type || 'DSAR Request'} for ${party?.name || 'Unknown Party'}`;
+      
       await updateDSARRequest(requestId, { status: newStatus as any });
       await refetchDSAR(); // Refresh the data
+      
+      // Trigger appropriate notification based on status
+      if (newStatus === 'completed') {
+        notifyApprove('dsarRequest', entityName, {
+          requestId,
+          partyName: party?.name || 'Unknown Party',
+          requestType: request?.type || 'Unknown Type',
+          status: newStatus
+        });
+      } else if (newStatus === 'failed' || newStatus === 'rejected') {
+        notifyReject('dsarRequest', entityName, {
+          requestId,
+          partyName: party?.name || 'Unknown Party',
+          requestType: request?.type || 'Unknown Type',
+          status: newStatus
+        });
+      } else {
+        notifyUpdate('dsarRequest', entityName, {
+          requestId,
+          partyName: party?.name || 'Unknown Party',
+          requestType: request?.type || 'Unknown Type',
+          status: newStatus
+        });
+      }
     } catch (error) {
       console.error('Failed to update DSAR request:', error);
     }
@@ -239,7 +272,7 @@ export const DSARRequests: React.FC<DSARRequestsProps> = ({ selectedCustomer }) 
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredRequests.map((request) => (
+              {filteredRequests.map((request: any) => (
                 <tr key={request.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <div className="font-medium text-gray-900">{getCustomerName(request.partyId)}</div>
