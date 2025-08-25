@@ -1,29 +1,19 @@
-// API Configuration for ConsentHub
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
+// API Configuration for ConsentHub - Using Comprehensive Backend
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api/v1';
 
 export const API_ENDPOINTS = {
-  // Authentication Service (Port 3007)
-  AUTH_SERVICE: 'http://localhost:3007/api/v1/auth',
-  
-  // Admin Service (Port 3009) - New dedicated admin service
-  ADMIN_SERVICE: 'http://localhost:3009/api/v1/admin',
-  
-  // Core Services
-  CONSENT_SERVICE: 'http://localhost:3002/api/v1/consent',
-  PREFERENCE_SERVICE: 'http://localhost:3003/api/v1/preference', 
-  PARTY_SERVICE: 'http://localhost:3004/api/v1/party',
-  DSAR_SERVICE: 'http://localhost:3005/api/v1/dsar',
-  ANALYTICS_SERVICE: 'http://localhost:3006/analytics',
-  EVENT_SERVICE: 'http://localhost:3008/api/v1/events',
-  PRIVACY_NOTICE_SERVICE: 'http://localhost:3010/api/v1/privacy-notice',
-  
-  // CSR Service for audit logs
-  CSR_SERVICE: 'http://localhost:3011/api/v1/csr',
-  
-  // Customer Service
-  CUSTOMER_SERVICE: 'http://localhost:3012/api/v1/customer',
-  
-  // Legacy comprehensive backend (fallback)
+  // All services point to comprehensive backend
+  AUTH_SERVICE: 'http://localhost:3001/api/v1/auth',
+  ADMIN_SERVICE: 'http://localhost:3001/api/v1/admin',
+  CONSENT_SERVICE: 'http://localhost:3001/api/v1/consent',
+  PREFERENCE_SERVICE: 'http://localhost:3001/api/v1/preference', 
+  PARTY_SERVICE: 'http://localhost:3001/api/v1/party',
+  DSAR_SERVICE: 'http://localhost:3001/api/v1/dsar',
+  ANALYTICS_SERVICE: 'http://localhost:3001/api/v1/analytics',
+  EVENT_SERVICE: 'http://localhost:3001/api/v1/event',
+  PRIVACY_NOTICE_SERVICE: 'http://localhost:3001/api/v1/privacy-notices',
+  CSR_SERVICE: 'http://localhost:3001/api/v1/csr',
+  CUSTOMER_SERVICE: 'http://localhost:3001/api/v1/customer',
   LEGACY: 'http://localhost:3001/api/v1'
 };
 
