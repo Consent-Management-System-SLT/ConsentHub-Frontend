@@ -239,27 +239,27 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
   }
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`space-y-4 sm:space-y-6 max-w-full overflow-x-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-myslt-text-primary">CSR Dashboard</h1>
-          <p className="text-myslt-text-secondary mt-2">Customer Service Representative Overview</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-myslt-text-primary truncate">CSR Dashboard</h1>
+          <p className="text-myslt-text-secondary mt-1 text-sm sm:text-base">Customer Service Representative Overview</p>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+            <span className="hidden sm:inline">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
           </button>
         </div>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
         {[
           { key: 'customers', label: 'Total Customers', value: stats.totalCustomers, type: 'customers', icon: Users, color: 'blue' },
           { key: 'requests', label: 'Pending DSAR Requests', value: stats.pendingRequests, type: 'requests', icon: FileText, color: 'amber' },
@@ -270,11 +270,11 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
         ].map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={stat.key} className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+            <div key={stat.key} className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-accent/20 p-3 sm:p-4 lg:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-myslt-text-secondary">{stat.label}</p>
-                  <p className="text-2xl font-bold text-myslt-text-primary">{stat.value}</p>
+                <div className="min-w-0 flex-1 pr-3">
+                  <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary line-clamp-2">{stat.label}</p>
+                  <p className="text-lg sm:text-xl lg:text-2xl font-bold text-myslt-text-primary">{stat.value}</p>
                   {stat.key === 'requests' && stat.value > 5 && (
                     <p className="text-xs text-red-600 mt-1">Needs attention</p>
                   )}
@@ -282,8 +282,8 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
                     <p className="text-xs text-red-600 mt-1">Active alerts</p>
                   )}
                 </div>
-                <div className={`p-3 bg-${stat.color}-100 rounded-full`}>
-                  <Icon className={`w-6 h-6 text-${stat.color}-600`} />
+                <div className={`p-2 sm:p-3 bg-${stat.color}-100 rounded-full shrink-0`}>
+                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-${stat.color}-600`} />
                 </div>
               </div>
             </div>
@@ -292,45 +292,45 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       </div>
 
       {/* Key Insights */}
-      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-6">
-        <div className="flex items-center space-x-2 mb-6">
-          <div className="p-2 bg-myslt-primary/20 rounded-lg">
-            <TrendingUp className="w-5 h-5 text-myslt-primary" />
+      <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-accent/20 p-3 sm:p-4 lg:p-6">
+        <div className="flex items-center space-x-2 mb-3 sm:mb-4 lg:mb-6">
+          <div className="p-1.5 sm:p-2 bg-myslt-primary/20 rounded-lg">
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-myslt-primary" />
           </div>
-          <h3 className="text-lg font-semibold text-myslt-text-primary">Key Insights</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-myslt-text-primary">Key Insights</h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-myslt-success/20 rounded-xl">
-            <div className="text-3xl font-bold text-myslt-success mb-1">{insights.consentRate}%</div>
-            <div className="text-sm text-myslt-text-secondary">Consent Grant Rate</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+          <div className="text-center p-3 sm:p-4 bg-myslt-success/20 rounded-lg sm:rounded-xl">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-success mb-1">{insights.consentRate}%</div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary">Consent Grant Rate</div>
           </div>
-          <div className="text-center p-4 bg-myslt-primary/20 rounded-xl">
-            <div className="text-3xl font-bold text-myslt-primary mb-1">{insights.resolvedRequests}</div>
-            <div className="text-sm text-myslt-text-secondary">Resolved DSAR Requests</div>
+          <div className="text-center p-3 sm:p-4 bg-myslt-primary/20 rounded-lg sm:rounded-xl">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-primary mb-1">{insights.resolvedRequests}</div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary">Resolved DSAR Requests</div>
           </div>
-          <div className="text-center p-4 bg-myslt-accent/20 rounded-xl">
-            <div className="text-3xl font-bold text-myslt-accent mb-1">{insights.newCustomers}</div>
-            <div className="text-sm text-myslt-text-secondary">New Customers Today</div>
+          <div className="text-center p-3 sm:p-4 bg-myslt-accent/20 rounded-lg sm:rounded-xl">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-accent mb-1">{insights.newCustomers}</div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary">New Customers Today</div>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-6">
-        <div className="flex items-center space-x-2 mb-6">
-          <div className="p-2 bg-myslt-primary/20 rounded-lg">
-            <Activity className="w-5 h-5 text-myslt-primary" />
+      <div className="bg-myslt-card-solid rounded-lg sm:rounded-xl shadow-sm border border-myslt-accent/20 p-3 sm:p-4 lg:p-6">
+        <div className="flex items-center space-x-2 mb-3 sm:mb-4 lg:mb-6">
+          <div className="p-1.5 sm:p-2 bg-myslt-primary/20 rounded-lg">
+            <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-myslt-primary" />
           </div>
-          <h3 className="text-lg font-semibold text-myslt-text-primary">Quick Actions</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-myslt-text-primary">Quick Actions</h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
           {Array.isArray(quickActions) && quickActions.map((action) => {
             const Icon = action.icon;
             return (
               <div
                 key={action.id}
                 onClick={action.action}
-                className={`p-4 border rounded-xl cursor-pointer transition-all hover:shadow-md ${
+                className={`p-3 sm:p-4 border rounded-lg sm:rounded-xl cursor-pointer transition-all hover:shadow-md ${
                   action.priority === 'high' 
                     ? 'border-red-400/50 bg-red-900/30 hover:border-red-400' 
                     : action.priority === 'medium'
@@ -338,22 +338,22 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
                     : 'border-myslt-accent/30 bg-myslt-service-card hover:border-myslt-accent/50'
                 }`}
               >
-                <div className="flex items-start space-x-3">
-                  <div className={`p-2 rounded-lg ${
+                <div className="flex items-start space-x-2 sm:space-x-3">
+                  <div className={`p-1.5 sm:p-2 rounded-lg shrink-0 ${
                     action.priority === 'high' ? 'bg-red-800/50' :
                     action.priority === 'medium' ? 'bg-amber-800/50' : 'bg-myslt-accent/20'
                   }`}>
-                    <Icon className={`w-5 h-5 ${
+                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${
                       action.priority === 'high' ? 'text-red-400' :
                       action.priority === 'medium' ? 'text-amber-400' : 'text-myslt-text-secondary'
                     }`} />
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-myslt-text-primary">{action.title}</h4>
-                    <p className="text-sm text-myslt-text-secondary mt-1">{action.description}</p>
+                  <div className="flex-1 min-w-0 pr-2">
+                    <h4 className="font-medium text-myslt-text-primary text-sm sm:text-base line-clamp-2">{action.title}</h4>
+                    <p className="text-xs sm:text-sm text-myslt-text-secondary mt-1 line-clamp-2">{action.description}</p>
                   </div>
                   {action.priority === 'high' && (
-                    <span className="px-2 py-1 bg-red-800/50 text-red-400 text-xs font-medium rounded-full">
+                    <span className="px-2 py-1 bg-red-800/50 text-red-400 text-xs font-medium rounded-full whitespace-nowrap shrink-0">
                       Urgent
                     </span>
                   )}

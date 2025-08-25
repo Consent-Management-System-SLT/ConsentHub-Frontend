@@ -231,7 +231,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   };
 
   return (
-    <div className={`min-h-screen bg-myslt-background flex ${className}`}>
+    <div className={`min-h-screen bg-myslt-background flex flex-col lg:flex-row ${className}`}>
       {/* Server Connection Alert */}
       {showConnectionAlert && (
         <ServerConnectionAlert 
@@ -250,7 +250,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
       />
       
       {/* Main content area */}
-      <div className="flex-1 lg:ml-0 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
         <CSRHeader 
           onRefresh={handleRefresh}
@@ -258,9 +258,11 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
         />
         
         {/* Main Content */}
-        <main className="flex-1 overflow-auto">
-          <div className="p-4 sm:p-6 lg:p-8">
-            {renderContent()}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto">
+          <div className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-full">
+            <div className="max-w-7xl mx-auto">
+              {renderContent()}
+            </div>
           </div>
         </main>
       </div>

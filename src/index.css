@@ -118,4 +118,48 @@
     background: linear-gradient(135deg, rgba(30, 144, 255, 0.2) 0%, rgba(37, 99, 235, 0.15) 100%);
     backdrop-filter: blur(10px);
   }
+
+  /* Line clamping utilities */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  /* Responsive text utilities */
+  .text-responsive-sm { @apply text-xs sm:text-sm; }
+  .text-responsive-base { @apply text-sm sm:text-base; }
+  .text-responsive-lg { @apply text-base sm:text-lg; }
+  .text-responsive-xl { @apply text-lg sm:text-xl; }
+  .text-responsive-2xl { @apply text-xl sm:text-2xl; }
+  .text-responsive-3xl { @apply text-2xl sm:text-3xl; }
+
+  /* Responsive padding utilities */
+  .p-responsive { @apply p-3 sm:p-4 lg:p-6; }
+  .px-responsive { @apply px-3 sm:px-4 lg:px-6; }
+  .py-responsive { @apply py-3 sm:py-4 lg:py-6; }
+
+  /* Responsive margin utilities */
+  .m-responsive { @apply m-3 sm:m-4 lg:m-6; }
+  .mx-responsive { @apply mx-3 sm:mx-4 lg:mx-6; }
+  .my-responsive { @apply my-3 sm:my-4 lg:my-6; }
+
+  /* Responsive gap utilities */
+  .gap-responsive { @apply gap-2 sm:gap-3 lg:gap-4; }
+  .gap-responsive-lg { @apply gap-3 sm:gap-4 lg:gap-6; }
 }

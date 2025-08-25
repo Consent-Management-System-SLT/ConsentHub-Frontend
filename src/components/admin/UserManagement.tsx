@@ -823,33 +823,33 @@ const UserManagement: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-myslt-text-primary">User Management</h1>
-          <p className="text-myslt-text-secondary mt-2">
+    <div className="max-w-full mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-8">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-myslt-text-primary truncate">User Management</h1>
+          <p className="text-myslt-text-secondary mt-1 sm:mt-2 text-sm sm:text-base">
             Manage user accounts and permissions {totalCount > 0 && `(${totalCount} total users)`}
           </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 shrink-0">
           <button 
             onClick={() => {
               setShowAddModal(true);
               setError(null);
             }}
             disabled={loading}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
+            className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
           >
             <Plus className="w-4 h-4" />
-            <span className="text-sm font-medium">Add User</span>
+            <span>Add User</span>
           </button>
           <button 
             onClick={fetchUsers}
             disabled={loading}
-            className="px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors flex items-center space-x-2 disabled:opacity-50"
+            className="px-3 sm:px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span className="text-sm font-medium">Refresh</span>
+            <span>Refresh</span>
           </button>
         </div>
       </div>
@@ -887,15 +887,15 @@ const UserManagement: React.FC = () => {
       )}
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
+        <div className="bg-myslt-card rounded-lg sm:rounded-xl shadow-sm border border-myslt-accent/20 p-3 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-myslt-text-secondary">Total Users</p>
-              <p className="text-2xl font-bold text-myslt-success">{users.length}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary">Total Users</p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-myslt-success">{users.length}</p>
             </div>
-            <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-myslt-success" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-myslt-accent/20 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-myslt-success" />
             </div>
           </div>
         </div>
