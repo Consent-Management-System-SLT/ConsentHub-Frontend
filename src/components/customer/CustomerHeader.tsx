@@ -15,20 +15,26 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout,
   
   return (
     <header className="bg-myslt-primary shadow-lg sticky top-0 z-40 border-b border-myslt-accent/20">
-      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Brand Text - Logo moved to sidebar */}
-          <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-shrink-0">
             <div className="min-w-0">
-              <h1 className="text-lg sm:text-xl font-bold text-myslt-text-primary truncate">{t('customerDashboard.brand')}</h1>
-              <p className="text-xs sm:text-sm text-myslt-text-secondary">{t('customerDashboard.subtitle')}</p>
+              <h1 className="text-base sm:text-lg md:text-xl font-bold text-myslt-text-primary truncate">
+                <span className="hidden sm:inline">{t('customerDashboard.brand')}</span>
+                <span className="sm:hidden">ConsentHub</span>
+              </h1>
+              <p className="text-xs text-myslt-text-secondary">
+                <span className="hidden sm:inline">{t('customerDashboard.subtitle')}</span>
+                <span className="sm:hidden">Customer</span>
+              </p>
             </div>
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
             {/* Language Selector - Hidden on mobile to save space */}
-            <div className="hidden sm:flex items-center">
+            <div className="hidden md:flex items-center">
               <LanguageSelector />
             </div>
 
@@ -36,14 +42,14 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout,
             <NotificationBell size="sm" />
 
             {/* User Profile */}
-            <div className="flex items-center gap-2">
-              <div className="hidden sm:flex flex-col text-right min-w-0">
-                <p className="text-sm font-medium text-myslt-text-primary truncate max-w-[8rem] lg:max-w-[12rem]">{customerName}</p>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="hidden lg:flex flex-col text-right min-w-0">
+                <p className="text-sm font-medium text-myslt-text-primary truncate max-w-[8rem] xl:max-w-[12rem]">{customerName}</p>
                 <p className="text-xs text-myslt-text-secondary">{t('customerDashboard.userRole')}</p>
               </div>
-              <div className="w-8 h-8 sm:w-9 sm:h-9 bg-myslt-accent rounded-full flex items-center justify-center flex-shrink-0">
-                <button type="button" onClick={onProfileClick} className="w-8 h-8 sm:w-9 sm:h-9 bg-myslt-accent rounded-full flex items-center justify-center flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-myslt-success hover:bg-myslt-accent/80 transition-all duration-200">
-                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-myslt-text-primary" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 bg-myslt-accent rounded-full flex items-center justify-center flex-shrink-0">
+                <button type="button" onClick={onProfileClick} className="w-full h-full bg-myslt-accent rounded-full flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-myslt-success hover:bg-myslt-accent/80 transition-all duration-200">
+                  <User className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-myslt-text-primary" />
                 </button>
               </div>
             </div>
@@ -52,9 +58,9 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout,
             <div className="flex items-center">
               <button
                 onClick={onLogout}
-                className="flex items-center gap-1 sm:gap-2 px-3 py-2 text-sm font-medium text-myslt-text-primary bg-myslt-card hover:bg-myslt-accent rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-myslt-success"
+                className="flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-myslt-text-primary bg-myslt-card hover:bg-myslt-accent rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-myslt-success"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">{t('common.logout')}</span>
               </button>
             </div>
@@ -62,7 +68,7 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerName, onLogout,
         </div>
         
         {/* Mobile Language Selector */}
-        <div className="sm:hidden pb-3 pt-3">
+        <div className="md:hidden pb-2 pt-2 border-t border-myslt-accent/10">
           <div className="flex items-center justify-center">
             <LanguageSelector />
           </div>

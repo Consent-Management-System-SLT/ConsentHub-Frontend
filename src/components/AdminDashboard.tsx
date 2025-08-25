@@ -89,7 +89,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
         
         {/* Main Content */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-full">
+          <div className="p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 max-w-full">
             <div className="max-w-7xl mx-auto">
               {renderContent()}
             </div>

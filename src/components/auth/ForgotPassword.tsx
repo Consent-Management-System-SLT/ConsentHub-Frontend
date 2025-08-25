@@ -99,25 +99,25 @@ const ForgotPassword: React.FC = () => {
 
   if (step === 3) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0072CE] to-[#4CAF50] py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="bg-white rounded-xl shadow-xl p-8">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0072CE] to-[#4CAF50] py-4 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="max-w-sm sm:max-w-md w-full space-y-4 sm:space-y-6 md:space-y-8">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-xl p-4 sm:p-6 md:p-8">
             <div className="text-center">
-              <CheckCircle className="mx-auto h-16 w-16 text-green-500 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <CheckCircle className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-green-500 mb-3 sm:mb-4" />
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">
                 Reset Link Sent!
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
                 We've sent a password reset link to {formData.email}
               </p>
-              <p className="text-sm text-gray-500 mb-8">
+              <p className="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8">
                 Please check your email and follow the instructions to reset your password. 
                 The link will expire in 24 hours.
               </p>
               
               <Link
                 to="/login"
-                className="w-full inline-flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#0072CE] hover:bg-[#005bb5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                className="w-full inline-flex justify-center py-2.5 sm:py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#0072CE] hover:bg-[#005bb5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
               >
                 Back to Login
               </Link>
@@ -129,39 +129,39 @@ const ForgotPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0072CE] to-[#4CAF50] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-lg w-full space-y-8">
-        <div className="bg-white rounded-xl shadow-xl p-8">
-          <div className="text-center mb-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0072CE] to-[#4CAF50] py-4 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8">
+      <div className="max-w-sm sm:max-w-md md:max-w-lg w-full space-y-4 sm:space-y-6 md:space-y-8">
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-xl p-4 sm:p-6 md:p-8">
+          <div className="text-center mb-6 sm:mb-8">
             <img 
               src="/SLTMobitel_Logo.svg.png" 
               alt="SLT-Mobitel" 
-              className="mx-auto h-16 w-auto mb-4"
+              className="mx-auto h-12 sm:h-14 md:h-16 w-auto mb-3 sm:mb-4"
             />
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
               Reset Password
             </h2>
-            <p className="text-gray-600">Consent Management System</p>
+            <p className="text-gray-600 text-sm sm:text-base">Consent Management System</p>
           </div>
 
           {/* Progress Bar */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <div className="flex items-center">
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+              <div className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-medium ${
                 step >= 1 ? 'bg-[#0072CE] text-white' : 'bg-gray-200 text-gray-600'
               }`}>
                 1
               </div>
-              <div className={`flex-1 h-1 mx-2 ${
+              <div className={`flex-1 h-1 mx-1.5 sm:mx-2 ${
                 step >= 2 ? 'bg-[#0072CE]' : 'bg-gray-200'
               }`}></div>
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+              <div className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-medium ${
                 step >= 2 ? 'bg-[#0072CE] text-white' : 'bg-gray-200 text-gray-600'
               }`}>
                 2
               </div>
             </div>
-            <div className="flex justify-between mt-2">
+            <div className="flex justify-between mt-1.5 sm:mt-2">
               <span className="text-xs text-gray-500">Email</span>
               <span className="text-xs text-gray-500">Verify Identity</span>
             </div>
@@ -211,12 +211,12 @@ const ForgotPassword: React.FC = () => {
           )}
 
           {step === 2 && (
-            <form onSubmit={handleStep2Submit} className="space-y-6">
-              <div className="flex items-center mb-4">
+            <form onSubmit={handleStep2Submit} className="space-y-4 sm:space-y-6">
+              <div className="flex items-center mb-3 sm:mb-4">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="flex items-center text-[#0072CE] hover:text-[#005bb5] transition-colors"
+                  className="flex items-center text-[#0072CE] hover:text-[#005bb5] transition-colors text-sm"
                 >
                   <ArrowLeft className="w-4 h-4 mr-1" />
                   Back
@@ -224,26 +224,26 @@ const ForgotPassword: React.FC = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Verify Your Identity</h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-3 sm:mb-4">Verify Your Identity</h3>
+                <p className="text-sm text-gray-600 mb-3 sm:mb-4">
                   Please provide the following information to verify your identity.
                 </p>
               </div>
 
               {/* Personal Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
                     First Name *
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                     <input
                       id="firstName"
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      className={`w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base ${
                         errors.firstName ? 'border-red-300' : 'border-gray-300'
                       }`}
                       placeholder="First name"
@@ -257,13 +257,13 @@ const ForgotPassword: React.FC = () => {
                     Last Name *
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                     <input
                       id="lastName"
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      className={`w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base ${
                         errors.lastName ? 'border-red-300' : 'border-gray-300'
                       }`}
                       placeholder="Last name"
@@ -278,13 +278,13 @@ const ForgotPassword: React.FC = () => {
                   Phone Number *
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                   <input
                     id="phone"
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    className={`w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base ${
                       errors.phone ? 'border-red-300' : 'border-gray-300'
                     }`}
                     placeholder="+94 XX XXX XXXX"
@@ -298,13 +298,13 @@ const ForgotPassword: React.FC = () => {
                   Company/Organization
                 </label>
                 <div className="relative">
-                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                   <input
                     id="company"
                     type="text"
                     value={formData.company}
                     onChange={(e) => handleInputChange('company', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                     placeholder="Company name"
                   />
                 </div>
@@ -319,7 +319,7 @@ const ForgotPassword: React.FC = () => {
                   id="securityQuestion"
                   value={formData.securityQuestion}
                   onChange={(e) => handleInputChange('securityQuestion', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base ${
                     errors.securityQuestion ? 'border-red-300' : 'border-gray-300'
                   }`}
                 >
@@ -340,7 +340,7 @@ const ForgotPassword: React.FC = () => {
                   type="text"
                   value={formData.securityAnswer}
                   onChange={(e) => handleInputChange('securityAnswer', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base ${
                     errors.securityAnswer ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Enter your answer"
@@ -351,7 +351,7 @@ const ForgotPassword: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3 px-4 rounded-lg text-white font-medium transition-colors ${
+                className={`w-full py-2.5 sm:py-3 px-4 rounded-lg text-white font-medium transition-colors text-sm sm:text-base ${
                   isLoading
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-[#0072CE] hover:bg-[#005bb5] focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
@@ -362,7 +362,7 @@ const ForgotPassword: React.FC = () => {
             </form>
           )}
 
-          <div className="mt-6 text-center">
+          <div className="mt-4 sm:mt-6 text-center">
             <span className="text-sm text-gray-600">Remember your password? </span>
             <Link
               to="/login"

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -104,65 +104,65 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0072CE] to-[#4CAF50] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="bg-white rounded-lg shadow-xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0072CE] to-[#4CAF50] py-4 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8">
+      <div className="max-w-sm sm:max-w-md md:max-w-lg w-full space-y-4 sm:space-y-6 md:space-y-8">
+        <div className="bg-white rounded-lg sm:rounded-xl shadow-xl p-4 sm:p-6 md:p-8">
           {/* Logo and header */}
           <div className="text-center">
             <img 
               src="/SLTMobitel_Logo.svg.png" 
               alt="SLT-Mobitel" 
-              className="mx-auto h-16 w-auto mb-4"
+              className="mx-auto h-12 sm:h-14 md:h-16 w-auto mb-3 sm:mb-4"
             />
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
               {t('auth.signIn')}
             </h2>
-            <p className="text-gray-600">Consent Management System</p>
+            <p className="text-gray-600 text-sm sm:text-base">Consent Management System</p>
           </div>
 
           {/* Demo credentials */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <h3 className="text-sm font-medium text-blue-800 mb-3">Quick Login - Click to Auto-Fill:</h3>
-            <div className="space-y-2">
+          <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 rounded-lg">
+            <h3 className="text-sm font-medium text-blue-800 mb-2 sm:mb-3">Quick Login - Click to Auto-Fill:</h3>
+            <div className="space-y-1.5 sm:space-y-2">
               <button
                 type="button"
                 onClick={() => fillCredentials('customer')}
-                className="w-full text-left p-2 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                className="w-full text-left p-2 sm:p-2.5 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-medium text-blue-900">Customer (Demo)</span>
+                    <span className="font-medium text-blue-900 text-sm sm:text-base">Customer (Demo)</span>
                     <div className="text-xs text-blue-700">customer@sltmobitel.lk / customer123</div>
                   </div>
-                  <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100">Click to fill</span>
+                  <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100 hidden sm:inline">Click to fill</span>
                 </div>
               </button>
               
               <button
                 type="button"
                 onClick={() => fillCredentials('admin')}
-                className="w-full text-left p-2 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                className="w-full text-left p-2 sm:p-2.5 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-medium text-blue-900">Admin (Demo)</span>
+                    <span className="font-medium text-blue-900 text-sm sm:text-base">Admin (Demo)</span>
                     <div className="text-xs text-blue-700">admin@sltmobitel.lk / admin123</div>
                   </div>
-                  <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100">Click to fill</span>
+                  <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100 hidden sm:inline">Click to fill</span>
                 </div>
               </button>
               
               <button
                 type="button"
                 onClick={() => fillCredentials('csr')}
-                className="w-full text-left p-2 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                className="w-full text-left p-2 sm:p-2.5 bg-white rounded border border-blue-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="font-medium text-blue-900">CSR Admin (Demo)</span>
+                    <span className="font-medium text-blue-900 text-sm sm:text-base">CSR Admin (Demo)</span>
                     <div className="text-xs text-blue-700">csr@sltmobitel.lk / csr123</div>
                   </div>
-                  <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100">Click to fill</span>
+                  <span className="text-xs text-blue-600 opacity-70 group-hover:opacity-100 hidden sm:inline">Click to fill</span>
                 </div>
               </button>
             </div>
@@ -170,24 +170,24 @@ const Login: React.FC = () => {
 
           {/* Success message */}
           {success && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
+            <div className="mt-3 sm:mt-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-start sm:items-center space-x-2">
+              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0 mt-0.5 sm:mt-0" />
               <span className="text-green-700 text-sm">{success}</span>
             </div>
           )}
 
           {/* Error message */}
           {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center space-x-2">
-              <AlertCircle className="h-5 w-5 text-red-500" />
+            <div className="mt-3 sm:mt-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-start sm:items-center space-x-2">
+              <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 flex-shrink-0 mt-0.5 sm:mt-0" />
               <span className="text-red-700 text-sm">{error}</span>
             </div>
           )}
 
           {/* Login form */}
-          <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
+          <form className="mt-4 sm:mt-6 space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('auth.email')}
               </label>
               <input
@@ -198,13 +198,13 @@ const Login: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#0072CE] focus:border-[#0072CE]"
+                className="mt-1 block w-full px-3 py-2.5 sm:py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#0072CE] focus:border-[#0072CE] text-sm sm:text-base"
                 placeholder="Enter your email"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('auth.password')}
               </label>
               <div className="mt-1 relative">
@@ -216,7 +216,7 @@ const Login: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#0072CE] focus:border-[#0072CE]"
+                  className="block w-full px-3 py-2.5 sm:py-3 pr-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#0072CE] focus:border-[#0072CE] text-sm sm:text-base"
                   placeholder="Enter your password"
                 />
                 <button
@@ -225,16 +225,16 @@ const Login: React.FC = () => {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
+                    <EyeOff className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
+                    <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                   )}
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+              <div className="flex items-center order-2 sm:order-1">
                 <input
                   id="remember-me"
                   name="remember-me"
@@ -246,7 +246,7 @@ const Login: React.FC = () => {
                 </label>
               </div>
 
-              <div className="text-sm">
+              <div className="text-sm order-1 sm:order-2">
                 <Link
                   to="/forgot-password"
                   className="font-medium text-[#0072CE] hover:text-[#005bb5] transition-colors"
@@ -260,10 +260,10 @@ const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0072CE] hover:bg-[#005bb5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0072CE] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="group relative w-full flex justify-center py-2.5 sm:py-3 px-4 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-[#0072CE] hover:bg-[#005bb5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0072CE] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isLoading ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
                 ) : (
                   t('auth.signInButton')
                 )}

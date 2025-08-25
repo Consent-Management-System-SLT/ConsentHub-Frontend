@@ -671,7 +671,79 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
 
       {/* Consents Table */}
       <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Card View */}
+        <div className="block lg:hidden">
+          <div className="p-4 space-y-4">
+            {paginatedConsents.map((consent) => (
+              <div key={consent.id} className="bg-myslt-service-card rounded-lg p-4 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedConsents.has(consent.id)}
+                      onChange={() => handleSelectConsent(consent.id)}
+                      className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                    />
+                    <div className="w-10 h-10 bg-myslt-card-solid rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-myslt-text-secondary" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-myslt-text-primary">{consent.customerName}</div>
+                      <div className="text-xs text-gray-500">{consent.email}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <button 
+                      onClick={() => handleViewConsent(consent)}
+                      className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded transition-colors"
+                      title="View Details"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => handleEditConsent(consent)}
+                      className="text-green-600 hover:text-green-900 p-1 hover:bg-green-50 rounded transition-colors"
+                      title="Edit Consent"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-gray-500">Type:</span>
+                    <span className={`ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium capitalize ${getConsentTypeColor(consent.consentType)}`}>
+                      {consent.consentType}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Status:</span>
+                    <div className="flex items-center ml-1">
+                      {getStatusIcon(consent.status)}
+                      <span className={`ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(consent.status)}`}>
+                        {consent.status}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Granted:</span>
+                    <span className="ml-1 text-myslt-text-primary">{new Date(consent.grantedDate).toLocaleDateString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Source:</span>
+                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-myslt-card-solid text-gray-800 capitalize">
+                      {consent.source}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-myslt-service-card">
               <tr>

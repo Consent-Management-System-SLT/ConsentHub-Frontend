@@ -162,4 +162,97 @@
   /* Responsive gap utilities */
   .gap-responsive { @apply gap-2 sm:gap-3 lg:gap-4; }
   .gap-responsive-lg { @apply gap-3 sm:gap-4 lg:gap-6; }
+
+  /* Additional responsive utilities */
+  .w-responsive { @apply w-full sm:w-auto; }
+  .h-responsive { @apply h-auto sm:h-screen; }
+  
+  /* Responsive flex utilities */
+  .flex-responsive { @apply flex-col sm:flex-row; }
+  .flex-responsive-reverse { @apply flex-col-reverse sm:flex-row; }
+  
+  /* Responsive grid utilities */
+  .grid-responsive-1 { @apply grid grid-cols-1 sm:grid-cols-2; }
+  .grid-responsive-2 { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3; }
+  .grid-responsive-3 { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4; }
+  .grid-responsive-4 { @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6; }
+
+  /* Mobile-first breakpoint utilities */
+  .mobile-hidden { @apply hidden sm:block; }
+  .mobile-only { @apply block sm:hidden; }
+  .tablet-hidden { @apply hidden md:block; }
+  .tablet-only { @apply hidden sm:block md:hidden; }
+  .desktop-hidden { @apply hidden lg:block; }
+  .desktop-only { @apply hidden lg:block; }
+
+  /* Responsive spacing for cards and containers */
+  .card-responsive { @apply p-3 sm:p-4 md:p-6 lg:p-8; }
+  .card-responsive-sm { @apply p-2 sm:p-3 md:p-4; }
+  .container-responsive { @apply mx-2 sm:mx-4 md:mx-6 lg:mx-8 xl:mx-auto; }
+
+  /* Responsive font sizes for dashboard elements */
+  .heading-responsive-sm { @apply text-lg sm:text-xl md:text-2xl; }
+  .heading-responsive-md { @apply text-xl sm:text-2xl md:text-3xl; }
+  .heading-responsive-lg { @apply text-2xl sm:text-3xl md:text-4xl; }
+
+  /* Mobile-optimized sidebar utilities */
+  .sidebar-responsive { @apply w-64 sm:w-72 lg:w-80; }
+  .sidebar-item-responsive { @apply px-2 py-2 sm:px-3 sm:py-3 lg:px-4 lg:py-4; }
+
+  /* Touch-friendly button sizes */
+  .btn-responsive { @apply px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3; }
+  .btn-responsive-sm { @apply px-2 py-1.5 sm:px-3 sm:py-2; }
+  .btn-responsive-lg { @apply px-4 py-2.5 sm:px-6 sm:py-3 lg:px-8 lg:py-4; }
+
+  /* Form input responsive sizing */
+  .input-responsive { @apply px-3 py-2.5 sm:py-3 text-sm sm:text-base; }
+  .select-responsive { @apply px-3 py-2.5 sm:py-3 text-sm sm:text-base; }
+
+  /* Enhanced mobile-specific utilities */
+  .mobile-scroll-area {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  
+  .mobile-input {
+    padding: 0.75rem;
+    font-size: 1rem; /* Prevents zoom on iOS */
+    border-radius: 0.375rem;
+  }
+  
+  .mobile-nav-item {
+    padding: 0.75rem 1rem;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Enhanced mobile breakpoint utilities */
+  .xs-only { @apply block sm:hidden; }
+  
+  /* Mobile dashboard utilities */
+  .mobile-dashboard-card {
+    @apply p-4 rounded-lg shadow-sm mb-4;
+  }
+  
+  /* Better mobile table handling */
+  .mobile-table-wrapper {
+    @apply overflow-x-auto rounded-lg;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Touch gesture improvements */
+  .touch-pan-y { touch-action: pan-y; }
+  .touch-pan-x { touch-action: pan-x; }
+  .touch-none { touch-action: none; }
+  
+  /* Mobile focus improvements */
+  .mobile-focus-ring:focus {
+    @apply outline-2 outline-blue-500 outline-offset-2;
+  }
+  
+  /* Mobile-specific spacing */
+  .mobile-gap-safe { @apply gap-2 sm:gap-4; }
+  .mobile-p-safe { @apply p-2 sm:p-4; }
+  .mobile-m-safe { @apply m-2 sm:m-4; }
 }

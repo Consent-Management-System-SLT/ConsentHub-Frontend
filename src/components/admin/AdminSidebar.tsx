@@ -163,16 +163,19 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </nav>
 
           {/* Footer */}
-          <div className="px-4 sm:px-6 py-4 border-t border-myslt-accent/20 bg-myslt-background/30">
-            <div className="bg-myslt-gradient rounded-xl p-4 border border-myslt-success/20">
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+          <div className="px-2 sm:px-3 lg:px-6 py-3 sm:py-4 border-t border-myslt-accent/20 bg-myslt-background/30">
+            <div className="bg-myslt-gradient rounded-lg sm:rounded-xl p-3 sm:p-4 border border-myslt-success/20">
+              <div className="flex items-start space-x-2 sm:space-x-3">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 bg-red-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-red-600" />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-sm font-semibold text-red-900 mb-1">Admin Access</h4>
-                  <p className="text-xs text-red-700 leading-relaxed">
+                  <h4 className="text-xs sm:text-sm font-semibold text-red-900 mb-0.5 sm:mb-1">Admin Access</h4>
+                  <p className="text-xs text-red-700 leading-relaxed hidden sm:block">
                     Full system privileges - use responsibly
+                  </p>
+                  <p className="text-xs text-red-700 leading-relaxed sm:hidden">
+                    Full privileges
                   </p>
                 </div>
               </div>

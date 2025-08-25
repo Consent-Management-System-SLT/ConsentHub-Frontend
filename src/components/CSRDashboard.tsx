@@ -1,22 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Users, 
-  Settings, 
   FileText, 
   Shield, 
-  Database, 
-  Search,
-  Bell,
   TrendingUp,
   AlertTriangle,
   CheckCircle,
   Clock,
-  User,
   HelpCircle,
   RefreshCw,
   Activity
 } from 'lucide-react';
-import { apiClient } from '../services/apiClient';
 import { csrDashboardService } from '../services/csrDashboardService';
 
 // Import CSR components (using backend-integrated versions)
@@ -259,7 +253,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
         
         {/* Main Content */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-full">
+          <div className="p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 max-w-full">
             <div className="max-w-7xl mx-auto">
               {renderContent()}
             </div>
@@ -270,10 +264,10 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
       {/* Floating Help Button */}
       <button
         onClick={() => setShowHelpModal(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-success-gradient text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group z-40"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 bg-success-gradient text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group z-40"
         title="Help & Documentation"
       >
-        <HelpCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
+        <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
       </button>
 
       {/* Help Modal */}
