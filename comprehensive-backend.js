@@ -5354,22 +5354,85 @@ app.post("/api/v1/dsar", (req, res) => {
 });
 
 // PUT /api/v1/dsar/:id - Update DSAR request for CSR
-app.put("/api/v1/dsar/:id", (req, res) => {
+app.put("/api/v1/dsar/:id", async (req, res) => {
     console.log(`📋 CSR Dashboard: Updating DSAR request ${req.params.id}`);
+    console.log('📋 Update payload:', req.body);
+    
     const { id } = req.params;
-    const requestIndex = dsarRequests.findIndex(r => r.id === id);
     
-    if (requestIndex === -1) {
-        return res.status(404).json({ error: "DSAR request not found" });
+    try {
+        // Update in-memory array for CSR dashboard compatibility
+        const requestIndex = dsarRequests.findIndex(r => r.id === id);
+        
+        if (requestIndex !== -1) {
+            dsarRequests[requestIndex] = {
+                ...dsarRequests[requestIndex],
+                ...req.body,
+                updatedAt: new Date().toISOString()
+            };
+        }
+
+        // Update in MongoDB for persistence and customer visibility
+        const updatedRequest = await DSARRequest.findOneAndUpdate(
+            { $or: [{ _id: id }, { id: id }] },
+            {
+                ...req.body,
+                updatedAt: new Date()
+            },
+            { new: true }
+        );
+
+        if (updatedRequest) {
+            console.log(`✅ Successfully updated DSAR request ${id} in MongoDB`);
+            
+            // Transform MongoDB result to match expected format
+            const responseData = {
+                id: updatedRequest.id || updatedRequest._id.toString(),
+                requestId: updatedRequest.requestId,
+                partyId: updatedRequest.partyId,
+                customerId: updatedRequest.customerId,
+                requestType: updatedRequest.requestType,
+                status: updatedRequest.status,
+                description: updatedRequest.description,
+                requestorName: updatedRequest.requestorName,
+                requestorEmail: updatedRequest.requestorEmail,
+                submittedAt: updatedRequest.submittedAt,
+                updatedAt: updatedRequest.updatedAt.toISOString(),
+                approvedAt: updatedRequest.approvedAt,
+                rejectedAt: updatedRequest.rejectedAt,
+                completedAt: updatedRequest.completedAt,
+                processingNotes: updatedRequest.processingNotes,
+                processedBy: updatedRequest.processedBy,
+                priority: updatedRequest.priority || 'medium'
+            };
+            
+            res.json(responseData);
+        } else if (requestIndex !== -1) {
+            // Fallback to in-memory data if MongoDB update failed
+            console.log(`⚠️ MongoDB update failed, using in-memory data for DSAR ${id}`);
+            res.json(dsarRequests[requestIndex]);
+        } else {
+            console.log(`❌ DSAR request ${id} not found in either MongoDB or memory`);
+            res.status(404).json({ error: "DSAR request not found" });
+        }
+    } catch (error) {
+        console.error('❌ Error updating DSAR request:', error);
+        
+        // Try to update in-memory as fallback
+        const requestIndex = dsarRequests.findIndex(r => r.id === id);
+        if (requestIndex !== -1) {
+            dsarRequests[requestIndex] = {
+                ...dsarRequests[requestIndex],
+                ...req.body,
+                updatedAt: new Date().toISOString()
+            };
+            
+            console.log(`⚠️ Using in-memory fallback for DSAR ${id}`);
+            res.json(dsarRequests[requestIndex]);
+        } else {
+            res.status(404).json({ error: "DSAR request not found" });
+        }
     }
-    
-    dsarRequests[requestIndex] = {
-        ...dsarRequests[requestIndex],
-        ...req.body,
-        updatedAt: new Date().toISOString()
-    };
-    
-    res.json(dsarRequests[requestIndex]);
 });
 
 // POST /api/v1/consent - Create new consent for CSR
@@ -6851,6 +6914,117 @@ app.get("/api/v1/dsar/requests/:id", verifyToken, async (req, res) => {
     }
 });
 
+// Store SSE connections for real-time updates
+const sseConnections = new Map();
+
+// SSE endpoint for real-time DSAR updates
+app.get("/api/v1/dsar/updates/stream", async (req, res) => {
+    try {
+        // Get token from query params (EventSource doesn't support custom headers)
+        const token = req.query.token || req.headers.authorization?.replace('Bearer ', '');
+        
+        console.log('📡 SSE connection attempt - Token received:', token ? 'Yes' : 'No');
+        
+        if (!token) {
+            console.log('❌ SSE authentication failed: No token provided');
+            return res.status(401).json({ error: 'Authentication token required' });
+        }
+
+        // Verify token manually with proper error handling
+        const jwt = require('jsonwebtoken');
+        let decoded;
+        try {
+            // Try different JWT secrets
+            const secrets = [
+                process.env.JWT_SECRET,
+                'your-secret-key',
+                'consenthub-secret-key',
+                'default-secret-key'
+            ];
+            
+            let verificationSuccess = false;
+            for (const secret of secrets) {
+                if (secret) {
+                    try {
+                        decoded = jwt.verify(token, secret);
+                        console.log('✅ SSE JWT verified with secret:', secret);
+                        verificationSuccess = true;
+                        break;
+                    } catch (err) {
+                        console.log(`❌ JWT verification failed with secret "${secret}":`, err.message);
+                    }
+                }
+            }
+            
+            if (!verificationSuccess) {
+                throw new Error('Token verification failed with all secrets');
+            }
+        } catch (error) {
+            console.log('❌ SSE JWT verification error:', error.message);
+            console.log('🔍 Token details:', {
+                tokenLength: token.length,
+                tokenStart: token.substring(0, 20) + '...',
+                decodedPayload: jwt.decode(token)
+            });
+            return res.status(401).json({ error: 'Invalid authentication token' });
+        }
+        
+        // Set up SSE headers
+        res.writeHead(200, {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Cache-Control'
+        });
+
+        // Handle both userId and id field names in JWT
+        const userId = decoded.userId || decoded.id;
+        console.log(`📡 SSE connection established for user: ${userId}`);
+
+        // Store the connection
+        sseConnections.set(userId, res);
+
+        // Send initial connection confirmation
+        res.write(`data: ${JSON.stringify({
+            type: 'connected',
+            message: 'Real-time updates connected',
+            timestamp: new Date().toISOString()
+        })}\n\n`);
+
+        // Handle client disconnect
+        req.on('close', () => {
+            console.log(`📡 SSE connection closed for user: ${userId}`);
+            sseConnections.delete(userId);
+        });
+
+        req.on('aborted', () => {
+            console.log(`📡 SSE connection aborted for user: ${userId}`);
+            sseConnections.delete(userId);
+        });
+
+    } catch (error) {
+        console.error('❌ SSE endpoint error:', error);
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Server-sent events setup failed' });
+        }
+    }
+});
+
+// Function to send real-time updates to customers
+const sendRealTimeUpdate = (customerId, updateData) => {
+    const connection = sseConnections.get(customerId);
+    if (connection) {
+        try {
+            console.log(`📡 Sending real-time update to user ${customerId}:`, updateData.type);
+            connection.write(`data: ${JSON.stringify(updateData)}\n\n`);
+        } catch (error) {
+            console.error(`❌ Failed to send SSE update to ${customerId}:`, error);
+            sseConnections.delete(customerId);
+        }
+    }
+};
+
 // PUT /api/v1/dsar/requests/:id - Update DSAR request
 app.put("/api/v1/dsar/requests/:id", verifyToken, async (req, res) => {
     try {
@@ -6871,6 +7045,9 @@ app.put("/api/v1/dsar/requests/:id", verifyToken, async (req, res) => {
                 error: 'DSAR request not found'
             });
         }
+
+        // Store original status for comparison
+        const originalStatus = request.status;
 
         // Handle status updates
         if (updates.status && updates.status !== request.status) {
@@ -6899,6 +7076,24 @@ app.put("/api/v1/dsar/requests/:id", verifyToken, async (req, res) => {
         await request.save();
 
         console.log(`✅ DSAR request updated: ${request.requestId}`);
+
+        // Send real-time update to customer if status changed
+        if (originalStatus !== request.status) {
+            const updateData = {
+                type: 'dsar_status_update',
+                requestId: request.requestId,
+                requestDbId: request._id.toString(),
+                oldStatus: originalStatus,
+                newStatus: request.status,
+                requestType: request.requestType,
+                timestamp: new Date().toISOString(),
+                updatedBy: req.user.email || 'CSR Agent'
+            };
+
+            // Send to the customer who owns this request
+            sendRealTimeUpdate(request.requesterId, updateData);
+            console.log(`📡 Real-time update sent for request ${request.requestId}: ${originalStatus} → ${request.status}`);
+        }
 
         res.json({
             success: true,

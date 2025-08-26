@@ -175,6 +175,77 @@ class CSRDashboardService {
   }
 
   /**
+   * Update DSAR request status with real backend API call
+   */
+  async updateDSARRequest(requestId: string, updates: Partial<DSARRequest>): Promise<DSARRequest> {
+    try {
+      console.log('[CSR] Updating DSAR request:', requestId, updates);
+      
+      // Prepare update payload - map our interface to backend format
+      const updatePayload: any = {};
+
+      if (updates.status) {
+        // Map status values if needed - ensure we use valid enum values
+        const statusMap: { [key: string]: string } = {
+          'approved': 'in_progress', // Map approved to in_progress
+          'rejected': 'rejected',
+          'in_progress': 'in_progress',
+          'completed': 'completed',
+          'pending': 'pending',
+          'cancelled': 'cancelled'
+        };
+        updatePayload.status = statusMap[updates.status] || updates.status;
+      }
+
+      // Add processing note if we have processingNotes
+      if (updates.processingNotes) {
+        updatePayload.processingNote = updates.processingNotes;
+      }
+
+      // Add processed by information as assignedTo
+      if (updates.processedBy) {
+        updatePayload.assignedTo = {
+          userId: 'csr-current',
+          name: updates.processedBy,
+          email: 'csr@sltmobitel.lk' // TODO: Get from current user context
+        };
+      }
+
+      // Use the correct authenticated endpoint
+      const response = await apiClient.put(`/api/v1/dsar/requests/${requestId}`, updatePayload);
+      console.log('[CSR] DSAR request updated successfully:', response);
+      
+      // Transform response back to our interface format
+      const responseData = response.data as any;
+      const dsarData = responseData.data || responseData;
+      
+      const updatedRequest: DSARRequest = {
+        id: dsarData._id || dsarData.id,
+        partyId: dsarData.requesterId,
+        customerId: dsarData.requesterId,
+        requestType: dsarData.requestType,
+        status: dsarData.status,
+        submittedAt: dsarData.submittedAt,
+        completedAt: dsarData.completedAt,
+        approvedAt: dsarData.status === 'in_progress' ? dsarData.updatedAt : undefined,
+        rejectedAt: dsarData.status === 'rejected' ? dsarData.updatedAt : undefined,
+        description: dsarData.description,
+        requestorName: dsarData.requesterName,
+        requestorEmail: dsarData.requesterEmail,
+        priority: dsarData.priority || 'medium',
+        assignedTo: dsarData.assignedTo?.name,
+        processingNotes: updates.processingNotes || '',
+        processedBy: updates.processedBy || ''
+      };
+      
+      return updatedRequest;
+    } catch (error) {
+      console.error('[CSR] Failed to update DSAR request:', error);
+      throw new Error(`Failed to update DSAR request: ${error}`);
+    }
+  }
+
+  /**
    * Get audit events with real data from backend
    */
   async getAuditEvents(): Promise<AuditEvent[]> {

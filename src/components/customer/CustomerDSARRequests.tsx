@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Download, 
   Trash2, 
@@ -13,14 +13,17 @@ import {
   RefreshCw,
   Eye,
   Shield,
-  Database
+  Database,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { customerApiClient } from '../../services/customerApiClient';
+import fastRealTimeService from '../../services/fastRealTimeService';
 
 interface DSARRequest {
   id: string;
-  type: 'export' | 'delete' | 'rectify' | 'restrict';
+  type: 'export' | 'delete' | 'correct' | 'portability' | 'restrict' | 'object' | 'withdraw';
   status: 'pending' | 'processing' | 'completed' | 'rejected' | 'expired';
   requestedDate: string;
   completedDate?: string;
@@ -38,49 +41,216 @@ interface CustomerDSARRequestsProps {
 
 const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
   const [activeTab, setActiveTab] = useState<'new-request' | 'my-requests'>('my-requests');
-  const [requestType, setRequestType] = useState<'export' | 'delete' | 'rectify' | 'restrict'>('export');
+  const [requestType, setRequestType] = useState<'export' | 'delete' | 'correct' | 'portability' | 'restrict' | 'object' | 'withdraw'>('export');
   const [requestReason, setRequestReason] = useState('');
   const [additionalDetails, setAdditionalDetails] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [dsarRequests, setDsarRequests] = useState<DSARRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [realTimeConnected, setRealTimeConnected] = useState(false);
+  const previousRequestsRef = useRef<DSARRequest[]>([]);
   
   // Add notification functionality
   const { addNotification } = useNotifications();
 
-  // Mock data - replace with API calls
-  const dsarRequests: DSARRequest[] = [
-    {
-      id: 'DSAR-001',
-      type: 'export',
-      status: 'completed',
-      requestedDate: '2024-07-01',
-      completedDate: '2024-07-08',
-      description: 'Export all personal data',
-      downloadUrl: '/downloads/export-2024-07-08.zip',
-      expiryDate: '2024-08-08',
-      requestedBy: 'Customer Portal'
-    },
-    {
-      id: 'DSAR-002',
-      type: 'delete',
-      status: 'processing',
-      requestedDate: '2024-07-15',
-      estimatedCompletion: '2024-07-25',
-      description: 'Delete marketing preferences data',
-      reason: 'No longer wish to receive marketing communications',
-      requestedBy: 'Customer Portal'
-    },
-    {
-      id: 'DSAR-003',
-      type: 'export',
-      status: 'pending',
-      requestedDate: '2024-07-18',
-      estimatedCompletion: '2024-07-28',
-      description: 'Export billing and usage data',
-      reason: 'Required for personal records',
-      requestedBy: 'Customer Portal'
+  // Load real DSAR requests from backend
+  const loadDSARRequests = async () => {
+    try {
+      setLoading(true);
+      console.log('Loading real DSAR requests from backend...');
+      
+      const response = await customerApiClient.getDSARRequests();
+      console.log('DSAR requests loaded:', response);
+      
+      if (response?.data?.requests) {
+        // Transform backend data to frontend format
+        const transformedRequests: DSARRequest[] = response.data.requests.map((req: any) => ({
+          id: req.id,
+          type: req.requestType,
+          status: req.status,
+          requestedDate: req.submittedDate?.split('T')[0] || req.submittedAt?.split('T')[0],
+          completedDate: req.completedDate?.split('T')[0],
+          estimatedCompletion: req.expectedCompletionDate?.split('T')[0],
+          description: req.description || `${req.requestType} request`,
+          reason: req.requestDetails?.reason || req.reason,
+          downloadUrl: req.responseFiles?.[0]?.downloadUrl,
+          expiryDate: req.responseFiles?.[0]?.expiryDate?.split('T')[0],
+          requestedBy: 'Customer Portal'
+        }));
+        
+        // Check for status changes and create notifications
+        console.log('About to check for status changes...');
+        console.log('previousRequestsRef.current.length:', previousRequestsRef.current.length);
+        console.log('transformedRequests.length:', transformedRequests.length);
+        
+        if (previousRequestsRef.current.length > 0) {
+          checkForStatusChanges(previousRequestsRef.current, transformedRequests);
+        } else {
+          console.log('No previous requests to compare - first load');
+        }
+
+        // Update states
+        setDsarRequests(transformedRequests);
+        // Store current requests for next comparison
+        previousRequestsRef.current = transformedRequests;
+        console.log('Transformed DSAR requests:', transformedRequests);
+      } else {
+        console.warn('No DSAR requests found in response, using empty array');
+        setDsarRequests([]);
+      }
+      
+    } catch (error) {
+      console.error('Failed to load DSAR requests:', error);
+      // Fallback to empty array on error
+      setDsarRequests([]);
+      addNotification({
+        title: 'Error Loading DSAR Requests',
+        message: 'Unable to load your data requests. Please try again later.',
+        type: 'system',
+        category: 'warning'
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // Check for status changes and create notifications
+  const checkForStatusChanges = (previous: DSARRequest[], current: DSARRequest[]) => {
+    console.log('Checking for status changes...');
+    console.log('Previous requests:', previous.length);
+    console.log('Current requests:', current.length);
+    
+    current.forEach(currentRequest => {
+      const previousRequest = previous.find(prev => prev.id === currentRequest.id);
+      
+      if (previousRequest) {
+        console.log(`Request ${currentRequest.id}: ${previousRequest.status} → ${currentRequest.status}`);
+        
+        if (previousRequest.status !== currentRequest.status) {
+          // Status has changed - create notification
+          const statusMessages = {
+            'in_progress': {
+              title: 'DSAR Request Approved',
+              message: `Your ${currentRequest.type} request has been approved by our CSR team and is now being processed.`,
+              category: 'success' as const
+            },
+            'completed': {
+              title: 'DSAR Request Completed',
+              message: `Your ${currentRequest.type} request has been completed successfully. ${currentRequest.downloadUrl ? 'Download link is available.' : ''}`,
+              category: 'success' as const
+            },
+            'rejected': {
+              title: 'DSAR Request Rejected',
+              message: `Your ${currentRequest.type} request has been rejected. ${currentRequest.reason || 'Please contact support for more information.'}`,
+              category: 'warning' as const
+            }
+          };
+
+          const statusMessage = statusMessages[currentRequest.status as keyof typeof statusMessages];
+          
+          if (statusMessage) {
+            console.log(`Status change detected: ${previousRequest.status} → ${currentRequest.status}`);
+            
+            addNotification({
+              title: statusMessage.title,
+              message: statusMessage.message,
+              type: 'dsar',
+              category: statusMessage.category,
+              metadata: {
+                requestId: currentRequest.id,
+                requestType: currentRequest.type,
+                previousStatus: previousRequest.status,
+                newStatus: currentRequest.status,
+                timestamp: new Date().toISOString()
+              }
+            });
+          } else {
+            console.log(`No notification message for status: ${currentRequest.status}`);
+          }
+        } else {
+          console.log(`No status change for request ${currentRequest.id}`);
+        }
+      } else {
+        console.log(`New request detected: ${currentRequest.id} (${currentRequest.status})`);
+      }
+    });
+  };
+
+  useEffect(() => {
+    loadDSARRequests();
+    
+    // Set up fast real-time updates (2-second polling)
+    console.log('Setting up fast real-time DSAR updates...');
+    
+    // Start fast polling service
+    fastRealTimeService.start((updateData: any) => {
+      console.log('Fast real-time update received:', updateData);
+      
+      if (updateData.type === 'dsar_updates') {
+        // Reload DSAR requests to get latest data
+        loadDSARRequests();
+        
+        // Check for recent updates and show notifications
+        if (updateData.recentUpdates && updateData.recentUpdates.length > 0) {
+          updateData.recentUpdates.forEach((request: any) => {
+            const statusMessages = {
+              'in_progress': {
+                title: 'DSAR Request Approved',
+                message: `Your ${request.requestType} request has been approved and is now being processed.`,
+                category: 'success' as const
+              },
+              'completed': {
+                title: 'DSAR Request Completed',
+                message: `Your ${request.requestType} request has been completed successfully.`,
+                category: 'success' as const
+              },
+              'rejected': {
+                title: 'DSAR Request Rejected',
+                message: `Your ${request.requestType} request has been rejected. Please contact support.`,
+                category: 'warning' as const
+              }
+            };
+
+            const statusMessage = statusMessages[request.status as keyof typeof statusMessages];
+            
+            if (statusMessage) {
+              addNotification({
+                title: statusMessage.title,
+                message: statusMessage.message,
+                type: 'dsar',
+                category: statusMessage.category,
+                metadata: {
+                  requestId: request._id,
+                  requestType: request.requestType,
+                  status: request.status,
+                  timestamp: new Date().toISOString(),
+                  realTime: true
+                }
+              });
+            }
+          });
+        }
+      }
+    });
+
+    // Check connection status periodically
+    const connectionCheck = setInterval(() => {
+      const status = fastRealTimeService.getStatus();
+      setRealTimeConnected(status.connected);
+      
+      if (!status.connected) {
+        console.log('Fast polling connection check - not active');
+      }
+    }, 10000); // Check every 10 seconds
+    
+    return () => {
+      clearInterval(connectionCheck);
+      fastRealTimeService.stop();
+    };
+  }, []);
+
+  // Remove the old hardcoded mock data - now using real backend data
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -136,28 +306,33 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
     setIsSubmitting(true);
     
     try {
-      const newRequest = {
-        type: requestType,
+      // Prepare the request data according to backend expectations
+      const requestData = {
+        type: requestType, // 'export', 'delete', 'rectify', 'restrict'
         reason: requestReason,
-        additionalDetails: additionalDetails
+        additionalDetails: additionalDetails,
+        description: `${requestType} request: ${requestReason}${additionalDetails ? `. Additional details: ${additionalDetails}` : ''}`
       };
       
-      console.log('Submitting DSAR request:', newRequest);
+      console.log('Submitting DSAR request:', requestData);
       
       // Make real API call to create DSAR request
-      await customerApiClient.createDSARRequest(newRequest);
+      const response = await customerApiClient.createDSARRequest(requestData);
+      
+      console.log('DSAR request submitted successfully:', response);
       
       setSubmitStatus('success');
       
-      // Add notification for admin/CSR users about the new DSAR request
+      // Add notification for user confirmation
       addNotification({
-        title: 'New DSAR Request Submitted',
-        message: `Customer has submitted a new ${requestType} request at ${new Date().toLocaleString()}`,
+        title: 'DSAR Request Submitted Successfully',
+        message: `Your ${requestType} request has been submitted and is now pending review by our customer service team.`,
         type: 'dsar',
-        category: 'urgent',
+        category: 'success',
         metadata: {
           requestType,
-          reason: requestReason
+          requestId: response?.data?.request?.id || response?.data?.request?._id,
+          status: 'pending'
         }
       });
       
@@ -165,14 +340,27 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
       setRequestReason('');
       setAdditionalDetails('');
       
-      // Switch to requests view
+      // Switch to requests view and reload data to show the new request
       setTimeout(() => {
         setActiveTab('my-requests');
         setSubmitStatus('idle');
+        // Reload DSAR requests to show the new request immediately
+        loadDSARRequests();
       }, 2000);
       
     } catch (error) {
+      console.error('Failed to submit DSAR request:', error);
+      
       setSubmitStatus('error');
+      
+      // Show error notification
+      addNotification({
+        title: 'Request Submission Failed',
+        message: 'There was an error submitting your DSAR request. Please try again or contact support.',
+        type: 'system',
+        category: 'warning'
+      });
+      
       setTimeout(() => setSubmitStatus('idle'), 3000);
     } finally {
       setIsSubmitting(false);
@@ -195,11 +383,18 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
       color: 'border-red-200 hover:border-red-300'
     },
     {
-      value: 'rectify' as const,
+      value: 'correct' as const,
       label: 'Correct My Data',
       description: 'Request correction of inaccurate personal information',
       icon: <FileText className="w-6 h-6 text-orange-600" />,
       color: 'border-orange-200 hover:border-orange-300'
+    },
+    {
+      value: 'portability' as const,
+      label: 'Data Portability',
+      description: 'Receive your data in a portable format to transfer elsewhere',
+      icon: <Download className="w-6 h-6 text-green-600" />,
+      color: 'border-green-200 hover:border-green-300'
     },
     {
       value: 'restrict' as const,
@@ -207,14 +402,49 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
       description: 'Limit how we process your personal data',
       icon: <Shield className="w-6 h-6 text-purple-600" />,
       color: 'border-purple-200 hover:border-purple-300'
+    },
+    {
+      value: 'object' as const,
+      label: 'Object to Processing',
+      description: 'Object to specific types of data processing',
+      icon: <XCircle className="w-6 h-6 text-red-600" />,
+      color: 'border-red-200 hover:border-red-300'
+    },
+    {
+      value: 'withdraw' as const,
+      label: 'Withdraw Consent',
+      description: 'Withdraw your consent for data processing',
+      icon: <AlertTriangle className="w-6 h-6 text-yellow-600" />,
+      color: 'border-yellow-200 hover:border-yellow-300'
     }
   ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-myslt-text-primary">DSAR Requests</h1>
-        <p className="text-myslt-text-muted mt-2">Submit and manage your data subject access rights requests</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">DSAR Requests</h1>
+          <p className="text-myslt-text-muted mt-2">Submit and manage your data subject access rights requests</p>
+        </div>
+        
+        {/* Fast Real-time Connection Status */}
+        <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+          realTimeConnected 
+            ? 'bg-green-100 text-green-800 border border-green-200' 
+            : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+        }`}>
+          {realTimeConnected ? (
+            <>
+              <Wifi className="w-3 h-3" />
+              <span>Fast Updates (2s)</span>
+            </>
+          ) : (
+            <>
+              <WifiOff className="w-3 h-3" />
+              <span>Starting...</span>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Tab Navigation */}
@@ -291,9 +521,31 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
             </div>
           </div>
 
+          {/* Requests Header with Refresh */}
+          <div className="flex items-center justify-between mt-6 mb-4">
+            <h3 className="text-lg font-semibold text-myslt-text-primary">My DSAR Requests</h3>
+            <button
+              onClick={loadDSARRequests}
+              disabled={loading}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-myslt-accent hover:text-myslt-accent-hover hover:bg-myslt-accent/10 rounded-lg transition-colors disabled:opacity-50"
+              title="Refresh to see latest status updates"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
+
           {/* Requests List */}
-          <div className="space-y-4">
-            {dsarRequests.map((request) => (
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex items-center space-x-3">
+                <RefreshCw className="w-6 h-6 text-myslt-primary animate-spin" />
+                <span className="text-myslt-text-muted">Loading your DSAR requests...</span>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {dsarRequests.map((request) => (
               <div key={request.id} className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-4">
@@ -371,19 +623,20 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
                 </div>
               </div>
             ))}
-          </div>
 
-          {dsarRequests.length === 0 && (
-            <div className="text-center py-12">
-              <Database className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No requests found</h3>
-              <p className="text-gray-500 mb-4">You haven't submitted any DSAR requests yet.</p>
-              <button
-                onClick={() => setActiveTab('new-request')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Submit Your First Request
-              </button>
+            {dsarRequests.length === 0 && !loading && (
+              <div className="text-center py-12">
+                <Database className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No requests found</h3>
+                <p className="text-gray-500 mb-4">You haven't submitted any DSAR requests yet.</p>
+                <button
+                  onClick={() => setActiveTab('new-request')}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Submit Your First Request
+                </button>
+              </div>
+            )}
             </div>
           )}
         </>

@@ -14,7 +14,8 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
-  X
+  X,
+  CheckCircle
 } from 'lucide-react';
 import ServerConnectionAlert from '../shared/ServerConnectionAlert';
 
@@ -194,6 +195,109 @@ const DSARManager: React.FC = () => {
     } catch (error) {
       console.error('Export failed:', error);
       alert(`Export failed: ${(error as Error).message}`);
+    }
+  };
+
+  // DSAR Request Status Update Functions
+  const updateDSARStatus = async (requestId: string, status: string, processingNote?: string) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      console.log(`🔄 Updating DSAR request ${requestId} to status: ${status}`);
+
+      const updateData: any = { status };
+      if (processingNote) {
+        updateData.processingNote = processingNote;
+      }
+
+      const response = await fetch(`http://localhost:3001/api/v1/dsar/requests/${requestId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Failed to update DSAR request: ${response.status} ${errorData}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ DSAR request updated successfully:', result);
+
+      // Reload requests to show updated status
+      await loadDSARRequests();
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Failed to update DSAR status:', error);
+      throw error;
+    }
+  };
+
+  const handleApproveRequest = async (request: any) => {
+    try {
+      if (!confirm(`Are you sure you want to approve the DSAR request from ${request.requesterEmail}?`)) {
+        return;
+      }
+      
+      console.log('🟢 Approving DSAR request:', request);
+      
+      const processingNote = `Request approved by CSR on ${new Date().toLocaleDateString()}. Processing ${request.requestType} request for ${request.requesterEmail}`;
+      
+      await updateDSARStatus(request._id || request.id, 'in_progress', processingNote);
+      
+      alert(`✅ DSAR request ${request.requestId || request.id} has been approved and is now in progress.\n\nThe customer will be notified of this status change.`);
+    } catch (error) {
+      alert(`❌ Failed to approve request: ${(error as Error).message}`);
+    }
+  };
+
+  const handleRejectRequest = async (request: any) => {
+    try {
+      const reason = prompt('⚠️ Please provide a clear reason for rejecting this DSAR request:\n\nThis reason will be shared with the customer.');
+      
+      if (!reason || reason.trim() === '') {
+        alert('Rejection reason is required and cannot be empty.');
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to reject the DSAR request from ${request.requesterEmail}?\n\nReason: ${reason}`)) {
+        return;
+      }
+
+      console.log('🔴 Rejecting DSAR request:', request);
+      
+      const processingNote = `Request rejected by CSR on ${new Date().toLocaleDateString()}. Reason: ${reason}`;
+      
+      await updateDSARStatus(request._id || request.id, 'rejected', processingNote);
+      
+      alert(`❌ DSAR request ${request.requestId || request.id} has been rejected.\n\nThe customer will be notified with the provided reason.`);
+    } catch (error) {
+      alert(`❌ Failed to reject request: ${(error as Error).message}`);
+    }
+  };
+
+  const handleCompleteRequest = async (request: any) => {
+    try {
+      if (!confirm(`Are you sure you want to mark the DSAR request from ${request.requesterEmail} as completed?\n\nThis indicates the request has been fully processed.`)) {
+        return;
+      }
+      
+      console.log('✅ Completing DSAR request:', request);
+      
+      const processingNote = `Request completed by CSR on ${new Date().toLocaleDateString()}. ${request.requestType} has been fully processed for ${request.requesterEmail}`;
+      
+      await updateDSARStatus(request._id || request.id, 'completed', processingNote);
+      
+      alert(`✅ DSAR request ${request.requestId || request.id} has been marked as completed.\n\nThe customer will be notified that their request has been processed.`);
+    } catch (error) {
+      alert(`❌ Failed to complete request: ${(error as Error).message}`);
     }
   };
 
@@ -417,13 +521,51 @@ const DSARManager: React.FC = () => {
                   </div>
                 </div>
                 
-                <button
-                  onClick={() => setSelectedRequest(request)}
-                  className="flex items-center gap-2 px-3 py-2 text-myslt-accent hover:text-myslt-accent-hover hover:bg-myslt-accent/10 rounded-lg transition-colors"
-                >
-                  <Eye className="h-4 w-4" />
-                  <span className="text-sm">View</span>
-                </button>
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 ml-4">
+                  {/* Status-based action buttons */}
+                  {request.status === 'pending' && (
+                    <>
+                      <button
+                        onClick={() => handleApproveRequest(request)}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors text-sm font-medium"
+                        title="Approve and start processing this request"
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleRejectRequest(request)}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors text-sm font-medium"
+                        title="Reject this request with reason"
+                      >
+                        <XCircle className="h-4 w-4" />
+                        Reject
+                      </button>
+                    </>
+                  )}
+                  
+                  {request.status === 'in_progress' && (
+                    <button
+                      onClick={() => handleCompleteRequest(request)}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors text-sm font-medium"
+                      title="Mark this request as completed"
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                      Complete
+                    </button>
+                  )}
+                  
+                  {/* View Details Button - Always Available */}
+                  <button
+                    onClick={() => setSelectedRequest(request)}
+                    className="flex items-center gap-1 px-3 py-1.5 text-myslt-accent hover:text-myslt-accent-hover hover:bg-myslt-accent/10 rounded-lg transition-colors text-sm font-medium"
+                    title="View detailed information"
+                  >
+                    <Eye className="h-4 w-4" />
+                    Details
+                  </button>
+                </div>
               </div>
             </div>
           ))

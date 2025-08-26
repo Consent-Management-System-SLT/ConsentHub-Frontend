@@ -91,29 +91,21 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
     try {
       setProcessing(requestId);
       
-      // Update local state with enhanced information
+      // Call the backend API to update the DSAR request
+      const updatedRequest = await csrDashboardService.updateDSARRequest(requestId, {
+        status: newStatus,
+        processingNotes: notes || '',
+        processedBy: 'CSR Agent'
+      });
+      
+      // Update local state with the response from backend
       setRequests(prevRequests => 
         prevRequests.map(request => 
-          request.id === requestId 
-            ? { 
-                ...request, 
-                status: newStatus, 
-                updatedAt: new Date().toISOString(),
-                processedBy: 'CSR Agent',
-                processingNotes: notes || '',
-                ...(newStatus === 'approved' && { approvedAt: new Date().toISOString() }),
-                ...(newStatus === 'rejected' && { rejectedAt: new Date().toISOString() }),
-                ...(newStatus === 'in_progress' && { startedAt: new Date().toISOString() }),
-                ...(newStatus === 'completed' && { completedAt: new Date().toISOString() })
-              }
-            : request
+          request.id === requestId ? updatedRequest : request
         )
       );
       
-      console.log(`Updated DSAR request ${requestId} status to ${newStatus} with notes: ${notes}`);
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log(`✅ Successfully updated DSAR request ${requestId} status to ${newStatus}`);
       
       // Close any open modals
       setShowApprovalModal(false);
@@ -121,7 +113,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       setApprovalNotes('');
       
     } catch (err) {
-      console.error('Error updating DSAR request:', err);
+      console.error('❌ Error updating DSAR request:', err);
       setError('Failed to update request status. Please try again.');
     } finally {
       setProcessing(null);
