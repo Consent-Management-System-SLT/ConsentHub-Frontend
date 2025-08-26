@@ -1,6 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Eye, Check, X, AlertCircle, RefreshCw } from 'lucide-react';
+import { FileText, Eye, Clock, RefreshCw, History, Calendar, User, AlertCircle } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
+
+// Function to format consent purpose names properly
+const formatPurposeName = (purpose: string): string => {
+  if (!purpose) return 'Unknown Purpose';
+  
+  const purposeMap: { [key: string]: string } = {
+    'research': 'Research & Analytics',
+    'dataprocessing': 'Data Processing',
+    'dataProcessing': 'Data Processing',
+    'marketing': 'Marketing Communications',
+    'analytics': 'Analytics & Performance',
+    'personalization': 'Personalization Services',
+    'communication': 'Communication Services',
+    'advertising': 'Advertising & Promotions',
+    'profiling': 'User Profiling',
+    'thirdparty': 'Third Party Sharing',
+    'thirdParty': 'Third Party Sharing',
+    'cookies': 'Cookies & Tracking',
+    'location': 'Location Services',
+    'biometric': 'Biometric Data Processing',
+    'financial': 'Financial Services',
+    'health': 'Health Data Processing',
+    'essential': 'Essential Services',
+    'email': 'Email Communications',
+    'sms': 'SMS Communications',
+    'push': 'Push Notifications',
+    'data_sharing': 'Data Sharing'
+  };
+
+  // If we have a mapping, use it
+  const lowerPurpose = purpose.toLowerCase();
+  if (purposeMap[lowerPurpose]) {
+    return purposeMap[lowerPurpose];
+  }
+
+  // Otherwise, format camelCase or snake_case properly
+  return purpose
+    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+    .replace(/_/g, ' ') // Replace underscores with spaces
+    .replace(/\b\w/g, l => l.toUpperCase()) // Capitalize first letter of each word
+    .trim();
+};
+
+// Function to generate consent descriptions
+const generateDescription = (purpose: string): string => {
+  if (!purpose) return 'No description available';
+  
+  const descriptions: { [key: string]: string } = {
+    'research': 'Permission to use your data for research and analytical purposes to improve our services',
+    'dataprocessing': 'Consent for processing your personal data for business operations and service delivery', 
+    'dataProcessing': 'Consent for processing your personal data for business operations and service delivery',
+    'marketing': 'Authorization to send you marketing communications and promotional materials',
+    'analytics': 'Consent to use your data for analytics and business intelligence purposes',
+    'personalization': 'Permission to personalize your experience and customize content for you',
+    'communication': 'Consent to communicate with you about our services and updates',
+    'advertising': 'Authorization to show you relevant advertisements and promotional content',
+    'profiling': 'Consent to create user profiles for better service delivery',
+    'thirdparty': 'Permission to share your data with trusted third-party partners',
+    'thirdParty': 'Permission to share your data with trusted third-party partners',
+    'cookies': 'Consent to use cookies and similar tracking technologies',
+    'location': 'Permission to access and use your location information',
+    'biometric': 'Consent for processing biometric data for identification purposes',
+    'financial': 'Authorization to process financial information for payment services',
+    'health': 'Consent for processing health-related data for medical services',
+    'essential': 'Required consent for essential service functionality',
+    'email': 'Permission to send you email communications',
+    'sms': 'Authorization to send you SMS messages',
+    'push': 'Consent to send you push notifications',
+    'data_sharing': 'Permission to share your data as outlined in our privacy policy'
+  };
+
+  const lowerPurpose = purpose.toLowerCase();
+  return descriptions[lowerPurpose] || descriptions[purpose] || 'Consent for data processing activities related to this purpose';
+};
 
 interface ConsentHistoryTableProps {
   className?: string;
@@ -17,10 +91,53 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const handleCopyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopySuccess(true);
+      // Reset the success state after 2 seconds
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      // Fallback method for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      } catch (fallbackErr) {
+        console.error('Fallback copy failed: ', fallbackErr);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
 
   useEffect(() => {
     loadConsentsAndCustomers();
   }, [customerId]);
+
+  // Auto-refresh every 10 seconds for real-time updates
+  useEffect(() => {
+    if (!autoRefresh) return;
+    
+    const interval = setInterval(() => {
+      loadConsentsAndCustomers();
+    }, 10000); // Refresh every 10 seconds for faster updates
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, customerId]);
+
+  const handleManualRefresh = async () => {
+    await loadConsentsAndCustomers();
+  };
 
   const loadConsentsAndCustomers = async () => {
     try {
@@ -39,10 +156,43 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
         filteredConsents = consentArray.filter(consent => consent.customerId === customerId);
       }
       
-      console.log('Loaded consents:', filteredConsents);
-      console.log('Loaded customers:', customerArray.length);
+      console.log('=== CONSENT HISTORY DEBUG ===');
+      console.log('Total consents loaded:', consentArray.length);
+      console.log('Total customers loaded:', customerArray.length);
+      console.log('Filtered consents:', filteredConsents.length);
+      
+      // Debug: Look for jothi@gmail.com specifically
+      const jothiCustomer = customerArray.find(c => 
+        c.email === 'jothi@gmail.com' || 
+        c.name?.toLowerCase().includes('jothi') ||
+        c.id?.includes('jothi')
+      );
+      if (jothiCustomer) {
+        console.log('Found Jothi customer:', jothiCustomer);
+        const jothiConsents = consentArray.filter(c => 
+          c.partyId === jothiCustomer.id || 
+          c.customerId === jothiCustomer.id
+        );
+        console.log('Jothi consents found:', jothiConsents.length, jothiConsents);
+      } else {
+        console.log('Jothi customer not found. Available customers:', 
+          customerArray.map(c => ({ id: c.id, name: c.name, email: c.email }))
+        );
+      }
+      
+      // Show recent consent updates (last 5 minutes)
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      const recentConsents = consentArray.filter(c => {
+        const lastModified = new Date((c as any).lastModified || (c as any).updatedAt || (c as any).createdAt);
+        return lastModified > fiveMinutesAgo;
+      });
+      console.log('Recent consent updates (last 5 min):', recentConsents.length, recentConsents);
+      
+      console.log('=== END DEBUG ===');
+      
       setConsents(filteredConsents);
       setCustomers(customerArray);
+      setLastUpdated(new Date());
     } catch (err) {
       console.error('Error loading consents and customers:', err);
       setError('Failed to load consent history. Please try again.');
@@ -56,23 +206,6 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
   const getCustomerName = (partyId: string): string => {
     const customer = customers.find(c => c.id === partyId);
     return customer ? customer.name : `Customer ${partyId}`;
-  };
-
-  const updateConsentStatus = async (consentId: string, newStatus: string) => {
-    try {
-      // For demo purposes, we'll just update the local state
-      const updatedConsents = consents.map(consent => 
-        consent.id === consentId 
-          ? { ...consent, status: newStatus, updatedAt: new Date().toISOString() }
-          : consent
-      );
-      setConsents(updatedConsents);
-      
-      console.log(`Updated consent ${consentId} to status: ${newStatus}`);
-    } catch (err) {
-      console.error('Error updating consent:', err);
-      setError('Failed to update consent status. Please try again.');
-    }
   };
 
   const getStatusColor = (status: string) => {
@@ -160,21 +293,44 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <FileText className="w-6 h-6 text-indigo-600" />
+            <History className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-xl font-semibold text-myslt-text-primary">Consent History</h2>
+              <h2 className="text-xl font-semibold text-myslt-text-primary">Consent History & Audit Trail</h2>
               <p className="text-sm text-myslt-text-secondary">
-                {customerId ? `Showing consents for customer: ${getCustomerName(customerId)}` : 'View and manage customer consent records'}
+                {customerId ? `Showing consent history for customer: ${getCustomerName(customerId)}` : 'Real-time tracking of all customer consent changes'}
               </p>
+              <div className="flex items-center space-x-4 text-xs text-myslt-text-muted mt-1">
+                <span className="flex items-center space-x-1">
+                  <Clock className="w-3 h-3" />
+                  <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
+                </span>
+                <span className="flex items-center space-x-1">
+                  <div className={`w-2 h-2 rounded-full ${autoRefresh ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <span>{autoRefresh ? 'Auto-refresh ON (10s)' : 'Auto-refresh OFF'}</span>
+                </span>
+              </div>
             </div>
           </div>
-          <button
-            onClick={loadConsentsAndCustomers}
-            className="px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setAutoRefresh(!autoRefresh)}
+              className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                autoRefresh 
+                  ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                  : 'bg-red-100 text-red-800 hover:bg-red-200'
+              }`}
+            >
+              {autoRefresh ? 'Auto ON' : 'Auto OFF'}
+            </button>
+            <button
+              onClick={loadConsentsAndCustomers}
+              disabled={loading}
+              className="px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
         </div>
       </div>
 
@@ -195,19 +351,19 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                   Customer Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Purpose
+                  Consent Purpose
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  Current Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
+                  Last Modified
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created Date
+                  Channel
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  View Details
                 </th>
               </tr>
             </thead>
@@ -220,7 +376,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-myslt-text-primary">{consent.purpose}</div>
+                    <div className="text-sm text-myslt-text-primary">{formatPurposeName(consent.purpose)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(consent.status)}`}>
@@ -228,41 +384,26 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-myslt-text-primary">{consent.consentType || 'N/A'}</div>
+                    <div className="text-sm text-myslt-text-primary">
+                      {formatDate(consent.lastModified || consent.updatedAt || consent.createdAt)}
+                    </div>
+                    <div className="text-xs text-myslt-text-muted">
+                      {new Date(consent.lastModified || consent.updatedAt || consent.createdAt).toLocaleTimeString()}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-myslt-text-primary">
-                      {formatDate(consent.createdAt)}
-                    </div>
+                    <div className="text-sm text-myslt-text-primary">{consent.channel || 'All Channels'}</div>
+                    <div className="text-xs text-myslt-text-muted">{consent.consentType || 'Standard'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleViewDetails(consent)}
-                        className="text-indigo-600 hover:text-indigo-900"
-                        title="View Details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      {consent.status === 'granted' && (
-                        <button
-                          onClick={() => updateConsentStatus(consent.id, 'revoked')}
-                          className="text-red-600 hover:text-red-900"
-                          title="Revoke Consent"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                      {consent.status === 'revoked' && (
-                        <button
-                          onClick={() => updateConsentStatus(consent.id, 'granted')}
-                          className="text-green-600 hover:text-green-900"
-                          title="Grant Consent"
-                        >
-                          <Check className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
+                    <button
+                      onClick={() => handleViewDetails(consent)}
+                      className="text-indigo-600 hover:text-indigo-900 flex items-center space-x-1"
+                      title="View Full History"
+                    >
+                      <Eye className="w-4 h-4" />
+                      <span className="text-xs">View</span>
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -274,67 +415,171 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       {/* Modal for viewing consent details */}
       {showModal && selectedConsent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-myslt-card-solid rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-myslt-card-solid rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-myslt-text-primary">Consent Details</h3>
+                <h3 className="text-xl font-semibold text-myslt-text-primary flex items-center">
+                  <FileText className="w-6 h-6 mr-2" />
+                  Consent Details
+                </h3>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-myslt-text-secondary"
+                  className="text-gray-400 hover:text-myslt-text-secondary transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <span className="text-2xl">×</span>
                 </button>
               </div>
             </div>
             <div className="p-6">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Consent ID</label>
-                    <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.id}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Customer</label>
-                    <p className="mt-1 text-sm text-myslt-text-primary">
-                      {getCustomerName(selectedConsent.partyId)}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Purpose</label>
-                    <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.purpose}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Status</label>
-                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedConsent.status)}`}>
-                      {selectedConsent.status}
-                    </span>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Type</label>
-                    <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.consentType || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Created</label>
-                    <p className="mt-1 text-sm text-myslt-text-primary">{formatDate(selectedConsent.createdAt)}</p>
+              <div className="space-y-6">
+                {/* Customer & Status - Full Width */}
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="bg-myslt-service-card p-4 rounded-lg">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700">Customer</label>
+                        <p className="mt-1 text-lg text-myslt-text-primary font-semibold">
+                          {getCustomerName(selectedConsent.partyId)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <label className="block text-sm font-medium text-gray-700">Current Status</label>
+                        <span className={`inline-flex px-4 py-2 rounded-full text-sm font-medium mt-1 ${getStatusColor(selectedConsent.status)}`}>
+                          {selectedConsent.status.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                {selectedConsent.description && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
-                    <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.description}</p>
+
+                {/* Purpose - Full Width */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Purpose</label>
+                  <div className="mt-1 bg-myslt-service-card p-3 rounded-lg">
+                    <p className="text-lg text-myslt-text-primary font-medium">{formatPurposeName(selectedConsent.purpose)}</p>
+                    <p className="text-sm text-myslt-text-muted mt-1">{generateDescription(selectedConsent.purpose)}</p>
                   </div>
-                )}
-                {selectedConsent.validFor && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Valid Period</label>
-                    <div className="mt-1 text-sm text-myslt-text-primary">
-                      <p>From: {formatDate(selectedConsent.validFor.startDateTime)}</p>
-                      {selectedConsent.validFor.endDateTime && (
-                        <p>To: {formatDate(selectedConsent.validFor.endDateTime)}</p>
-                      )}
+                </div>
+
+                {/* Consent ID - Full Width with Copy */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Consent ID</label>
+                  <div className="mt-1 bg-slate-100 border border-slate-300 p-4 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-slate-800 font-mono break-all pr-4 font-semibold">{selectedConsent.id}</p>
+                      <button 
+                        onClick={() => handleCopyToClipboard(selectedConsent.id)}
+                        className={`flex-shrink-0 px-3 py-1 text-white text-xs rounded transition-all duration-200 ${
+                          copySuccess 
+                            ? 'bg-green-600 hover:bg-green-700' 
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        }`}
+                        title={copySuccess ? "Copied!" : "Copy ID"}
+                      >
+                        {copySuccess ? '✓ Copied' : 'Copy'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timeline Information */}
+                <div className="border-t pt-6">
+                  <h4 className="text-md font-medium text-myslt-text-primary mb-4 flex items-center">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Timeline & History
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="bg-myslt-service-card p-4 rounded-lg">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Created Date</label>
+                          <p className="mt-1 text-sm text-myslt-text-primary">{formatDate(selectedConsent.createdAt)}</p>
+                          <p className="text-xs text-myslt-text-muted">
+                            {new Date(selectedConsent.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <label className="block text-sm font-medium text-gray-700">Last Modified</label>
+                          <p className="mt-1 text-sm text-myslt-text-primary">
+                            {formatDate(selectedConsent.lastModified || selectedConsent.updatedAt || selectedConsent.createdAt)}
+                          </p>
+                          <p className="text-xs text-myslt-text-muted">
+                            {new Date(selectedConsent.lastModified || selectedConsent.updatedAt || selectedConsent.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Technical Details */}
+                <div className="border-t pt-6">
+                  <h4 className="text-md font-medium text-myslt-text-primary mb-4">Technical Details</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Channel</label>
+                      <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.channel || 'All Channels'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Consent Type</label>
+                      <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.consentType || 'Standard'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Legal Basis</label>
+                      <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.lawfulBasis || 'Consent'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Source</label>
+                      <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.source || 'Customer Portal'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {selectedConsent.description && (
+                  <div className="border-t pt-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <div className="bg-myslt-service-card p-4 rounded-lg">
+                      <p className="text-sm text-myslt-text-primary">{selectedConsent.description}</p>
                     </div>
                   </div>
                 )}
+
+                {/* Validity Period */}
+                {selectedConsent.validFor && (
+                  <div className="border-t pt-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Validity Period</label>
+                    <div className="bg-myslt-service-card p-4 rounded-lg">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="text-sm font-medium">Valid From:</span>
+                          <p className="text-sm text-myslt-text-primary">{formatDate(selectedConsent.validFor.startDateTime)}</p>
+                        </div>
+                        {selectedConsent.validFor.endDateTime && (
+                          <div>
+                            <span className="text-sm font-medium">Valid Until:</span>
+                            <p className="text-sm text-myslt-text-primary">{formatDate(selectedConsent.validFor.endDateTime)}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Note about management */}
+                <div className="border-t pt-6">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-start">
+                      <User className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-blue-800">Need to modify this consent?</p>
+                        <p className="text-sm text-blue-700 mt-1">
+                          Use the <strong>Consent Management</strong> page to grant, revoke, or update customer consents. 
+                          This page is for viewing historical records only.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
