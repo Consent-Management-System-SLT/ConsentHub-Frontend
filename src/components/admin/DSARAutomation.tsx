@@ -4,8 +4,9 @@ import { apiClient } from '../../services/apiClient';
 
 interface DSARRequest {
   id: string;
-  requestType: 'export' | 'deletion' | 'portability' | 'rectification';
-  status: 'pending' | 'processing' | 'completed' | 'rejected';
+  _id?: string;
+  requestType: 'data_access' | 'data_erasure' | 'data_portability' | 'data_rectification' | 'export' | 'deletion' | 'portability' | 'rectification';
+  status: 'pending' | 'in_progress' | 'completed' | 'rejected' | 'cancelled';
   requesterId: string;
   requesterName: string;
   requesterEmail: string;
@@ -32,8 +33,10 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
 
   const loadDSARRequests = async () => {
     try {
-      const response = await apiClient.get('/api/dsar-requests');
-      setRequests(response.data);
+      const response = await apiClient.get('/api/v1/dsar/requests');
+      console.log('DSAR requests response:', response.data);
+      const responseData = response.data as any;
+      setRequests(responseData.requests || responseData);
     } catch (error) {
       console.error('Error loading DSAR requests:', error);
       // Mock data for demo
@@ -50,7 +53,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
         {
           id: '2',
           requestType: 'deletion',
-          status: 'processing',
+          status: 'in_progress',
           requesterId: 'user456',
           requesterName: 'Sarah Johnson',
           requesterEmail: 'sarah.johnson@email.com',
@@ -61,6 +64,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
   };
 
   const handleAutoProcess = async (dsarId: string) => {
+    console.log('Auto-processing DSAR with ID:', dsarId);
     setProcessingRequests(prev => new Set(prev).add(dsarId));
     
     try {
@@ -146,7 +150,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
   };
 
   const pendingRequests = requests.filter(r => r.status === 'pending');
-  const processingRequests_ = requests.filter(r => r.status === 'processing');
+  const processingRequests_ = requests.filter(r => r.status === 'in_progress');
   const completedRequests = requests.filter(r => r.status === 'completed');
 
   return (
@@ -266,7 +270,14 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                     
                     <div className="flex items-center space-x-3">
                       <button
-                        onClick={() => handleAutoProcess(request.id)}
+                        onClick={() => {
+                          const requestId = request.id || request._id;
+                          if (requestId) {
+                            handleAutoProcess(requestId);
+                          } else {
+                            console.error('No valid ID found for request:', request);
+                          }
+                        }}
                         disabled={isProcessing}
                         className={`myslt-btn-primary px-4 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
                           recommendation?.level === 'high' 

@@ -60,6 +60,19 @@ const DSARManager: React.FC = () => {
       let requestsArray: any[] = [];
       if (data && data.requests && Array.isArray(data.requests)) {
         requestsArray = data.requests;
+        
+        // Validate and log data structure issues
+        requestsArray.forEach((request, index) => {
+          if (!request.status) {
+            console.warn(`Request at index ${index} missing status:`, request);
+          }
+          if (!request.priority) {
+            console.warn(`Request at index ${index} missing priority:`, request);
+          }
+          if (!request.requestType) {
+            console.warn(`Request at index ${index} missing requestType:`, request);
+          }
+        });
       } else {
         console.warn('Unexpected response structure:', data);
         requestsArray = [];
@@ -333,7 +346,7 @@ const DSARManager: React.FC = () => {
                             : 'bg-myslt-muted/20 text-myslt-text-muted border border-myslt-muted/30'
                         }`}
                       >
-                        {request.status.replace('_', ' ').toUpperCase()}
+                        {request.status ? request.status.replace('_', ' ').toUpperCase() : 'UNKNOWN'}
                       </span>
                       
                       <span
@@ -345,7 +358,7 @@ const DSARManager: React.FC = () => {
                             : 'bg-myslt-muted/20 text-myslt-text-muted border border-myslt-muted/30'
                         }`}
                       >
-                        {request.priority.toUpperCase()}
+                        {request.priority ? request.priority.toUpperCase() : 'LOW'}
                       </span>
 
                       {request.sensitiveData && (
@@ -376,7 +389,7 @@ const DSARManager: React.FC = () => {
                     <div className="flex items-center gap-4 text-xs text-myslt-text-muted">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        <span>Due: {new Date(request.dueDate).toLocaleDateString()}</span>
+                        <span>Due: {request.dueDate ? new Date(request.dueDate).toLocaleDateString() : 'Unknown'}</span>
                         {request.daysRemaining !== null && (
                           <span className={`ml-1 ${request.daysRemaining < 0 ? 'text-myslt-danger' : request.daysRemaining <= 7 ? 'text-myslt-warning' : 'text-myslt-text-muted'}`}>
                             ({request.daysRemaining < 0 ? `${Math.abs(request.daysRemaining)} days overdue` : `${request.daysRemaining} days left`})
@@ -392,7 +405,7 @@ const DSARManager: React.FC = () => {
                            request.requestType === 'data_portability' ? 'Data Portability (Art. 20)' :
                            request.requestType === 'restrict_processing' ? 'Restrict Processing (Art. 18)' :
                            request.requestType === 'object_processing' ? 'Object to Processing (Art. 21)' :
-                           request.requestType.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                           (request.requestType ? request.requestType.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) : 'Unknown Request Type')}
                         </span>
                       </div>
                       {request.applicableLaws && request.applicableLaws.length > 0 && (
@@ -480,11 +493,11 @@ const DSARManager: React.FC = () => {
                 <div>
                   <h3 className="font-medium text-myslt-text-primary mb-2">Request Information</h3>
                   <div className="space-y-1 text-sm">
-                    <div><span className="font-medium text-myslt-text-primary">Type:</span> <span className="text-myslt-text-secondary">{selectedRequest.requestType.replace('-', ' ')}</span></div>
-                    <div><span className="font-medium text-myslt-text-primary">Status:</span> <span className="text-myslt-text-secondary">{selectedRequest.status}</span></div>
-                    <div><span className="font-medium text-myslt-text-primary">Priority:</span> <span className="text-myslt-text-secondary">{selectedRequest.priority}</span></div>
-                    <div><span className="font-medium text-myslt-text-primary">Submitted:</span> <span className="text-myslt-text-secondary">{new Date(selectedRequest.submittedAt).toLocaleString()}</span></div>
-                    <div><span className="font-medium text-myslt-text-primary">Due Date:</span> <span className="text-myslt-text-secondary">{new Date(selectedRequest.dueDate).toLocaleString()}</span></div>
+                    <div><span className="font-medium text-myslt-text-primary">Type:</span> <span className="text-myslt-text-secondary">{selectedRequest.requestType ? selectedRequest.requestType.replace('-', ' ') : 'Unknown'}</span></div>
+                    <div><span className="font-medium text-myslt-text-primary">Status:</span> <span className="text-myslt-text-secondary">{selectedRequest.status || 'Unknown'}</span></div>
+                    <div><span className="font-medium text-myslt-text-primary">Priority:</span> <span className="text-myslt-text-secondary">{selectedRequest.priority || 'Unknown'}</span></div>
+                    <div><span className="font-medium text-myslt-text-primary">Submitted:</span> <span className="text-myslt-text-secondary">{selectedRequest.submittedAt ? new Date(selectedRequest.submittedAt).toLocaleString() : 'Unknown'}</span></div>
+                    <div><span className="font-medium text-myslt-text-primary">Due Date:</span> <span className="text-myslt-text-secondary">{selectedRequest.dueDate ? new Date(selectedRequest.dueDate).toLocaleString() : 'Unknown'}</span></div>
                   </div>
                 </div>
                 

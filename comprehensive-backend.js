@@ -1963,47 +1963,69 @@ app.get("/api/v1/dsar/requests", async (req, res) => {
         if (requestType) query.requestType = requestType;
         if (priority) query.priority = priority;
 
-        // Execute query with pagination
+        // Execute query with pagination and use lean() to get plain objects
         const mongoRequests = await DSARRequest.find(query)
             .sort({ submittedAt: -1 })
             .limit(parseInt(limit))
-            .skip((parseInt(page) - 1) * parseInt(limit));
+            .skip((parseInt(page) - 1) * parseInt(limit))
+            .lean();
 
         const total = await DSARRequest.countDocuments(query);
         
-        // Combine with in-memory data if needed
-        let allRequests = mongoRequests.length > 0 ? mongoRequests : dsarRequests;
+        console.log(`📊 Found ${mongoRequests.length} DSAR requests from MongoDB`);
         
-        // Add risk indicators
-        const requestsWithRisk = allRequests.map(request => ({
-            ...request,
-            id: request.id || request._id?.toString(),
-            daysSinceSubmission: Math.floor(
-                (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
-            ),
-            isOverdue: (() => {
-                const days = Math.floor(
-                    (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
-                );
-                return days > 30 && !['completed', 'closed'].includes(request.status);
-            })(),
-            riskLevel: (() => {
-                const days = Math.floor(
-                    (Date.now() - new Date(request.submittedAt || request.createdAt).getTime()) / (1000 * 60 * 60 * 24)
-                );
-                if (days >= 25) return 'critical';
-                if (days >= 20) return 'high';
-                if (days >= 15) return 'medium';
-                return 'low';
-            })()
-        }));
+        // Process requests to ensure proper structure and add computed fields
+        const processedRequests = mongoRequests.map(request => {
+            const now = new Date();
+            const submittedAt = new Date(request.submittedAt);
+            const dueDate = new Date(request.dueDate);
+            
+            // Calculate days since submission and days remaining
+            const daysSinceSubmission = Math.floor((now - submittedAt) / (1000 * 60 * 60 * 24));
+            const daysRemaining = Math.floor((dueDate - now) / (1000 * 60 * 60 * 24));
+            
+            return {
+                _id: request._id,
+                requestId: request.requestId,
+                requesterId: request.requesterId,
+                requesterName: request.requesterName,
+                customerName: request.requesterName, // Alias for compatibility
+                requesterEmail: request.requesterEmail,
+                customerEmail: request.requesterEmail, // Alias for compatibility
+                requesterPhone: request.requesterPhone,
+                requestType: request.requestType,
+                subject: request.subject,
+                description: request.description,
+                status: request.status,
+                priority: request.priority,
+                submittedAt: request.submittedAt,
+                dueDate: request.dueDate,
+                completedAt: request.completedAt,
+                assignedTo: request.assignedTo,
+                responseData: request.responseData,
+                verificationStatus: request.verificationStatus,
+                rejectionReason: request.rejectionReason,
+                rejectionDetails: request.rejectionDetails,
+                metadata: request.metadata,
+                
+                // Computed fields
+                id: request._id?.toString(),
+                daysSinceSubmission,
+                daysRemaining,
+                isOverdue: daysRemaining < 0 && ['pending', 'in_progress'].includes(request.status),
+                riskLevel: daysRemaining < 0 ? 'critical' : 
+                          daysRemaining <= 5 ? 'high' : 
+                          daysRemaining <= 10 ? 'medium' : 'low',
+                sensitiveData: request.dataCategories?.includes('personal_data') || false
+            };
+        });
+        
+        console.log(`✅ Processed ${processedRequests.length} requests with proper structure`);
 
-        console.log(`Returning ${requestsWithRisk.length} DSAR requests with risk indicators`);
-        
         res.json({
             success: true,
-            requests: requestsWithRisk,
-            total: mongoRequests.length > 0 ? total : dsarRequests.length,
+            requests: processedRequests,
+            total: total,
             page: parseInt(page),
             limit: parseInt(limit)
         });
@@ -6606,6 +6628,8 @@ app.get("/api/v1/privacy-notices/export/:format", verifyToken, async (req, res) 
 // GET /api/v1/dsar/requests - Get all DSAR requests with advanced filtering
 app.get("/api/v1/dsar/requests", verifyToken, async (req, res) => {
     try {
+        console.log('🔍 DSAR requests endpoint called with query:', req.query);
+        
         const { 
             status, 
             requestType, 
@@ -6639,13 +6663,61 @@ app.get("/api/v1/dsar/requests", verifyToken, async (req, res) => {
             query.dueDate = { $lt: new Date() };
         }
 
+        console.log('📊 MongoDB query:', query);
+
         // Execute query with pagination
         const requests = await DSARRequest.find(query)
             .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
             .limit(parseInt(limit))
-            .skip((parseInt(page) - 1) * parseInt(limit));
+            .skip((parseInt(page) - 1) * parseInt(limit))
+            .lean(); // Use lean() to get plain JavaScript objects
 
         const total = await DSARRequest.countDocuments(query);
+        
+        console.log(`📋 Found ${requests.length} requests from MongoDB`);
+        console.log('🔧 Sample raw request:', JSON.stringify(requests[0], null, 2));
+        
+        // Process requests to add computed fields and ensure proper structure
+        const processedRequests = requests.map(request => {
+            const now = new Date();
+            const submittedAt = new Date(request.submittedAt);
+            const dueDate = new Date(request.dueDate);
+            
+            // Calculate days since submission and days remaining
+            const daysSinceSubmission = Math.floor((now - submittedAt) / (1000 * 60 * 60 * 24));
+            const daysRemaining = Math.floor((dueDate - now) / (1000 * 60 * 60 * 24));
+            
+            return {
+                _id: request._id,
+                requestId: request.requestId,
+                requesterId: request.requesterId,
+                requesterName: request.requesterName,
+                requesterEmail: request.requesterEmail,
+                requesterPhone: request.requesterPhone,
+                requestType: request.requestType,
+                subject: request.subject,
+                description: request.description,
+                status: request.status,
+                priority: request.priority,
+                submittedAt: request.submittedAt,
+                dueDate: request.dueDate,
+                completedAt: request.completedAt,
+                assignedTo: request.assignedTo,
+                responseData: request.responseData,
+                verificationStatus: request.verificationStatus,
+                rejectionReason: request.rejectionReason,
+                rejectionDetails: request.rejectionDetails,
+                metadata: request.metadata,
+                
+                // Computed fields
+                daysSinceSubmission,
+                daysRemaining,
+                isOverdue: daysRemaining < 0 && ['pending', 'in_progress'].includes(request.status),
+                riskLevel: daysRemaining < 0 ? 'high' : daysRemaining <= 7 ? 'medium' : 'low'
+            };
+        });
+        
+        console.log('✅ Processed request sample:', JSON.stringify(processedRequests[0], null, 2));
         
         // Get statistics
         const stats = {
@@ -6661,7 +6733,7 @@ app.get("/api/v1/dsar/requests", verifyToken, async (req, res) => {
 
         res.json({
             success: true,
-            requests: requests,
+            requests: processedRequests,
             total,
             page: parseInt(page),
             limit: parseInt(limit),
@@ -8380,19 +8452,25 @@ app.post('/api/v1/guardian/consent', verifyToken, async (req, res) => {
 
 // ===== ENHANCED DSAR AUTOMATION =====
 
+// Test endpoint for debugging
+app.get('/api/v1/test/automation', (req, res) => {
+  console.log('🔍 Test endpoint called - automation check');
+  res.json({ message: 'Automation endpoint test successful' });
+});
+
 // Auto-process DSAR Request
 app.post('/api/v1/dsar/:id/auto-process', verifyToken, async (req, res) => {
   try {
     const dsarId = req.params.id;
+    console.log(`🔍 Looking for DSAR request with ID: ${dsarId}`);
     
-    // Find DSAR request in the in-memory array
-    const dsarIndex = dsarRequests.findIndex(r => r.id === dsarId);
+    // Find DSAR request in MongoDB instead of in-memory array
+    const dsar = await DSARRequest.findById(dsarId);
+    console.log(`📋 Found DSAR request:`, dsar ? 'YES' : 'NO');
     
-    if (dsarIndex === -1) {
+    if (!dsar) {
       return res.status(404).json({ error: 'DSAR request not found' });
     }
-    
-    const dsar = dsarRequests[dsarIndex];
     
     if (dsar.status !== 'pending') {
       return res.status(400).json({ error: 'Request is not in pending status' });
@@ -8411,11 +8489,12 @@ app.post('/api/v1/dsar/:id/auto-process', verifyToken, async (req, res) => {
     
     try {
       // Update status to processing
-      dsarRequests[dsarIndex].status = 'processing';
-      dsarRequests[dsarIndex].processingStartedAt = new Date().toISOString();
+      dsar.status = 'in_progress';
+      dsar.processingStartedAt = new Date();
+      await dsar.save();
       
       // Simulate processing based on request type
-      if (dsar.requestType === 'export') {
+      if (dsar.requestType === 'data_access') {
         // Simulate data export generation
         await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
         
@@ -8426,7 +8505,7 @@ app.post('/api/v1/dsar/:id/auto-process', verifyToken, async (req, res) => {
         processingResult.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days
       }
       
-      if (dsar.requestType === 'deletion') {
+      if (dsar.requestType === 'data_erasure') {
         // Simulate data deletion verification
         await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second delay
         
@@ -8436,7 +8515,7 @@ app.post('/api/v1/dsar/:id/auto-process', verifyToken, async (req, res) => {
         processingResult.deletionCertificate = `cert_${dsarId}_${Date.now()}`;
       }
       
-      if (dsar.requestType === 'portability') {
+      if (dsar.requestType === 'data_portability') {
         // Simulate data portability preparation
         await new Promise(resolve => setTimeout(resolve, 2500)); // 2.5 second delay
         
@@ -8446,7 +8525,7 @@ app.post('/api/v1/dsar/:id/auto-process', verifyToken, async (req, res) => {
         processingResult.machineReadable = true;
       }
       
-      if (dsar.requestType === 'rectification') {
+      if (dsar.requestType === 'data_rectification') {
         // Simulate data correction verification
         await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 second delay
         
@@ -8456,14 +8535,15 @@ app.post('/api/v1/dsar/:id/auto-process', verifyToken, async (req, res) => {
       }
       
       // Update the DSAR request with completion
-      dsarRequests[dsarIndex].status = 'completed';
-      dsarRequests[dsarIndex].completedAt = new Date().toISOString();
-      dsarRequests[dsarIndex].processingResult = processingResult;
-      dsarRequests[dsarIndex].autoProcessed = true;
+      dsar.status = 'completed';
+      dsar.completedAt = new Date();
+      dsar.processingResult = processingResult;
+      dsar.autoProcessed = true;
+      await dsar.save();
       
       // Add success metrics
       processingResult.success = true;
-      processingResult.completedAt = dsarRequests[dsarIndex].completedAt;
+      processingResult.completedAt = dsar.completedAt;
       processingResult.requestId = dsarId;
       
       console.log(`✅ Auto-processed DSAR request ${dsarId} (${dsar.requestType})`);
@@ -8473,21 +8553,22 @@ app.post('/api/v1/dsar/:id/auto-process', verifyToken, async (req, res) => {
         eventType: 'DSARRequestCompletedEvent',
         eventId: require('uuid').v4(),
         eventTime: new Date().toISOString(),
-        event: { dsarRequest: { id: dsar.id, status: dsar.status, requestType: dsar.requestType } }
+        event: { dsarRequest: { id: dsar._id, status: dsar.status, requestType: dsar.requestType } }
       });
       
       res.json({ 
         success: true,
         result: processingResult,
         message: `DSAR request ${dsarId} has been automatically processed`,
-        updatedRequest: dsarRequests[dsarIndex]
+        updatedRequest: dsar
       });
       
     } catch (processingError) {
       // Handle processing failures
-      dsarRequests[dsarIndex].status = 'failed';
-      dsarRequests[dsarIndex].failureReason = processingError.message;
-      dsarRequests[dsarIndex].failedAt = new Date().toISOString();
+      dsar.status = 'rejected';
+      dsar.failureReason = processingError.message;
+      dsar.failedAt = new Date();
+      await dsar.save();
       
       processingResult.success = false;
       processingResult.error = processingError.message;
