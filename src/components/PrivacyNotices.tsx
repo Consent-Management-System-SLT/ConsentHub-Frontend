@@ -583,7 +583,7 @@ export const PrivacyNotices: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-myslt-card p-6 rounded-lg shadow-sm border border-myslt-accent/20">
+      <div className="mb-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-myslt-text-primary flex items-center">
             <FileText className="h-5 w-5 mr-2 text-myslt-primary" />

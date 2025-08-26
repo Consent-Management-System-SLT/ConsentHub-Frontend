@@ -12,7 +12,7 @@ const PrivacyNoticeManager: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       {/* Header */}
-      <div className="myslt-card p-4 sm:p-6">
+      <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-myslt-text-primary">Privacy Notices</h1>

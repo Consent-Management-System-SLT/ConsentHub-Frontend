@@ -203,15 +203,15 @@ const TopicPreferences: React.FC = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
-      <div className="myslt-card p-4 sm:p-6">
-        <div className="p-6 border-b border-myslt-border">
-          <h2 className="text-2xl font-semibold text-myslt-text-primary">Topic Preferences</h2>
-          <p className="text-myslt-text-secondary mt-2">
-            Customize your communication preferences by topic and channel. Set Do Not Disturb periods to control when you receive notifications.
-          </p>
-        </div>
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold text-myslt-text-primary">Topic Preferences</h2>
+        <p className="text-myslt-text-secondary mt-2">
+          Customize your communication preferences by topic and channel. Set Do Not Disturb periods to control when you receive notifications.
+        </p>
+      </div>
 
-        <div className="p-6 space-y-8">
+      <div className="myslt-card p-4 sm:p-6">
+        <div className="space-y-8">
           {/* Topic Preferences */}
           <div>
             <h3 className="text-lg font-medium text-myslt-text-primary mb-4">Communication Topics</h3>

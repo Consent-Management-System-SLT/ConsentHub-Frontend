@@ -689,7 +689,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     </div>
                     <div>
                       <div className="text-sm font-medium text-myslt-text-primary">{consent.customerName}</div>
-                      <div className="text-xs text-gray-500">{consent.email}</div>
+                      <div className="text-xs text-myslt-text-secondary">{consent.email}</div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-1">
@@ -712,13 +712,13 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
-                    <span className="text-gray-500">Type:</span>
+                    <span className="text-myslt-text-secondary">Type:</span>
                     <span className={`ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium capitalize ${getConsentTypeColor(consent.consentType)}`}>
                       {consent.consentType}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-500">Status:</span>
+                    <span className="text-myslt-text-secondary">Status:</span>
                     <div className="flex items-center ml-1">
                       {getStatusIcon(consent.status)}
                       <span className={`ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(consent.status)}`}>
@@ -727,11 +727,11 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-500">Granted:</span>
+                    <span className="text-myslt-text-secondary">Granted:</span>
                     <span className="ml-1 text-myslt-text-primary">{new Date(consent.grantedDate).toLocaleDateString()}</span>
                   </div>
                   <div>
-                    <span className="text-gray-500">Source:</span>
+                    <span className="text-myslt-text-secondary">Source:</span>
                     <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-myslt-card-solid text-gray-800 capitalize">
                       {consent.source}
                     </span>
@@ -756,7 +756,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   />
                 </th>
                 <th 
-                  className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-myslt-service-card"
+                  className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider cursor-pointer hover:bg-myslt-service-card"
                   onClick={() => {
                     setSortBy('name');
                     setSortOrder(sortBy === 'name' && sortOrder === 'asc' ? 'desc' : 'asc');
@@ -767,11 +767,11 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'name' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider">
                   Consent Type
                 </th>
                 <th 
-                  className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-myslt-service-card"
+                  className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider cursor-pointer hover:bg-myslt-service-card"
                   onClick={() => {
                     setSortBy('status');
                     setSortOrder(sortBy === 'status' && sortOrder === 'asc' ? 'desc' : 'asc');
@@ -783,7 +783,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   </div>
                 </th>
                 <th 
-                  className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-myslt-service-card"
+                  className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider cursor-pointer hover:bg-myslt-service-card"
                   onClick={() => {
                     setSortBy('date');
                     setSortOrder(sortBy === 'date' && sortOrder === 'asc' ? 'desc' : 'asc');
@@ -794,13 +794,13 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'date' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider">
                   Expiry Date
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider">
                   Source
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -823,7 +823,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-myslt-text-primary">{consent.customerName}</div>
-                        <div className="text-sm text-gray-500">{consent.email}</div>
+                        <div className="text-sm text-myslt-text-secondary">{consent.email}</div>
                         <div className="text-xs text-gray-400">{consent.customerId}</div>
                       </div>
                     </div>
@@ -889,7 +889,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-between mt-6">
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-myslt-text-secondary">
           Showing {sortedConsents.length === 0 ? 0 : Math.min(startIndex + 1, sortedConsents.length)} to {Math.min(endIndex, sortedConsents.length)} of {sortedConsents.length} consents
         </div>
         <div className="flex items-center space-x-2">
@@ -934,7 +934,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   onClick={() => setShowModal(false)}
                   className="p-2 hover:bg-myslt-service-card rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-myslt-text-secondary" />
                 </button>
               </div>
             </div>

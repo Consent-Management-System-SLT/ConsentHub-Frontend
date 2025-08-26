@@ -152,7 +152,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
   return (
     <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       {/* Page Header */}
-      <div className="myslt-card p-4 sm:p-6">
+      <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-myslt-text-primary mb-2">DSAR Automation Dashboard</h1>
         <p className="text-myslt-text-secondary">
           Intelligent automation for Data Subject Access Requests with compliance tracking

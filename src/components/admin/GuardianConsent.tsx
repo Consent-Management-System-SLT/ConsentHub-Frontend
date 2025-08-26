@@ -344,7 +344,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
   return (
     <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       {/* Page Header */}
-      <div className="myslt-card p-4 sm:p-6">
+      <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-myslt-text-primary mb-2">Guardian Consent Management</h1>
         <p className="text-myslt-text-secondary">
           Manage consent preferences for minors under guardian supervision (GDPR Article 8 compliance)
