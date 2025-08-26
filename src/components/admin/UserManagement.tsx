@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Search, Edit, Trash2, Shield, UserCheck, RefreshCw, Eye, EyeOff, X, UserX, Pause, Play } from 'lucide-react';
+import { Users, Plus, Search, Edit, Trash2, Shield, UserCheck, RefreshCw, Eye, EyeOff, X, UserX, Pause, Play, AlertTriangle } from 'lucide-react';
 import { useCRUDNotifications } from '../shared/withNotifications';
 
 interface User {

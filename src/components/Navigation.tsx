@@ -51,7 +51,7 @@ export const Navigation: React.FC<NavigationProps> = ({
         {/* Logo and Title */}
         <div className="flex items-center space-x-2 sm:space-x-3">
           <img
-            src="/SLTMobitel_Logo.svg.png"
+            src="/Logo-SLT.png"
             alt="Logo"
             className="h-8 sm:h-10 w-auto"
           />

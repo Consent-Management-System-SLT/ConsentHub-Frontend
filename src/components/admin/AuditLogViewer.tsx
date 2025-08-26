@@ -425,79 +425,79 @@ const AuditLogViewer: React.FC = () => {
 
       <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-myslt-service-card">
+          <table className="myslt-table">
+            <thead className="myslt-table-header">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severity</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Outcome</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compliance</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="myslt-table-header-cell">Timestamp</th>
+                <th className="myslt-table-header-cell">User</th>
+                <th className="myslt-table-header-cell">Action</th>
+                <th className="myslt-table-header-cell">Category</th>
+                <th className="myslt-table-header-cell">Severity</th>
+                <th className="myslt-table-header-cell">Outcome</th>
+                <th className="myslt-table-header-cell">Compliance</th>
+                <th className="myslt-table-header-cell">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-myslt-card-solid divide-y divide-gray-200">
+            <tbody className="myslt-table-body">
               {auditLogs.map((log) => (
-                <tr key={log._id} className="hover:bg-myslt-service-card">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">
+                <tr key={log._id} className="myslt-table-row">
+                  <td className="myslt-table-cell">
                     <div className="flex items-center">
-                      <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+                      <Calendar className="w-4 h-4 text-myslt-text-muted mr-2" />
                       {formatDate(log.createdAt)}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="myslt-table-cell">
                     <div className="flex items-center">
-                      <User className="w-4 h-4 text-gray-400 mr-2" />
+                      <User className="w-4 h-4 text-myslt-text-muted mr-2" />
                       <div>
                         <div className="text-sm text-myslt-text-primary font-medium">{log.userName}</div>
-                        <div className="text-xs text-gray-500">{log.userEmail}</div>
+                        <div className="text-xs text-myslt-text-muted">{log.userEmail}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <td className="myslt-table-cell">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-myslt-accent/20 text-myslt-text-primary">
                       {log.action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">
+                  <td className="myslt-table-cell">
                     <div className="flex items-center">
                       {getCategoryIcon(log.category)}
                       <span className="ml-2">{log.category}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="myslt-table-cell">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getSeverityColor(log.severity)}`}>
                       {log.severity.toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="myslt-table-cell">
                     <div className="flex items-center">
                       {getOutcomeIcon(log.outcome)}
-                      <span className="ml-2 text-sm text-myslt-text-primary capitalize">{log.outcome}</span>
+                      <span className="ml-2 text-sm text-myslt-text-secondary capitalize">{log.outcome}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="myslt-table-cell">
                     {log.complianceRelevant ? (
                       <div className="flex flex-col">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 mb-1">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-myslt-success/20 text-myslt-success mb-1">
                           GDPR Relevant
                         </span>
                         {log.regulatoryFramework.length > 0 && (
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-myslt-text-muted">
                             {log.regulatoryFramework.join(', ')}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <span className="text-xs text-gray-400">N/A</span>
+                      <span className="text-xs text-myslt-text-muted">N/A</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="myslt-table-cell font-medium">
                     <button
                       onClick={() => setSelectedLog(log)}
-                      className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
+                      className="text-myslt-accent hover:text-myslt-primary p-1 hover:bg-myslt-accent/10 rounded transition-colors"
                     >
                       <Eye className="w-4 h-4" />
                     </button>

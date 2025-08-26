@@ -61,10 +61,10 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
 
   return (
     <>
-      {/* Mobile overlay */}
+      {/* Mobile overlay - solid background */}
       {isOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity duration-300"
+          className="lg:hidden fixed inset-0 bg-myslt-background z-30 transition-opacity duration-300"
           onClick={onToggle}
         />
       )}
@@ -72,13 +72,13 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
       {/* Mobile menu button */}
       <button
         onClick={onToggle}
-        className="lg:hidden fixed top-16 sm:top-20 left-3 sm:left-4 z-50 p-2 sm:p-3 rounded-lg sm:rounded-xl bg-myslt-card shadow-lg border border-myslt-accent/20 hover:shadow-xl transition-all duration-200"
+        className="lg:hidden fixed top-16 sm:top-20 left-3 sm:left-4 z-50 p-2 sm:p-3 rounded-lg sm:rounded-xl myslt-sidebar-mobile shadow-lg border-2 border-myslt-accent hover:shadow-xl transition-all duration-200"
         aria-label="Toggle navigation menu"
       >
         {isOpen ? (
-          <X className="w-4 h-4 sm:w-5 sm:h-5 text-myslt-text-secondary" />
+          <X className="myslt-icon-sm sm:myslt-icon-md" />
         ) : (
-          <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-myslt-text-secondary" />
+          <Menu className="myslt-icon-sm sm:myslt-icon-md" />
         )}
       </button>
 
@@ -95,7 +95,7 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center justify-center w-full">
                 <img 
-                  src="/SLTMobitel_Logo.svg.png" 
+                  src="/Logo-SLT.png" 
                   alt="SLT Mobitel" 
                   className="h-8 sm:h-10 w-auto"
                 />

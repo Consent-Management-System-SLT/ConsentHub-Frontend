@@ -69,15 +69,15 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
 
   const getNotificationIcon = (_type: string, category: string) => {
     if (category === 'urgent') {
-      return <AlertCircle className="w-4 h-4 text-red-500" />;
+      return <AlertCircle className="myslt-icon-sm text-myslt-danger" />;
     }
     if (category === 'success') {
-      return <CheckCircle className="w-4 h-4 text-green-500" />;
+      return <CheckCircle className="myslt-icon-sm text-myslt-success" />;
     }
     if (category === 'warning') {
-      return <AlertCircle className="w-4 h-4 text-yellow-500" />;
+      return <AlertCircle className="myslt-icon-sm text-myslt-warning" />;
     }
-    return <Info className="w-4 h-4 text-blue-500" />;
+    return <Info className="myslt-icon-sm text-myslt-info" />;
   };
 
   const formatTimestamp = (timestamp: string) => {
@@ -106,19 +106,19 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative ${sizeClasses.button} text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors`}
+        className={`relative ${sizeClasses.button} text-myslt-text-secondary hover:text-myslt-text-primary focus:outline-none focus:ring-2 focus:ring-myslt-success rounded-lg transition-colors`}
         title="Notifications"
       >
         <Bell className={sizeClasses.bell} />
         {unreadCount > 0 && (
-          <span className={`absolute -top-1 -right-1 ${sizeClasses.badge} rounded-full bg-red-500 ring-2 ring-white font-bold text-white flex items-center justify-center`}>
+          <span className={`absolute -top-1 -right-1 ${sizeClasses.badge} rounded-full bg-myslt-danger ring-2 ring-myslt-primary font-bold text-white flex items-center justify-center`}>
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </button>
 
       {showLabel && (
-        <span className="ml-2 text-sm text-gray-600">
+        <span className="ml-2 text-sm text-myslt-text-secondary">
           Notifications {unreadCount > 0 && `(${unreadCount})`}
         </span>
       )}
@@ -126,14 +126,14 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
       {isOpen && (
         <div 
           ref={dropdownRef}
-          className="absolute right-0 top-12 w-96 bg-myslt-card rounded-xl shadow-2xl border border-myslt-accent/20 z-50 max-h-[80vh] flex flex-col"
+          className="myslt-notification-dropdown absolute right-0 top-12 w-96 rounded-xl shadow-2xl z-50 max-h-[80vh] flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-myslt-accent/20">
+          <div className="flex items-center justify-between p-4 border-b border-myslt-accent">
             <div className="flex items-center space-x-2">
               <h3 className="text-lg font-semibold text-myslt-text-primary">Notifications</h3>
               {unreadCount > 0 && (
-                <span className="px-2 py-1 text-xs font-medium text-white bg-red-500 rounded-full">
+                <span className="px-2 py-1 text-xs font-medium text-white bg-myslt-danger rounded-full">
                   {unreadCount}
                 </span>
               )}
@@ -149,9 +149,9 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-myslt-service-card rounded-full transition-colors"
+                className="p-1 hover:bg-myslt-accent/20 rounded-full transition-colors"
               >
-                <X className="w-4 h-4 text-gray-500" />
+                <X className="myslt-icon-sm text-myslt-text-muted" />
               </button>
             </div>
           </div>
@@ -160,17 +160,17 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
           <div className="flex-1 overflow-y-auto">
             {displayedNotifications.length === 0 ? (
               <div className="p-8 text-center">
-                <Bell className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 font-medium">No notifications</p>
-                <p className="text-gray-400 text-sm mt-1">You're all caught up!</p>
+                <Bell className="w-12 h-12 text-myslt-text-muted mx-auto mb-4" />
+                <p className="text-myslt-text-secondary font-medium">No notifications</p>
+                <p className="text-myslt-text-muted text-sm mt-1">You're all caught up!</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-myslt-accent/30">
                 {displayedNotifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 hover:bg-myslt-service-card transition-colors cursor-pointer group ${
-                      !notification.read ? 'bg-myslt-card-gradient border-l-4 border-l-myslt-primary' : ''
+                    className={`p-4 hover:bg-myslt-accent/20 transition-colors cursor-pointer group ${
+                      !notification.read ? 'bg-myslt-accent/10 border-l-4 border-l-myslt-primary' : ''
                     }`}
                     onClick={() => handleNotificationClick(notification.id)}
                   >

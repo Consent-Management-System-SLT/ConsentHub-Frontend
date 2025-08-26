@@ -111,12 +111,12 @@ class CSRDashboardService {
    */
   async getCSRStats(): Promise<CSRStats> {
     try {
-      console.log('🔍 Fetching CSR stats from backend...');
+      console.log('[CSR] Fetching CSR stats from backend...');
       const response = await apiClient.get(this.statsUrl);
-      console.log('✅ CSR stats loaded successfully:', response.data);
+      console.log('[CSR] CSR stats loaded successfully:', response.data);
       return response.data;
     } catch (error) {
-      console.warn('⚠️ Backend CSR stats unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend CSR stats unavailable, using fallback data:', error);
       this.useOfflineMode = true;
       return this.getFallbackStats();
     }
@@ -127,12 +127,12 @@ class CSRDashboardService {
    */
   async getCustomers(): Promise<CustomerData[]> {
     try {
-      console.log('🔍 Fetching customers from /api/v1/party...');
+      console.log('[CSR] Fetching customers from /api/v1/party...');
       const response = await apiClient.get(`${this.baseUrl}/party`);
-      console.log('✅ Customers loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
+      console.log('[CSR] Customers loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
       return Array.isArray(response.data) ? response.data : this.getFallbackCustomers();
     } catch (error) {
-      console.warn('⚠️ Backend customers unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend customers unavailable, using fallback data:', error);
       return this.getFallbackCustomers();
     }
   }
@@ -142,12 +142,12 @@ class CSRDashboardService {
    */
   async getConsents(): Promise<ConsentData[]> {
     try {
-      console.log('🔍 Fetching consents from /api/v1/csr/consent...');
+      console.log('[CSR] Fetching consents from /api/v1/csr/consent...');
       const response = await apiClient.get(`${this.baseUrl}/csr/consent`);
-      console.log('✅ Consents loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
+      console.log('[CSR] Consents loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
       return Array.isArray(response.data) ? response.data : this.getFallbackConsents();
     } catch (error) {
-      console.warn('⚠️ Backend consents unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend consents unavailable, using fallback data:', error);
       return this.getFallbackConsents();
     }
   }
@@ -157,9 +157,9 @@ class CSRDashboardService {
    */
   async getDSARRequests(): Promise<DSARRequest[]> {
     try {
-      console.log('🔍 Fetching DSAR requests from /api/dsar-requests...');
+      console.log('[CSR] Fetching DSAR requests from /api/dsar-requests...');
       const response = await apiClient.get('/api/dsar-requests');
-      console.log('✅ DSAR requests loaded successfully:', response.data);
+      console.log('[CSR] DSAR requests loaded successfully:', response.data);
       
       // Handle response - it should be directly an array with enhanced data
       if (Array.isArray(response.data)) {
@@ -169,7 +169,7 @@ class CSRDashboardService {
         return this.getFallbackDSARRequests();
       }
     } catch (error) {
-      console.warn('⚠️ Backend DSAR requests unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend DSAR requests unavailable, using fallback data:', error);
       return this.getFallbackDSARRequests();
     }
   }
@@ -179,12 +179,12 @@ class CSRDashboardService {
    */
   async getAuditEvents(): Promise<AuditEvent[]> {
     try {
-      console.log('🔍 Fetching audit events from /api/v1/event...');
+      console.log('[CSR] Fetching audit events from /api/v1/event...');
       const response = await apiClient.get(`${this.baseUrl}/event`);
-      console.log('✅ Audit events loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
+      console.log('[CSR] Audit events loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
       return Array.isArray(response.data) ? response.data : this.getFallbackAuditEvents();
     } catch (error) {
-      console.warn('⚠️ Backend audit events unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend audit events unavailable, using fallback data:', error);
       return this.getFallbackAuditEvents();
     }
   }
@@ -206,7 +206,7 @@ class CSRDashboardService {
       // Return all preferences
       return this.getFallbackCommunicationPreferences();
     } catch (error) {
-      console.warn('⚠️ Backend communication preferences unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend communication preferences unavailable, using fallback data:', error);
       return this.getFallbackCommunicationPreferences(customerId);
     }
   }
@@ -223,7 +223,7 @@ class CSRDashboardService {
       const response = await apiClient.get(`${this.baseUrl}/consent/guardian`);
       return Array.isArray(response.data) ? response.data : this.getFallbackGuardianConsentData();
     } catch (error) {
-      console.warn('⚠️ Backend guardian consent data unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend guardian consent data unavailable, using fallback data:', error);
       return this.getFallbackGuardianConsentData();
     }
   }

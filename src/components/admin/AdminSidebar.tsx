@@ -50,10 +50,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   return (
     <>
-      {/* Mobile overlay */}
+      {/* Mobile overlay - solid background instead of transparent */}
       {isOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity duration-300"
+          className="lg:hidden fixed inset-0 bg-myslt-background z-30 transition-opacity duration-300"
           onClick={onToggle}
         />
       )}
@@ -61,33 +61,32 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       {/* Mobile menu button */}
       <button
         onClick={onToggle}
-        className="lg:hidden fixed top-20 left-4 z-50 p-3 rounded-xl bg-myslt-card shadow-lg border border-myslt-accent/20 hover:shadow-xl transition-all duration-200"
+        className="lg:hidden fixed top-20 left-4 z-50 p-3 rounded-xl myslt-sidebar-mobile shadow-lg border-2 border-myslt-accent hover:shadow-xl transition-all duration-200"
         aria-label="Toggle navigation menu"
       >
         {isOpen ? (
-          <X className="w-5 h-5 text-myslt-text-secondary" />
+          <X className="myslt-icon-md" />
         ) : (
-          <Menu className="w-5 h-5 text-myslt-text-secondary" />
+          <Menu className="myslt-icon-md" />
         )}
       </button>
 
-      {/* Sidebar */}
+      {/* Sidebar - solid background for mobile */}
       <aside className={`
-        fixed lg:relative left-0 top-0 h-full w-64 bg-myslt-card border-r border-myslt-accent/20 z-40 
+        fixed lg:relative left-0 top-0 h-full w-64 myslt-sidebar-mobile border-r-2 border-myslt-accent z-40 
         transform transition-all duration-300 ease-in-out shadow-xl lg:shadow-none
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col h-full">
-          {/* Header - Match main header height exactly */}
-          <div className="px-4 sm:px-6 bg-myslt-gradient h-16 flex items-center justify-center border-b border-myslt-accent/20">
+          {/* Header - solid background without transparency */}
+          <div className="px-4 sm:px-6 bg-myslt-card-solid border-2 border-myslt-accent h-16 flex items-center justify-center">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center justify-center w-full">
                 <img 
-                  src="/SLTMobitel_Logo.svg.png" 
+                  src="/Logo-SLT.png" 
                   alt="SLT Mobitel" 
                   className="h-10 w-auto"
                 />
-                {/* Admin Portal text removed as requested */}
               </div>
               {/* Close button for mobile */}
               <button
@@ -95,7 +94,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 className="lg:hidden p-2 rounded-lg hover:bg-myslt-accent/10 transition-colors absolute right-4"
                 aria-label="Close navigation menu"
               >
-                <X className="w-5 h-5 text-myslt-text-secondary" />
+                <X className="myslt-icon-md" />
               </button>
             </div>
           </div>

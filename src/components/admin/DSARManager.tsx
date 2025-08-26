@@ -188,11 +188,11 @@ const DSARManager: React.FC = () => {
     return (
       <div className="p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded"></div>
-          <div className="h-16 bg-gray-200 rounded"></div>
+          <div className="h-8 bg-myslt-card rounded"></div>
+          <div className="h-16 bg-myslt-card rounded"></div>
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-200 rounded"></div>
+              <div key={i} className="h-20 bg-myslt-card rounded"></div>
             ))}
           </div>
         </div>
@@ -207,15 +207,15 @@ const DSARManager: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">DSAR Management</h1>
-          <p className="text-gray-600 mt-1">Manage Data Subject Access Requests</p>
+          <h1 className="text-2xl font-bold text-myslt-text-primary">DSAR Management</h1>
+          <p className="text-myslt-text-secondary mt-1">Manage Data Subject Access Requests</p>
         </div>
         
         <div className="flex items-center gap-2">
           <button
             onClick={handleRefresh}
             disabled={loading || refreshing}
-            className={`flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`myslt-btn-secondary flex items-center gap-2 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
@@ -223,7 +223,7 @@ const DSARManager: React.FC = () => {
           
           <button
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+            className="myslt-btn-primary flex items-center gap-2 px-4 py-2"
           >
             <Download className="h-4 w-4" />
             <span>Export CSV</span>
@@ -232,13 +232,13 @@ const DSARManager: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="bg-myslt-danger/20 border border-myslt-danger/30 rounded-lg p-4">
           <div className="flex items-center">
-            <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-            <p className="text-red-700">{error}</p>
+            <AlertCircle className="h-5 w-5 text-myslt-danger mr-2" />
+            <p className="text-myslt-text-primary">{error}</p>
             <button 
               onClick={loadDSARRequests}
-              className="ml-auto px-3 py-1 text-sm bg-red-100 hover:bg-red-200 text-red-700 rounded"
+              className="ml-auto px-3 py-1 text-sm bg-myslt-danger/20 hover:bg-myslt-danger/30 text-myslt-danger rounded"
             >
               Retry
             </button>
@@ -247,22 +247,22 @@ const DSARManager: React.FC = () => {
       )}
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+      <div className="myslt-card p-4">
         <div className="flex gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-myslt-text-muted" />
               <input
                 type="text"
                 placeholder="Search by request ID, email, name, type, or subject..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="myslt-input w-full pl-10 pr-10 py-2"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-myslt-text-muted hover:text-myslt-text-secondary"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -273,7 +273,7 @@ const DSARManager: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="myslt-input px-3 py-2"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -287,12 +287,12 @@ const DSARManager: React.FC = () => {
       </div>
 
       {/* Results */}
-      <div className="text-sm text-gray-600 mb-4">
+      <div className="text-sm text-myslt-text-secondary mb-4">
         {filteredRequests.length > 0 ? (
           <>
             Showing {Math.min(startIndex + 1, filteredRequests.length)} to {Math.min(endIndex, filteredRequests.length)} of {filteredRequests.length} requests
             {filteredRequests.length < requests.length && (
-              <span className="ml-2 text-blue-600">({requests.length} total)</span>
+              <span className="ml-2 text-myslt-text-accent">({requests.length} total)</span>
             )}
           </>
         ) : (
@@ -303,10 +303,10 @@ const DSARManager: React.FC = () => {
       {/* Request List */}
       <div className="space-y-4">
         {filteredRequests.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-            <Archive className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No requests found</h3>
-            <p className="text-gray-500">
+          <div className="myslt-card p-8 text-center">
+            <Archive className="h-12 w-12 text-myslt-text-muted mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-myslt-text-primary mb-2">No requests found</h3>
+            <p className="text-myslt-text-secondary">
               {searchTerm || statusFilter !== 'all'
                 ? "Try adjusting your search criteria or filters."
                 : "No DSAR requests have been submitted yet."}
@@ -314,23 +314,23 @@ const DSARManager: React.FC = () => {
           </div>
         ) : (
           paginatedRequests.map((request) => (
-            <div key={request._id} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+            <div key={request._id} className="myslt-card p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1 space-y-3">
                   <div className="flex items-center gap-3">
-                    <h3 className="font-semibold text-gray-900">{request.requestId}</h3>
+                    <h3 className="font-semibold text-myslt-text-primary">{request.requestId}</h3>
                     <div className="flex items-center gap-2">
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
                           request.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-myslt-warning/20 text-myslt-warning border border-myslt-warning/30'
                             : request.status === 'in_progress'
-                            ? 'bg-blue-100 text-blue-800'
+                            ? 'bg-myslt-info/20 text-myslt-info border border-myslt-info/30'
                             : request.status === 'completed'
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-myslt-success/20 text-myslt-success border border-myslt-success/30'
                             : request.status === 'rejected'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-myslt-danger/20 text-myslt-danger border border-myslt-danger/30'
+                            : 'bg-myslt-muted/20 text-myslt-text-muted border border-myslt-muted/30'
                         }`}
                       >
                         {request.status.replace('_', ' ').toUpperCase()}
@@ -339,23 +339,23 @@ const DSARManager: React.FC = () => {
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
                           request.priority === 'high'
-                            ? 'bg-red-100 text-red-800'
+                            ? 'bg-myslt-danger/20 text-myslt-danger border border-myslt-danger/30'
                             : request.priority === 'medium'
-                            ? 'bg-orange-100 text-orange-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-myslt-warning/20 text-myslt-warning border border-myslt-warning/30'
+                            : 'bg-myslt-muted/20 text-myslt-text-muted border border-myslt-muted/30'
                         }`}
                       >
                         {request.priority.toUpperCase()}
                       </span>
 
                       {request.sensitiveData && (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-myslt-accent/20 text-myslt-accent border border-myslt-accent/30">
                           SENSITIVE
                         </span>
                       )}
                       
                       {request.isOverdue && (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-myslt-danger/20 text-myslt-danger border border-myslt-danger/30">
                           OVERDUE
                         </span>
                       )}
@@ -364,21 +364,21 @@ const DSARManager: React.FC = () => {
                   
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-gray-400" />
+                      <User className="h-4 w-4 text-myslt-text-muted" />
                       <span className="text-sm">
-                        <span className="font-medium">{request.requesterName || request.customerName || 'N/A'}</span>
-                        <span className="text-gray-500 ml-2">({request.requesterEmail || request.customerEmail})</span>
+                        <span className="font-medium text-myslt-text-primary">{request.requesterName || request.customerName || 'N/A'}</span>
+                        <span className="text-myslt-text-secondary ml-2">({request.requesterEmail || request.customerEmail})</span>
                       </span>
                     </div>
                     
-                    <p className="text-sm text-gray-700">{request.description}</p>
+                    <p className="text-sm text-myslt-text-secondary">{request.description}</p>
                     
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-4 text-xs text-myslt-text-muted">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         <span>Due: {new Date(request.dueDate).toLocaleDateString()}</span>
                         {request.daysRemaining !== null && (
-                          <span className={`ml-1 ${request.daysRemaining < 0 ? 'text-red-600' : request.daysRemaining <= 7 ? 'text-yellow-600' : 'text-gray-500'}`}>
+                          <span className={`ml-1 ${request.daysRemaining < 0 ? 'text-myslt-danger' : request.daysRemaining <= 7 ? 'text-myslt-warning' : 'text-myslt-text-muted'}`}>
                             ({request.daysRemaining < 0 ? `${Math.abs(request.daysRemaining)} days overdue` : `${request.daysRemaining} days left`})
                           </span>
                         )}
@@ -406,7 +406,7 @@ const DSARManager: React.FC = () => {
                 
                 <button
                   onClick={() => setSelectedRequest(request)}
-                  className="flex items-center gap-2 px-3 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg"
+                  className="flex items-center gap-2 px-3 py-2 text-myslt-accent hover:text-myslt-accent-hover hover:bg-myslt-accent/10 rounded-lg transition-colors"
                 >
                   <Eye className="h-4 w-4" />
                   <span className="text-sm">View</span>
@@ -420,14 +420,14 @@ const DSARManager: React.FC = () => {
       {/* Pagination */}
       {filteredRequests.length > 0 && (
         <div className="flex items-center justify-between mt-6">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-myslt-text-secondary">
             Showing {filteredRequests.length === 0 ? 0 : Math.min(startIndex + 1, filteredRequests.length)} to {Math.min(endIndex, filteredRequests.length)} of {filteredRequests.length} requests
           </div>
           <div className="flex items-center space-x-2">
             <button 
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="flex items-center gap-1 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="myslt-btn-secondary flex items-center gap-1 px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-4 w-4" />
               Previous
@@ -438,8 +438,8 @@ const DSARManager: React.FC = () => {
                 onClick={() => setCurrentPage(page)}
                 className={`px-3 py-2 rounded-lg transition-colors text-sm ${
                   currentPage === page
-                    ? 'bg-blue-600 text-white'
-                    : 'border border-gray-300 hover:bg-gray-50'
+                    ? 'bg-myslt-accent text-white'
+                    : 'myslt-btn-secondary'
                 }`}
               >
                 {page}
@@ -448,7 +448,7 @@ const DSARManager: React.FC = () => {
             <button 
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="flex items-center gap-1 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="myslt-btn-secondary flex items-center gap-1 px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
               <ChevronRight className="h-4 w-4" />
@@ -459,16 +459,16 @@ const DSARManager: React.FC = () => {
 
       {/* Detail Modal */}
       {selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-auto">
-            <div className="p-6 border-b border-gray-200">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="myslt-card max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-6 border-b border-myslt-border">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-myslt-text-primary">
                   Request Details - {selectedRequest.requestId}
                 </h2>
                 <button
                   onClick={() => setSelectedRequest(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-myslt-text-muted hover:text-myslt-text-secondary transition-colors"
                 >
                   <XCircle className="h-6 w-6" />
                 </button>
@@ -478,31 +478,31 @@ const DSARManager: React.FC = () => {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Request Information</h3>
+                  <h3 className="font-medium text-myslt-text-primary mb-2">Request Information</h3>
                   <div className="space-y-1 text-sm">
-                    <div><span className="font-medium">Type:</span> {selectedRequest.requestType.replace('-', ' ')}</div>
-                    <div><span className="font-medium">Status:</span> {selectedRequest.status}</div>
-                    <div><span className="font-medium">Priority:</span> {selectedRequest.priority}</div>
-                    <div><span className="font-medium">Submitted:</span> {new Date(selectedRequest.submittedAt).toLocaleString()}</div>
-                    <div><span className="font-medium">Due Date:</span> {new Date(selectedRequest.dueDate).toLocaleString()}</div>
+                    <div><span className="font-medium text-myslt-text-primary">Type:</span> <span className="text-myslt-text-secondary">{selectedRequest.requestType.replace('-', ' ')}</span></div>
+                    <div><span className="font-medium text-myslt-text-primary">Status:</span> <span className="text-myslt-text-secondary">{selectedRequest.status}</span></div>
+                    <div><span className="font-medium text-myslt-text-primary">Priority:</span> <span className="text-myslt-text-secondary">{selectedRequest.priority}</span></div>
+                    <div><span className="font-medium text-myslt-text-primary">Submitted:</span> <span className="text-myslt-text-secondary">{new Date(selectedRequest.submittedAt).toLocaleString()}</span></div>
+                    <div><span className="font-medium text-myslt-text-primary">Due Date:</span> <span className="text-myslt-text-secondary">{new Date(selectedRequest.dueDate).toLocaleString()}</span></div>
                   </div>
                 </div>
                 
                 <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Customer Information</h3>
+                  <h3 className="font-medium text-myslt-text-primary mb-2">Customer Information</h3>
                   <div className="space-y-1 text-sm">
-                    <div><span className="font-medium">Name:</span> {selectedRequest.requesterName || selectedRequest.customerName || 'N/A'}</div>
-                    <div><span className="font-medium">Email:</span> {selectedRequest.requesterEmail || selectedRequest.customerEmail}</div>
+                    <div><span className="font-medium text-myslt-text-primary">Name:</span> <span className="text-myslt-text-secondary">{selectedRequest.requesterName || selectedRequest.customerName || 'N/A'}</span></div>
+                    <div><span className="font-medium text-myslt-text-primary">Email:</span> <span className="text-myslt-text-secondary">{selectedRequest.requesterEmail || selectedRequest.customerEmail}</span></div>
                     {selectedRequest.assignedTo && (
-                      <div><span className="font-medium">Assigned To:</span> {selectedRequest.assignedTo}</div>
+                      <div><span className="font-medium text-myslt-text-primary">Assigned To:</span> <span className="text-myslt-text-secondary">{selectedRequest.assignedTo}</span></div>
                     )}
                   </div>
                 </div>
               </div>
               
               <div>
-                <h3 className="font-medium text-gray-900 mb-2">Description</h3>
-                <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{selectedRequest.description}</p>
+                <h3 className="font-medium text-myslt-text-primary mb-2">Description</h3>
+                <p className="text-sm text-myslt-text-secondary bg-myslt-muted/10 p-3 rounded-lg border border-myslt-border">{selectedRequest.description}</p>
               </div>
             </div>
           </div>

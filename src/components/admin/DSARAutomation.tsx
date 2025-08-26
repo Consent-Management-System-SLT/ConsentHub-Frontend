@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FileText, Trash2, Upload, Edit, AlertTriangle, Clock, Info, BarChart, CheckCircle } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
 
 interface DSARRequest {
@@ -103,14 +104,15 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
     );
   };
 
-  const getRequestTypeIcon = (type: string) => {
+  const renderRequestTypeIcon = (type: string) => {
     const icons = {
-      export: '📄',
-      deletion: '🗑️',
-      portability: '📤',
-      rectification: '✏️'
+      export: FileText,
+      deletion: Trash2,
+      portability: Upload,
+      rectification: Edit
     };
-    return icons[type as keyof typeof icons] || '📋';
+    const IconComponent = icons[type as keyof typeof icons] || FileText;
+    return <IconComponent className="myslt-icon" />;
   };
 
   const getAutomationRecommendation = (request: DSARRequest) => {
@@ -148,53 +150,53 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
   const completedRequests = requests.filter(r => r.status === 'completed');
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       {/* Page Header */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">DSAR Automation Dashboard</h1>
-        <p className="text-gray-600">
+      <div className="myslt-card p-4 sm:p-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-myslt-text-primary mb-2">DSAR Automation Dashboard</h1>
+        <p className="text-myslt-text-secondary">
           Intelligent automation for Data Subject Access Requests with compliance tracking
         </p>
       </div>
 
       {/* Automation Statistics */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg p-6 text-white">
+      <div className="bg-gradient-to-r from-myslt-accent to-myslt-accent/80 rounded-lg p-4 sm:p-6 text-white">
         <h3 className="text-lg font-semibold mb-4">Automation Overview</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-white bg-opacity-20 rounded-lg p-4">
-            <div className="text-2xl font-bold">{pendingRequests.length}</div>
-            <div className="text-sm opacity-90">Pending Requests</div>
+            <div className="text-xl sm:text-2xl font-bold">{pendingRequests.length}</div>
+            <div className="text-xs sm:text-sm opacity-90">Pending Requests</div>
           </div>
           <div className="bg-white bg-opacity-20 rounded-lg p-4">
-            <div className="text-2xl font-bold">{processingRequests_.length}</div>
-            <div className="text-sm opacity-90">Processing</div>
+            <div className="text-xl sm:text-2xl font-bold">{processingRequests_.length}</div>
+            <div className="text-xs sm:text-sm opacity-90">Processing</div>
           </div>
           <div className="bg-white bg-opacity-20 rounded-lg p-4">
-            <div className="text-2xl font-bold">{completedRequests.length}</div>
-            <div className="text-sm opacity-90">Auto-Completed</div>
+            <div className="text-xl sm:text-2xl font-bold">{completedRequests.length}</div>
+            <div className="text-xs sm:text-sm opacity-90">Auto-Completed</div>
           </div>
           <div className="bg-white bg-opacity-20 rounded-lg p-4">
-            <div className="text-2xl font-bold">
+            <div className="text-xl sm:text-2xl font-bold">
               {completedRequests.length > 0 ? 
                 Math.round((completedRequests.length / requests.length) * 100) : 0}%
             </div>
-            <div className="text-sm opacity-90">Completion Rate</div>
+            <div className="text-xs sm:text-sm opacity-90">Completion Rate</div>
           </div>
         </div>
       </div>
 
       {/* Pending Requests with Auto-Processing */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <h4 className="text-lg font-semibold text-gray-900">Pending DSAR Requests</h4>
-          <p className="text-gray-600 mt-1">Requests eligible for automated processing</p>
+      <div className="myslt-card overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 border-b border-myslt-border">
+          <h4 className="text-lg font-semibold text-myslt-text-primary">Pending DSAR Requests</h4>
+          <p className="text-myslt-text-secondary text-sm mt-1">Requests eligible for automated processing</p>
         </div>
         
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-myslt-border">
           {pendingRequests.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="p-6 sm:p-8 text-center text-myslt-text-muted">
+              <div className="w-12 sm:w-16 h-12 sm:h-16 bg-myslt-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 sm:w-8 h-6 sm:h-8 text-myslt-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
@@ -206,51 +208,52 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
               const isProcessing = processingRequests.has(request.id);
               
               return (
-                <div key={request.id} className="p-6">
+                <div key={request.id} className="p-4 sm:p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-4">
-                      <div className="text-2xl">{getRequestTypeIcon(request.requestType)}</div>
+                      <div className="text-xl sm:text-2xl">{renderRequestTypeIcon(request.requestType)}</div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <h5 className="font-medium text-gray-900">
+                          <h5 className="font-medium text-myslt-text-primary">
                             {request.requestType.charAt(0).toUpperCase() + request.requestType.slice(1)} Request
                           </h5>
                           {getStatusBadge(request.status)}
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">
+                        <p className="text-sm text-myslt-text-secondary mb-2">
                           Requester: {request.requesterName} ({request.requesterEmail})
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-myslt-text-muted">
                           Created: {new Date(request.createdAt).toLocaleDateString()}
                         </p>
                         
                         {recommendation && (
-                          <div className={`mt-3 p-3 rounded-lg ${
-                            recommendation.level === 'high' ? 'bg-red-50 border border-red-200' :
-                            recommendation.level === 'medium' ? 'bg-yellow-50 border border-yellow-200' :
-                            'bg-blue-50 border border-blue-200'
+                          <div className={`mt-3 p-3 rounded-lg border ${
+                            recommendation.level === 'high' ? 'bg-myslt-danger/20 border-myslt-danger/30' :
+                            recommendation.level === 'medium' ? 'bg-myslt-warning/20 border-myslt-warning/30' :
+                            'bg-myslt-info/20 border-myslt-info/30'
                           }`}>
                             <div className="flex items-start">
                               <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 mt-0.5 ${
-                                recommendation.level === 'high' ? 'bg-red-100' :
-                                recommendation.level === 'medium' ? 'bg-yellow-100' :
-                                'bg-blue-100'
+                                recommendation.level === 'high' ? 'bg-myslt-danger/30' :
+                                recommendation.level === 'medium' ? 'bg-myslt-warning/30' :
+                                'bg-myslt-info/30'
                               }`}>
-                                {recommendation.level === 'high' ? '⚠️' :
-                                 recommendation.level === 'medium' ? '⏰' : 'ℹ️'}
+                                {recommendation.level === 'high' ? <AlertTriangle className="w-3 h-3 text-myslt-danger" /> :
+                                 recommendation.level === 'medium' ? <Clock className="w-3 h-3 text-myslt-warning" /> : 
+                                 <Info className="w-3 h-3 text-myslt-info" />}
                               </div>
                               <div>
                                 <p className={`text-sm font-medium ${
-                                  recommendation.level === 'high' ? 'text-red-800' :
-                                  recommendation.level === 'medium' ? 'text-yellow-800' :
-                                  'text-blue-800'
+                                  recommendation.level === 'high' ? 'text-myslt-danger' :
+                                  recommendation.level === 'medium' ? 'text-myslt-warning' :
+                                  'text-myslt-info'
                                 }`}>
                                   Automation Recommendation
                                 </p>
                                 <p className={`text-sm ${
-                                  recommendation.level === 'high' ? 'text-red-700' :
-                                  recommendation.level === 'medium' ? 'text-yellow-700' :
-                                  'text-blue-700'
+                                  recommendation.level === 'high' ? 'text-myslt-danger' :
+                                  recommendation.level === 'medium' ? 'text-myslt-warning' :
+                                  'text-myslt-info'
                                 }`}>
                                   {recommendation.message}
                                 </p>
@@ -265,11 +268,11 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                       <button
                         onClick={() => handleAutoProcess(request.id)}
                         disabled={isProcessing}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        className={`myslt-btn-primary px-4 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
                           recommendation?.level === 'high' 
-                            ? 'bg-red-600 hover:bg-red-700 text-white' 
-                            : 'bg-blue-600 hover:bg-blue-700 text-white'
-                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            ? 'bg-myslt-danger hover:bg-myslt-danger/90 text-white border-myslt-danger' 
+                            : ''
+                        }`}
                       >
                         {isProcessing ? (
                           <div className="flex items-center">
@@ -285,19 +288,19 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                   
                   {/* Processing Result */}
                   {processingResults[request.id] && (
-                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <h6 className="font-medium text-green-800 mb-2">Processing Completed</h6>
-                      <div className="text-sm text-green-700 space-y-1">
+                    <div className="mt-4 p-4 bg-myslt-success/20 border border-myslt-success/30 rounded-lg">
+                      <h6 className="font-medium text-myslt-success mb-2">Processing Completed</h6>
+                      <div className="text-sm text-myslt-success space-y-1">
                         {processingResults[request.id].dataExported && (
-                          <p>✅ Data exported successfully</p>
+                          <p className="flex items-center"><CheckCircle className="myslt-icon mr-1 text-green-500" /> Data exported successfully</p>
                         )}
                         {processingResults[request.id].dataDeleted && (
-                          <p>✅ Data deleted and anonymized</p>
+                          <p className="flex items-center"><CheckCircle className="myslt-icon mr-1 text-green-500" /> Data deleted and anonymized</p>
                         )}
                         {processingResults[request.id].exportSize && (
-                          <p>📊 Export size: {Math.round(processingResults[request.id].exportSize / 1024)} KB</p>
+                          <p className="flex items-center"><BarChart className="myslt-icon mr-1" /> Export size: {Math.round(processingResults[request.id].exportSize / 1024)} KB</p>
                         )}
-                        <p>⏰ Processed at: {new Date(processingResults[request.id].processingTime).toLocaleString()}</p>
+                        <p className="flex items-center"><Clock className="myslt-icon mr-1" /> Processed at: {new Date(processingResults[request.id].processingTime).toLocaleString()}</p>
                       </div>
                     </div>
                   )}
@@ -310,28 +313,28 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
 
       {/* Recently Completed Requests */}
       {completedRequests.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h4 className="text-lg font-semibold text-gray-900">Recently Auto-Processed Requests</h4>
-            <p className="text-gray-600 mt-1">Successfully automated DSAR completions</p>
+        <div className="myslt-card overflow-hidden">
+          <div className="px-4 sm:px-6 py-4 border-b border-myslt-border">
+            <h4 className="text-lg font-semibold text-myslt-text-primary">Recently Auto-Processed Requests</h4>
+            <p className="text-myslt-text-secondary text-sm mt-1">Successfully automated DSAR completions</p>
           </div>
           
-          <div className="divide-y divide-gray-200 max-h-64 overflow-y-auto">
+          <div className="divide-y divide-myslt-border max-h-64 overflow-y-auto">
             {completedRequests.slice(0, 5).map(request => (
               <div key={request.id} className="p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="text-xl">{getRequestTypeIcon(request.requestType)}</div>
+                  <div className="text-lg sm:text-xl">{renderRequestTypeIcon(request.requestType)}</div>
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-myslt-text-primary">
                       {request.requestType.charAt(0).toUpperCase() + request.requestType.slice(1)} Request
                     </p>
-                    <p className="text-sm text-gray-600">{request.requesterName}</p>
+                    <p className="text-sm text-myslt-text-secondary">{request.requesterName}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   {getStatusBadge(request.status)}
                   {request.completedAt && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-myslt-text-muted mt-1">
                       {new Date(request.completedAt).toLocaleDateString()}
                     </p>
                   )}

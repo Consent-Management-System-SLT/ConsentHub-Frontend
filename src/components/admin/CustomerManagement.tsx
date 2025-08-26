@@ -189,10 +189,10 @@ const CustomerManagement: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg p-4 border border-myslt-accent/20 shadow-sm">
+        <div className="myslt-card p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Users className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-myslt-accent/20 rounded-lg">
+              <Users className="w-5 h-5 text-myslt-accent" />
             </div>
             <div>
               <p className="text-sm text-myslt-text-secondary">Total Customers</p>
@@ -201,10 +201,10 @@ const CustomerManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-4 border border-myslt-accent/20 shadow-sm">
+        <div className="myslt-card p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <UserPlus className="w-5 h-5 text-green-600" />
+            <div className="p-2 bg-myslt-success/20 rounded-lg">
+              <UserPlus className="w-5 h-5 text-myslt-success" />
             </div>
             <div>
               <p className="text-sm text-myslt-text-secondary">Active Customers</p>
@@ -215,10 +215,10 @@ const CustomerManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-4 border border-myslt-accent/20 shadow-sm">
+        <div className="myslt-card p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Shield className="w-5 h-5 text-purple-600" />
+            <div className="p-2 bg-myslt-info/20 rounded-lg">
+              <Shield className="w-5 h-5 text-myslt-info" />
             </div>
             <div>
               <p className="text-sm text-myslt-text-secondary">Avg Consents</p>
@@ -229,10 +229,10 @@ const CustomerManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-4 border border-myslt-accent/20 shadow-sm">
+        <div className="myslt-card p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <Calendar className="w-5 h-5 text-orange-600" />
+            <div className="p-2 bg-myslt-warning/20 rounded-lg">
+              <Calendar className="w-5 h-5 text-myslt-warning" />
             </div>
             <div>
               <p className="text-sm text-myslt-text-secondary">New This Month</p>
@@ -279,7 +279,7 @@ const CustomerManagement: React.FC = () => {
       )}
 
       {/* Customer Table */}
-      <div className="bg-white rounded-lg border border-myslt-accent/20 shadow-sm overflow-hidden">
+      <div className="myslt-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-myslt-accent/5">
@@ -361,13 +361,13 @@ const CustomerManagement: React.FC = () => {
 
       {/* Customer Details Modal */}
       {showCustomerDetails && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="myslt-card p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-myslt-text-primary">Customer Details</h2>
               <button
                 onClick={() => setShowCustomerDetails(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-myslt-muted/10 rounded-lg transition-colors text-myslt-text-muted hover:text-myslt-text-secondary"
               >
                 <X className="w-5 h-5" />
               </button>

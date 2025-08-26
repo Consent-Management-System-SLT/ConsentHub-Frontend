@@ -73,7 +73,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      console.log('🔄 Loading comprehensive CSR dashboard data...');
+      console.log('[CSR] Loading comprehensive CSR dashboard data...');
       
       // Use the new CSR dashboard service with comprehensive fallbacks
       const dashboardData = await csrDashboardService.getComprehensiveDashboardData();

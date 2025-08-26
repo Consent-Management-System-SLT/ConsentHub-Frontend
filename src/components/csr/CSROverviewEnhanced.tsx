@@ -139,12 +139,12 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
   const loadDetailedStats = async () => {
     try {
       setLoading(true);
-      console.log('🔄 Loading detailed CSR dashboard stats...');
+      console.log('[CSR] Loading detailed CSR dashboard stats...');
       
       // Load comprehensive dashboard data
       const dashboardData = await csrDashboardService.getComprehensiveDashboardData();
       
-      console.log('📊 Dashboard data loaded:', {
+      console.log('[CSR] Dashboard data loaded:', {
         statsKeys: Object.keys(dashboardData.stats),
         customersCount: dashboardData.customers?.length,
         consentsCount: dashboardData.consents?.length,
@@ -191,13 +191,13 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       
       // Show data status
       if (dashboardData.offlineMode) {
-        console.log('⚠️ Running in offline mode with fallback data');
+        console.log('[CSR] Running in offline mode with fallback data');
       } else {
-        console.log('✅ Using real data from backend APIs');
+        console.log('[CSR] Using real data from backend APIs');
       }
       
     } catch (error) {
-      console.error('❌ Error loading CSR dashboard data:', error);
+      console.error('[CSR] Error loading CSR dashboard data:', error);
       
       // Load fallback stats if there's an error
       setStats({

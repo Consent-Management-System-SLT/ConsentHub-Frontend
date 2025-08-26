@@ -37,10 +37,10 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
 
   return (
     <>
-      {/* Mobile overlay */}
+      {/* Mobile overlay - solid background */}
       {isOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity duration-300"
+          className="lg:hidden fixed inset-0 bg-myslt-background z-30 transition-opacity duration-300"
           onClick={onToggle}
         />
       )}
@@ -70,7 +70,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center justify-center w-full">
                 <img 
-                  src="/SLTMobitel_Logo.svg.png" 
+                  src="/Logo-SLT.png" 
                   alt="SLT Mobitel" 
                   className="h-10 w-auto"
                 />

@@ -415,13 +415,13 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
+        return <CheckCircle className="w-4 h-4 text-myslt-success" />;
       case 'withdrawn':
-        return <XCircle className="w-4 h-4 text-red-600" />;
+        return <XCircle className="w-4 h-4 text-myslt-danger" />;
       case 'expired':
-        return <AlertCircle className="w-4 h-4 text-yellow-600" />;
+        return <AlertCircle className="w-4 h-4 text-myslt-warning" />;
       case 'pending':
-        return <AlertCircle className="w-4 h-4 text-blue-600" />;
+        return <AlertCircle className="w-4 h-4 text-myslt-accent" />;
       default:
         return <AlertCircle className="w-4 h-4 text-myslt-text-secondary" />;
     }
@@ -430,30 +430,30 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-myslt-success/20 text-myslt-success';
       case 'withdrawn':
-        return 'bg-red-100 text-red-800';
+        return 'bg-myslt-danger/20 text-myslt-danger';
       case 'expired':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-myslt-warning/20 text-myslt-warning';
       case 'pending':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-myslt-accent/20 text-myslt-accent';
       default:
-        return 'bg-myslt-service-card text-gray-800';
+        return 'bg-myslt-card text-myslt-text-secondary';
     }
   };
 
   const getConsentTypeColor = (type: string) => {
     switch (type) {
       case 'marketing':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-myslt-info/20 text-myslt-info';
       case 'analytics':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-myslt-accent/20 text-myslt-accent';
       case 'functional':
-        return 'bg-green-100 text-green-800';
+        return 'bg-myslt-success/20 text-myslt-success';
       case 'necessary':
-        return 'bg-myslt-service-card text-gray-800';
+        return 'bg-myslt-card text-myslt-text-secondary';
       default:
-        return 'bg-myslt-service-card text-gray-800';
+        return 'bg-myslt-card text-myslt-text-secondary';
     }
   };
 
@@ -502,7 +502,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
 
       {/* Error State */}
       {consentsError && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-myslt-danger/20 border border-myslt-danger/30 text-myslt-text-primary px-4 py-3 rounded mb-4">
           <p>Error loading consents: {consentsError}</p>
         </div>
       )}
@@ -519,36 +519,36 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
         <div className="flex items-center space-x-3">
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            className="myslt-btn-primary px-4 py-2 flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
             <span className="text-sm font-medium">Create New Consent</span>
           </button>
           <button 
             onClick={handleExportData}
-            className="px-4 py-2 bg-myslt-card-solid border border-gray-300 rounded-lg hover:bg-myslt-service-card transition-colors flex items-center space-x-2"
+            className="myslt-btn-secondary px-4 py-2 flex items-center space-x-2"
           >
-            <Download className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Export</span>
+            <Download className="w-4 h-4" />
+            <span className="text-sm font-medium">Export</span>
           </button>
           {selectedConsents.size > 0 && (
             <div className="flex items-center space-x-2">
               <span className="text-sm text-myslt-text-secondary">{selectedConsents.size} selected</span>
               <button 
                 onClick={() => handleBulkAction('export')}
-                className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                className="myslt-btn-primary px-3 py-2 text-sm"
               >
                 Export Selected
               </button>
               <button 
                 onClick={() => handleBulkAction('delete')}
-                className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                className="px-3 py-2 bg-myslt-danger text-white rounded-lg hover:bg-myslt-danger/80 transition-colors text-sm"
               >
                 Delete Selected
               </button>
             </div>
           )}
-          <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2">
+          <button className="px-4 py-2 bg-myslt-danger text-white rounded-lg hover:bg-myslt-danger/80 transition-colors flex items-center space-x-2">
             <RefreshCw className="w-4 h-4" />
             <span className="text-sm font-medium">Refresh</span>
           </button>
@@ -557,44 +557,44 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
+        <div className="myslt-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-myslt-text-secondary">Active Consents</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-2xl font-bold text-myslt-success">
                 {consents.filter(c => c.status === 'active').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-myslt-success/20 rounded-xl flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-myslt-success" />
             </div>
           </div>
         </div>
         
-        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
+        <div className="myslt-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-myslt-text-secondary">Withdrawn</p>
-              <p className="text-2xl font-bold text-red-600">
+              <p className="text-2xl font-bold text-myslt-danger">
                 {consents.filter(c => c.status === 'withdrawn').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-              <XCircle className="w-6 h-6 text-red-600" />
+            <div className="w-12 h-12 bg-myslt-danger/20 rounded-xl flex items-center justify-center">
+              <XCircle className="w-6 h-6 text-myslt-danger" />
             </div>
           </div>
         </div>
         
-        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
+        <div className="myslt-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-myslt-text-secondary">Expired</p>
-              <p className="text-2xl font-bold text-yellow-600">
+              <p className="text-2xl font-bold text-myslt-warning">
                 {consents.filter(c => c.status === 'expired').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-              <AlertCircle className="w-6 h-6 text-yellow-600" />
+            <div className="w-12 h-12 bg-myslt-warning/20 rounded-xl flex items-center justify-center">
+              <AlertCircle className="w-6 h-6 text-myslt-warning" />
             </div>
           </div>
         </div>

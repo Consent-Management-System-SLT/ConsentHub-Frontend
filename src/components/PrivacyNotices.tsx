@@ -727,24 +727,24 @@ export const PrivacyNotices: React.FC = () => {
               </div>
             </div>
 
-            <h3 className="text-lg font-medium text-gray-900 mb-2 line-clamp-2">
+            <h3 className="text-lg font-medium text-myslt-text-primary mb-2 line-clamp-2">
               {notice.title}
             </h3>
 
-            <div className="space-y-2 mb-4 text-sm text-gray-600">
+            <div className="space-y-2 mb-4 text-sm text-myslt-text-secondary">
               <div className="flex items-center space-x-2">
-                <FileText className="h-4 w-4 text-gray-400" />
+                <FileText className="h-4 w-4 text-myslt-text-muted" />
                 <span>{notice.category}</span>
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded">{notice.language}</span>
+                <span className="text-xs bg-myslt-accent/20 text-myslt-text-primary px-2 py-1 rounded">{notice.language}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4 text-gray-400" />
+                <Calendar className="h-4 w-4 text-myslt-text-muted" />
                 <span>
                   Effective: {new Date(notice.effectiveDate).toLocaleDateString()}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4 text-gray-400" />
+                <Users className="h-4 w-4 text-myslt-text-muted" />
                 <span>{notice.acknowledgments.length} acknowledgments</span>
               </div>
             </div>

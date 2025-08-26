@@ -148,23 +148,23 @@ const ComplianceRulesManager = () => {
     }
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = (priority: any) => {
     switch (priority) {
-      case 'critical': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'low': return 'text-green-600 bg-green-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'critical': return 'text-myslt-danger bg-myslt-danger/20 border border-myslt-danger/30';
+      case 'high': return 'text-myslt-warning bg-myslt-warning/20 border border-myslt-warning/30';
+      case 'medium': return 'text-myslt-info bg-myslt-info/20 border border-myslt-info/30';
+      case 'low': return 'text-myslt-success bg-myslt-success/20 border border-myslt-success/30';
+      default: return 'text-myslt-text-muted bg-myslt-muted/20 border border-myslt-muted/30';
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: any) => {
     switch (status) {
-      case 'active': return 'text-green-600 bg-green-100';
-      case 'inactive': return 'text-red-600 bg-red-100';
-      case 'draft': return 'text-gray-600 bg-gray-100';
-      case 'pending_review': return 'text-yellow-600 bg-yellow-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'active': return 'text-myslt-success bg-myslt-success/20 border border-myslt-success/30';
+      case 'inactive': return 'text-myslt-danger bg-myslt-danger/20 border border-myslt-danger/30';
+      case 'draft': return 'text-myslt-text-muted bg-myslt-muted/20 border border-myslt-muted/30';
+      case 'pending_review': return 'text-myslt-warning bg-myslt-warning/20 border border-myslt-warning/30';
+      default: return 'text-myslt-text-muted bg-myslt-muted/20 border border-myslt-muted/30';
     }
   };
 
@@ -172,20 +172,20 @@ const ComplianceRulesManager = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Compliance Rules Management</h1>
-          <p className="text-gray-600 mt-2">Configure and manage automated compliance rules</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">Compliance Rules Management</h1>
+          <p className="text-myslt-text-secondary mt-2">Configure and manage automated compliance rules</p>
         </div>
         <div className="flex items-center space-x-3">
           <button
             onClick={fetchRules}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            className="myslt-btn-secondary px-4 py-2 flex items-center space-x-2"
           >
             <RefreshCw className="w-4 h-4" />
             <span className="text-sm font-medium">Refresh</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+            className="myslt-btn-primary px-4 py-2 flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
             <span className="text-sm font-medium">Add Rule</span>
@@ -194,7 +194,7 @@ const ComplianceRulesManager = () => {
       </div>
 
       {success && (
-        <div className="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
+        <div className="mb-6 bg-myslt-success/20 border border-myslt-success/30 text-myslt-success px-4 py-3 rounded-lg">
           <div className="flex items-center">
             <CheckCircle className="w-5 h-5 mr-2" />
             {success}
@@ -203,7 +203,7 @@ const ComplianceRulesManager = () => {
       )}
 
       {error && (
-        <div className="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+        <div className="mb-6 bg-myslt-danger/20 border border-myslt-danger/30 text-myslt-danger px-4 py-3 rounded-lg">
           <div className="flex items-center">
             <AlertTriangle className="w-5 h-5 mr-2" />
             {error}
@@ -213,27 +213,27 @@ const ComplianceRulesManager = () => {
 
       {loading ? (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-myslt-accent"></div>
         </div>
       ) : rules.length === 0 ? (
         <div className="text-center py-12">
-          <AlertTriangle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <p className="text-gray-600 text-lg">No compliance rules found</p>
+          <AlertTriangle className="mx-auto h-12 w-12 text-myslt-text-muted mb-4" />
+          <p className="text-myslt-text-secondary text-lg">No compliance rules found</p>
           <button
             onClick={() => setShowAddModal(true)}
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            className="myslt-btn-primary mt-4 px-4 py-2"
           >
             Create your first rule
           </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rules.map((rule) => (
-            <div key={rule._id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          {rules.map((rule: any) => (
+            <div key={rule._id} className="myslt-card p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    <Shield className="w-5 h-5 text-blue-600" />
+                  <div className="p-2 bg-myslt-muted/10 rounded-lg">
+                    <Shield className="w-5 h-5 text-myslt-accent" />
                   </div>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(rule.status)}`}>
                     {rule.status.replace('_', ' ')}
@@ -244,35 +244,35 @@ const ComplianceRulesManager = () => {
                 </span>
               </div>
               
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{rule.name}</h3>
-              <p className="text-sm text-gray-600 mb-4">{rule.description}</p>
+              <h3 className="text-lg font-semibold text-myslt-text-primary mb-2">{rule.name}</h3>
+              <p className="text-sm text-myslt-text-secondary mb-4">{rule.description}</p>
               
               <div className="space-y-3 mb-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Type:</span>
-                  <span className="font-medium text-gray-900">{rule.ruleType}</span>
+                  <span className="text-myslt-text-muted">Type:</span>
+                  <span className="font-medium text-myslt-text-primary">{rule.ruleType}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Success Rate:</span>
-                  <span className="font-medium text-green-600">{rule.metrics?.success_rate || 0}%</span>
+                  <span className="text-myslt-text-muted">Success Rate:</span>
+                  <span className="font-medium text-myslt-success">{rule.metrics?.success_rate || 0}%</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">Executions:</span>
-                  <span className="font-medium text-gray-900">{rule.metrics?.enforcement_count || 0}</span>
+                  <span className="text-myslt-text-muted">Executions:</span>
+                  <span className="font-medium text-myslt-text-primary">{rule.metrics?.enforcement_count || 0}</span>
                 </div>
               </div>
 
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => { setSelectedRule(rule); setShowDetailsModal(true); }}
-                  className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 text-sm"
+                  className="flex-1 myslt-btn-primary px-3 py-2 flex items-center justify-center space-x-2 text-sm"
                 >
                   <Eye className="w-4 h-4" />
                   <span>Details</span>
                 </button>
                 <button
                   onClick={() => { setSelectedRule(rule); setShowEditModal(true); }}
-                  className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
+                  className="p-2 text-myslt-accent hover:text-myslt-accent-hover hover:bg-myslt-accent/10 rounded-lg transition-colors"
                 >
                   <Settings className="w-4 h-4" />
                 </button>

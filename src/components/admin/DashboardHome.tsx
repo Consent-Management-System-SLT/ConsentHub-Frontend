@@ -151,8 +151,8 @@ const DashboardHome: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="flex items-center space-x-3">
-          <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
-          <span className="text-lg text-gray-600">Loading dashboard data...</span>
+          <RefreshCw className="w-6 h-6 animate-spin text-myslt-accent" />
+          <span className="text-lg text-myslt-text-secondary">Loading dashboard data...</span>
         </div>
       </div>
     );
@@ -161,15 +161,15 @@ const DashboardHome: React.FC = () => {
   if (error) {
     return (
       <div className="p-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <div className="bg-myslt-danger/20 border border-myslt-danger/30 rounded-lg p-6">
           <div className="flex items-center space-x-3">
-            <AlertTriangle className="w-6 h-6 text-red-500" />
+            <AlertTriangle className="w-6 h-6 text-myslt-danger" />
             <div>
-              <h3 className="text-lg font-semibold text-red-800">Dashboard Error</h3>
-              <p className="text-red-600 mt-1">{error}</p>
+              <h3 className="text-lg font-semibold text-myslt-text-primary">Dashboard Error</h3>
+              <p className="text-myslt-text-secondary mt-1">{error}</p>
               <button 
                 onClick={fetchDashboardData}
-                className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="myslt-btn-primary mt-3 px-4 py-2"
               >
                 Try Again
               </button>
@@ -183,8 +183,8 @@ const DashboardHome: React.FC = () => {
   if (!dashboardData) {
     return (
       <div className="p-4 sm:p-8">
-        <div className="text-center text-gray-500">
-          <Database className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+        <div className="text-center text-myslt-text-muted">
+          <Database className="w-12 h-12 mx-auto mb-4 text-myslt-text-muted" />
           <p>No dashboard data available</p>
         </div>
       </div>
@@ -196,26 +196,26 @@ const DashboardHome: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl font-bold text-myslt-text-primary truncate">Admin Dashboard</h1>
+          <p className="text-myslt-text-secondary mt-1 text-sm sm:text-base">
             Real-time system overview and compliance monitoring
           </p>
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 shrink-0">
-          <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
+          <div className="text-xs sm:text-sm text-myslt-text-muted text-center sm:text-left">
             Last updated: {lastUpdated}
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button 
               onClick={fetchDashboardData}
-              className="flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+              className="myslt-btn-primary flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 text-sm sm:text-base"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Refresh</span>
             </button>
             <button 
               onClick={testNotification}
-              className="flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
+              className="myslt-btn-secondary flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 text-sm sm:text-base"
             >
               <Bell className="w-4 h-4" />
               <span>Test</span>
@@ -226,108 +226,108 @@ const DashboardHome: React.FC = () => {
 
       {/* System Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-gray-200">
+        <div className="myslt-card p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Total Consents</p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardData.systemOverview.totalConsents}</p>
+              <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Total Consents</p>
+              <p className="text-xl sm:text-2xl font-bold text-myslt-text-primary">{dashboardData.systemOverview.totalConsents}</p>
             </div>
-            <Shield className="w-6 sm:w-8 h-6 sm:h-8 text-blue-600 shrink-0" />
+            <Shield className="w-6 sm:w-8 h-6 sm:h-8 text-myslt-accent shrink-0" />
           </div>
           <div className="mt-3 sm:mt-4 text-xs sm:text-sm">
-            <span className="text-green-600 font-medium">
+            <span className="text-myslt-success font-medium">
               {dashboardData.systemOverview.grantedConsents} granted
             </span>
-            <span className="text-gray-500 mx-2">|</span>
-            <span className="text-red-600 font-medium">
+            <span className="text-myslt-text-muted mx-2">|</span>
+            <span className="text-myslt-danger font-medium">
               {dashboardData.systemOverview.revokedConsents} revoked
             </span>
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-gray-200">
+        <div className="myslt-card p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Total Users</p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardData.systemOverview.totalUsers}</p>
+              <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Total Users</p>
+              <p className="text-xl sm:text-2xl font-bold text-myslt-text-primary">{dashboardData.systemOverview.totalUsers}</p>
             </div>
-            <Users className="w-6 sm:w-8 h-6 sm:h-8 text-green-600 shrink-0" />
+            <Users className="w-6 sm:w-8 h-6 sm:h-8 text-myslt-success shrink-0" />
           </div>
-          <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-600">
+          <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-myslt-text-secondary">
             Active system users
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-gray-200">
+        <div className="myslt-card p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">DSAR Requests</p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardData.systemOverview.totalDSAR}</p>
+              <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">DSAR Requests</p>
+              <p className="text-xl sm:text-2xl font-bold text-myslt-text-primary">{dashboardData.systemOverview.totalDSAR}</p>
             </div>
-            <FileText className="w-6 sm:w-8 h-6 sm:h-8 text-purple-600 shrink-0" />
+            <FileText className="w-6 sm:w-8 h-6 sm:h-8 text-myslt-info shrink-0" />
           </div>
           <div className="mt-3 sm:mt-4 text-xs sm:text-sm">
-            <span className="text-yellow-600 font-medium">
+            <span className="text-myslt-warning font-medium">
               {dashboardData.systemOverview.pendingDSAR} pending
             </span>
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-gray-200">
+        <div className="myslt-card p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Preferences</p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardData.systemOverview.totalPreferences}</p>
+              <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Preferences</p>
+              <p className="text-xl sm:text-2xl font-bold text-myslt-text-primary">{dashboardData.systemOverview.totalPreferences}</p>
             </div>
-            <BarChart3 className="w-6 sm:w-8 h-6 sm:h-8 text-indigo-600 shrink-0" />
+            <BarChart3 className="w-6 sm:w-8 h-6 sm:h-8 text-myslt-accent shrink-0" />
           </div>
-          <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-600">
+          <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-myslt-text-secondary">
             User preference profiles
           </div>
         </div>
       </div>
 
       {/* Compliance Metrics */}
-      <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-gray-200">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center space-x-2">
+      <div className="myslt-card p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-myslt-text-primary mb-3 sm:mb-4 flex items-center space-x-2">
           <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5" />
           <span>Compliance Metrics</span>
         </h2>
         
         <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-green-600">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-success">
               {dashboardData.complianceMetrics.complianceScore}%
             </div>
-            <div className="text-xs sm:text-sm text-gray-600 mt-1">Compliance Score</div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary mt-1">Compliance Score</div>
           </div>
           
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-blue-600">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-accent">
               {dashboardData.complianceMetrics.consentGrantRate}%
             </div>
-            <div className="text-xs sm:text-sm text-gray-600 mt-1">Consent Grant Rate</div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary mt-1">Consent Grant Rate</div>
           </div>
           
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-purple-600">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-info">
               {dashboardData.complianceMetrics.averageResponseTime}ms
             </div>
-            <div className="text-xs sm:text-sm text-gray-600 mt-1">Avg Response Time</div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary mt-1">Avg Response Time</div>
           </div>
           
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-yellow-600">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-warning">
               {dashboardData.complianceMetrics.overdueItems}
             </div>
-            <div className="text-xs sm:text-sm text-gray-600 mt-1">Overdue Items</div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary mt-1">Overdue Items</div>
           </div>
           
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-red-600">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-danger">
               {dashboardData.complianceMetrics.upcomingDeadlines}
             </div>
-            <div className="text-xs sm:text-sm text-gray-600 mt-1">Upcoming Deadlines</div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary mt-1">Upcoming Deadlines</div>
           </div>
         </div>
       </div>
@@ -335,47 +335,47 @@ const DashboardHome: React.FC = () => {
       {/* System Health and Recent Activity */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         {/* System Health */}
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-gray-200">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center space-x-2">
+        <div className="myslt-card p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-myslt-text-primary mb-3 sm:mb-4 flex items-center space-x-2">
             <Server className="w-4 sm:w-5 h-4 sm:h-5" />
             <span>System Health</span>
           </h2>
           
           <div className="space-y-3 sm:space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 text-sm sm:text-base">Database</span>
+              <span className="text-myslt-text-secondary text-sm sm:text-base">Database</span>
               <div className="flex items-center space-x-2">
                 {dashboardData.systemHealth.databaseConnected ? (
                   <>
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-green-600 text-xs sm:text-sm font-medium">Connected</span>
+                    <CheckCircle className="w-4 h-4 text-myslt-success" />
+                    <span className="text-myslt-success text-xs sm:text-sm font-medium">Connected</span>
                   </>
                 ) : (
                   <>
-                    <AlertTriangle className="w-4 h-4 text-red-600" />
-                    <span className="text-red-600 text-xs sm:text-sm font-medium">Disconnected</span>
+                    <AlertTriangle className="w-4 h-4 text-myslt-danger" />
+                    <span className="text-myslt-danger text-xs sm:text-sm font-medium">Disconnected</span>
                   </>
                 )}
               </div>
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 text-sm sm:text-base">System Uptime</span>
-              <span className="text-gray-900 font-medium text-sm sm:text-base">
+              <span className="text-myslt-text-secondary text-sm sm:text-base">System Uptime</span>
+              <span className="text-myslt-text-primary font-medium text-sm sm:text-base">
                 {formatUptime(dashboardData.systemHealth.systemUptime)}
               </span>
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 text-sm sm:text-base">Services Online</span>
-              <span className="text-green-600 font-medium text-sm sm:text-base">
+              <span className="text-myslt-text-secondary text-sm sm:text-base">Services Online</span>
+              <span className="text-myslt-success font-medium text-sm sm:text-base">
                 {dashboardData.systemHealth.servicesOnline.length}/4
               </span>
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 text-sm sm:text-base">Last Backup</span>
-              <span className="text-gray-900 font-medium text-xs sm:text-sm">
+              <span className="text-myslt-text-secondary text-sm sm:text-base">Last Backup</span>
+              <span className="text-myslt-text-primary font-medium text-xs sm:text-sm">
                 {formatDate(dashboardData.systemHealth.lastBackup)}
               </span>
             </div>
@@ -383,27 +383,27 @@ const DashboardHome: React.FC = () => {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-gray-200">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center space-x-2">
+        <div className="myslt-card p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-myslt-text-primary mb-3 sm:mb-4 flex items-center space-x-2">
             <Activity className="w-4 sm:w-5 h-4 sm:h-5" />
             <span>Recent Activity</span>
           </h2>
           
           <div className="space-y-2 sm:space-y-3 max-h-64 overflow-y-auto">
             {dashboardData.recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-center space-x-2 sm:space-x-3 p-2 hover:bg-gray-50 rounded">
+              <div key={activity.id} className="flex items-center space-x-2 sm:space-x-3 p-2 hover:bg-myslt-muted/10 rounded">
                 <div className="flex-shrink-0">
                   {activity.action === 'granted' ? (
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <CheckCircle className="w-4 h-4 text-myslt-success" />
                   ) : activity.action === 'revoked' ? (
-                    <AlertTriangle className="w-4 h-4 text-red-600" />
+                    <AlertTriangle className="w-4 h-4 text-myslt-danger" />
                   ) : (
-                    <Clock className="w-4 h-4 text-gray-600" />
+                    <Clock className="w-4 h-4 text-myslt-text-muted" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm text-gray-900 truncate">{activity.description}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs sm:text-sm text-myslt-text-primary truncate">{activity.description}</p>
+                  <p className="text-xs text-myslt-text-muted">
                     {formatDate(activity.timestamp)} • <span className="truncate max-w-[100px] sm:max-w-none inline-block">{activity.partyId}</span>
                   </p>
                 </div>
@@ -414,16 +414,16 @@ const DashboardHome: React.FC = () => {
       </div>
 
       {/* Time Period Selector */}
-      <div className="bg-white p-3 sm:p-4 rounded-lg shadow border border-gray-200">
+      <div className="myslt-card p-3 sm:p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center space-x-2">
-            <Calendar className="w-4 sm:w-5 h-4 sm:h-5 text-gray-600" />
-            <span className="text-gray-700 font-medium text-sm sm:text-base">Data Period:</span>
+            <Calendar className="w-4 sm:w-5 h-4 sm:h-5 text-myslt-text-muted" />
+            <span className="text-myslt-text-primary font-medium text-sm sm:text-base">Data Period:</span>
           </div>
           <select 
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base min-w-0"
+            className="myslt-input px-3 py-2 text-sm sm:text-base min-w-0"
           >
             <option value="1d">Last 24 hours</option>
             <option value="7d">Last 7 days</option>

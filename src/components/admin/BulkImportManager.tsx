@@ -322,21 +322,21 @@ CSR User,csr@example.com,+1987654321,csr,true`
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Bulk Import</h1>
-          <p className="text-gray-600 mt-2">Import customer data and consents in bulk</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">Bulk Import</h1>
+          <p className="text-myslt-text-secondary mt-2">Import customer data and consents in bulk</p>
         </div>
         <div className="flex items-center space-x-3">
           <button 
             onClick={handleDownloadTemplate}
             className="px-4 py-2 bg-myslt-card-solid border border-myslt-border rounded-lg hover:bg-myslt-service-card transition-colors flex items-center space-x-2"
           >
-            <Download className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Download Template</span>
+            <Download className="w-4 h-4 text-myslt-text-muted" />
+            <span className="text-sm font-medium text-myslt-text-secondary">Download Template</span>
           </button>
           <button 
             onClick={handleRefresh}
             disabled={refreshing}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
+            className="px-4 py-2 bg-myslt-danger text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
             <span className="text-sm font-medium">Refresh</span>
@@ -499,16 +499,16 @@ CSR User,csr@example.com,+1987654321,csr,true`
             <>
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {importHistory.length > 0 ? importHistory.map((item) => (
-                  <div key={item._id} className="border border-gray-200 rounded-lg p-4">
+                  <div key={item._id} className="border border-myslt-accent/20 rounded-lg p-4 bg-myslt-card">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center space-x-3">
                         {getStatusIcon(item.status)}
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{item.fileName}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-sm font-medium text-myslt-text-primary">{item.fileName}</p>
+                          <p className="text-xs text-myslt-text-muted">
                             {new Date(item.createdAt).toLocaleDateString()} at {new Date(item.createdAt).toLocaleTimeString()}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-myslt-text-muted">
                             Type: {item.importType} • Size: {formatFileSize(item.fileSize)}
                           </p>
                         </div>
@@ -520,20 +520,20 @@ CSR User,csr@example.com,+1987654321,csr,true`
                     
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-gray-500">Total Records</p>
-                        <p className="font-medium">{(item.totalCount || 0).toLocaleString()}</p>
+                        <p className="text-myslt-text-muted">Total Records</p>
+                        <p className="font-medium text-myslt-text-primary">{(item.totalCount || 0).toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Processed</p>
-                        <p className="font-medium">{(item.processedCount || 0).toLocaleString()}</p>
+                        <p className="text-myslt-text-muted">Processed</p>
+                        <p className="font-medium text-myslt-text-primary">{(item.processedCount || 0).toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Successful</p>
-                        <p className="font-medium text-green-600">{(item.successfulCount || 0).toLocaleString()}</p>
+                        <p className="text-myslt-text-muted">Successful</p>
+                        <p className="font-medium text-myslt-success">{(item.successfulCount || 0).toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Errors</p>
-                        <p className="font-medium text-red-600">{(item.failedCount || 0).toLocaleString()}</p>
+                        <p className="text-myslt-text-muted">Errors</p>
+                        <p className="font-medium text-myslt-danger">{(item.failedCount || 0).toLocaleString()}</p>
                       </div>
                     </div>
                     

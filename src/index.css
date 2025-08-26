@@ -2,7 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import consistent font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 /* SLT Mobitel Theme Styles */
+@layer base {
+  /* Global font and base styles */
+  * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  /* Typography Hierarchy */
+  h1 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold text-myslt-text-primary leading-tight;
+  }
+  
+  h2 {
+    @apply text-xl md:text-2xl lg:text-3xl font-semibold text-myslt-text-primary leading-tight;
+  }
+  
+  h3 {
+    @apply text-lg md:text-xl lg:text-2xl font-medium text-myslt-text-primary leading-tight;
+  }
+  
+  h4 {
+    @apply text-base md:text-lg font-medium text-myslt-text-secondary leading-tight;
+  }
+  
+  h5 {
+    @apply text-sm md:text-base font-medium text-myslt-text-secondary leading-tight;
+  }
+  
+  h6 {
+    @apply text-xs md:text-sm font-medium text-myslt-text-muted leading-tight;
+  }
+  
+  p {
+    @apply text-sm md:text-base text-myslt-text-secondary leading-relaxed;
+  }
+  
+  small {
+    @apply text-xs text-myslt-text-muted;
+  }
+  
+  /* Remove default margins */
+  h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+  }
+}
+
 @layer components {
   /* Card Components */
   .myslt-card {
@@ -20,6 +68,39 @@
   
   .myslt-btn-secondary {
     @apply bg-myslt-card text-myslt-text-primary px-4 py-2 rounded-lg font-medium hover:bg-myslt-accent transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-myslt-success/50;
+  }
+
+  /* Table Components */
+  .myslt-table {
+    @apply min-w-full divide-y divide-myslt-accent/30 bg-myslt-card rounded-lg overflow-hidden;
+  }
+  
+  .myslt-table-header {
+    @apply bg-myslt-card-solid border-b border-myslt-accent/40;
+  }
+  
+  .myslt-table-header-cell {
+    @apply px-6 py-4 text-left text-sm font-semibold text-myslt-text-primary uppercase tracking-wider;
+  }
+  
+  .myslt-table-body {
+    @apply bg-myslt-card divide-y divide-myslt-accent/20;
+  }
+  
+  .myslt-table-row {
+    @apply hover:bg-myslt-accent/10 transition-colors duration-150;
+  }
+  
+  .myslt-table-cell {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-myslt-text-secondary;
+  }
+  
+  .myslt-table-cell-primary {
+    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-myslt-text-primary;
+  }
+  
+  .myslt-table-cell-muted {
+    @apply px-6 py-4 whitespace-nowrap text-xs text-myslt-text-muted;
   }
 
   /* Text Components */
@@ -67,12 +148,48 @@
     @apply bg-myslt-background min-h-screen;
   }
   
+  /* Mobile-first sidebar without transparency */
   .myslt-sidebar {
-    @apply bg-myslt-card border-r border-myslt-accent/20;
+    @apply bg-myslt-card-solid border-r border-myslt-accent;
+  }
+  
+  /* Mobile sidebar overlay - solid background */
+  .myslt-sidebar-mobile {
+    background-color: #2d5aa0 !important;
+    backdrop-filter: none !important;
   }
   
   .myslt-header {
     @apply bg-myslt-primary shadow-lg border-b border-myslt-accent/20;
+  }
+  
+  /* Notification dropdown - solid background */
+  .myslt-notification-dropdown {
+    background-color: #2d5aa0 !important;
+    backdrop-filter: none !important;
+    border: 1px solid #3b82f6;
+  }
+  
+  /* Icon styles - consistent sizing and colors */
+  .myslt-icon-sm {
+    @apply w-4 h-4 text-myslt-text-secondary;
+  }
+  
+  .myslt-icon-md {
+    @apply w-5 h-5 text-myslt-text-secondary;
+  }
+  
+  .myslt-icon-lg {
+    @apply w-6 h-6 text-myslt-text-primary;
+  }
+  
+  .myslt-icon-xl {
+    @apply w-8 h-8 text-myslt-text-primary;
+  }
+  
+  /* Icon sizing utility - general icon size */
+  .myslt-icon {
+    @apply w-4 h-4 text-myslt-text-secondary;
   }
 }
 
@@ -86,16 +203,29 @@
   .bg-myslt-primary-dark { background-color: #1a365d; }
   .bg-myslt-accent { background-color: #3b82f6; }
   .bg-myslt-success { background-color: #00d084; }
+  .bg-myslt-warning { background-color: #fbbf24; }
+  .bg-myslt-danger { background-color: #f87171; }
+  .bg-myslt-info { background-color: #60a5fa; }
   
   /* Text Colors */
   .text-myslt-text-primary { color: #ffffff; }
   .text-myslt-text-secondary { color: #e2e8f0; }
   .text-myslt-text-muted { color: #94a3b8; }
   .text-myslt-text-accent { color: #60a5fa; }
+  .text-myslt-success { color: #00d084; }
+  .text-myslt-warning { color: #fbbf24; }
+  .text-myslt-danger { color: #f87171; }
+  .text-myslt-info { color: #60a5fa; }
+  .text-myslt-accent { color: #3b82f6; }
   
   /* Border Colors */
   .border-myslt-accent { border-color: #3b82f6; }
   .border-myslt-primary { border-color: #1e90ff; }
+  .border-myslt-success { border-color: #00d084; }
+  .border-myslt-warning { border-color: #fbbf24; }
+  .border-myslt-danger { border-color: #f87171; }
+  .border-myslt-info { border-color: #60a5fa; }
+  .border-myslt-border { border-color: rgba(59, 130, 246, 0.3); }
   
   /* SLT Style Card Effects */
   .myslt-card-glow {
@@ -255,4 +385,20 @@
   .mobile-gap-safe { @apply gap-2 sm:gap-4; }
   .mobile-p-safe { @apply p-2 sm:p-4; }
   .mobile-m-safe { @apply m-2 sm:m-4; }
+  
+  /* MySLT Checkbox Styles */
+  .myslt-checkbox {
+    @apply appearance-none w-4 h-4 border border-myslt-border rounded bg-myslt-card;
+    @apply checked:bg-myslt-accent checked:border-myslt-accent;
+    @apply focus:ring-2 focus:ring-myslt-accent/20 focus:outline-none;
+    @apply hover:border-myslt-accent transition-colors;
+    background-image: none;
+  }
+  
+  .myslt-checkbox:checked {
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m13.854 3.646-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 9.293l6.646-6.647a.5.5 0 0 1 .708.708z'/%3e%3c/svg%3e");
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
 }
