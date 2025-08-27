@@ -101,6 +101,106 @@ export interface AuditEvent {
   severity?: string;
 }
 
+export interface AnalyticsData {
+  overview: {
+    totalSent: number;
+    totalDelivered: number;
+    totalOpened: number;
+    totalClicked: number;
+    totalFailed: number;
+    deliveryRate: number;
+    openRate: number;
+    clickRate: number;
+  };
+  channels: {
+    [key: string]: {
+      sent: number;
+      delivered: number;
+      deliveryRate: number;
+      opened: number;
+      openRate: number;
+      clicked: number;
+      clickRate: number;
+    };
+  };
+  trends: Array<{
+    date: string;
+    sent: number;
+    delivered: number;
+    opened: number;
+    clicked: number;
+  }>;
+  topPerformers: {
+    templates: Array<{
+      id: string;
+      name: string;
+      performance: number;
+    }>;
+    campaigns: Array<{
+      id: string;
+      name: string;
+      performance: number;
+    }>;
+  };
+}
+
+export interface NotificationTemplate {
+  id: string;
+  name: string;
+  description: string;
+  type: 'promotional' | 'informational' | 'alert' | 'survey';
+  channels: string[];
+  subject: string;
+  content: string;
+  variables: string[];
+  tags: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
+  usage: {
+    timesUsed: number;
+    lastUsed?: string;
+    averagePerformance?: number;
+  };
+}
+
+export interface CampaignData {
+  id: string;
+  name: string;
+  description: string;
+  status: 'draft' | 'active' | 'paused' | 'completed';
+  startDate: string;
+  endDate?: string;
+  audienceSize: number;
+  performance: {
+    sent: number;
+    delivered: number;
+    opened: number;
+    clicked: number;
+  };
+  channels: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NotificationLog {
+  id: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  channel: string;
+  subject: string;
+  message: string;
+  messageType: string;
+  status: 'pending' | 'sent' | 'delivered' | 'failed';
+  sentAt: string;
+  deliveredAt?: string;
+  openedAt?: string;
+  clickedAt?: string;
+}
+
 class CSRDashboardService {
   private readonly baseUrl = '/api/v1';
   private readonly statsUrl = '/api/csr/stats';
@@ -1506,6 +1606,146 @@ class CSRDashboardService {
       return allConsents.filter(consent => 
         consent.customerId === customerId || consent.partyId === customerId
       );
+    }
+  }
+
+  // Notification methods
+  async getNotificationAnalytics(): Promise<{ data: AnalyticsData }> {
+    try {
+      console.log('[CSR] Fetching notification analytics...');
+      const response = await apiClient.get('/api/csr/notifications/analytics');
+      console.log('[CSR] Notification analytics loaded successfully:', response.data);
+      return { data: response.data.data || response.data as AnalyticsData };
+    } catch (error) {
+      console.warn('[CSR] Backend notification analytics unavailable, using fallback:', error);
+      
+      // Return fallback analytics data
+      return {
+        data: {
+          overview: {
+            totalSent: 0,
+            totalDelivered: 0,
+            totalOpened: 0,
+            totalClicked: 0,
+            totalFailed: 0,
+            deliveryRate: 0,
+            openRate: 0,
+            clickRate: 0
+          },
+          channels: {},
+          trends: [],
+          topPerformers: {
+            templates: [],
+            campaigns: []
+          }
+        }
+      };
+    }
+  }
+
+  async sendNotifications(data: {
+    customerIds: string[];
+    channels: string[];
+    subject: string;
+    message: string;
+    messageType: string;
+  }): Promise<any> {
+    try {
+      console.log('[CSR] Sending notifications...', data);
+      const response = await apiClient.post('/api/csr/notifications/send', data);
+      console.log('[CSR] Notifications sent successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('[CSR] Failed to send notifications:', error);
+      throw error;
+    }
+  }
+
+  async getNotificationCustomers(): Promise<{ data: any[] }> {
+    try {
+      console.log('[CSR] Fetching customers for notifications...');
+      const response = await apiClient.get('/api/csr/customers');
+      const responseData = response.data as any;
+      console.log('[CSR] Customers loaded successfully for notifications:', responseData?.data?.length || 0);
+      return { data: responseData?.data || [] };
+    } catch (error) {
+      console.warn('[CSR] Backend customers unavailable for notifications, using fallback:', error);
+      
+      // Try to get customers from the existing getCustomers method as fallback
+      try {
+        const customers = await this.getCustomers();
+        return {
+          data: customers.map((customer: any) => ({
+            id: customer.id,
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone || customer.mobile,
+            organization: customer.company,
+            createdAt: customer.createdAt
+          }))
+        };
+      } catch (fallbackError) {
+        console.error('[CSR] Fallback customer fetch failed:', fallbackError);
+        return { data: [] };
+      }
+    }
+  }
+
+  // Get pre-built notification templates
+  async getNotificationTemplates() {
+    console.log('[CSR] Fetching notification templates...');
+    
+    try {
+      const response = await apiClient.get('/api/csr/notifications/templates');
+      console.log('[CSR] Templates loaded successfully:', response.data.count);
+      return response.data;
+    } catch (error) {
+      console.error('[CSR] Failed to fetch templates:', error);
+      
+      // Fallback with local templates
+      return {
+        data: [
+          {
+            id: 'welcome',
+            name: 'Welcome Message',
+            subject: 'Welcome to SLT Mobitel Services',
+            message: 'Welcome to SLT Mobitel! We are excited to have you as our valued customer.',
+            type: 'promotional',
+            channels: ['email', 'sms']
+          },
+          {
+            id: 'payment_reminder',
+            name: 'Payment Reminder',
+            subject: 'Payment Reminder - Your Bill is Due',
+            message: 'This is a friendly reminder that your monthly bill is due.',
+            type: 'reminder',
+            channels: ['email', 'sms', 'push']
+          }
+        ]
+      };
+    }
+  }
+
+  // Send bulk notifications to all customers
+  async sendBulkNotifications(data: {
+    channels: string[];
+    subject: string;
+    message: string;
+    messageType: string;
+  }) {
+    console.log('[CSR] Sending bulk notifications...', data);
+    
+    try {
+      const response = await apiClient.post('/api/csr/notifications/send/bulk', data);
+      console.log('[CSR] Bulk notifications sent successfully:', response.data.summary);
+      return response.data;
+    } catch (error: any) {
+      console.error('[CSR] Failed to send bulk notifications:', error.response?.data || error.message);
+      throw {
+        message: 'An error occurred',
+        status: error.response?.status || 500,
+        details: error.response?.data || error.message
+      };
     }
   }
 }

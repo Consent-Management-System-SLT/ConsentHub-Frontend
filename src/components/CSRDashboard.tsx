@@ -26,6 +26,7 @@ import GuardianConsentForm from './csr/GuardianConsentForm_Backend';
 import AuditLogTable from './csr/AuditLogTable_Backend';
 import CSROverviewEnhanced from './csr/CSROverviewEnhanced';
 import CustomerProfile from './csr/CustomerProfile';
+import NotificationCenter from './csr/NotificationCenter';
 import HelpModal from './csr/HelpModal';
 import ServerConnectionAlert from './shared/ServerConnectionAlert';
 import NotificationContainer from './shared/NotificationContainer';
@@ -227,6 +228,8 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
         return <ConsentManagement customerId={selectedCustomer?.id} />;
       case 'preference-editor':
         return <PreferenceEditorForm customerId={selectedCustomer?.id} />;
+      case 'notification-center':
+        return <NotificationCenter />;
       case 'dsar-requests':
         return <DSARRequestPanel customerId={selectedCustomer?.id} />;
       case 'guardian-consent':

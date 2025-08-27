@@ -10,7 +10,8 @@ import {
   ChevronRight,
   Menu,
   X,
-  UserCheck
+  UserCheck,
+  Bell
 } from 'lucide-react';
 
 interface SidebarNavProps {
@@ -32,6 +33,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
     { id: 'consent-history', label: 'Consent History', icon: FileText, description: 'View customer consent history' },
     { id: 'consent-management', label: 'Consent Management', icon: Shield, description: 'Search customers and update their consents' },
     { id: 'preference-editor', label: 'Preferences', icon: Settings, description: 'Manage customer preferences' },
+    { id: 'notification-center', label: 'Notification Center', icon: Bell, description: 'Send notifications and manage campaigns' },
     { id: 'dsar-requests', label: 'DSAR Requests', icon: Database, description: 'Handle data subject access requests' },
     { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Manage guardian consent forms' },
     { id: 'audit-logs', label: 'Audit Logs', icon: Activity, description: 'View system audit logs' }

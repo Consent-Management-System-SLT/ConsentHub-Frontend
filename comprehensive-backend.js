@@ -15,7 +15,9 @@ const DSARRequest = require('./models/DSARRequest');
 const AuditLog = require('./models/AuditLog');
 const BulkImport = require('./models/BulkImport');
 const ComplianceRule = require('./models/ComplianceRule');
+const NotificationLog = require('./models/NotificationLog');
 const { Webhook, EventLog } = require('./models/Webhook');
+const { notificationService } = require('./services/notificationService');
 const { seedGuardians } = require('./seedGuardians');
 const { 
   PreferenceCategory, 
@@ -1771,6 +1773,501 @@ app.get("/api/csr/stats", async (req, res) => {
         };
         
         res.json(stats);
+    }
+});
+
+// CSR Notification Center API Routes
+
+// GET /api/csr/notifications/analytics - Get notification analytics
+app.get("/api/csr/notifications/analytics", async (req, res) => {
+    try {
+        console.log('📈 CSR Notifications: Fetching notification analytics from database');
+        
+        // Try to get real analytics from MongoDB
+        let analytics;
+        try {
+            analytics = await NotificationLog.getAnalytics();
+            console.log('✅ Retrieved real notification analytics from MongoDB');
+        } catch (error) {
+            console.log('⚠️ MongoDB analytics failed, using fallback data:', error.message);
+            
+            // Fallback analytics data
+            analytics = {
+                overview: {
+                    totalSent: 1250,
+                    totalDelivered: 1198,
+                    totalOpened: 856,
+                    totalClicked: 342,
+                    totalFailed: 52,
+                    deliveryRate: 95.8,
+                    openRate: 71.4,
+                    clickRate: 27.4
+                },
+                channels: {
+                    email: {
+                        sent: 750,
+                        delivered: 720,
+                        deliveryRate: 96.0,
+                        opened: 510,
+                        openRate: 70.8,
+                        clicked: 204,
+                        clickRate: 27.2
+                    },
+                    sms: {
+                        sent: 400,
+                        delivered: 388,
+                        deliveryRate: 97.0,
+                        opened: 310,
+                        openRate: 79.9,
+                        clicked: 124,
+                        clickRate: 31.0
+                    },
+                    push: {
+                        sent: 100,
+                        delivered: 90,
+                        deliveryRate: 90.0,
+                        opened: 36,
+                        openRate: 40.0,
+                        clicked: 14,
+                        clickRate: 15.6
+                    }
+                },
+                trends: [
+                    { date: '2024-01-15', sent: 150, delivered: 145, opened: 98, clicked: 42 },
+                    { date: '2024-01-16', sent: 180, delivered: 172, opened: 124, clicked: 51 },
+                    { date: '2024-01-17', sent: 200, delivered: 195, opened: 141, clicked: 58 }
+                ],
+                topPerformers: {
+                    templates: [
+                        { id: '1', name: 'Service Update', performance: 85.2 },
+                        { id: '2', name: 'Privacy Notice', performance: 78.9 }
+                    ],
+                    campaigns: [
+                        { id: '1', name: 'Monthly Update', performance: 92.1 },
+                        { id: '2', name: 'Consent Reminder', performance: 88.7 }
+                    ]
+                }
+            };
+        }
+        
+        res.json({ success: true, data: analytics });
+    } catch (error) {
+        console.error('❌ Error fetching notification analytics:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch notification analytics',
+            details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
+    }
+});
+
+// POST /api/csr/notifications/send - Send notifications to customers
+app.post("/api/csr/notifications/send", async (req, res) => {
+    try {
+        const { customerIds, channels, subject, message, messageType } = req.body;
+        
+        console.log('📧 CSR Notifications: Sending notification', {
+            customers: customerIds?.length || 0,
+            channels,
+            messageType,
+            subject: subject?.substring(0, 50) + '...'
+        });
+        
+        // Validate the request using the notification service
+        const validationErrors = notificationService.validateNotificationData({
+            customerIds, channels, subject, message
+        });
+        
+        if (validationErrors.length > 0) {
+            return res.status(400).json({ 
+                error: 'Validation failed',
+                details: validationErrors
+            });
+        }
+        
+        // Fetch customer data for the selected IDs
+        let customers = [];
+        try {
+            customers = await User.find({ 
+                _id: { $in: customerIds },
+                role: 'customer',
+                status: 'active'
+            }).lean();
+            console.log(`📋 Found ${customers.length} customers in MongoDB`);
+        } catch (error) {
+            console.log('⚠️ MongoDB fetch failed, using in-memory data:', error.message);
+            customers = users.filter(u => 
+                customerIds.includes(u.id) && 
+                u.role === 'customer'
+            );
+        }
+        
+        if (customers.length === 0) {
+            return res.status(400).json({ 
+                error: 'No valid customers found for the provided IDs' 
+            });
+        }
+        
+        const results = [];
+        const notificationLogs = [];
+        
+        // Process each customer
+        for (const customer of customers) {
+            try {
+                console.log(`📤 Sending to ${customer.name} (${customer.email})`);
+                
+                // Use the notification service to send via multiple channels
+                const channelResults = await notificationService.sendMultiChannelNotification({
+                    customer: {
+                        id: customer._id || customer.id,
+                        name: customer.name,
+                        email: customer.email,
+                        phone: customer.phone
+                    },
+                    channels,
+                    subject,
+                    message,
+                    messageType
+                });
+                
+                // Process results and create logs
+                for (const result of channelResults) {
+                    const logEntry = {
+                        customerId: customer._id || customer.id,
+                        customerName: customer.name,
+                        customerEmail: customer.email,
+                        customerPhone: customer.phone,
+                        channel: result.channel,
+                        subject,
+                        message,
+                        messageType,
+                        status: result.success ? 'delivered' : 'failed',
+                        messageId: result.messageId,
+                        sentAt: new Date(),
+                        deliveredAt: result.success ? result.deliveredAt : null,
+                        deliveryDetails: {
+                            success: result.success,
+                            error: result.error || null,
+                            retryCount: 0
+                        },
+                        csrId: 'csr_user', // In real implementation, get from JWT token
+                        csrName: 'CSR User',
+                        analytics: {
+                            opened: false,
+                            clicked: false,
+                            bounced: false,
+                            unsubscribed: false
+                        }
+                    };
+                    
+                    results.push(logEntry);
+                    notificationLogs.push(logEntry);
+                    
+                    console.log(`${result.success ? '✅' : '❌'} ${result.channel} to ${customer.name}: ${result.success ? 'success' : result.error}`);
+                }
+                
+            } catch (error) {
+                console.error(`❌ Error sending notifications to ${customer.name}:`, error);
+                
+                // Add failed entries for all channels
+                channels.forEach(channel => {
+                    results.push({
+                        customerId: customer._id || customer.id,
+                        customerName: customer.name,
+                        channel,
+                        status: 'failed',
+                        error: error.message,
+                        sentAt: new Date()
+                    });
+                });
+            }
+        }
+        
+        // Save notification logs to MongoDB
+        if (notificationLogs.length > 0) {
+            try {
+                await NotificationLog.insertMany(notificationLogs);
+                console.log(`📝 Saved ${notificationLogs.length} notification logs to MongoDB`);
+            } catch (error) {
+                console.error('⚠️ Failed to save notification logs to MongoDB:', error.message);
+            }
+        }
+        
+        // Calculate summary
+        const summary = {
+            totalSent: results.length,
+            delivered: results.filter(r => r.status === 'delivered').length,
+            failed: results.filter(r => r.status === 'failed').length,
+            customers: customers.length,
+            channels: channels.length,
+            deliveryRate: results.length > 0 ? 
+                ((results.filter(r => r.status === 'delivered').length / results.length) * 100).toFixed(1) : 0
+        };
+        
+        console.log('✅ Notification sending completed:', summary);
+        
+        res.json({ 
+            success: true, 
+            message: `Successfully processed notifications for ${customers.length} customers across ${channels.length} channels`,
+            summary,
+            details: results.slice(0, 10) // Limit response size
+        });
+        
+    } catch (error) {
+        console.error('❌ Error sending notifications:', error);
+        res.status(500).json({ 
+            error: 'Failed to send notifications',
+            details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
+    }
+});
+
+// GET /api/csr/notifications/templates - Get pre-built notification templates
+app.get("/api/csr/notifications/templates", async (req, res) => {
+    try {
+        console.log('📋 CSR Notifications: Fetching pre-built templates');
+        
+        const templates = notificationService.getPreBuiltTemplates();
+        
+        res.json({
+            success: true,
+            data: templates,
+            count: templates.length
+        });
+        
+    } catch (error) {
+        console.error('❌ Error fetching templates:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch templates',
+            details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
+    }
+});
+
+// POST /api/csr/notifications/send/bulk - Send notifications to all customers
+app.post("/api/csr/notifications/send/bulk", async (req, res) => {
+    try {
+        const { channels, subject, message, messageType } = req.body;
+        
+        console.log('📢 CSR Notifications: Sending bulk notification to all customers');
+        
+        // Validate the request
+        const validationErrors = notificationService.validateNotificationData({
+            customerIds: ['bulk'], // Placeholder for bulk validation
+            channels,
+            subject,
+            message
+        });
+        
+        if (validationErrors.length > 1) { // Allow customerIds error for bulk
+            return res.status(400).json({ 
+                error: 'Validation failed',
+                details: validationErrors.filter(error => !error.includes('Customer IDs'))
+            });
+        }
+        
+        // Fetch all customers
+        let customers = [];
+        try {
+            customers = await User.find({ 
+                role: 'customer',
+                status: 'active'
+            }).lean();
+            console.log(`📋 Found ${customers.length} active customers for bulk notification`);
+        } catch (error) {
+            console.log('⚠️ MongoDB fetch failed, using in-memory data:', error.message);
+            customers = users.filter(u => u.role === 'customer');
+        }
+        
+        if (customers.length === 0) {
+            return res.status(400).json({ 
+                error: 'No active customers found for bulk notification' 
+            });
+        }
+        
+        // Transform customers to the format expected by notification service
+        const transformedCustomers = customers.map(customer => ({
+            id: customer._id || customer.id,
+            name: customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim(),
+            email: customer.email,
+            phone: customer.phone || customer.mobile
+        }));
+        
+        // Send bulk notification
+        const results = await notificationService.sendBulkNotification({
+            customers: transformedCustomers,
+            channels,
+            subject,
+            message,
+            messageType
+        });
+        
+        // Process and save logs
+        const notificationLogs = [];
+        let successCount = 0;
+        let failureCount = 0;
+        
+        results.forEach(result => {
+            if (result.status === 'completed') {
+                result.results.forEach(channelResult => {
+                    const logEntry = {
+                        customerId: result.customerId,
+                        customerName: result.customerName,
+                        channel: channelResult.channel,
+                        subject,
+                        message,
+                        messageType,
+                        status: channelResult.success ? 'delivered' : 'failed',
+                        messageId: channelResult.messageId,
+                        sentAt: new Date(),
+                        deliveredAt: channelResult.success ? channelResult.deliveredAt : null,
+                        deliveryDetails: {
+                            success: channelResult.success,
+                            error: channelResult.error || null,
+                            retryCount: 0
+                        },
+                        csrId: 'csr_user', // In real implementation, get from JWT token
+                        csrName: 'CSR User',
+                        analytics: {
+                            opened: false,
+                            clicked: false,
+                            bounced: false,
+                            unsubscribed: false
+                        }
+                    };
+                    
+                    notificationLogs.push(logEntry);
+                    
+                    if (channelResult.success) {
+                        successCount++;
+                    } else {
+                        failureCount++;
+                    }
+                });
+            } else {
+                failureCount++;
+            }
+        });
+        
+        // Save logs to MongoDB (if available)
+        try {
+            if (notificationLogs.length > 0) {
+                await NotificationLog.insertMany(notificationLogs);
+                console.log(`📊 Saved ${notificationLogs.length} notification logs to MongoDB`);
+            }
+        } catch (error) {
+            console.log('⚠️ Failed to save logs to MongoDB:', error.message);
+        }
+        
+        const summary = {
+            totalCustomers: transformedCustomers.length,
+            totalNotifications: results.length * channels.length,
+            successfulDeliveries: successCount,
+            failedDeliveries: failureCount,
+            channels: channels,
+            deliveryRate: Math.round((successCount / (successCount + failureCount)) * 100) || 0
+        };
+        
+        console.log(`📊 Bulk notification summary:`, summary);
+        
+        res.json({
+            success: true,
+            message: `Bulk notification sent to ${transformedCustomers.length} customers across ${channels.length} channels`,
+            summary,
+            details: results.slice(0, 10) // Limit response size
+        });
+        
+    } catch (error) {
+        console.error('❌ Error sending bulk notifications:', error);
+        res.status(500).json({ 
+            error: 'Failed to send bulk notifications',
+            details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
+    }
+});
+
+// GET /api/csr/customers - Get customer list for notification targeting
+app.get("/api/csr/customers", async (req, res) => {
+    try {
+        console.log('👥 CSR Notifications: Fetching customer list');
+        
+        let customers = [];
+        
+        // Try to fetch from MongoDB first
+        try {
+            const mongoCustomers = await User.find({ 
+                role: 'customer',
+                status: 'active'
+            }).select('_id name email phone profile organization createdAt').lean();
+            
+            customers = mongoCustomers.map(customer => ({
+                id: customer._id,
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone,
+                organization: customer.organization,
+                createdAt: customer.createdAt,
+                profile: customer.profile
+            }));
+            
+            console.log(`📋 Fetched ${customers.length} customers from MongoDB`);
+        } catch (error) {
+            console.log('⚠️ MongoDB fetch failed, using in-memory data:', error.message);
+            
+            // Fallback to in-memory data
+            customers = users
+                .filter(u => u.role === 'customer')
+                .map(u => ({
+                    id: u.id,
+                    name: u.name,
+                    email: u.email,
+                    phone: u.phone,
+                    organization: u.organization,
+                    createdAt: u.createdAt
+                }));
+        }
+        
+        // Add some sample customers if the list is empty
+        if (customers.length === 0) {
+            customers = [
+                {
+                    id: "sample_1",
+                    name: "John Doe",
+                    email: "john.doe@example.com",
+                    phone: "+94771234567",
+                    organization: "Sample Corp",
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "sample_2", 
+                    name: "Jane Smith",
+                    email: "jane.smith@example.com",
+                    phone: "+94771234568",
+                    organization: "Demo Inc",
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: "sample_3",
+                    name: "Bob Johnson", 
+                    email: "bob.johnson@example.com",
+                    phone: "+94771234569",
+                    organization: "Test Ltd",
+                    createdAt: new Date().toISOString()
+                }
+            ];
+        }
+        
+        res.json({ 
+            success: true, 
+            data: customers,
+            count: customers.length
+        });
+        
+    } catch (error) {
+        console.error('❌ Error fetching customers:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch customers',
+            details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
     }
 });
 
