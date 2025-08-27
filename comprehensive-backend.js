@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
+const socketIo = require("socket.io");
 const multer = require("multer");
 const csvParser = require("csv-parser");
 const fs = require("fs-extra");
@@ -22,7 +24,17 @@ const {
   PreferenceTemplate, 
   PreferenceAudit 
 } = require('./models/Preference');
+
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 
 // Connect to MongoDB
@@ -5950,6 +5962,153 @@ app.get("/api/v1/customer/consents", verifyToken, async (req, res) => {
     }
 });
 
+// Grant consent endpoint
+app.post("/api/v1/customer/consents/:id/grant", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({
+                error: true,
+                message: 'Access denied'
+            });
+        }
+
+        const consentId = req.params.id;
+        const { notes } = req.body;
+        
+        console.log('✅ Granting consent:', consentId, 'for customer:', req.user.id);
+
+        // Find and update the consent in MongoDB
+        const consent = await Consent.findOneAndUpdate(
+            { 
+                id: consentId,
+                $or: [
+                    { userId: req.user.id },
+                    { partyId: req.user.id }
+                ]
+            },
+            {
+                $set: {
+                    status: 'granted',
+                    grantedAt: new Date(),
+                    updatedAt: new Date(),
+                    revokedAt: null,
+                    notes: notes || 'Granted by customer'
+                }
+            },
+            { new: true }
+        );
+
+        if (!consent) {
+            return res.status(404).json({
+                success: false,
+                error: 'Consent not found'
+            });
+        }
+
+        console.log('✅ Consent granted successfully:', consentId);
+
+        // Emit real-time update to CSR dashboard
+        if (global.io) {
+            global.io.to('csr-dashboard').emit('consent-updated', {
+                type: 'granted',
+                consent: consent,
+                timestamp: new Date(),
+                user: {
+                    id: req.user.id,
+                    email: req.user.email
+                }
+            });
+            console.log('📡 Real-time update sent to CSR dashboard - consent granted');
+        }
+
+        res.json({
+            success: true,
+            data: consent,
+            message: 'Consent granted successfully'
+        });
+    } catch (error) {
+        console.error('Error granting consent:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to grant consent',
+            message: error.message
+        });
+    }
+});
+
+// Revoke consent endpoint
+app.post("/api/v1/customer/consents/:id/revoke", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({
+                error: true,
+                message: 'Access denied'
+            });
+        }
+
+        const consentId = req.params.id;
+        const { reason } = req.body;
+        
+        console.log('✅ Revoking consent:', consentId, 'for customer:', req.user.id);
+
+        // Find and update the consent in MongoDB
+        const consent = await Consent.findOneAndUpdate(
+            { 
+                id: consentId,
+                $or: [
+                    { userId: req.user.id },
+                    { partyId: req.user.id }
+                ]
+            },
+            {
+                $set: {
+                    status: 'revoked',
+                    revokedAt: new Date(),
+                    updatedAt: new Date(),
+                    reason: reason || 'Revoked by customer'
+                }
+            },
+            { new: true }
+        );
+
+        if (!consent) {
+            return res.status(404).json({
+                success: false,
+                error: 'Consent not found'
+            });
+        }
+
+        console.log('✅ Consent revoked successfully:', consentId);
+
+        // Emit real-time update to CSR dashboard
+        if (global.io) {
+            global.io.to('csr-dashboard').emit('consent-updated', {
+                type: 'revoked',
+                consent: consent,
+                timestamp: new Date(),
+                user: {
+                    id: req.user.id,
+                    email: req.user.email
+                }
+            });
+            console.log('📡 Real-time update sent to CSR dashboard - consent revoked');
+        }
+
+        res.json({
+            success: true,
+            data: consent,
+            message: 'Consent revoked successfully'
+        });
+    } catch (error) {
+        console.error('Error revoking consent:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to revoke consent',
+            message: error.message
+        });
+    }
+});
+
 app.get("/api/v1/customer/preferences", verifyToken, async (req, res) => {
     try {
         if (req.user.role !== 'customer') {
@@ -8054,8 +8213,32 @@ app.get("/api/v1/csr/customers/search", verifyToken, (req, res) => {
     });
 });
 
+// WebSocket connection handling
+io.on('connection', (socket) => {
+    console.log('🔌 Client connected to WebSocket:', socket.id);
+    
+    // Join CSR dashboard room for real-time updates
+    socket.on('join-csr-dashboard', () => {
+        socket.join('csr-dashboard');
+        console.log('👨‍💼 CSR joined dashboard room:', socket.id);
+    });
+    
+    // Leave CSR dashboard room
+    socket.on('leave-csr-dashboard', () => {
+        socket.leave('csr-dashboard');
+        console.log('👨‍💼 CSR left dashboard room:', socket.id);
+    });
+    
+    socket.on('disconnect', () => {
+        console.log('🔌 Client disconnected:', socket.id);
+    });
+});
+
+// Make io available globally for emitting events
+global.io = io;
+
 // Start server
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
     console.log(`🎯 ConsentHub Comprehensive Backend running on http://localhost:${PORT}`);
     
     // Seed guardian data on startup

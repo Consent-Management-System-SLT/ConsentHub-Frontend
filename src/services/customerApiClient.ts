@@ -202,20 +202,14 @@ class CustomerApiClient {
   }
 
   async grantConsent(data: { consentId: string; status: string; grantedAt?: string; notes?: string }) {
-    return this.put<any>(`/api/v1/consent/${data.consentId}`, {
-      status: 'granted',
-      grantedAt: data.grantedAt || new Date().toISOString(),
-      notes: data.notes || 'Granted by customer',
-      updatedBy: 'customer'
+    return this.post<any>(`/api/v1/customer/consents/${data.consentId}/grant`, {
+      notes: data.notes || 'Granted by customer'
     });
   }
 
   async revokeConsent(id: string, reason?: string) {
-    return this.put<any>(`/api/v1/consent/${id}`, {
-      status: 'revoked',
-      revokedAt: new Date().toISOString(),
-      notes: reason || 'Revoked by customer',
-      updatedBy: 'customer'
+    return this.post<any>(`/api/v1/customer/consents/${id}/revoke`, {
+      reason: reason || 'Revoked by customer'
     });
   }
 

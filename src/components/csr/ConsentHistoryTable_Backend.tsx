@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Eye, Clock, RefreshCw, History, Calendar, User, AlertCircle } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
+import { websocketService, ConsentUpdateEvent } from '../../services/websocketService';
+import WebSocketStatus from '../shared/WebSocketStatus';
+import { notificationManager } from '../shared/NotificationContainer';
 
 // Function to format consent purpose names properly
 const formatPurposeName = (purpose: string): string => {
@@ -124,13 +127,83 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
     loadConsentsAndCustomers();
   }, [customerId]);
 
-  // Auto-refresh every 10 seconds for real-time updates
+  // WebSocket real-time updates
+  useEffect(() => {
+    console.log('🔌 Setting up WebSocket for real-time consent updates');
+    
+    // Join CSR dashboard for real-time updates
+    websocketService.joinCSRDashboard();
+    
+    // Listen for consent updates
+    const handleConsentUpdate = (event: ConsentUpdateEvent) => {
+      console.log('📡 Received real-time consent update:', event);
+      
+      // Show notification
+      const customerName = getCustomerName(event.consent.partyId || event.consent.userId) || event.user.email;
+      const purposeName = formatPurposeName(event.consent.purpose);
+      
+      if (event.type === 'granted') {
+        notificationManager.success(
+          'Consent Granted',
+          `${customerName} granted consent for ${purposeName}`
+        );
+      } else {
+        notificationManager.warning(
+          'Consent Revoked',
+          `${customerName} revoked consent for ${purposeName}`
+        );
+      }
+      
+      // Update the consents list with the updated consent
+      setConsents(prevConsents => {
+        const updatedConsents = prevConsents.map(consent => {
+          if (consent.id === event.consent.id) {
+            return {
+              ...consent,
+              ...event.consent,
+              updatedAt: event.timestamp
+            };
+          }
+          return consent;
+        });
+        
+        // If we didn't find the consent in the list, add it (new consent)
+        const found = prevConsents.some(c => c.id === event.consent.id);
+        if (!found) {
+          updatedConsents.push(event.consent);
+        }
+        
+        return updatedConsents.sort((a, b) => 
+          new Date(b.updatedAt || b.createdAt).getTime() - 
+          new Date(a.updatedAt || a.createdAt).getTime()
+        );
+      });
+      
+      // Update last updated timestamp
+      setLastUpdated(new Date());
+    };
+    
+    websocketService.onConsentUpdate(handleConsentUpdate);
+    
+    // Cleanup on unmount
+    return () => {
+      console.log('🔌 Cleaning up WebSocket listeners');
+      websocketService.offConsentUpdate();
+      websocketService.leaveCSRDashboard();
+    };
+  }, []);
+
+  // Auto-refresh every 30 seconds as fallback (reduced frequency since we have real-time updates)
   useEffect(() => {
     if (!autoRefresh) return;
     
     const interval = setInterval(() => {
-      loadConsentsAndCustomers();
-    }, 10000); // Refresh every 10 seconds for faster updates
+      // Only do full refresh if WebSocket is not connected
+      if (!websocketService.isConnected()) {
+        console.log('📡 WebSocket disconnected, falling back to polling');
+        loadConsentsAndCustomers();
+      }
+    }, 30000); // Reduced to 30 seconds since we have real-time updates
 
     return () => clearInterval(interval);
   }, [autoRefresh, customerId]);
@@ -161,24 +234,47 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       console.log('Total customers loaded:', customerArray.length);
       console.log('Filtered consents:', filteredConsents.length);
       
-      // Debug: Look for jothi@gmail.com specifically
-      const jothiCustomer = customerArray.find(c => 
-        c.email === 'jothi@gmail.com' || 
-        c.name?.toLowerCase().includes('jothi') ||
-        c.id?.includes('jothi')
+      // Debug: Show first few consent records to understand data structure
+      console.log('First 3 consents:', consentArray.slice(0, 3));
+      console.log('First 3 customers:', customerArray.slice(0, 3));
+      
+      // Debug: Look for Ojitha specifically
+      const ojithaCustomer = customerArray.find(c => 
+        c.email?.toLowerCase().includes('ojitharajapaksha') || 
+        c.name?.toLowerCase().includes('ojitha') ||
+        c.id?.includes('68ae007022c61b8784d852ea')
       );
-      if (jothiCustomer) {
-        console.log('Found Jothi customer:', jothiCustomer);
-        const jothiConsents = consentArray.filter(c => 
-          c.partyId === jothiCustomer.id || 
-          c.customerId === jothiCustomer.id
+      if (ojithaCustomer) {
+        console.log('Found Ojitha customer:', ojithaCustomer);
+        const ojithaConsents = consentArray.filter(c => 
+          c.partyId === ojithaCustomer.id || 
+          c.customerId === ojithaCustomer.id
         );
-        console.log('Jothi consents found:', jothiConsents.length, jothiConsents);
+        console.log('Ojitha consents found:', ojithaConsents.length, ojithaConsents);
       } else {
-        console.log('Jothi customer not found. Available customers:', 
-          customerArray.map(c => ({ id: c.id, name: c.name, email: c.email }))
+        console.log('Ojitha customer not found. Available customers:', 
+          customerArray.slice(0, 10).map(c => ({ id: c.id, name: c.name, email: c.email }))
         );
       }
+      
+      // Debug: Look for ojitharajapaksha email in consent metadata
+      const ojithaConsentsInData = consentArray.filter(c => 
+        (c as any).metadata?.customerEmail?.includes('ojitharajapaksha') ||
+        c.partyId === '68ae007022c61b8784d852ea' ||
+        c.customerId === '68ae007022c61b8784d852ea'
+      );
+      console.log('Ojitha consents by metadata/ID:', ojithaConsentsInData.length, ojithaConsentsInData);
+      
+      // Show consent-customer mapping
+      const consentCustomerMapping = filteredConsents.map(c => ({
+        consentId: c.id,
+        partyId: c.partyId,
+        customerId: c.customerId,
+        customerFound: customerArray.find(customer => customer.id === c.partyId),
+        purpose: c.purpose,
+        status: c.status
+      }));
+      console.log('Consent-Customer mapping (first 10):', consentCustomerMapping.slice(0, 10));
       
       // Show recent consent updates (last 5 minutes)
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
@@ -306,8 +402,9 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                 </span>
                 <span className="flex items-center space-x-1">
                   <div className={`w-2 h-2 rounded-full ${autoRefresh ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  <span>{autoRefresh ? 'Auto-refresh ON (10s)' : 'Auto-refresh OFF'}</span>
+                  <span>{autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}</span>
                 </span>
+                <WebSocketStatus />
               </div>
             </div>
           </div>

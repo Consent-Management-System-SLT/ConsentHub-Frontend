@@ -12,6 +12,7 @@ import {
   Activity
 } from 'lucide-react';
 import { csrDashboardService } from '../services/csrDashboardService';
+import { websocketService } from '../services/websocketService';
 
 // Import CSR components (using backend-integrated versions)
 import CSRHeader from './csr/CSRHeader';
@@ -27,6 +28,7 @@ import CSROverviewEnhanced from './csr/CSROverviewEnhanced';
 import CustomerProfile from './csr/CustomerProfile';
 import HelpModal from './csr/HelpModal';
 import ServerConnectionAlert from './shared/ServerConnectionAlert';
+import NotificationContainer from './shared/NotificationContainer';
 
 interface CSRDashboardProps {
   className?: string;
@@ -57,7 +59,28 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   useEffect(() => {
+    console.log('🎯 CSR Dashboard initializing...');
+    
+    // Initialize WebSocket connection for real-time updates
+    console.log('🔌 Initializing WebSocket for CSR Dashboard');
+    if (websocketService.isConnected()) {
+      websocketService.joinCSRDashboard();
+    } else {
+      // Wait a bit and try to join when connected
+      setTimeout(() => {
+        if (websocketService.isConnected()) {
+          websocketService.joinCSRDashboard();
+        }
+      }, 2000);
+    }
+    
     loadDashboardData();
+    
+    // Cleanup on unmount
+    return () => {
+      console.log('🔌 CSR Dashboard cleanup - leaving WebSocket room');
+      websocketService.leaveCSRDashboard();
+    };
   }, []);
 
   // Auto-refresh functionality
@@ -278,6 +301,9 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
         isOpen={showHelpModal}
         onClose={() => setShowHelpModal(false)}
       />
+
+      {/* Real-time Notification Container */}
+      <NotificationContainer />
     </div>
   );
 };

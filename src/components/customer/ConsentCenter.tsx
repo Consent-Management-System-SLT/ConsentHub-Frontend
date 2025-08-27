@@ -212,15 +212,65 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
         },
         {
           id: 'consent-3',
-          purpose: 'Data Processing',
+          purpose: 'Third-party Sharing',
           status: 'revoked',
           channel: 'Website, App',
           validFrom: new Date(Date.now() - 86400000 * 90).toISOString(),
-          description: 'Consent for processing your personal data as part of our core services and business operations.',
+          description: 'Permission to share data with trusted third-party partners for enhanced services and integrations.',
           category: 'General',
           jurisdiction: 'LK',
           lastUpdated: new Date(Date.now() - 86400000 * 2).toISOString(),
           grantedBy: 'customer'
+        },
+        {
+          id: 'consent-4',
+          purpose: 'Location Services',
+          status: 'granted',
+          channel: 'Mobile App',
+          validFrom: new Date(Date.now() - 86400000 * 45).toISOString(),
+          validUntil: new Date(Date.now() + 86400000 * 180).toISOString(),
+          description: 'Access and use your location data to provide location-based services and features.',
+          category: 'Location',
+          jurisdiction: 'LK',
+          lastUpdated: new Date(Date.now() - 86400000 * 3).toISOString(),
+          grantedBy: 'customer'
+        },
+        {
+          id: 'consent-5',
+          purpose: 'Personalization Services',
+          status: 'revoked',
+          channel: 'Website, App',
+          validFrom: new Date(Date.now() - 86400000 * 120).toISOString(),
+          description: 'Customize content, recommendations, and services based on your preferences and behavior.',
+          category: 'Personalization',
+          jurisdiction: 'LK',
+          lastUpdated: new Date(Date.now() - 86400000 * 1).toISOString(),
+          grantedBy: 'customer'
+        },
+        {
+          id: 'consent-6',
+          purpose: 'Cookies & Tracking',
+          status: 'expired',
+          channel: 'Website',
+          validFrom: new Date(Date.now() - 86400000 * 400).toISOString(),
+          validUntil: new Date(Date.now() - 86400000 * 35).toISOString(),
+          description: 'Use cookies and similar tracking technologies to improve your browsing experience.',
+          category: 'Cookies',
+          jurisdiction: 'LK',
+          lastUpdated: new Date(Date.now() - 86400000 * 35).toISOString(),
+          grantedBy: 'system'
+        },
+        {
+          id: 'consent-7',
+          purpose: 'Push Notifications',
+          status: 'pending',
+          channel: 'Mobile App',
+          validFrom: new Date().toISOString(),
+          description: 'Send push notifications to your mobile device for important updates and alerts.',
+          category: 'Communication',
+          jurisdiction: 'LK',
+          lastUpdated: new Date().toISOString(),
+          grantedBy: 'system'
         }
       ]);
     } finally {
@@ -279,21 +329,51 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   const handleConsentAction = async (consentId: string, action: 'revoke' | 'grant') => {
     try {
       setUpdating(consentId);
-      console.log(`${action} consent ${consentId}`);
+      console.log(`${action}ing consent ${consentId}`);
       
       // Find the consent being modified
       const consent = consents.find(c => c.id === consentId);
+      if (!consent) {
+        throw new Error('Consent not found');
+      }
+      
+      // Validate action based on current status
+      if (action === 'grant' && consent.status === 'granted') {
+        addNotification({
+          title: 'Already Granted',
+          message: 'This consent is already granted.',
+          type: 'system',
+          category: 'info'
+        });
+        return;
+      }
+      
+      if (action === 'revoke' && consent.status === 'revoked') {
+        addNotification({
+          title: 'Already Revoked',
+          message: 'This consent is already revoked.',
+          type: 'system',
+          category: 'info'
+        });
+        return;
+      }
       
       // Call the appropriate backend API method
+      let response;
       if (action === 'revoke') {
-        await customerApiClient.revokeConsent(consentId, 'Customer requested revocation');
+        response = await customerApiClient.revokeConsent(consentId, 'Customer requested revocation');
       } else if (action === 'grant') {
-        await customerApiClient.grantConsent({ 
+        response = await customerApiClient.grantConsent({ 
           consentId, 
           status: 'granted',
           grantedAt: new Date().toISOString(),
           notes: 'Customer granted consent'
         });
+      }
+      
+      // Validate response
+      if (!response?.success) {
+        throw new Error(response?.message || `Failed to ${action} consent`);
       }
       
       // Update local state
@@ -302,23 +382,23 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
           c.id === consentId 
             ? { 
                 ...c, 
-                status: action === 'revoke' ? 'revoked' : 'granted',
+                status: action === 'revoke' ? 'revoked' as const : 'granted' as const,
                 lastUpdated: new Date().toISOString()
               }
             : c
         )
       );
       
-      // Add notification
+      // Add success notification
       addNotification({
         title: `Consent ${action === 'revoke' ? 'Revoked' : 'Granted'}`,
-        message: `You have successfully ${action}d consent for "${consent?.purpose || 'unknown purpose'}"`,
+        message: `You have successfully ${action}d consent for "${consent.purpose}"`,
         type: 'consent',
         category: action === 'revoke' ? 'warning' : 'success',
         metadata: {
           consentId,
           action,
-          purpose: consent?.purpose
+          purpose: consent.purpose
         }
       });
       
@@ -326,11 +406,13 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
       
     } catch (error: any) {
       console.error(`Failed to ${action} consent:`, error);
+      
+      // Show error notification
       addNotification({
         title: `Consent ${action === 'revoke' ? 'Revocation' : 'Grant'} Failed`,
-        message: `Failed to ${action} consent. Please try again.`,
+        message: error.message || `Failed to ${action} consent. Please try again.`,
         type: 'system',
-        category: 'warning'
+        category: 'urgent'
       });
     } finally {
       setUpdating(null);
@@ -404,9 +486,46 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                   <option value="Marketing">Marketing</option>
                   <option value="Analytics">Analytics</option>
                   <option value="Personalization">Personalization</option>
+                  <option value="Location">Location</option>
+                  <option value="General">General</option>
+                  <option value="Cookies">Cookies</option>
                   <option value="Communication">Communication</option>
                 </select>
               </div>
+            </div>
+          </div>
+
+          {/* Consent Statistics */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div className="bg-myslt-background p-4 rounded-lg border border-myslt-accent/20">
+              <div className="text-2xl font-bold text-myslt-text-primary">
+                {filteredConsents.length}
+              </div>
+              <div className="text-sm text-myslt-text-secondary">Total Consents</div>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <div className="text-2xl font-bold text-green-600">
+                {filteredConsents.filter(c => c.status === 'granted').length}
+              </div>
+              <div className="text-sm text-green-700">Active</div>
+            </div>
+            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+              <div className="text-2xl font-bold text-red-600">
+                {filteredConsents.filter(c => c.status === 'revoked').length}
+              </div>
+              <div className="text-sm text-red-700">Revoked</div>
+            </div>
+            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+              <div className="text-2xl font-bold text-yellow-600">
+                {filteredConsents.filter(c => c.status === 'pending').length}
+              </div>
+              <div className="text-sm text-yellow-700">Pending</div>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div className="text-2xl font-bold text-gray-600">
+                {filteredConsents.filter(c => c.status === 'expired').length}
+              </div>
+              <div className="text-sm text-gray-700">Expired</div>
             </div>
           </div>
 
@@ -493,11 +612,13 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                         Details
                       </button>
                       
+                      {/* Single Toggle Button - Changes based on current status */}
                       {consent.status === 'granted' ? (
                         <button
                           onClick={() => handleConsentAction(consent.id, 'revoke')}
                           disabled={updating === consent.id}
-                          className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center text-sm disabled:opacity-50"
+                          className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Click to revoke this consent"
                         >
                           {updating === consent.id ? (
                             <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
@@ -506,20 +627,21 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                           )}
                           Revoke
                         </button>
-                      ) : consent.status === 'revoked' ? (
+                      ) : (
                         <button
                           onClick={() => handleConsentAction(consent.id, 'grant')}
                           disabled={updating === consent.id}
-                          className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center text-sm disabled:opacity-50"
+                          className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={`Click to grant this ${consent.status} consent`}
                         >
                           {updating === consent.id ? (
                             <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
                           ) : (
                             <CheckCircle className="w-4 h-4 mr-1" />
                           )}
-                          Grant
+                          {consent.status === 'expired' ? 'Renew' : 'Grant'}
                         </button>
-                      ) : null}
+                      )}
                     </div>
                   </div>
                 </div>
@@ -619,6 +741,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                     Close
                   </button>
                   
+                  {/* Single Toggle Button in Modal */}
                   {selectedConsent.status === 'granted' ? (
                     <button
                       onClick={() => {
@@ -626,7 +749,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                         setSelectedConsent(null);
                       }}
                       disabled={updating === selectedConsent.id}
-                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center disabled:opacity-50"
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {updating === selectedConsent.id ? (
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -635,23 +758,23 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                       )}
                       Revoke Consent
                     </button>
-                  ) : selectedConsent.status === 'revoked' ? (
+                  ) : (
                     <button
                       onClick={() => {
                         handleConsentAction(selectedConsent.id, 'grant');
                         setSelectedConsent(null);
                       }}
                       disabled={updating === selectedConsent.id}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center disabled:opacity-50"
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {updating === selectedConsent.id ? (
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                       ) : (
                         <CheckCircle className="w-4 h-4 mr-2" />
                       )}
-                      Grant Consent
+                      {selectedConsent.status === 'expired' ? 'Renew' : 'Grant'} Consent
                     </button>
-                  ) : null}
+                  )}
                 </div>
               </div>
             </div>
