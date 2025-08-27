@@ -22,7 +22,7 @@ class ApiClient {
     
     this.axiosInstance = axios.create({
       baseURL: this.baseURL,
-      timeout: 10000,
+      timeout: 60000, // Increased to 60 seconds for bulk operations
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

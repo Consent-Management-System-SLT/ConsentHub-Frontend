@@ -529,7 +529,7 @@ Thank you for helping us make SLT Mobitel the best choice for telecommunications
   async sendBulkNotification({ customers, channels, subject, message, messageType }) {
     console.log(`📢 Starting bulk notification to ${customers.length} customers`);
     const results = [];
-    const batchSize = 5; // Process in batches to avoid overwhelming the email server
+    const batchSize = 10; // Increased batch size for better performance
     
     for (let i = 0; i < customers.length; i += batchSize) {
       const batch = customers.slice(i, i + batchSize);
@@ -559,9 +559,9 @@ Thank you for helping us make SLT Mobitel the best choice for telecommunications
           }
         });
         
-        // Add delay between batches
+        // Reduced delay between batches for faster processing
         if (i + batchSize < customers.length) {
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Reduced from 2000ms to 1000ms
         }
         
       } catch (error) {

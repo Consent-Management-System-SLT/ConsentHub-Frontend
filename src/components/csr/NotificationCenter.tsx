@@ -253,9 +253,21 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
       
       // Reload analytics
       loadAnalytics();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to send bulk notification:', error);
-      setError('Failed to send bulk notification. Please try again.');
+      
+      // Provide more specific error messages
+      let errorMessage = 'Failed to send bulk notification. Please try again.';
+      
+      if (error.details?.includes('timeout')) {
+        errorMessage = 'Bulk notification is taking longer than expected. It may still be processing in the background.';
+      } else if (error.status === 0) {
+        errorMessage = 'Connection timeout - bulk notification may still be processing. Please check the analytics for updates.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsSending(false);
     }
@@ -651,7 +663,12 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                       className="flex items-center space-x-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Users className={`w-4 h-4 ${isSending ? 'animate-pulse' : ''}`} />
-                      <span>{isSending ? 'Sending...' : `Send to All ${customers.length} Customers`}</span>
+                      <span>
+                        {isSending 
+                          ? `Sending to ${customers.length} customers... This may take up to 1 minute` 
+                          : `Send to All ${customers.length} Customers`
+                        }
+                      </span>
                     </button>
                   </div>
                 </div>
