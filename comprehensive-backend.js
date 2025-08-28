@@ -2271,6 +2271,67 @@ app.get("/api/csr/customers", async (req, res) => {
     }
 });
 
+// POST /api/csr/notifications/welcome - Send welcome email to customer
+app.post("/api/csr/notifications/welcome", async (req, res) => {
+    try {
+        const { email, customerName, createdBy = 'admin' } = req.body;
+        
+        console.log(`📧 CSR Notifications: Sending welcome email to ${email} (created by: ${createdBy})`);
+        
+        if (!email) {
+            return res.status(400).json({
+                error: 'Email is required'
+            });
+        }
+        
+        // Find customer details from database
+        let customer = null;
+        try {
+            customer = await User.findOne({ email: email.toLowerCase() });
+        } catch (dbError) {
+            console.warn('⚠️ Database lookup failed, using provided data:', dbError.message);
+        }
+        
+        // Prepare customer data for welcome email
+        const customerData = {
+            email: email,
+            name: customerName || (customer ? `${customer.firstName} ${customer.lastName}` : 'Valued Customer'),
+            firstName: customer?.firstName || 'Valued',
+            lastName: customer?.lastName || 'Customer',
+            id: customer?._id || 'N/A'
+        };
+        
+        // Send welcome email using notification service
+        const { notificationService } = require('./services/notificationService');
+        const welcomeResult = await notificationService.sendWelcomeEmail(customerData, createdBy);
+        
+        if (welcomeResult.success) {
+            console.log(`✅ Welcome email sent successfully to ${email}`);
+            
+            res.json({
+                success: true,
+                message: `Welcome email sent successfully to ${email}`,
+                messageId: welcomeResult.messageId,
+                templateUsed: welcomeResult.templateUsed
+            });
+        } else {
+            console.error(`❌ Failed to send welcome email to ${email}:`, welcomeResult.error);
+            
+            res.status(500).json({
+                error: 'Failed to send welcome email',
+                details: welcomeResult.error
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Error sending welcome email:', error);
+        res.status(500).json({
+            error: 'Failed to send welcome email',
+            details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
+    }
+});
+
 // GET /api/v1/party - Get all customers/parties for CSR
 app.get("/api/v1/party", async (req, res) => {
     try {
@@ -5048,6 +5109,26 @@ app.post("/api/v1/users", async (req, res) => {
         const savedUser = await newUser.save();
         console.log("New user created by admin:", savedUser.email, "ID:", savedUser._id);
         
+        // Send welcome email for admin-created account
+        try {
+            const { notificationService } = require('./services/notificationService');
+            const welcomeResult = await notificationService.sendWelcomeEmail({
+                email: savedUser.email,
+                name: `${savedUser.firstName} ${savedUser.lastName}`,
+                firstName: savedUser.firstName,
+                lastName: savedUser.lastName,
+                id: savedUser._id
+            }, 'admin');
+            
+            if (welcomeResult.success) {
+                console.log(`✅ Admin welcome email sent to new user: ${savedUser.email}`);
+            } else {
+                console.error(`❌ Failed to send admin welcome email to ${savedUser.email}:`, welcomeResult.error);
+            }
+        } catch (emailError) {
+            console.error(`❌ Welcome email service error for admin-created user ${savedUser.email}:`, emailError);
+        }
+        
         // Transform to match frontend expectations
         const responseUser = {
             id: savedUser._id.toString(),
@@ -6215,6 +6296,26 @@ app.post("/api/v1/auth/register", async (req, res) => {
         auditEvents.push(auditEntry);
         
         console.log("New user registered:", savedUser.email, "ID:", savedUser._id);
+        
+        // Send welcome email for self-registration
+        try {
+            const { notificationService } = require('./services/notificationService');
+            const welcomeResult = await notificationService.sendWelcomeEmail({
+                email: savedUser.email,
+                name: savedUser.name,
+                firstName: savedUser.firstName,
+                lastName: savedUser.lastName,
+                id: savedUser._id
+            }, 'self');
+            
+            if (welcomeResult.success) {
+                console.log(`✅ Welcome email sent to new user: ${savedUser.email}`);
+            } else {
+                console.error(`❌ Failed to send welcome email to ${savedUser.email}:`, welcomeResult.error);
+            }
+        } catch (emailError) {
+            console.error(`❌ Welcome email service error for ${savedUser.email}:`, emailError);
+        }
         
         res.status(201).json({
             success: true,

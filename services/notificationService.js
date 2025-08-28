@@ -41,6 +41,93 @@ class NotificationService {
   getPreBuiltTemplates() {
     return [
       {
+        id: 'account_created_welcome',
+        name: 'Account Created - Welcome Email',
+        subject: 'Welcome to SLT Mobitel - Your Account is Ready!',
+        message: `Dear [CUSTOMER_NAME],
+
+Congratulations! Your SLT Mobitel account has been successfully created and is now active.
+
+Account Details:
+• Email: [CUSTOMER_EMAIL]
+• Account Number: [ACCOUNT_ID]
+• Registration Date: ${new Date().toLocaleDateString()}
+• Status: Active and Ready to Use
+
+What's Next:
+1. Login to your account at portal.sltmobitel.lk
+2. Complete your profile setup
+3. Choose your preferred service plans
+4. Download the MyMobitel app for easy management
+
+Welcome Benefits:
+• Island-wide 4G/5G network coverage
+• 24/7 customer support at 1717
+• Exclusive new customer promotions
+• Seamless digital service experience
+• Advanced account management tools
+
+Need Help Getting Started?
+• Visit: sltmobitel.lk/help
+• Call: 1717 (24/7 support)
+• Email: support@sltmobitel.lk
+• Live Chat: Available on our website
+
+Thank you for choosing SLT Mobitel as your telecommunications partner. We're excited to serve you!
+
+Welcome to the SLT Family!
+
+Best regards,
+SLT Mobitel Team`,
+        type: 'welcome',
+        channels: ['email']
+      },
+      {
+        id: 'admin_created_account',
+        name: 'Account Created by Admin - Welcome Email',
+        subject: 'Your SLT Mobitel Account Has Been Created',
+        message: `Dear [CUSTOMER_NAME],
+
+An account has been created for you on the SLT Mobitel platform by our administration team.
+
+Your Account Information:
+• Email: [CUSTOMER_EMAIL]
+• Account ID: [ACCOUNT_ID]
+• Created Date: ${new Date().toLocaleDateString()}
+• Created By: SLT Administration Team
+• Status: Active and Verified
+
+Important First Steps:
+1. Set up your password at: portal.sltmobitel.lk/reset-password
+2. Complete your security verification
+3. Review and update your account preferences
+4. Explore available services and plans
+
+Account Features Available:
+• Full access to SLT Mobitel services
+• Online bill payment and account management
+• 4G/5G network services
+• Customer support portal
+• Mobile app integration
+• Service upgrade options
+
+Security Notice:
+Your account has been pre-verified by our team. For security purposes, please set up your password and enable two-factor authentication when you first login.
+
+Support & Assistance:
+• Customer Service: 1717 (24/7)
+• Online Support: sltmobitel.lk/support
+• Service Centers: Find locations at sltmobitel.lk/centers
+• Email Support: support@sltmobitel.lk
+
+Welcome to SLT Mobitel! We're here to provide you with the best telecommunications experience.
+
+Warm regards,
+SLT Mobitel Customer Care Team`,
+        type: 'administrative',
+        channels: ['email']
+      },
+      {
         id: 'welcome',
         name: 'Welcome New Customer',
         subject: 'Welcome to SLT Mobitel - Your Journey Begins Here!',
@@ -1103,6 +1190,69 @@ Thank you for helping us make SLT Mobitel the best choice for telecommunications
       },
       templates: this.getPreBuiltTemplates().length
     };
+  }
+
+  // Send welcome email when account is created
+  async sendWelcomeEmail(customerData, createdBy = 'self') {
+    try {
+      console.log(`📧 Sending welcome email to ${customerData.email} (created by: ${createdBy})`);
+      
+      // Choose appropriate template based on who created the account
+      const templateId = createdBy === 'admin' ? 'admin_created_account' : 'account_created_welcome';
+      const templates = this.getPreBuiltTemplates();
+      const template = templates.find(t => t.id === templateId);
+      
+      if (!template) {
+        throw new Error(`Welcome email template not found: ${templateId}`);
+      }
+      
+      // Replace placeholders in template
+      let subject = template.subject;
+      let message = template.message;
+      
+      const customerName = customerData.name || `${customerData.firstName || ''} ${customerData.lastName || ''}`.trim() || 'Valued Customer';
+      const customerId = customerData.id || customerData._id || 'N/A';
+      
+      message = message.replace(/\[CUSTOMER_NAME\]/g, customerName);
+      message = message.replace(/\[CUSTOMER_EMAIL\]/g, customerData.email);
+      message = message.replace(/\[ACCOUNT_ID\]/g, customerId);
+      
+      // Generate professional HTML email
+      const htmlContent = this.generateEmailTemplate({
+        customerName: customerName,
+        message: message,
+        messageType: 'welcome',
+        subject: subject
+      });
+      
+      // Send email
+      const result = await this.emailTransporter.sendMail({
+        from: {
+          name: 'SLT Mobitel ConsentHub',
+          address: 'ojithatester@gmail.com'
+        },
+        to: customerData.email,
+        subject: subject,
+        html: htmlContent,
+        text: message // Fallback plain text
+      });
+      
+      console.log(`✅ Welcome email sent successfully to ${customerData.email}`);
+      return {
+        success: true,
+        messageId: result.messageId,
+        templateUsed: templateId,
+        recipient: customerData.email
+      };
+      
+    } catch (error) {
+      console.error(`❌ Failed to send welcome email to ${customerData.email}:`, error);
+      return {
+        success: false,
+        error: error.message,
+        recipient: customerData.email
+      };
+    }
   }
 }
 

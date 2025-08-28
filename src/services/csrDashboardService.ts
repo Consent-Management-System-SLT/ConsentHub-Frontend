@@ -1748,6 +1748,32 @@ class CSRDashboardService {
       };
     }
   }
+
+  // Send welcome email to customer
+  async sendWelcomeEmail(data: {
+    email: string;
+    customerName?: string;
+    createdBy?: 'admin' | 'self';
+  }) {
+    console.log('[CSR] Sending welcome email...', data);
+    
+    try {
+      const response = await apiClient.post('/api/csr/notifications/welcome', {
+        email: data.email,
+        customerName: data.customerName,
+        createdBy: data.createdBy || 'admin'
+      });
+      console.log('[CSR] Welcome email sent successfully:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('[CSR] Failed to send welcome email:', error.response?.data || error.message);
+      throw {
+        message: error.response?.data?.error || 'Failed to send welcome email',
+        status: error.response?.status || 500,
+        details: error.response?.data || error.message
+      };
+    }
+  }
 }
 
 export const csrDashboardService = new CSRDashboardService();

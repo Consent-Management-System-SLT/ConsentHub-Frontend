@@ -183,6 +183,8 @@ class CustomerDashboardService {
   async getDashboardOverview(): Promise<DashboardOverview> {
     try {
       console.log('Fetching dashboard overview from:', `${this.baseUrl}/overview`);
+      
+      // Try to fetch from backend API first
       const response = await multiServiceApiClient.makeRequest(
         'GET',
         `${this.baseUrl}/overview`,
@@ -191,10 +193,22 @@ class CustomerDashboardService {
       );
 
       console.log('Dashboard API response:', response);
+      
+      // Also fetch real consent statistics
+      const consentStats = await this.getConsentStats();
+      console.log('Real consent statistics:', consentStats);
 
       if (response.success && response.data) {
         console.log('Dashboard data received:', response.data);
-        return response.data;
+        // Merge with real consent stats
+        const enhancedData = {
+          ...response.data,
+          consentStats: consentStats,
+          activeConsents: consentStats.granted,
+          totalConsents: consentStats.total
+        };
+        console.log('Enhanced dashboard data with real consent stats:', enhancedData);
+        return enhancedData;
       }
 
       if (response && !response.success) {
@@ -210,9 +224,28 @@ class CustomerDashboardService {
         response: error.response,
         stack: error.stack
       });
-      // Return mock data as fallback
-      console.log('Returning mock data as fallback');
-      return this.getMockDashboardData();
+      
+      // Even in fallback mode, try to get real consent statistics
+      try {
+        console.log('Getting real consent stats for fallback data...');
+        const consentStats = await this.getConsentStats();
+        console.log('Real consent statistics (fallback mode):', consentStats);
+        
+        const mockData = this.getMockDashboardData();
+        const enhancedMockData = {
+          ...mockData,
+          consentStats: consentStats,
+          activeConsents: consentStats.granted,
+          totalConsents: consentStats.total
+        };
+        
+        console.log('Returning enhanced mock data with real consent stats:', enhancedMockData);
+        return enhancedMockData;
+      } catch (consentError) {
+        console.error('Failed to get consent stats in fallback mode:', consentError);
+        console.log('Returning basic mock data as final fallback');
+        return this.getMockDashboardData();
+      }
     }
   }
 
@@ -244,6 +277,67 @@ class CustomerDashboardService {
     } catch (error) {
       console.error('Error fetching consents:', error);
       return [];
+    }
+  }
+
+  /**
+   * Get detailed consent statistics
+   */
+  async getConsentStats(): Promise<{
+    granted: number;
+    revoked: number;
+    expired: number;
+    pending: number;
+    total: number;
+  }> {
+    try {
+      console.log('Fetching consent statistics...');
+      const consents = await this.getConsents();
+      
+      const now = new Date();
+      const stats = {
+        granted: 0,
+        revoked: 0,
+        expired: 0,
+        pending: 0,
+        total: consents.length
+      };
+      
+      consents.forEach(consent => {
+        switch (consent.status?.toLowerCase()) {
+          case 'granted':
+            // Check if expired
+            if (consent.expiresAt && new Date(consent.expiresAt) < now) {
+              stats.expired++;
+            } else {
+              stats.granted++;
+            }
+            break;
+          case 'revoked':
+          case 'denied':
+            stats.revoked++;
+            break;
+          case 'pending':
+          case 'requested':
+            stats.pending++;
+            break;
+          default:
+            // Handle any other status as pending
+            stats.pending++;
+        }
+      });
+      
+      console.log('Consent statistics calculated:', stats);
+      return stats;
+    } catch (error) {
+      console.error('Error calculating consent statistics:', error);
+      return {
+        granted: 0,
+        revoked: 0,
+        expired: 0,
+        pending: 0,
+        total: 0
+      };
     }
   }
 
