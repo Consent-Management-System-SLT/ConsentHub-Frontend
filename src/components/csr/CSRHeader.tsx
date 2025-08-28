@@ -87,7 +87,7 @@ const CSRHeader: React.FC<CSRHeaderProps> = ({
             {/* User Profile */}
             <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="hidden lg:flex flex-col text-right min-w-0">
-                <p className="text-sm font-medium text-myslt-text-primary truncate max-w-[8rem] xl:max-w-[12rem]">Sarah Johnson</p>
+                <p className="text-sm font-medium text-myslt-text-primary truncate max-w-[8rem] xl:max-w-[12rem]">CSR User</p>
                 <p className="text-xs text-myslt-text-secondary">Customer Service Rep</p>
               </div>
               <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 bg-myslt-accent rounded-full flex items-center justify-center flex-shrink-0">
