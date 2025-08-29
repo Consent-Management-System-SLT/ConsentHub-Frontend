@@ -17,6 +17,7 @@ const BulkImport = require('./models/BulkImport');
 const ComplianceRule = require('./models/ComplianceRule');
 const NotificationLog = require('./models/NotificationLog');
 const { Webhook, EventLog } = require('./models/Webhook');
+const CommunicationPreference = require('./models/CommunicationPreference');
 const { notificationService } = require('./services/notificationService');
 const { seedGuardians } = require('./seedGuardians');
 const { 
@@ -6716,29 +6717,364 @@ app.get("/api/v1/customer/preferences", verifyToken, async (req, res) => {
             });
         }
         
-        console.log('✅ Fetching preferences for customer:', req.user.id);
+        console.log('✅ Fetching comprehensive preferences for customer:', req.user.id);
         
-        // Import UserPreference model here to avoid issues
-        const mongoose = require('mongoose');
-        const UserPreference = mongoose.model('UserPreference');
+        let allPreferences = [];
         
-        const preferences = await UserPreference.find({ 
-            $or: [
-                { userId: req.user.id },
-                { partyId: req.user.id }
-            ]
-        }).sort({ updatedAt: -1 }).lean();
+        try {
+            // Import models here to avoid issues
+            const mongoose = require('mongoose');
+            const UserPreference = mongoose.model('UserPreference');
+            
+            // 1. Fetch UserPreferences (individual preferences)
+            const userPreferences = await UserPreference.find({ 
+                $or: [
+                    { userId: req.user.id },
+                    { partyId: req.user.id }
+                ]
+            }).sort({ updatedAt: -1 }).lean();
+            
+            // 2. Try to fetch Communication Preferences from CommunicationPreference model
+            try {
+                // Try to use the imported CommunicationPreference model
+                const commPreferences = await CommunicationPreference.find({ 
+                    partyId: req.user.id 
+                }).lean();
+                
+                // Transform communication preferences to match frontend expectations
+                commPreferences.forEach(pref => {
+                    allPreferences.push({
+                        id: pref.id || pref._id.toString(),
+                        partyId: pref.partyId,
+                        preferenceType: 'communication',
+                        category: 'communication',
+                        preferredChannels: pref.preferredChannels || {
+                            email: true,
+                            sms: false,
+                            phone: false,
+                            push: true,
+                            mail: false
+                        },
+                        topicSubscriptions: pref.topicSubscriptions || {
+                            marketing: false,
+                            promotions: false,
+                            serviceUpdates: true,
+                            billing: true,
+                            security: true,
+                            newsletter: false,
+                            surveys: false
+                        },
+                        doNotDisturb: {
+                            enabled: pref.quietHours?.enabled || false,
+                            start: pref.quietHours?.start || '22:00',
+                            end: pref.quietHours?.end || '08:00'
+                        },
+                        frequency: pref.frequency || 'immediate',
+                        timezone: pref.timezone || 'UTC',
+                        language: pref.language || 'en',
+                        lastUpdated: pref.updatedAt || pref.createdAt || new Date().toISOString()
+                    });
+                });
+                
+            } catch (csrError) {
+                console.log('CommunicationPreference model error:', csrError.message);
+                // Add default communication preferences if none exist
+                allPreferences.push({
+                    id: 'default-comm-' + req.user.id,
+                    partyId: req.user.id,
+                    preferenceType: 'communication',
+                    category: 'communication',
+                    preferredChannels: {
+                        email: true,
+                        sms: false,
+                        phone: false,
+                        push: true,
+                        mail: false
+                    },
+                    topicSubscriptions: {
+                        marketing: false,
+                        promotions: false,
+                        serviceUpdates: true,
+                        billing: true,
+                        security: true,
+                        newsletter: false,
+                        surveys: false
+                    },
+                    doNotDisturb: {
+                        enabled: false,
+                        start: '22:00',
+                        end: '08:00'
+                    },
+                    frequency: 'immediate',
+                    timezone: 'UTC',
+                    language: 'en',
+                    lastUpdated: new Date().toISOString()
+                });
+            }
+            
+            // 3. Add individual user preferences
+            userPreferences.forEach(pref => {
+                allPreferences.push({
+                    id: pref.id || pref._id.toString(),
+                    userId: pref.userId,
+                    partyId: pref.partyId,
+                    preferenceId: pref.preferenceId,
+                    preferenceType: pref.preferenceType || 'user',
+                    category: pref.category || 'general',
+                    value: pref.value,
+                    source: pref.source || 'user',
+                    metadata: pref.metadata || {},
+                    lastUpdated: pref.updatedAt || pref.createdAt || new Date().toISOString()
+                });
+            });
+            
+        } catch (error) {
+            console.log('Database query failed, using mock preferences:', error.message);
+            // Fallback to mock data if database fails
+            allPreferences = [
+                {
+                    id: 'mock-comm-pref',
+                    partyId: req.user.id,
+                    preferenceType: 'communication',
+                    category: 'communication',
+                    preferredChannels: {
+                        email: true,
+                        sms: false,
+                        phone: false,
+                        push: true,
+                        mail: false
+                    },
+                    topicSubscriptions: {
+                        marketing: false,
+                        promotions: false,
+                        serviceUpdates: true,
+                        billing: true,
+                        security: true,
+                        newsletter: false,
+                        surveys: false
+                    },
+                    doNotDisturb: {
+                        enabled: false,
+                        start: '22:00',
+                        end: '08:00'
+                    },
+                    frequency: 'immediate',
+                    timezone: 'UTC',
+                    language: 'en',
+                    lastUpdated: new Date().toISOString()
+                }
+            ];
+        }
         
-        console.log(`Found ${preferences.length} preferences for customer`);
+        console.log(`Found ${allPreferences.length} total preferences for customer`);
         
         res.json({
             success: true,
             data: {
-                preferences: preferences
+                preferences: allPreferences,
+                total: allPreferences.length,
+                communication: allPreferences.filter(p => p.preferenceType === 'communication'),
+                user: allPreferences.filter(p => p.preferenceType === 'user' || p.preferenceType !== 'communication')
             }
         });
     } catch (error) {
         console.error('Error fetching customer preferences:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error'
+        });
+    }
+});
+
+// POST endpoint for updating customer preferences
+app.post("/api/v1/customer/preferences", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({
+                error: true,
+                message: 'Access denied'
+            });
+        }
+        
+        const { preferences, type, updates } = req.body;
+        console.log('✅ Updating preferences for customer:', req.user.id, 'type:', type);
+        
+        if (!preferences && !updates) {
+            return res.status(400).json({
+                error: true,
+                message: 'Preferences or updates data is required'
+            });
+        }
+        
+        const mongoose = require('mongoose');
+        let updatedPreferences = [];
+        
+        try {
+            // Handle communication preferences
+            if (type === 'communication' || (preferences && preferences.preferenceType === 'communication')) {
+                try {
+                    const updateData = preferences || updates;
+                    
+                    const communicationPreference = await CommunicationPreference.findOneAndUpdate(
+                        { partyId: req.user.id },
+                        {
+                            partyId: req.user.id,
+                            preferredChannels: updateData.preferredChannels || {
+                                email: true,
+                                sms: false,
+                                phone: false,
+                                push: true,
+                                mail: false
+                            },
+                            topicSubscriptions: updateData.topicSubscriptions || {
+                                marketing: false,
+                                promotions: false,
+                                serviceUpdates: true,
+                                billing: true,
+                                security: true,
+                                newsletter: false,
+                                surveys: false
+                            },
+                            quietHours: updateData.quietHours ? {
+                                enabled: updateData.quietHours.enabled || false,
+                                start: updateData.quietHours.start || '22:00',
+                                end: updateData.quietHours.end || '08:00'
+                            } : updateData.doNotDisturb ? {
+                                enabled: updateData.doNotDisturb.enabled || false,
+                                start: updateData.doNotDisturb.start || '22:00',
+                                end: updateData.doNotDisturb.end || '08:00'
+                            } : {
+                                enabled: false,
+                                start: '22:00',
+                                end: '08:00'
+                            },
+                            frequency: updateData.frequency || 'immediate',
+                            timezone: updateData.timezone || 'UTC',
+                            language: updateData.language || 'en',
+                            updatedAt: new Date(),
+                            updatedBy: req.user.id
+                        },
+                        { 
+                            new: true,
+                            upsert: true,
+                            runValidators: true
+                        }
+                    );
+                    
+                    updatedPreferences.push({
+                        id: communicationPreference._id.toString(),
+                        partyId: communicationPreference.partyId,
+                        preferenceType: 'communication',
+                        category: 'communication',
+                        preferredChannels: communicationPreference.preferredChannels,
+                        topicSubscriptions: communicationPreference.topicSubscriptions,
+                        doNotDisturb: {
+                            enabled: communicationPreference.quietHours?.enabled || false,
+                            start: communicationPreference.quietHours?.start || '22:00',
+                            end: communicationPreference.quietHours?.end || '08:00'
+                        },
+                        frequency: communicationPreference.frequency,
+                        timezone: communicationPreference.timezone,
+                        language: communicationPreference.language,
+                        lastUpdated: communicationPreference.updatedAt
+                    });
+                    
+                    // Log audit event
+                    try {
+                        const AuditLog = mongoose.model('AuditLog');
+                        await AuditLog.create({
+                            action: 'PREFERENCE_UPDATE',
+                            entity: 'Preference',
+                            entityId: communicationPreference._id,
+                            performedBy: req.user.id,
+                            details: {
+                                preferenceType: 'communication',
+                                partyId: req.user.id,
+                                changes: updateData
+                            },
+                            timestamp: new Date()
+                        });
+                    } catch (auditError) {
+                        console.log('Audit log creation failed:', auditError.message);
+                    }
+                    
+                } catch (commError) {
+                    console.log('Communication preference update failed:', commError.message);
+                    return res.status(500).json({
+                        error: true,
+                        message: 'Failed to update communication preferences'
+                    });
+                }
+            }
+            
+            // Handle individual user preferences
+            if (Array.isArray(preferences)) {
+                const UserPreference = mongoose.model('UserPreference');
+                
+                for (const pref of preferences) {
+                    if (pref.preferenceType !== 'communication') {
+                        const userPreference = await UserPreference.findOneAndUpdate(
+                            { 
+                                $or: [
+                                    { userId: req.user.id, preferenceId: pref.preferenceId },
+                                    { partyId: req.user.id, preferenceId: pref.preferenceId }
+                                ]
+                            },
+                            {
+                                userId: req.user.id,
+                                partyId: req.user.id,
+                                preferenceId: pref.preferenceId,
+                                preferenceType: pref.preferenceType || 'user',
+                                category: pref.category || 'general',
+                                value: pref.value,
+                                source: 'user',
+                                metadata: pref.metadata || {},
+                                updatedAt: new Date()
+                            },
+                            { 
+                                new: true,
+                                upsert: true,
+                                runValidators: true
+                            }
+                        );
+                        
+                        updatedPreferences.push({
+                            id: userPreference._id.toString(),
+                            userId: userPreference.userId,
+                            partyId: userPreference.partyId,
+                            preferenceId: userPreference.preferenceId,
+                            preferenceType: userPreference.preferenceType,
+                            category: userPreference.category,
+                            value: userPreference.value,
+                            source: userPreference.source,
+                            metadata: userPreference.metadata,
+                            lastUpdated: userPreference.updatedAt
+                        });
+                    }
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error updating preferences:', error);
+            return res.status(500).json({
+                error: true,
+                message: 'Failed to update preferences: ' + error.message
+            });
+        }
+        
+        console.log(`Successfully updated ${updatedPreferences.length} preferences`);
+        
+        res.json({
+            success: true,
+            message: 'Preferences updated successfully',
+            data: {
+                preferences: updatedPreferences,
+                total: updatedPreferences.length
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error updating customer preferences:', error);
         res.status(500).json({
             error: true,
             message: 'Internal server error'
@@ -8809,6 +9145,134 @@ app.get("/api/v1/csr/customers/search", verifyToken, (req, res) => {
         total: filteredCustomers.length,
         searchCriteria: { query, type }
     });
+});
+
+// CSR - Get specific customer's communication preferences
+app.get("/api/v1/csr/customers/:customerId/preferences", verifyToken, async (req, res) => {
+    if (req.user.role !== 'csr' && req.user.role !== 'admin') {
+        return res.status(403).json({
+            error: true,
+            message: 'Access denied. CSR or Admin role required.'
+        });
+    }
+
+    const { customerId } = req.params;
+
+    try {
+        console.log(`🔍 CSR fetching preferences for customer: ${customerId}`);
+
+        // Import models here to avoid issues
+        const mongoose = require('mongoose');
+        const CommunicationPreference = mongoose.model('CommunicationPreference');
+        const UserPreference = mongoose.model('UserPreference');
+
+        // Try to get communication preferences from CommunicationPreference collection
+        let communicationPrefs = await CommunicationPreference.findOne({ 
+            partyId: customerId 
+        }).lean();
+
+        // If no communication preferences found, try UserPreference collection
+        if (!communicationPrefs) {
+            console.log(`🔍 No CommunicationPreference found, checking UserPreference for: ${customerId}`);
+            const userPrefs = await UserPreference.find({ 
+                $or: [
+                    { userId: customerId },
+                    { partyId: customerId }
+                ]
+            }).lean();
+
+            if (userPrefs && userPrefs.length > 0) {
+                // Transform UserPreference to CommunicationPreference format
+                communicationPrefs = {
+                    id: `comm_${customerId}`,
+                    partyId: customerId,
+                    preferredChannels: {
+                        email: userPrefs.some(p => p.preferenceId?.includes('email') && p.value?.enabled) || true,
+                        sms: userPrefs.some(p => p.preferenceId?.includes('sms') && p.value?.enabled) || false,
+                        push: userPrefs.some(p => p.preferenceId?.includes('push') && p.value?.enabled) || true,
+                        phone: userPrefs.some(p => p.preferenceId?.includes('phone') && p.value?.enabled) || false
+                    },
+                    topicSubscriptions: {
+                        marketing: userPrefs.some(p => p.preferenceId?.includes('marketing') && p.value?.enabled) || false,
+                        promotional: userPrefs.some(p => p.preferenceId?.includes('promotional') && p.value?.enabled) || false,
+                        transactional: userPrefs.some(p => p.preferenceId?.includes('transactional') && p.value?.enabled) || true,
+                        service: userPrefs.some(p => p.preferenceId?.includes('service') && p.value?.enabled) || true,
+                        security: userPrefs.some(p => p.preferenceId?.includes('security') && p.value?.enabled) || true,
+                        billing: userPrefs.some(p => p.preferenceId?.includes('billing') && p.value?.enabled) || true
+                    },
+                    doNotDisturb: {
+                        enabled: userPrefs.some(p => p.preferenceId?.includes('doNotDisturb') && p.value?.enabled) || false,
+                        startTime: '22:00',
+                        endTime: '08:00',
+                        days: ['sunday', 'saturday']
+                    },
+                    frequency: 'weekly',
+                    timezone: 'Asia/Colombo',
+                    language: 'en',
+                    lastUpdated: userPrefs[0]?.updatedAt || new Date().toISOString(),
+                    updatedBy: userPrefs[0]?.userId || 'system'
+                };
+            }
+        }
+
+        // If still no preferences found, create default ones
+        if (!communicationPrefs) {
+            console.log(`🔧 Creating default preferences for customer: ${customerId}`);
+            communicationPrefs = {
+                id: `comm_${customerId}`,
+                partyId: customerId,
+                preferredChannels: {
+                    email: true,
+                    sms: false,
+                    push: true,
+                    phone: false
+                },
+                topicSubscriptions: {
+                    marketing: false,
+                    promotional: false,
+                    transactional: true,
+                    service: true,
+                    security: true,
+                    billing: true
+                },
+                doNotDisturb: {
+                    enabled: false,
+                    startTime: '22:00',
+                    endTime: '08:00',
+                    days: ['sunday', 'saturday']
+                },
+                frequency: 'weekly',
+                timezone: 'Asia/Colombo',
+                language: 'en',
+                lastUpdated: new Date().toISOString(),
+                updatedBy: 'system'
+            };
+        }
+
+        // Ensure the response has the correct structure
+        const responseData = {
+            ...communicationPrefs,
+            id: communicationPrefs.id || communicationPrefs._id?.toString() || `comm_${customerId}`,
+            partyId: customerId,
+            lastUpdated: communicationPrefs.lastUpdated || communicationPrefs.updatedAt || new Date().toISOString(),
+            updatedBy: communicationPrefs.updatedBy || 'system'
+        };
+
+        console.log(`✅ Successfully retrieved preferences for customer: ${customerId}`);
+
+        res.json({
+            success: true,
+            preferences: responseData
+        });
+
+    } catch (error) {
+        console.error(`❌ Error fetching customer preferences for ${customerId}:`, error);
+        res.status(500).json({
+            error: true,
+            message: 'Failed to fetch customer communication preferences',
+            details: error.message
+        });
+    }
 });
 
 // WebSocket connection handling

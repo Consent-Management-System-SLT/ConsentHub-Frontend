@@ -256,14 +256,20 @@ class CustomerDashboardService {
     try {
       const response = await multiServiceApiClient.makeRequest(
         'GET',
-        '/api/v1/consents',
+        '/api/v1/customer/consents',
         undefined,
-        'customer',
-        'consent'
+        'customer'
       );
 
-      const consents = response?.data || response || [];
-      return consents.map((consent: any) => ({
+      // Handle the response structure: {success: true, data: {consents: [...]}}
+      const consentsData = response?.data?.consents || response?.consents || [];
+      
+      if (!Array.isArray(consentsData)) {
+        console.warn('Consents data is not an array:', consentsData);
+        return [];
+      }
+
+      return consentsData.map((consent: any) => ({
         id: consent.id || consent._id,
         purpose: consent.purpose || 'General Data Processing',
         dataCategory: consent.dataCategory || 'Personal Information',

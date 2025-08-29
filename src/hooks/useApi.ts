@@ -67,6 +67,23 @@ export function useConsentStats(partyId?: string) {
 export function usePreferences(partyId?: string): { data: PrivacyPreference | PrivacyPreference[] | null; loading: boolean; error: string | null; refetch: () => void } {
   return useApi(
     () => {
+      // For customer users, use the comprehensive customer preferences endpoint
+      const userRole = localStorage.getItem('userRole');
+      if (userRole === 'customer') {
+        console.log('🔄 Loading customer preferences from MongoDB Atlas');
+        return preferenceService.getCustomerPreferences().then(r => {
+          console.log('📊 MongoDB response received:', r.success);
+          
+          // Transform the response to match expected format
+          if (r.data && r.data.preferences) {
+            console.log('✅ Preferences loaded from MongoDB Atlas:', r.data.preferences.length);
+            return r.data.preferences;
+          }
+          return r.data || [];
+        });
+      }
+      
+      // For admin/CSR users, use party-specific lookup
       if (partyId) {
         return preferenceService.getPreferenceByPartyId(partyId).then(r => r.data);
       }
@@ -296,7 +313,7 @@ export function usePreferenceMutation() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updatePreference = useCallback(async (id: string, updates: Parameters<typeof preferenceService.updatePreference>[1]) => {
+  const updatePreference = useCallback(async (id: string, updates: any) => {
     setLoading(true);
     setError(null);
     try {
@@ -311,7 +328,7 @@ export function usePreferenceMutation() {
     }
   }, []);
 
-  const updatePreferenceByPartyId = useCallback(async (partyId: string, updates: Parameters<typeof preferenceService.updatePreferenceByPartyId>[1]) => {
+  const updatePreferenceByPartyId = useCallback(async (partyId: string, updates: any) => {
     setLoading(true);
     setError(null);
     try {
@@ -326,9 +343,25 @@ export function usePreferenceMutation() {
     }
   }, []);
 
+  const updateCommunicationPreferences = useCallback(async (partyId: string, preferences: any) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await preferenceService.updateCommunicationPreferences(partyId, preferences);
+      return response.data;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update communication preferences';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     updatePreference,
     updatePreferenceByPartyId,
+    updateCommunicationPreferences,
     loading,
     error
   };

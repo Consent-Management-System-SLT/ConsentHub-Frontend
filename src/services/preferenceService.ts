@@ -77,9 +77,13 @@ const apiRequest = async <T>(
   try {
     const url = `${API_BASE_URL}${endpoint}`;
     
+    // Get auth token from localStorage
+    const token = localStorage.getItem('authToken');
+    
     const defaultOptions: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
     };
 
@@ -419,6 +423,106 @@ export const preferenceService = {
       method: 'POST',
       body: JSON.stringify({ ...configData, options }),
     });
+  },
+
+  // ==================== CUSTOMER PREFERENCE METHODS ====================
+
+  /**
+   * Get preferences for a specific customer/party
+   */
+  async getPreferenceByPartyId(partyId: string): Promise<ApiResponse<any>> {
+    return apiRequest<any>(`/customer/preferences?partyId=${partyId}`);
+  },
+
+  /**
+   * Update preferences by party ID (for customer preference updates)
+   */
+  async updatePreferenceByPartyId(partyId: string, preferenceData: any): Promise<ApiResponse<any>> {
+    return apiRequest<any>(`/customer/preferences`, {
+      method: 'POST',
+      body: JSON.stringify({
+        ...preferenceData,
+        partyId: partyId
+      }),
+    });
+  },
+
+  /**
+   * Update communication preferences (bulk update)
+   */
+  async updateCommunicationPreferences(partyId: string, preferences: {
+    preferredChannels?: {
+      email?: boolean;
+      sms?: boolean;
+      phone?: boolean;
+      push?: boolean;
+      mail?: boolean;
+    };
+    topicSubscriptions?: {
+      marketing?: boolean;
+      promotions?: boolean;
+      serviceUpdates?: boolean;
+      billing?: boolean;
+      security?: boolean;
+      newsletter?: boolean;
+      surveys?: boolean;
+    };
+    frequency?: 'immediate' | 'daily' | 'weekly' | 'monthly' | 'quarterly';
+    timezone?: string;
+    language?: string;
+    doNotDisturb?: {
+      enabled?: boolean;
+      start?: string;
+      end?: string;
+    };
+  }): Promise<ApiResponse<any>> {
+    console.log('🔄 Updating communication preferences for party:', partyId);
+    return apiRequest<any>(`/customer/preferences`, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'communication',
+        updates: {
+          preferredChannels: preferences.preferredChannels || {},
+          topicSubscriptions: preferences.topicSubscriptions || {},
+          frequency: preferences.frequency || 'immediate',
+          timezone: preferences.timezone || 'UTC',
+          language: preferences.language || 'en',
+          quietHours: preferences.doNotDisturb ? {
+            enabled: preferences.doNotDisturb.enabled || false,
+            start: preferences.doNotDisturb.start || '22:00',
+            end: preferences.doNotDisturb.end || '08:00'
+          } : {
+            enabled: false,
+            start: '22:00',
+            end: '08:00'
+          }
+        }
+      }),
+    });
+  },
+
+  /**
+   * Get customer preferences (includes communication and user preferences)
+   */
+  async getCustomerPreferences(): Promise<ApiResponse<any>> {
+    console.log('📊 Fetching customer preferences from comprehensive backend with cache-busting');
+    // Add cache-busting timestamp to URL instead of problematic headers
+    const cacheBuster = Date.now();
+    return apiRequest<any>(`/customer/preferences?_t=${cacheBuster}`);
+  },
+
+  /**
+   * Get customer preference summary
+   */
+  async getCustomerPreferenceSummary(partyId: string): Promise<ApiResponse<any>> {
+    return apiRequest<any>(`/customer/preferences/summary?partyId=${partyId}`);
+  },
+
+  /**
+   * Get customer preferences by channel
+   */
+  async getCustomerPreferencesByChannel(partyId: string): Promise<ApiResponse<any>> {
+    return apiRequest<any>(`/customer/preferences/by-channel?partyId=${partyId}`);
   }
 };
 

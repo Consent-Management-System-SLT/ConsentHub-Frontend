@@ -28,7 +28,7 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
   // Load data from backend
   const { data: preferencesData, loading: preferencesLoading, refetch: refetchPreferences } = usePreferences(filteredCustomer?.id);
   const { data: partiesData, loading: partiesLoading } = useParties();
-  const { updatePreference, loading: mutationLoading } = usePreferenceMutation();
+  const { updatePreference, updateCommunicationPreferences, loading: mutationLoading } = usePreferenceMutation();
 
   // Transform data to ensure it's an array
   const preferences = Array.isArray(preferencesData) ? preferencesData : 
@@ -70,14 +70,29 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
   };
 
   const handleSave = async () => {
-    if (editingId && editForm) {
+    if (editingId && editForm && filteredCustomer) {
       try {
-        await updatePreference(editingId, editForm);
+        // Check if this is a bulk preference update (has preferredChannels or topicSubscriptions)
+        if (editForm.preferredChannels || editForm.topicSubscriptions || editForm.doNotDisturb) {
+          // Use the new bulk update method for communication preferences
+          await updateCommunicationPreferences(filteredCustomer.id, {
+            preferredChannels: editForm.preferredChannels,
+            topicSubscriptions: editForm.topicSubscriptions,
+            doNotDisturb: editForm.doNotDisturb,
+            frequency: (editForm as any).frequency,
+            timezone: (editForm as any).timezone,
+            language: (editForm as any).language
+          });
+        } else {
+          // Fallback to individual preference update
+          await updatePreference(editingId, editForm);
+        }
         await refetchPreferences(); // Refresh the data
         setEditingId(null);
         setEditForm({});
       } catch (error) {
         console.error('Failed to update preference:', error);
+        // You could add toast notification here
       }
     }
   };

@@ -10,9 +10,9 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
-import { useCustomerPreferences } from '../../hooks/useCustomerApi';
-import { customerApiClient } from '../../services/customerApiClient';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { preferenceService } from '../../services/preferenceService';
+import { authService } from '../../services/authService';
 
 interface PreferenceSettings {
   channels: {
@@ -79,39 +79,115 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
 
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load real preferences data
-  const { data: preferencesData, loading, error } = useCustomerPreferences();
-  
   // Add notification functionality
   const { addNotification } = useNotifications();
 
+  // Load preferences from the correct service
+  const loadPreferences = async () => {
+    try {
+      setIsLoading(true);
+      console.log('🔄 Loading customer preferences...');
+      
+      const response = await preferenceService.getCustomerPreferences();
+      
+      if (response.success && response.data) {
+        console.log('📊 Raw preferences data:', response.data);
+        
+        console.log('🔍 Debug - response.data:', typeof response.data, response.data);
+        
+        // Handle both possible response structures for maximum compatibility
+        let communicationData = null;
+        
+        // Pattern 1: Direct communication array
+        if (response.data.communication && Array.isArray(response.data.communication) && response.data.communication.length > 0) {
+          communicationData = response.data.communication;
+          console.log('🔍 Using direct communication structure');
+        }
+        // Pattern 2: Nested data.communication array (comprehensive backend)
+        else if (response.data.data && response.data.data.communication && Array.isArray(response.data.data.communication) && response.data.data.communication.length > 0) {
+          communicationData = response.data.data.communication;
+          console.log('🔍 Using nested data.communication structure');
+        }
+        
+        const communicationPrefs = communicationData && communicationData.length > 0 
+          ? communicationData[0] 
+          : null;
+        
+        console.log('🔍 Debug - communicationPrefs result:', !!communicationPrefs);
+        
+        if (communicationPrefs) {
+          console.log('🔄 Mapping backend preferences to UI format...');
+          console.log('📊 Communication preferences:', communicationPrefs);
+          
+          const updatedPreferences = { ...preferences };
+          
+          // Map preferred channels
+          if (communicationPrefs.preferredChannels) {
+            updatedPreferences.channels = {
+              email: communicationPrefs.preferredChannels.email || false,
+              sms: communicationPrefs.preferredChannels.sms || false,
+              push: communicationPrefs.preferredChannels.push || false,
+              inApp: communicationPrefs.preferredChannels.push || false, // Map push to inApp for UI
+            };
+          }
+          
+          // Map topic subscriptions
+          if (communicationPrefs.topicSubscriptions) {
+            updatedPreferences.topics = {
+              offers: communicationPrefs.topicSubscriptions.marketing || false,
+              productUpdates: communicationPrefs.topicSubscriptions.serviceUpdates || false,
+              serviceAlerts: communicationPrefs.topicSubscriptions.serviceUpdates || false,
+              billing: communicationPrefs.topicSubscriptions.billing || false,
+              security: communicationPrefs.topicSubscriptions.security || false,
+              newsletters: communicationPrefs.topicSubscriptions.newsletter || false,
+            };
+          }
+          
+          // Map do not disturb settings (backend converts quietHours -> doNotDisturb for frontend)
+          if (communicationPrefs.doNotDisturb) {
+            updatedPreferences.dndSettings = {
+              enabled: communicationPrefs.doNotDisturb.enabled || false,
+              startTime: communicationPrefs.doNotDisturb.start || '22:00',
+              endTime: communicationPrefs.doNotDisturb.end || '08:00',
+            };
+          }
+          
+          // Map other settings
+          if (communicationPrefs.language) {
+            updatedPreferences.language = communicationPrefs.language;
+          }
+          
+          if (communicationPrefs.timezone) {
+            updatedPreferences.timezone = communicationPrefs.timezone;
+          }
+          
+          console.log('✅ Preferences mapped successfully:', updatedPreferences);
+          setPreferences(updatedPreferences);
+          
+        } else {
+          console.log('⚠️ No communication preferences found in response, using defaults');
+        }
+      } else {
+        console.warn('⚠️ Failed to load preferences:', response.error);
+      }
+    } catch (error) {
+      console.error('❌ Error loading preferences:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load preferences on component mount
+  useEffect(() => {
+    loadPreferences();
+  }, []);
+
   // Update preferences when data loads
   useEffect(() => {
-    if (preferencesData && preferencesData.preferences && Array.isArray(preferencesData.preferences)) {
-      const loadedPreferences = { ...preferences };
-      
-      // Map backend preference data to UI format
-      preferencesData.preferences.forEach((pref: any) => {
-        if (pref.value && pref.value.category === 'communication') {
-          const channelType = pref.value.type;
-          const isEnabled = pref.value.enabled;
-          
-          if (channelType === 'email') {
-            loadedPreferences.channels.email = isEnabled;
-          } else if (channelType === 'sms') {
-            loadedPreferences.channels.sms = isEnabled;
-          } else if (channelType === 'push') {
-            // Map push to both push and inApp for UI compatibility
-            loadedPreferences.channels.push = isEnabled;
-            loadedPreferences.channels.inApp = isEnabled;
-          }
-        }
-      });
-      
-      setPreferences(loadedPreferences);
-    }
-  }, [preferencesData]);
+    // This is now handled by loadPreferences function
+  }, []);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const updateChannelPreference = (channel: keyof PreferenceSettings['channels'], value: boolean) => {
@@ -161,45 +237,66 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // First, fetch current preferences to get their IDs
-      const currentPrefsResponse = await customerApiClient.getPreferences();
-      const currentPrefs = currentPrefsResponse.data?.preferences || [];
-      
-      // Map frontend preference structure to backend updates
-      const updatePromises: Promise<any>[] = [];
-      
-      // Update each channel preference
-      Object.entries(preferences.channels).forEach(([channel, enabled]) => {
-        const backendChannel = channel === 'inApp' ? 'push' : channel; // Map inApp to push
-        const existingPref = currentPrefs.find((p: any) => 
-          p.value?.type === backendChannel && p.value?.category === 'communication'
-        );
+      // Get the current user data from context
+      const userData = await authService.getCurrentUser();
+      if (!userData || !userData.id) {
+        throw new Error('User not authenticated');
+      }
+
+      // Map frontend preference structure to backend format
+      const preferredChannels = {
+        email: preferences.channels.email,
+        sms: preferences.channels.sms,
+        push: preferences.channels.inApp, // Map inApp to push
+        phone: false, // Default value
+        mail: false   // Default value
+      };
+
+      const topicSubscriptions = {
+        marketing: preferences.topics.offers, // Map offers to marketing
+        promotions: preferences.topics.offers, // Map offers to promotions
+        serviceUpdates: preferences.topics.serviceAlerts, // Map serviceAlerts to serviceUpdates
+        billing: preferences.topics.billing,
+        security: preferences.topics.security,
+        newsletter: preferences.topics.newsletters, // Map newsletters to newsletter
+        surveys: false // Default value as it's not in the frontend
+      };
+
+      const doNotDisturbSettings = {
+        enabled: preferences.dndSettings.enabled,
+        start: preferences.dndSettings.startTime,
+        end: preferences.dndSettings.endTime
+      };
+
+      // Use the preferenceService to update communication preferences
+      const response = await preferenceService.updateCommunicationPreferences(userData.id, {
+        preferredChannels,
+        topicSubscriptions,
+        frequency: 'immediate', // Default frequency since the frontend has a different structure
+        timezone: preferences.timezone,
+        language: preferences.language,
+        doNotDisturb: doNotDisturbSettings
+      });
+
+      if (response.success) {
+        console.log('Preferences saved successfully');
+        setSaveStatus('success');
+        setHasChanges(false);
         
-        if (existingPref) {
-          const updateData = {
-            value: {
-              ...existingPref.value,
-              enabled: enabled
-            }
-          };
-          updatePromises.push(customerApiClient.updatePreference(existingPref._id, updateData));
-        }
-      });
-      
-      // Execute all updates
-      await Promise.all(updatePromises);
-      
-      console.log('Preferences saved successfully');
-      setSaveStatus('success');
-      setHasChanges(false);
-      
-      // Add notification for admin/CSR users
-      addNotification({
-        title: 'Customer Preferences Updated',
-        message: `Customer has updated their communication preferences at ${new Date().toLocaleString()}`,
-        type: 'preference',
-        category: 'info'
-      });
+        // Reload preferences to ensure UI shows the saved state
+        console.log('🔄 Reloading preferences after save...');
+        await loadPreferences();
+        
+        // Add notification for admin/CSR users
+        addNotification({
+          title: 'Customer Preferences Updated',
+          message: `Customer has updated their communication preferences at ${new Date().toLocaleString()}`,
+          type: 'preference',
+          category: 'info'
+        });
+      } else {
+        throw new Error(response.error || 'Failed to save preferences');
+      }
       
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
@@ -274,6 +371,20 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
       </button>
     </div>
   );
+
+  // Show loading state while preferences are being loaded
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-myslt-primary border-t-transparent mx-auto mb-4"></div>
+            <p className="text-myslt-text-muted">Loading your preferences...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
