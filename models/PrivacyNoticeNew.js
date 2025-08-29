@@ -109,6 +109,11 @@ const privacyNoticeSchema = new mongoose.Schema({
     userId: { type: String, required: true },
     userEmail: String,
     acknowledgedAt: { type: Date, default: Date.now },
+    decision: { 
+      type: String, 
+      enum: ['accept', 'decline'], 
+      required: true 
+    },
     ipAddress: String,
     userAgent: String
   }],

@@ -7105,23 +7105,54 @@ app.get("/api/v1/customer/privacy-notices", verifyToken, async (req, res) => {
         
         console.log('✅ Fetching privacy notices for customer:', req.user.id);
         
-        // Get customer-specific privacy notices
-        const { getCustomerIsolatedData } = require('./customer-data-provisioning');
-        const notices = await getCustomerIsolatedData(req.user.id, 'privacy_notices');
+        // Get all active privacy notices
+        const allNotices = await PrivacyNotice.find({ 
+            status: 'active' 
+        }).sort({ createdAt: -1 });
         
-        console.log(`Found ${notices.length} privacy notices for customer ${req.user.id}`);
+        // Process notices to include customer acknowledgment status
+        const processedNotices = allNotices.map(notice => {
+            const customerAck = notice.acknowledgments?.find(
+                ack => ack.userId === req.user.id || ack.userEmail === req.user.email
+            );
+            
+            return {
+                id: notice._id,
+                noticeId: notice.noticeId,
+                title: notice.title,
+                description: notice.description,
+                content: notice.content,
+                version: notice.version,
+                category: notice.category,
+                status: notice.status,
+                language: notice.language,
+                effectiveDate: notice.effectiveDate,
+                expirationDate: notice.expirationDate,
+                priority: notice.priority,
+                metadata: notice.metadata,
+                createdAt: notice.createdAt,
+                updatedAt: notice.updatedAt,
+                // Customer-specific acknowledgment info
+                acknowledged: !!customerAck,  // Convert to boolean
+                acknowledgedAt: customerAck?.acknowledgedAt,
+                customerDecision: customerAck?.decision
+            };
+        });
+        
+        console.log(`Found ${processedNotices.length} privacy notices for customer ${req.user.id}`);
         
         res.json({
             success: true,
             data: {
-                notices: notices
+                notices: processedNotices
             }
         });
     } catch (error) {
         console.error('Error fetching privacy notices:', error);
         res.status(500).json({
             error: true,
-            message: 'Internal server error'
+            message: 'Internal server error',
+            details: error.message
         });
     }
 });
@@ -7661,72 +7692,113 @@ app.post("/api/v1/privacy-notices/:id/acknowledge", verifyToken, async (req, res
         const noticeId = req.params.id;
         const { decision } = req.body; // 'accept' or 'decline'
         
-        // Find the customer-specific privacy notice
-        const notice = await PrivacyNotice.findOne({ 
+        console.log('� DEBUGGING ACKNOWLEDGMENT ENDPOINT:');
+        console.log(`   - Notice ID: ${noticeId}`);
+        console.log(`   - Decision: ${decision}`);
+        console.log(`   - User ID: ${req.user?.id}`);
+        console.log(`   - User Email: ${req.user?.email}`);
+        console.log(`   - Request Body:`, JSON.stringify(req.body, null, 2));
+        console.log(`   - User Object:`, JSON.stringify(req.user, null, 2));
+        
+        if (!decision || !['accept', 'decline'].includes(decision)) {
+            console.log('❌ Invalid decision provided');
+            return res.status(400).json({
+                success: false,
+                error: "Invalid decision. Must be 'accept' or 'decline'"
+            });
+        }
+        
+        // Find the privacy notice using multiple possible ID formats
+        console.log('🔍 Searching for privacy notice...');
+        let notice = await PrivacyNotice.findOne({ 
             $or: [
                 { _id: noticeId },
-                { noticeId: noticeId }
-            ],
-            $or: [
-                { customerId: req.user.id },
-                { status: 'active', customerId: { $exists: false } } // Global notices
+                { noticeId: noticeId },
+                { 'metadata.originalId': noticeId }
             ]
         });
         
         if (!notice) {
+            console.log(`❌ Notice not found with ID: ${noticeId}`);
+            // Let's also check what notices exist
+            const allNotices = await PrivacyNotice.find({}).limit(5);
+            console.log('📋 Available notices:', allNotices.map(n => ({
+                _id: n._id,
+                noticeId: n.noticeId,
+                title: n.title
+            })));
+            
             return res.status(404).json({
                 success: false,
                 error: "Privacy notice not found"
             });
         }
 
-        // Update the notice with customer's decision
-        if (notice.customerId) {
-            // Customer-specific notice
-            notice.acknowledged = true;
-            notice.acknowledgedAt = new Date();
-            notice.status = decision === 'accept' ? 'accepted' : 'declined';
-            notice.customerDecision = decision;
-            
-            await notice.save();
+        console.log(`✅ Found notice: ${notice.title} (MongoDB ID: ${notice._id})`);
+
+        // Check if customer has already acknowledged this notice
+        const existingAcknowledgment = notice.acknowledgments?.find(
+            ack => ack.userId === req.user.id || ack.userEmail === req.user.email
+        );
+
+        console.log('📋 Existing acknowledgment:', existingAcknowledgment ? 'Found' : 'Not found');
+
+        if (existingAcknowledgment) {
+            // Update existing acknowledgment
+            console.log('🔄 Updating existing acknowledgment...');
+            existingAcknowledgment.decision = decision;
+            existingAcknowledgment.acknowledgedAt = new Date();
+            existingAcknowledgment.ipAddress = req.ip;
+            existingAcknowledgment.userAgent = req.get('User-Agent');
         } else {
-            // Create customer-specific acknowledgment for global notice
-            const customerNotice = new PrivacyNotice({
-                noticeId: `${notice.noticeId}_customer_${req.user.id}`,
-                title: notice.title,
-                content: notice.content,
-                category: notice.category,
-                status: decision === 'accept' ? 'accepted' : 'declined',
-                priority: notice.priority,
-                version: notice.version,
-                effectiveDate: notice.effectiveDate,
-                language: notice.language,
-                customerId: req.user.id,
-                acknowledged: true,
-                acknowledgedAt: new Date(),
-                customerDecision: decision,
-                metadata: {
-                    globalNoticeId: notice._id,
-                    customerAction: decision,
-                    actionTimestamp: new Date()
-                }
-            });
+            // Create new acknowledgment
+            console.log('➕ Creating new acknowledgment...');
+            if (!notice.acknowledgments) {
+                notice.acknowledgments = [];
+            }
             
-            await customerNotice.save();
+            notice.acknowledgments.push({
+                userId: req.user.id,
+                userEmail: req.user.email,
+                acknowledgedAt: new Date(),
+                decision: decision,
+                ipAddress: req.ip,
+                userAgent: req.get('User-Agent')
+            });
         }
+
+        // Save the updated notice
+        console.log('💾 Saving updated notice...');
+        const savedNotice = await notice.save();
+        console.log(`✅ Notice saved successfully. Acknowledgments count: ${savedNotice.acknowledgments?.length || 0}`);
 
         console.log(`📋 Privacy notice ${noticeId} ${decision}ed by customer ${req.user.id}`);
 
         res.json({
             success: true,
-            message: `Privacy notice ${decision}ed successfully`
+            message: `Privacy notice ${decision}ed successfully`,
+            data: {
+                noticeId: notice.noticeId || notice._id,
+                decision: decision,
+                acknowledgedAt: new Date()
+            }
         });
     } catch (error) {
         console.error('❌ Error acknowledging privacy notice:', error);
+        console.error('❌ Error stack:', error.stack);
+        console.error('❌ Error details:', {
+            name: error.name,
+            message: error.message,
+            code: error.code
+        });
         res.status(500).json({ 
             success: false, 
             error: 'Failed to acknowledge privacy notice',
-            details: error.message 
+            details: error.message,
+            debugInfo: {
+                errorName: error.name,
+                errorCode: error.code
+            }
         });
     }
 });

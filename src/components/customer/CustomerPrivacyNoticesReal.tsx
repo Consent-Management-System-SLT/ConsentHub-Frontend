@@ -425,46 +425,6 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
           </div>
         </div>
 
-        {/* Summary Stats */}
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Privacy Notice Summary</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{notices.length}</div>
-              <div className="text-sm text-blue-800">Total Notices</div>
-            </div>
-            <div className="text-center p-4 bg-amber-50 rounded-lg">
-              <div className="text-2xl font-bold text-amber-600">
-                {notices.filter(n => !n.acknowledged).length}
-              </div>
-              <div className="text-sm text-amber-800">Pending Review</div>
-            </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">
-                {notices.filter(n => n.customerDecision === 'accept').length}
-              </div>
-              <div className="text-sm text-green-800">Accepted</div>
-            </div>
-            <div className="text-center p-4 bg-red-50 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">
-                {notices.filter(n => n.customerDecision === 'decline').length}
-              </div>
-              <div className="text-sm text-red-800">Declined</div>
-            </div>
-          </div>
-          
-          {/* Status Information */}
-          <div className="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-600">
-            <h4 className="font-semibold text-white mb-2">How Privacy Notices Work</h4>
-            <div className="text-sm text-gray-200 space-y-1">
-              <p>• <strong className="text-yellow-400">Pending:</strong> Notices that require your response</p>
-              <p>• <strong className="text-green-400">Accepted:</strong> Notices you have agreed to</p>
-              <p>• <strong className="text-red-400">Declined:</strong> Notices you have refused</p>
-              <p>• You can change your decision at any time by reviewing and responding again</p>
-            </div>
-          </div>
-        </div>
-
         {/* Filters */}
         <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6 mb-6">
           <div className="flex flex-col sm:flex-row gap-4">
@@ -499,13 +459,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
             <div className="flex items-center space-x-2">
               <AlertTriangle className="w-5 h-5 text-red-500" />
-              <div>
-                <span className="text-red-700 font-medium">Error Processing Request</span>
-                <p className="text-red-600 text-sm mt-1">{error}</p>
-                <p className="text-red-500 text-xs mt-2">
-                  If this error persists, please try refreshing the page or contact support.
-                </p>
-              </div>
+              <span className="text-red-700">{error}</span>
             </div>
           </div>
         )}
@@ -621,6 +575,35 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
             </p>
           </div>
         )}
+
+        {/* Summary Stats */}
+        <div className="mt-6 bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+          <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Summary</h3>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{notices.length}</div>
+              <div className="text-sm text-blue-800">Total Notices</div>
+            </div>
+            <div className="text-center p-4 bg-amber-50 rounded-lg">
+              <div className="text-2xl font-bold text-amber-600">
+                {notices.filter(n => !n.acknowledged).length}
+              </div>
+              <div className="text-sm text-amber-800">Pending</div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">
+                {notices.filter(n => n.customerDecision === 'accept').length}
+              </div>
+              <div className="text-sm text-green-800">Accepted</div>
+            </div>
+            <div className="text-center p-4 bg-red-50 rounded-lg">
+              <div className="text-2xl font-bold text-red-600">
+                {notices.filter(n => n.customerDecision === 'decline').length}
+              </div>
+              <div className="text-sm text-red-800">Declined</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
