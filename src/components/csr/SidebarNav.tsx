@@ -3,7 +3,6 @@ import {
   Home, 
   Search, 
   FileText, 
-  Settings, 
   Database, 
   Shield, 
   Activity,
@@ -11,7 +10,8 @@ import {
   Menu,
   X,
   UserCheck,
-  Bell
+  Bell,
+  MessageSquare
 } from 'lucide-react';
 
 interface SidebarNavProps {
@@ -32,7 +32,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
     { id: 'customer-search', label: 'Customer Search', icon: Search, description: 'Search and manage customers' },
     { id: 'consent-history', label: 'Consent History', icon: FileText, description: 'View customer consent history' },
     { id: 'consent-management', label: 'Consent Management', icon: Shield, description: 'Search customers and update their consents' },
-    { id: 'preference-editor', label: 'Preferences', icon: Settings, description: 'Manage customer preferences' },
+    { id: 'preference-editor', label: 'Communication Preferences', icon: MessageSquare, description: 'Manage customer communication preferences and settings' },
     { id: 'notification-center', label: 'Notification Center', icon: Bell, description: 'Send notifications and manage campaigns' },
     { id: 'dsar-requests', label: 'DSAR Requests', icon: Database, description: 'Handle data subject access requests' },
     { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Manage guardian consent forms' },

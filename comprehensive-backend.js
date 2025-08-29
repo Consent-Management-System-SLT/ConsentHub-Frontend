@@ -7064,6 +7064,18 @@ app.post("/api/v1/customer/preferences", verifyToken, async (req, res) => {
         
         console.log(`Successfully updated ${updatedPreferences.length} preferences`);
         
+        // Emit real-time update to CSR dashboard for customer preference changes
+        if (global.io) {
+            global.io.emit('customerPreferencesUpdated', {
+                customerId: req.user.id,
+                preferences: updatedPreferences,
+                updatedBy: req.user.email || req.user.id,
+                timestamp: new Date().toISOString(),
+                source: 'customer'
+            });
+            console.log(`🔄 Real-time notification sent for customer ${req.user.id} preference update`);
+        }
+        
         res.json({
             success: true,
             message: 'Preferences updated successfully',
@@ -8880,7 +8892,7 @@ app.delete("/api/v1/dsar/request/:id", verifyToken, async (req, res) => {
 // CSR ENDPOINTS FOR CUSTOMER MANAGEMENT
 
 // CSR - Get all customers (parties)
-app.get("/api/v1/csr/customers", verifyToken, (req, res) => {
+app.get("/api/v1/csr/customers", verifyToken, async (req, res) => {
     if (req.user.role !== 'csr' && req.user.role !== 'admin') {
         return res.status(403).json({
             error: true,
@@ -8888,25 +8900,85 @@ app.get("/api/v1/csr/customers", verifyToken, (req, res) => {
         });
     }
     
-    // Return all parties (customers) for CSR dashboard
-    const customersWithDetails = parties.map(party => {
-        const user = users.find(u => u.id === party.userId || u.email === party.email);
-        return {
-            ...party,
-            userDetails: user ? {
-                status: user.status,
-                lastLoginAt: user.lastLoginAt,
-                emailVerified: user.emailVerified,
+    try {
+        console.log('🔍 CSR Dashboard: Fetching real customers from MongoDB');
+        
+        // Get search query if provided
+        const searchQuery = req.query.search;
+        
+        // Import User model
+        const mongoose = require('mongoose');
+        const User = mongoose.model('User');
+        
+        // Build query filter
+        let filter = { role: 'customer' };
+        if (searchQuery) {
+            filter.$or = [
+                { email: { $regex: searchQuery, $options: 'i' } },
+                { firstName: { $regex: searchQuery, $options: 'i' } },
+                { lastName: { $regex: searchQuery, $options: 'i' } }
+            ];
+        }
+        
+        // Fetch real users from MongoDB
+        const users = await User.find(filter)
+            .select('_id email firstName lastName role isActive createdAt updatedAt')
+            .sort({ createdAt: -1 })
+            .limit(100)
+            .lean();
+        
+        // Transform users to match expected frontend format
+        const customers = users.map(user => ({
+            id: user._id.toString(),
+            email: user.email,
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
+            role: user.role,
+            status: user.isActive ? 'active' : 'inactive',
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+            userDetails: {
+                status: user.isActive ? 'active' : 'inactive',
+                emailVerified: true,
                 createdAt: user.createdAt
-            } : null
-        };
-    });
-    
-    res.json({
-        success: true,
-        customers: customersWithDetails,
-        total: customersWithDetails.length
-    });
+            }
+        }));
+        
+        console.log(`✅ Found ${customers.length} real customers from MongoDB`);
+        if (searchQuery) {
+            console.log(`   Search term: "${searchQuery}"`);
+        }
+        
+        res.json({
+            success: true,
+            customers: customers,
+            total: customers.length
+        });
+        
+    } catch (error) {
+        console.error('❌ Error fetching customers from MongoDB:', error);
+        
+        // Fallback to mock data if MongoDB fails
+        console.log('⚠️ Falling back to mock data');
+        const customersWithDetails = parties.map(party => {
+            const user = users.find(u => u.id === party.userId || u.email === party.email);
+            return {
+                ...party,
+                userDetails: user ? {
+                    status: user.status,
+                    lastLoginAt: user.lastLoginAt,
+                    emailVerified: user.emailVerified,
+                    createdAt: user.createdAt
+                } : null
+            };
+        });
+        
+        res.json({
+            success: true,
+            customers: customersWithDetails,
+            total: customersWithDetails.length
+        });
+    }
 });
 
 // CSR - Get specific customer details
@@ -9087,7 +9159,7 @@ app.put("/api/v1/csr/customers/:customerId", verifyToken, (req, res) => {
 });
 
 // CSR - Search customers
-app.get("/api/v1/csr/customers/search", verifyToken, (req, res) => {
+app.get("/api/v1/csr/customers/search", verifyToken, async (req, res) => {
     if (req.user.role !== 'csr' && req.user.role !== 'admin') {
         return res.status(403).json({
             error: true,
@@ -9104,47 +9176,146 @@ app.get("/api/v1/csr/customers/search", verifyToken, (req, res) => {
             total: 0
         });
     }
-    
-    const searchQuery = query.toLowerCase();
-    let filteredCustomers = [];
-    
-    // Search in parties and users
-    const allCustomers = parties.map(party => {
-        const user = users.find(u => u.id === party.userId || u.email === party.email);
-        return {
-            ...party,
-            userDetails: user
-        };
-    });
-    
-    // Filter based on search criteria
-    filteredCustomers = allCustomers.filter(customer => {
-        const name = customer.name?.toLowerCase() || '';
-        const email = customer.email?.toLowerCase() || '';
-        const phone = customer.phone || '';
-        const mobile = customer.mobile || '';
+
+    try {
+        const searchQuery = query.toLowerCase();
+        let filteredCustomers = [];
         
+        // Import User model for MongoDB search
+        const mongoose = require('mongoose');
+        const User = mongoose.model('User');
+        
+        // Search in MongoDB User collection for customers
+        const searchCriteria = {
+            role: 'customer',
+            $or: [
+                { name: { $regex: searchQuery, $options: 'i' } },
+                { email: { $regex: searchQuery, $options: 'i' } },
+                { phone: { $regex: searchQuery, $options: 'i' } },
+                { firstName: { $regex: searchQuery, $options: 'i' } },
+                { lastName: { $regex: searchQuery, $options: 'i' } }
+            ]
+        };
+        
+        // If searching by specific type
         if (type === 'email') {
-            return email.includes(searchQuery);
+            searchCriteria.$or = [{ email: { $regex: searchQuery, $options: 'i' } }];
         } else if (type === 'phone') {
-            return phone.includes(searchQuery) || mobile.includes(searchQuery);
+            searchCriteria.$or = [{ phone: { $regex: searchQuery, $options: 'i' } }];
         } else if (type === 'name') {
-            return name.includes(searchQuery);
-        } else {
-            // General search
+            searchCriteria.$or = [
+                { name: { $regex: searchQuery, $options: 'i' } },
+                { firstName: { $regex: searchQuery, $options: 'i' } },
+                { lastName: { $regex: searchQuery, $options: 'i' } }
+            ];
+        }
+        
+        const dbCustomers = await User.find(searchCriteria).limit(20).lean();
+        
+        // Convert MongoDB users to customer format
+        const mongoCustomers = dbCustomers.map(user => ({
+            id: user._id.toString(),
+            userId: user._id.toString(),
+            name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+            email: user.email,
+            phone: user.phone || '',
+            mobile: user.phone || '',
+            status: user.status || 'active',
+            type: 'customer',
+            createdAt: user.createdAt || new Date().toISOString(),
+            address: user.address || '',
+            dateOfBirth: user.dateOfBirth || '',
+            lastLogin: user.lastLoginAt,
+            userDetails: {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                company: user.company,
+                organization: user.organization,
+                emailVerified: user.emailVerified,
+                role: user.role
+            }
+        }));
+        
+        filteredCustomers = mongoCustomers;
+        
+        // Also search in parties array as fallback
+        const allCustomers = parties.map(party => {
+            const user = users.find(u => u.id === party.userId || u.email === party.email);
+            return {
+                ...party,
+                userDetails: user
+            };
+        });
+        
+        // Filter parties based on search criteria
+        const partyResults = allCustomers.filter(customer => {
+            const name = customer.name?.toLowerCase() || '';
+            const email = customer.email?.toLowerCase() || '';
+            const phone = customer.phone || '';
+            const mobile = customer.mobile || '';
+            
+            if (type === 'email') {
+                return email.includes(searchQuery);
+            } else if (type === 'phone') {
+                return phone.includes(searchQuery) || mobile.includes(searchQuery);
+            } else if (type === 'name') {
+                return name.includes(searchQuery);
+            } else {
+                // General search
+                return name.includes(searchQuery) || 
+                       email.includes(searchQuery) || 
+                       phone.includes(searchQuery) || 
+                       mobile.includes(searchQuery);
+            }
+        });
+        
+        // Combine results and remove duplicates
+        const allResults = [...filteredCustomers, ...partyResults];
+        const uniqueResults = allResults.filter((customer, index, self) => 
+            index === self.findIndex((c) => (c.email === customer.email))
+        );
+        
+        console.log(`🔍 CSR Customer Search: "${query}" found ${uniqueResults.length} customers`);
+        
+        res.json({
+            success: true,
+            customers: uniqueResults,
+            total: uniqueResults.length,
+            searchCriteria: { query, type }
+        });
+        
+    } catch (error) {
+        console.error('Error searching customers:', error);
+        
+        // Fallback to original parties search
+        const searchQuery = query.toLowerCase();
+        const allCustomers = parties.map(party => {
+            const user = users.find(u => u.id === party.userId || u.email === party.email);
+            return {
+                ...party,
+                userDetails: user
+            };
+        });
+        
+        const filteredCustomers = allCustomers.filter(customer => {
+            const name = customer.name?.toLowerCase() || '';
+            const email = customer.email?.toLowerCase() || '';
+            const phone = customer.phone || '';
+            const mobile = customer.mobile || '';
+            
             return name.includes(searchQuery) || 
                    email.includes(searchQuery) || 
                    phone.includes(searchQuery) || 
                    mobile.includes(searchQuery);
-        }
-    });
-    
-    res.json({
-        success: true,
-        customers: filteredCustomers,
-        total: filteredCustomers.length,
-        searchCriteria: { query, type }
-    });
+        });
+        
+        res.json({
+            success: true,
+            customers: filteredCustomers,
+            total: filteredCustomers.length,
+            searchCriteria: { query, type }
+        });
+    }
 });
 
 // CSR - Get specific customer's communication preferences
@@ -9270,6 +9441,99 @@ app.get("/api/v1/csr/customers/:customerId/preferences", verifyToken, async (req
         res.status(500).json({
             error: true,
             message: 'Failed to fetch customer communication preferences',
+            details: error.message
+        });
+    }
+});
+
+// CSR - Update specific customer's communication preferences
+app.put("/api/v1/csr/customers/:customerId/preferences", verifyToken, async (req, res) => {
+    if (req.user.role !== 'csr' && req.user.role !== 'admin') {
+        return res.status(403).json({
+            error: true,
+            message: 'Access denied. CSR or Admin role required.'
+        });
+    }
+
+    const { customerId } = req.params;
+    const { preferences } = req.body;
+
+    try {
+        console.log(`🔄 CSR updating preferences for customer: ${customerId}`);
+
+        // Import models here to avoid issues
+        const mongoose = require('mongoose');
+        const CommunicationPreference = mongoose.model('CommunicationPreference');
+
+        // Update or create communication preferences
+        const updatedPreferences = await CommunicationPreference.findOneAndUpdate(
+            { partyId: customerId },
+            {
+                partyId: customerId,
+                preferredChannels: {
+                    email: preferences.channels?.email ?? true,
+                    sms: preferences.channels?.sms ?? false,
+                    push: preferences.channels?.push ?? true,
+                    phone: preferences.channels?.phone ?? false,
+                    inApp: preferences.channels?.inApp ?? true
+                },
+                topicSubscriptions: {
+                    marketing: preferences.topics?.marketing ?? false,
+                    promotions: preferences.topics?.promotions ?? false, // Keep consistent field names
+                    serviceUpdates: preferences.topics?.serviceUpdates ?? preferences.topics?.productUpdates ?? false, // Map productUpdates to serviceUpdates
+                    billing: preferences.topics?.billing ?? false,
+                    security: preferences.topics?.security ?? false,
+                    newsletter: preferences.topics?.newsletters ?? preferences.topics?.newsletter ?? false, // Handle both field names
+                    surveys: preferences.topics?.surveys ?? false
+                },
+                quietHours: {
+                    enabled: preferences.dndSettings?.enabled ?? false,
+                    start: preferences.dndSettings?.startTime ?? '22:00',
+                    end: preferences.dndSettings?.endTime ?? '08:00'
+                },
+                doNotDisturb: {
+                    enabled: preferences.dndSettings?.enabled ?? false,
+                    start: preferences.dndSettings?.startTime ?? '22:00',
+                    end: preferences.dndSettings?.endTime ?? '08:00'
+                },
+                frequency: preferences.frequency?.digestMode ? 'daily' : 'immediate',
+                timezone: preferences.timezone ?? 'Asia/Colombo',
+                language: preferences.language ?? 'en',
+                lastUpdated: new Date().toISOString(),
+                updatedBy: req.user.email || req.user.id
+            },
+            { 
+                upsert: true, 
+                new: true,
+                runValidators: true
+            }
+        ).lean();
+
+        console.log(`✅ CSR successfully updated preferences for customer: ${customerId}`);
+
+        // Emit real-time update to customer dashboard for CSR preference changes
+        if (global.io) {
+            global.io.emit('csrPreferencesUpdated', {
+                customerId: customerId,
+                preferences: updatedPreferences,
+                updatedBy: req.user.email || req.user.id,
+                timestamp: new Date().toISOString(),
+                source: 'csr'
+            });
+            console.log(`🔄 Real-time notification sent for CSR update to customer ${customerId}`);
+        }
+
+        res.json({
+            success: true,
+            message: 'Customer preferences updated successfully',
+            preferences: updatedPreferences
+        });
+
+    } catch (error) {
+        console.error(`❌ Error updating customer preferences for ${customerId}:`, error);
+        res.status(500).json({
+            error: true,
+            message: 'Failed to update customer communication preferences',
             details: error.message
         });
     }

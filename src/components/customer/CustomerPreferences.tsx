@@ -13,6 +13,7 @@ import {
 import { useNotifications } from '../../contexts/NotificationContext';
 import { preferenceService } from '../../services/preferenceService';
 import { authService } from '../../services/authService';
+import { websocketService, PreferenceUpdateEvent } from '../../services/websocketService';
 
 interface PreferenceSettings {
   channels: {
@@ -110,6 +111,16 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
           communicationData = response.data.data.communication;
           console.log('🔍 Using nested data.communication structure');
         }
+        // Pattern 3: Single communication object (after CSR updates)
+        else if (response.data.data && response.data.data.communication && !Array.isArray(response.data.data.communication)) {
+          communicationData = [response.data.data.communication];
+          console.log('🔍 Using single communication object structure');
+        }
+        // Pattern 4: Direct preferences in response data
+        else if (response.data.preferences && typeof response.data.preferences === 'object') {
+          communicationData = [response.data.preferences];
+          console.log('🔍 Using direct preferences structure');
+        }
         
         const communicationPrefs = communicationData && communicationData.length > 0 
           ? communicationData[0] 
@@ -145,12 +156,13 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
             };
           }
           
-          // Map do not disturb settings (backend converts quietHours -> doNotDisturb for frontend)
-          if (communicationPrefs.doNotDisturb) {
+          // Map do not disturb settings (handle both quietHours and doNotDisturb field names)
+          if (communicationPrefs.doNotDisturb || communicationPrefs.quietHours) {
+            const dndData = communicationPrefs.doNotDisturb || communicationPrefs.quietHours;
             updatedPreferences.dndSettings = {
-              enabled: communicationPrefs.doNotDisturb.enabled || false,
-              startTime: communicationPrefs.doNotDisturb.start || '22:00',
-              endTime: communicationPrefs.doNotDisturb.end || '08:00',
+              enabled: dndData.enabled || false,
+              startTime: dndData.start || '22:00',
+              endTime: dndData.end || '08:00',
             };
           }
           
@@ -188,6 +200,41 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
   useEffect(() => {
     // This is now handled by loadPreferences function
   }, []);
+
+  // Set up real-time preference update listener for CSR changes
+  useEffect(() => {
+    console.log('🔄 Setting up real-time CSR preference update listener in customer dashboard');
+    
+    const handleCSRPreferenceUpdate = async (event: PreferenceUpdateEvent) => {
+      console.log('🔄 Customer received CSR preference update:', event);
+      
+      try {
+        const currentUser = await authService.getCurrentUser();
+        
+        // Only update if it's for the current customer and source is CSR
+        if (currentUser?.id && event.customerId === currentUser.id && event.source === 'csr') {
+          console.log('🔄 Refreshing customer view for CSR preference update');
+          await loadPreferences(); // Reload preferences to get latest data
+          setSaveStatus('idle'); // Reset any save status
+          setHasChanges(false); // Reset changes flag
+          
+          // Show a notification that CSR made changes
+          addNotification('Your communication preferences have been updated by customer service.');
+        }
+      } catch (error) {
+        console.error('Error handling CSR preference update:', error);
+      }
+    };
+
+    // Set up the listener
+    websocketService.onCSRPreferenceUpdate(handleCSRPreferenceUpdate);
+
+    // Cleanup listener on unmount
+    return () => {
+      console.log('🔄 Cleaning up CSR preference update listener in customer dashboard');
+      websocketService.offCSRPreferenceUpdate();
+    };
+  }, []); // Run once on mount
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const updateChannelPreference = (channel: keyof PreferenceSettings['channels'], value: boolean) => {

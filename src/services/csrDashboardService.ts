@@ -420,6 +420,51 @@ class CSRDashboardService {
   }
 
   /**
+   * Search customers for preferences (used by Communication Preferences component)
+   */
+  async searchCustomersForPreferences(searchTerm: string): Promise<{customers: CustomerData[], total: number}> {
+    try {
+      const response = await apiClient.get(`/api/v1/csr/customers/search`, {
+        params: { query: searchTerm }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error searching customers for preferences:', error);
+      // Fallback to local search
+      const customers = await this.searchCustomers(searchTerm);
+      return { customers, total: customers.length };
+    }
+  }
+
+  /**
+   * Get customer communication preferences
+   */
+  async getCustomerPreferences(customerId: string): Promise<any> {
+    try {
+      const response = await apiClient.get(`/api/v1/csr/customers/${customerId}/preferences`);
+      return response.data.preferences;
+    } catch (error) {
+      console.error('Error fetching customer preferences:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update customer communication preferences (CSR action)
+   */
+  async updateCustomerPreferences(customerId: string, preferences: any): Promise<any> {
+    try {
+      const response = await apiClient.put(`/api/v1/csr/customers/${customerId}/preferences`, {
+        preferences
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating customer preferences:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get comprehensive dashboard data
    */
   async getComprehensiveDashboardData() {

@@ -10,6 +10,14 @@ export interface ConsentUpdateEvent {
   };
 }
 
+export interface PreferenceUpdateEvent {
+  customerId: string;
+  preferences: any;
+  updatedBy: string;
+  timestamp: string;
+  source: 'customer' | 'csr';
+}
+
 class WebSocketService {
   private socket: Socket | null = null;
   private reconnectAttempts = 0;
@@ -100,6 +108,52 @@ class WebSocketService {
   offConsentUpdate(): void {
     if (this.socket) {
       this.socket.off('consent-updated');
+    }
+  }
+
+  // Listen for customer preference updates (when customer updates their own preferences)
+  onCustomerPreferenceUpdate(callback: (event: PreferenceUpdateEvent) => void): void {
+    if (this.socket) {
+      console.log('📡 Setting up customerPreferencesUpdated listener for CSR dashboard');
+      this.socket.on('customerPreferencesUpdated', (event: PreferenceUpdateEvent) => {
+        console.log('📡 Received real-time customer preference update:', event);
+        console.log('📡 Customer ID:', event.customerId);
+        console.log('📡 Updated by:', event.updatedBy);
+        console.log('📡 Source:', event.source);
+        callback(event);
+      });
+    } else {
+      console.error('📡 Cannot set up customer preference listener - WebSocket not initialized');
+    }
+  }
+
+  // Remove customer preference update listener
+  offCustomerPreferenceUpdate(): void {
+    if (this.socket) {
+      this.socket.off('customerPreferencesUpdated');
+    }
+  }
+
+  // Listen for CSR preference updates (when CSR updates customer preferences)
+  onCSRPreferenceUpdate(callback: (event: PreferenceUpdateEvent) => void): void {
+    if (this.socket) {
+      console.log('📡 Setting up csrPreferencesUpdated listener for customer dashboard');
+      this.socket.on('csrPreferencesUpdated', (event: PreferenceUpdateEvent) => {
+        console.log('📡 Received real-time CSR preference update:', event);
+        console.log('📡 Customer ID:', event.customerId);
+        console.log('📡 Updated by:', event.updatedBy);
+        console.log('📡 Source:', event.source);
+        callback(event);
+      });
+    } else {
+      console.error('📡 Cannot set up CSR preference listener - WebSocket not initialized');
+    }
+  }
+
+  // Remove CSR preference update listener
+  offCSRPreferenceUpdate(): void {
+    if (this.socket) {
+      this.socket.off('csrPreferencesUpdated');
     }
   }
 
