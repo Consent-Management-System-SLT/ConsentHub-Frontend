@@ -23,35 +23,35 @@ if (isBrowser) {
         'NODE_ENV': import.meta.env.NODE_ENV
     };
 
-    console.log('📊 Current Environment Variables:');
+    console.log('Current Environment Variables:');
     Object.entries(envVars).forEach(([key, value]) => {
         const isCorrect = value && (value.includes('localhost:3001') || value.includes('http://localhost:3001'));
-        const status = isCorrect ? '✅' : '❌';
+        const status = isCorrect ? 'CORRECT' : 'INCORRECT';
         console.log(`${status} ${key}: ${value || 'undefined'}`);
     });
 
-    console.log('\n🎯 Expected Configuration:');
-    console.log('✅ All URLs should point to: http://localhost:3001');
-    console.log('✅ MODE should be: development');
+    console.log('\nExpected Configuration:');
+    console.log('All URLs should point to: http://localhost:3001');
+    console.log('MODE should be: development');
     
     // Test actual API connectivity
-    console.log('\n🔍 Testing Backend Connectivity...');
+    console.log('\nTesting Backend Connectivity...');
     
     const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
     
     fetch(`${backendUrl}/api/csr/stats`)
         .then(response => response.json())
         .then(data => {
-            console.log('✅ Backend Connection Successful!');
-            console.log(`📊 CSR Stats: ${data.totalCustomers} customers, ${data.pendingRequests} pending requests`);
+            console.log('Backend Connection Successful!');
+            console.log(`CSR Stats: ${data.totalCustomers} customers, ${data.pendingRequests} pending requests`);
         })
         .catch(error => {
-            console.error('❌ Backend Connection Failed:', error.message);
+            console.error('Backend Connection Failed:', error.message);
             console.log('💡 Make sure backend is running on http://localhost:3001');
         });
         
 } else {
-    console.log('⚠️ Running outside browser environment');
+    console.log('Running outside browser environment');
 }
 
 export {};

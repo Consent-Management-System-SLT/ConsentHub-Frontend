@@ -6,6 +6,7 @@ const multer = require("multer");
 const csvParser = require("csv-parser");
 const fs = require("fs-extra");
 const path = require("path");
+const mongoose = require("mongoose");
 require('dotenv').config();
 const connectDB = require('./config/database');
 const User = require('./models/User');
@@ -6347,7 +6348,7 @@ app.post("/api/v1/auth/register", async (req, res) => {
     }
 });
 
-// Customer Dashboard Overview
+// Customer Dashboard Overview - Real MongoDB Data
 app.get("/api/v1/customer/dashboard/overview", verifyToken, async (req, res) => {
     try {
         if (req.user.role !== 'customer') {
@@ -6357,6 +6358,8 @@ app.get("/api/v1/customer/dashboard/overview", verifyToken, async (req, res) => 
             });
         }
         
+        console.log('📊 Fetching real dashboard overview for customer:', req.user.id);
+        
         // Get user from MongoDB
         const user = await User.findById(req.user.id);
         if (!user) {
@@ -6365,162 +6368,243 @@ app.get("/api/v1/customer/dashboard/overview", verifyToken, async (req, res) => 
                 message: 'User not found'
             });
         }
-        
-        // Get user consents, preferences, privacy notices, and DSAR requests using isolated data retrieval
-        const { getCustomerIsolatedData } = require('./customer-data-provisioning');
-        const userConsents = await getCustomerIsolatedData(req.user.id, 'consents');
-        const userPreferences = await getCustomerIsolatedData(req.user.id, 'preferences');
-        const userPrivacyNotices = await getCustomerIsolatedData(req.user.id, 'privacy_notices');
-        const userDSARRequests = await getCustomerIsolatedData(req.user.id, 'dsar_requests');
-        
-        // Get communication preferences directly from collections
-        // Use UserPreference model instead of PreferenceItem since PreferenceItem doesn't have userId
-        const { UserPreference } = require('./models/Preference');
-        let communicationPrefs = await UserPreference.find({ 
-            userId: req.user.id.toString()
-        });
-        
-        // If no communication preferences exist, create default ones for this customer
-        if (communicationPrefs.length === 0) {
-            console.log('🔧 Creating default communication preferences for customer');
-            const defaultPrefs = [
-                {
-                    id: `user_pref_${req.user.id}_email_${Date.now()}`,
-                    userId: req.user.id.toString(),
-                    partyId: req.user.id.toString(),
-                    preferenceId: `pref_email_communication`,
-                    value: { type: 'email', enabled: true, category: 'communication' },
-                    source: 'system'
+
+        // 1. REAL CONSENTS DATA from MongoDB
+        const consents = await Consent.find({ 
+            $or: [
+                { userId: req.user.id },
+                { partyId: req.user.id }
+            ]
+        }).sort({ createdAt: -1 }).lean();
+
+        const activeConsents = consents.filter(c => c.status === 'granted').length;
+        const revokedConsents = consents.filter(c => c.status === 'revoked').length;
+        const expiredConsents = consents.filter(c => c.status === 'expired').length;
+        const pendingConsents = consents.filter(c => c.status === 'pending').length;
+
+        // 2. REAL COMMUNICATION PREFERENCES from MongoDB  
+        let commPreferences = await CommunicationPreference.find({ 
+            partyId: req.user.id.toString() 
+        }).sort({ updatedAt: -1 }).lean();
+
+        // Create default preferences if none exist
+        if (commPreferences.length === 0) {
+            const defaultCommPref = new CommunicationPreference({
+                partyId: req.user.id.toString(),
+                preferredChannels: {
+                    email: true,
+                    sms: true,
+                    push: false,
+                    phone: false
                 },
-                {
-                    id: `user_pref_${req.user.id}_sms_${Date.now() + 1}`,
-                    userId: req.user.id.toString(),
-                    partyId: req.user.id.toString(),
-                    preferenceId: `pref_sms_communication`,
-                    value: { type: 'sms', enabled: true, category: 'communication' },
-                    source: 'system'
+                topicSubscriptions: {
+                    marketing: false,
+                    security: true,
+                    billing: true,
+                    newsletter: false
                 },
-                {
-                    id: `user_pref_${req.user.id}_push_${Date.now() + 2}`,
-                    userId: req.user.id.toString(),
-                    partyId: req.user.id.toString(),
-                    preferenceId: `pref_push_communication`,
-                    value: { type: 'push', enabled: true, category: 'communication' },
-                    source: 'system'
-                }
-            ];
-            
-            try {
-                for (const prefData of defaultPrefs) {
-                    const pref = new UserPreference(prefData);
-                    await pref.save();
-                }
-                console.log('✅ Created 3 default communication preferences');
-                
-                // Re-fetch the preferences
-                communicationPrefs = await UserPreference.find({ 
-                    userId: req.user.id.toString()
-                });
-            } catch (prefError) {
-                console.warn('⚠️ Could not create default preferences:', prefError.message);
-            }
+                frequency: "immediate",
+                timezone: "Asia/Colombo",
+                language: "en"
+            });
+            await defaultCommPref.save();
+            commPreferences = [defaultCommPref.toObject()];
         }
+
+        const latestPreference = commPreferences[0] || {};
+        const enabledChannels = Object.values(latestPreference.preferredChannels || {}).filter(Boolean).length;
+        const enabledTopics = Object.values(latestPreference.topicSubscriptions || {}).filter(Boolean).length;
+        const totalPreferenceSettings = enabledChannels + enabledTopics;
+
+        // Build communication channels summary
+        const channels = [];
+        if (latestPreference.preferredChannels?.email) channels.push('Email');
+        if (latestPreference.preferredChannels?.sms) channels.push('SMS');
+        if (latestPreference.preferredChannels?.push) channels.push('Push');
+        if (latestPreference.preferredChannels?.phone) channels.push('Phone');
+
+        // 3. REAL PRIVACY NOTICES from MongoDB
+        const privacyNotices = await PrivacyNotice.find({ 
+            status: 'active' 
+        }).sort({ createdAt: -1 }).lean();
+
+        // Check which notices this customer has acknowledged
+        let acknowledgedNotices = 0;
+        let pendingNotices = 0;
         
-        // Calculate actual counts for this specific customer
-        const totalConsents = userConsents.length;
-        const activeConsents = userConsents.filter(c => c.status === 'granted').length;
-        const totalPreferences = Math.max(userPreferences.length, communicationPrefs.length);
+        privacyNotices.forEach(notice => {
+            const customerAck = notice.acknowledgments?.find(
+                ack => ack.userId === req.user.id || ack.userEmail === user.email
+            );
+            if (customerAck) {
+                acknowledgedNotices++;
+            } else {
+                pendingNotices++;
+            }
+        });
+
+        // 4. REAL DSAR REQUESTS from MongoDB
+        const dsarRequests = await DSARRequest.find({ 
+            $or: [
+                { partyId: req.user.id },
+                { customerId: req.user.id },
+                { requestorEmail: user.email }
+            ]
+        }).sort({ createdAt: -1 }).lean();
+
+        const pendingDSAR = dsarRequests.filter(d => d.status === 'pending').length;
+        const completedDSAR = dsarRequests.filter(d => d.status === 'completed').length;
+        const processingDSAR = dsarRequests.filter(d => d.status === 'processing').length;
+
+        // 5. RECENT ACTIVITY from real data
+        const recentActivity = [];
         
-        // Fix: Count active preferences by checking value.enabled in communicationPrefs
-        const activeCommunicationPrefs = communicationPrefs.filter(p => 
-            p.value && p.value.enabled === true
-        ).length;
-        const activeUserPrefs = userPreferences.filter(p => p.enabled).length;
-        const activePreferences = Math.max(activeUserPrefs, activeCommunicationPrefs);
-        const totalPrivacyNotices = userPrivacyNotices.length;
-        const acknowledgedPrivacyNotices = userPrivacyNotices.filter(p => p.acknowledged).length;
-        const totalDSARRequests = userDSARRequests.length;
-        const pendingDSARRequests = userDSARRequests.filter(d => d.status === 'pending').length;
-        
-        console.log(`📊 Dashboard Overview for ${user.name} (${user.email}):`);
-        console.log(`   Consents: ${totalConsents} (${activeConsents} active)`);
-        console.log(`   Preferences: ${totalPreferences} (${activePreferences} active)`);
-        console.log(`   Privacy Notices: ${totalPrivacyNotices} (${acknowledgedPrivacyNotices} acknowledged)`);
-        console.log(`   DSAR Requests: ${totalDSARRequests} (${pendingDSARRequests} pending)`);
-        
-        // Debug: Show raw data counts
-        console.log(`🔧 Raw Data Arrays:`);
-        console.log(`   userConsents.length: ${userConsents.length}`);
-        console.log(`   userPreferences.length: ${userPreferences.length}`);  
-        console.log(`   userPrivacyNotices.length: ${userPrivacyNotices.length}`);
-        console.log(`   userDSARRequests.length: ${userDSARRequests.length}`);
-        
-        // Debug: Show preference details
-        if (userPreferences.length > 0) {
-            console.log(`🔧 Preferences Details:`);
-            userPreferences.forEach((pref, idx) => {
-                console.log(`   ${idx + 1}. ${pref.type || pref.category}: enabled=${pref.enabled}, userId=${pref.userId}`);
+        // Add consent activities
+        const recentConsents = consents.slice(0, 3);
+        recentConsents.forEach(consent => {
+            if (consent.status === 'granted') {
+                recentActivity.push({
+                    type: "consent_granted",
+                    description: `${consent.purpose || consent.type} consent granted`,
+                    timestamp: consent.grantedAt || consent.createdAt,
+                    date: new Date(consent.grantedAt || consent.createdAt).toLocaleDateString()
+                });
+            }
+        });
+
+        // Add preference updates
+        if (commPreferences.length > 0 && commPreferences[0].updatedAt) {
+            recentActivity.push({
+                type: "preferences_updated", 
+                description: "Communication preferences updated",
+                timestamp: commPreferences[0].updatedAt,
+                date: new Date(commPreferences[0].updatedAt).toLocaleDateString()
             });
         }
+
+        // Add privacy notice acknowledgments
+        const recentNoticeAcks = privacyNotices.filter(notice => 
+            notice.acknowledgments?.some(ack => 
+                (ack.userId === req.user.id || ack.userEmail === user.email) && 
+                ack.acknowledgedAt
+            )
+        ).slice(0, 2);
+
+        recentNoticeAcks.forEach(notice => {
+            const ack = notice.acknowledgments.find(ack => 
+                ack.userId === req.user.id || ack.userEmail === user.email
+            );
+            recentActivity.push({
+                type: "privacy_notice_acknowledged",
+                description: `${notice.title} ${ack.decision}ed`,
+                timestamp: ack.acknowledgedAt,
+                date: new Date(ack.acknowledgedAt).toLocaleDateString()
+            });
+        });
+
+        // Add profile updates
+        if (user.updatedAt && user.updatedAt !== user.createdAt) {
+            recentActivity.push({
+                type: "profile_updated", 
+                description: "Profile information updated",
+                timestamp: user.updatedAt,
+                date: new Date(user.updatedAt).toLocaleDateString()
+            });
+        }
+
+        // Sort by timestamp (newest first) and take top 5
+        recentActivity.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        const topRecentActivity = recentActivity.slice(0, 5);
+
+        console.log(`📊 Real Dashboard Data for ${user.firstName} ${user.lastName} (${user.email}):`);
+        console.log(`   Consents: Total ${consents.length} (${activeConsents} active, ${revokedConsents} revoked, ${pendingConsents} pending)`);
+        console.log(`   Preferences: ${totalPreferenceSettings} configured settings`);
+        console.log(`   Privacy Notices: ${privacyNotices.length} total (${acknowledgedNotices} acknowledged, ${pendingNotices} pending)`);
+        console.log(`   DSAR Requests: ${dsarRequests.length} total (${pendingDSAR} pending, ${processingDSAR} processing, ${completedDSAR} completed)`);
+        console.log(`   Recent Activity: ${topRecentActivity.length} items`);
+
         res.json({
             success: true,
             data: {
-                // Main overview counts - all customer-specific
-                totalConsents: totalConsents,
-                activeConsents: activeConsents,
-                totalPreferences: totalPreferences,
-                activePreferences: activePreferences,
-                totalPrivacyNotices: totalPrivacyNotices,
-                acknowledgedPrivacyNotices: acknowledgedPrivacyNotices,
-                totalDSARRequests: totalDSARRequests,
-                pendingDSARRequests: pendingDSARRequests,
-                
-                // Data arrays for detailed views
-                consents: userConsents,
-                preferences: userPreferences,
-                privacyNotices: userPrivacyNotices,
-                dsarRequests: userDSARRequests,
-                
-                // Legacy fields for backward compatibility
-                pendingRequests: pendingDSARRequests,
-                lastActivity: user.lastLoginAt || new Date().toISOString(),
-                recentActivity: [
-                    {
-                        type: "consent_granted",
-                        description: userConsents.find(c => c.status === 'granted') ? 
-                            `${userConsents.find(c => c.status === 'granted').purpose} consent granted` : 
-                            "Consent granted",
-                        timestamp: userConsents.find(c => c.status === 'granted')?.grantedAt || user.createdAt
-                    },
-                    {
-                        type: "profile_updated", 
-                        description: "Profile information updated",
-                        timestamp: user.updatedAt || user.createdAt
-                    }
-                ],
-                stats: {
-                    consentGrants: activeConsents,
-                    consentDenials: userConsents.filter(c => c.status === 'denied').length,
-                    activePreferences: activePreferences,
-                    totalPrivacyNotices: totalPrivacyNotices,
-                    totalDSARRequests: totalDSARRequests
+                // CONSENT SUMMARY
+                consents: {
+                    total: consents.length,
+                    active: activeConsents,
+                    revoked: revokedConsents,
+                    expired: expiredConsents,
+                    pending: pendingConsents
                 },
+
+                // COMMUNICATION PREFERENCES SUMMARY  
+                communicationChannels: {
+                    total: enabledChannels,
+                    channels: channels,
+                    summary: channels.length > 0 ? channels.join(', ') : 'None configured',
+                    lastUpdated: latestPreference.updatedAt || latestPreference.createdAt,
+                    configured: totalPreferenceSettings > 0
+                },
+
+                // PRIVACY NOTICES SUMMARY
+                privacyNotices: {
+                    total: privacyNotices.length,
+                    acknowledged: acknowledgedNotices,
+                    pending: pendingNotices,
+                    pendingReview: pendingNotices
+                },
+
+                // DSAR REQUESTS SUMMARY
+                dsarRequests: {
+                    total: dsarRequests.length,
+                    pending: pendingDSAR,
+                    processing: processingDSAR, 
+                    completed: completedDSAR,
+                    status: processingDSAR > 0 ? 'processing' : (pendingDSAR > 0 ? 'pending' : 'completed')
+                },
+
+                // RECENT ACTIVITY
+                recentActivity: topRecentActivity,
+
+                // QUICK STATS
+                quickStats: {
+                    totalConsents: consents.length,
+                    activeConsents: activeConsents,
+                    totalPreferences: totalPreferenceSettings, 
+                    totalPrivacyNotices: privacyNotices.length,
+                    totalDSARRequests: dsarRequests.length,
+                    pendingActions: pendingNotices + pendingDSAR
+                },
+
+                // PRIVACY STATUS
+                privacyStatus: {
+                    privacyPolicyAccepted: acknowledgedNotices > 0,
+                    version: privacyNotices.find(n => n.title.includes('Privacy Policy'))?.version || '1.0',
+                    status: acknowledgedNotices === privacyNotices.length ? 'Active' : 'Pending',
+                    communicationPrefsConfigured: totalPreferenceSettings > 0,
+                    communicationLastUpdated: latestPreference.updatedAt ? 
+                        new Date(latestPreference.updatedAt).toLocaleDateString() : 'Not configured',
+                    pendingDSARStatus: processingDSAR > 0 ? 'Data export in progress' : 
+                                     (pendingDSAR > 0 ? 'Request pending' : 'No pending requests'),
+                    dsarProcessingStatus: processingDSAR > 0 ? 'Processing' : 'None'
+                },
+
+                // USER PROFILE
                 userProfile: {
-                    name: user.name,
+                    name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
                     email: user.email,
                     phone: user.phone,
-                    company: user.company,
-                    department: user.department,
-                    jobTitle: user.jobTitle,
-                    memberSince: user.createdAt
+                    memberSince: user.createdAt,
+                    lastLogin: user.lastLoginAt || user.updatedAt,
+                    isActive: user.isActive
                 }
             }
         });
+
     } catch (error) {
-        console.error('Dashboard overview error:', error);
+        console.error('❌ Dashboard overview error:', error);
         res.status(500).json({
             error: true,
-            message: 'Internal server error'
+            message: 'Internal server error',
+            details: error.message
         });
     }
 });

@@ -89,14 +89,14 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
   const loadPreferences = async () => {
     try {
       setIsLoading(true);
-      console.log('🔄 Loading customer preferences...');
+      console.log('Loading customer preferences...');
       
       const response = await preferenceService.getCustomerPreferences();
       
       if (response.success && response.data) {
-        console.log('📊 Raw preferences data:', response.data);
+        console.log('Raw preferences data:', response.data);
         
-        console.log('🔍 Debug - response.data:', typeof response.data, response.data);
+        console.log('Debug - response.data:', typeof response.data, response.data);
         
         // Handle both possible response structures for maximum compatibility
         let communicationData = null;
@@ -104,35 +104,33 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
         // Pattern 1: Direct communication array
         if (response.data.communication && Array.isArray(response.data.communication) && response.data.communication.length > 0) {
           communicationData = response.data.communication;
-          console.log('🔍 Using direct communication structure');
+          console.log('Using direct communication structure');
         }
         // Pattern 2: Nested data.communication array (comprehensive backend)
         else if (response.data.data && response.data.data.communication && Array.isArray(response.data.data.communication) && response.data.data.communication.length > 0) {
           communicationData = response.data.data.communication;
-          console.log('🔍 Using nested data.communication structure');
+          console.log('Using nested data.communication structure');
         }
         // Pattern 3: Single communication object (after CSR updates)
         else if (response.data.data && response.data.data.communication && !Array.isArray(response.data.data.communication)) {
           communicationData = [response.data.data.communication];
-          console.log('🔍 Using single communication object structure');
+          console.log('Using single communication object structure');
         }
         // Pattern 4: Direct preferences in response data
         else if (response.data.preferences && typeof response.data.preferences === 'object') {
           communicationData = [response.data.preferences];
-          console.log('🔍 Using direct preferences structure');
+          console.log('Using direct preferences structure');
         }
         
         const communicationPrefs = communicationData && communicationData.length > 0 
           ? communicationData[0] 
           : null;
         
-        console.log('🔍 Debug - communicationPrefs result:', !!communicationPrefs);
-        
+        console.log('Debug - communicationPrefs result:', !!communicationPrefs);
+
         if (communicationPrefs) {
-          console.log('🔄 Mapping backend preferences to UI format...');
-          console.log('📊 Communication preferences:', communicationPrefs);
-          
-          const updatedPreferences = { ...preferences };
+          console.log('Mapping backend preferences to UI format...');
+          console.log('Communication preferences:', communicationPrefs);          const updatedPreferences = { ...preferences };
           
           // Map preferred channels
           if (communicationPrefs.preferredChannels) {
@@ -175,17 +173,17 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
             updatedPreferences.timezone = communicationPrefs.timezone;
           }
           
-          console.log('✅ Preferences mapped successfully:', updatedPreferences);
+          console.log('Preferences mapped successfully:', updatedPreferences);
           setPreferences(updatedPreferences);
           
         } else {
-          console.log('⚠️ No communication preferences found in response, using defaults');
+          console.log('No communication preferences found in response, using defaults');
         }
       } else {
-        console.warn('⚠️ Failed to load preferences:', response.error);
+        console.warn('Failed to load preferences:', response.error);
       }
     } catch (error) {
-      console.error('❌ Error loading preferences:', error);
+      console.error('Error loading preferences:', error);
     } finally {
       setIsLoading(false);
     }
@@ -203,17 +201,17 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
 
   // Set up real-time preference update listener for CSR changes
   useEffect(() => {
-    console.log('🔄 Setting up real-time CSR preference update listener in customer dashboard');
+    console.log('Setting up real-time CSR preference update listener in customer dashboard');
     
     const handleCSRPreferenceUpdate = async (event: PreferenceUpdateEvent) => {
-      console.log('🔄 Customer received CSR preference update:', event);
+      console.log('Customer received CSR preference update:', event);
       
       try {
         const currentUser = await authService.getCurrentUser();
         
         // Only update if it's for the current customer and source is CSR
         if (currentUser?.id && event.customerId === currentUser.id && event.source === 'csr') {
-          console.log('🔄 Refreshing customer view for CSR preference update');
+          console.log('Refreshing customer view for CSR preference update');
           await loadPreferences(); // Reload preferences to get latest data
           setSaveStatus('idle'); // Reset any save status
           setHasChanges(false); // Reset changes flag
@@ -231,7 +229,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
 
     // Cleanup listener on unmount
     return () => {
-      console.log('🔄 Cleaning up CSR preference update listener in customer dashboard');
+      console.log('Cleaning up CSR preference update listener in customer dashboard');
       websocketService.offCSRPreferenceUpdate();
     };
   }, []); // Run once on mount
@@ -331,7 +329,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
         setHasChanges(false);
         
         // Reload preferences to ensure UI shows the saved state
-        console.log('🔄 Reloading preferences after save...');
+        console.log('Reloading preferences after save...');
         await loadPreferences();
         
         // Add notification for admin/CSR users

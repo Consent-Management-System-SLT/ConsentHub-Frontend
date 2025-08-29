@@ -60,10 +60,10 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   useEffect(() => {
-    console.log('🎯 CSR Dashboard initializing...');
+    console.log('CSR Dashboard initializing...');
     
     // Initialize WebSocket connection for real-time updates
-    console.log('🔌 Initializing WebSocket for CSR Dashboard');
+    console.log('Initializing WebSocket for CSR Dashboard');
     if (websocketService.isConnected()) {
       websocketService.joinCSRDashboard();
     } else {
@@ -79,7 +79,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
     
     // Cleanup on unmount
     return () => {
-      console.log('🔌 CSR Dashboard cleanup - leaving WebSocket room');
+      console.log('CSR Dashboard cleanup - leaving WebSocket room');
       websocketService.leaveCSRDashboard();
     };
   }, []);
@@ -143,7 +143,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
       setRecentActivities(recentEvents);
 
     } catch (error) {
-      console.error('❌ Error loading CSR dashboard data:', error);
+      console.error('Error loading CSR dashboard data:', error);
       
       // Emergency fallback - ensure we always have some data
       setDashboardStats({

@@ -484,7 +484,7 @@ export const PrivacyNotices: React.FC = () => {
       }
       
       // Make a direct fetch request for testing
-      console.log('📡 Making fetch request...');
+      console.log('Making fetch request...');
       const response = await fetch(testUrl, {
         method: 'GET',
         headers: {
@@ -493,12 +493,12 @@ export const PrivacyNotices: React.FC = () => {
         }
       });
       
-      console.log('📡 Response status:', response.status);
+      console.log('Response status:', response.status);
       console.log('📄 Response ok:', response.ok);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ Error response:', errorText);
+        console.error('Error response:', errorText);
         throw new Error(`Export failed: ${response.status} - ${errorText}`);
       }
       

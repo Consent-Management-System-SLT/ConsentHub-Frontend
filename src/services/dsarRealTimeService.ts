@@ -13,7 +13,7 @@ class DSARRealTimeService {
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
-        console.warn('⚠️ No auth token found for real-time connection');
+        console.warn('No auth token found for real-time connection');
         return;
       }
 
@@ -22,7 +22,7 @@ class DSARRealTimeService {
         this.eventSource.close();
       }
 
-      console.log('📡 Establishing real-time DSAR updates connection...');
+      console.log('Establishing real-time DSAR updates connection...');
 
       // Create new EventSource connection
       this.eventSource = new EventSource(
@@ -30,7 +30,7 @@ class DSARRealTimeService {
       );
 
       this.eventSource.onopen = () => {
-        console.log('✅ Real-time DSAR connection established');
+        console.log('Real-time DSAR connection established');
         this.reconnectAttempts = 0;
         
         // Clear any pending reconnection
@@ -43,34 +43,34 @@ class DSARRealTimeService {
       this.eventSource.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log('📡 Received real-time update:', data);
+          console.log('Received real-time update:', data);
 
           // Handle different types of updates
           switch (data.type) {
             case 'connected':
-              console.log('📡 Real-time connection confirmed');
+              console.log('Real-time connection confirmed');
               break;
 
             case 'dsar_status_update':
-              console.log(`🔔 DSAR Status Update: ${data.oldStatus} → ${data.newStatus}`);
+              console.log(`DSAR Status Update: ${data.oldStatus} → ${data.newStatus}`);
               this.notifyCallbacks('status_update', data);
               break;
 
             default:
-              console.log('📡 Unknown update type:', data.type);
+              console.log('Unknown update type:', data.type);
           }
         } catch (error) {
-          console.error('❌ Failed to parse real-time update:', error);
+          console.error('Failed to parse real-time update:', error);
         }
       };
 
       this.eventSource.onerror = (error) => {
-        console.error('❌ Real-time connection error:', error);
+        console.error('Real-time connection error:', error);
         this.handleConnectionError();
       };
 
     } catch (error) {
-      console.error('❌ Failed to establish real-time connection:', error);
+      console.error('Failed to establish real-time connection:', error);
       this.handleConnectionError();
     }
   }
@@ -84,14 +84,14 @@ class DSARRealTimeService {
     // Attempt reconnection with exponential backoff
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       const delay = Math.pow(2, this.reconnectAttempts) * 1000; // 1s, 2s, 4s, 8s, 16s
-      console.log(`🔄 Attempting reconnection in ${delay / 1000}s (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
+      console.log(`Attempting reconnection in ${delay / 1000}s (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
       
       this.reconnectTimeout = setTimeout(() => {
         this.reconnectAttempts++;
         this.connect();
       }, delay);
     } else {
-      console.error('❌ Max reconnection attempts reached. Real-time updates disabled.');
+      console.error('Max reconnection attempts reached. Real-time updates disabled.');
     }
   }
 
@@ -115,7 +115,7 @@ class DSARRealTimeService {
 
   // Disconnect and cleanup
   disconnect() {
-    console.log('📡 Disconnecting real-time updates...');
+    console.log('Disconnecting real-time updates...');
     
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);

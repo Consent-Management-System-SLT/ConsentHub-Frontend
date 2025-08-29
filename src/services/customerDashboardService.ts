@@ -1,32 +1,126 @@
 import { multiServiceApiClient } from './multiServiceApiClient';
 
 export interface DashboardOverview {
+  // Backend response structure
+  data?: {
+    consents: {
+      total: number;
+      active: number;
+      revoked: number;
+      expired: number;
+      pending: number;
+    };
+    communicationChannels: {
+      total: number;
+      channels: string[];
+      summary: string;
+      lastUpdated: string;
+      configured: boolean;
+    };
+    privacyNotices: {
+      total: number;
+      acknowledged: number;
+      pending: number;
+      pendingReview: number;
+    };
+    dsarRequests: {
+      total: number;
+      pending: number;
+      processing: number;
+      completed: number;
+      status: string;
+    };
+    recentActivity: Array<{
+      type: string;
+      description: string;
+      timestamp: string;
+      date: string;
+    }>;
+    quickStats: {
+      totalConsents: number;
+      activeConsents: number;
+      totalPreferences: number;
+      totalPrivacyNotices: number;
+      totalDSARRequests: number;
+      pendingActions: number;
+    };
+    privacyStatus: {
+      privacyPolicyAccepted: boolean;
+      version: string;
+      status: string;
+      communicationPrefsConfigured: boolean;
+      communicationLastUpdated: string;
+      pendingDSARStatus: string;
+      dsarProcessingStatus: string;
+    };
+    userProfile: {
+      name: string;
+      email: string;
+      phone: string;
+      memberSince: string;
+      lastLogin: string;
+      isActive: boolean;
+    };
+  };
+
+  // Direct access for backward compatibility
+  consents?: {
+    total: number;
+    active: number;
+    revoked: number;
+    expired: number;
+    pending: number;
+  };
+  communicationChannels?: {
+    total: number;
+    channels: string[];
+    summary: string;
+    lastUpdated: string;
+    configured: boolean;
+  };
+  privacyNotices?: {
+    total: number;
+    acknowledged: number;
+    pending: number;
+    pendingReview: number;
+  };
+  dsarRequests?: {
+    total: number;
+    pending: number;
+    processing: number;
+    completed: number;
+    status: string;
+  };
+  privacyStatus?: {
+    privacyPolicyAccepted: boolean;
+    version: string;
+    status: string;
+    communicationPrefsConfigured: boolean;
+    communicationLastUpdated: string;
+    pendingDSARStatus: string;
+    dsarProcessingStatus: string;
+  };
+  
   // Direct stats from backend
-  totalConsents: number;
-  activeConsents: number;
-  totalPreferences: number;
-  activePreferences: number;
-  totalPrivacyNotices: number;
-  acknowledgedPrivacyNotices: number;
-  totalDSARRequests: number;
-  pendingDSARRequests: number;
+  totalConsents?: number;
+  activeConsents?: number;
+  totalPreferences?: number;
+  activePreferences?: number;
+  totalPrivacyNotices?: number;
+  acknowledgedPrivacyNotices?: number;
+  totalDSARRequests?: number;
+  pendingDSARRequests?: number;
   
   // User profile from backend
   userProfile?: {
     name: string;
     email: string;
     phone: string;
-    company: string;
+    company?: string;
     memberSince: string;
   };
   
   // Arrays from backend
-  consents?: any[];
-  preferences?: any[];
-  privacyNotices?: any[];
-  dsarRequests?: any[];
-  
-  // Activity and other data
   recentActivity?: Array<{
     id?: string;
     type: string;

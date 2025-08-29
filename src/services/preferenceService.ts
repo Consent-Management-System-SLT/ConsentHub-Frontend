@@ -476,7 +476,7 @@ export const preferenceService = {
       end?: string;
     };
   }): Promise<ApiResponse<any>> {
-    console.log('🔄 Updating communication preferences for party:', partyId);
+    console.log('Updating communication preferences for party:', partyId);
     return apiRequest<any>(`/customer/preferences`, {
       method: 'POST',
       body: JSON.stringify({
@@ -505,7 +505,7 @@ export const preferenceService = {
    * Get customer preferences (includes communication and user preferences)
    */
   async getCustomerPreferences(): Promise<ApiResponse<any>> {
-    console.log('📊 Fetching customer preferences from comprehensive backend with cache-busting');
+    console.log('Fetching customer preferences from comprehensive backend with cache-busting');
     // Add cache-busting timestamp to URL instead of problematic headers
     const cacheBuster = Date.now();
     return apiRequest<any>(`/customer/preferences?_t=${cacheBuster}`);

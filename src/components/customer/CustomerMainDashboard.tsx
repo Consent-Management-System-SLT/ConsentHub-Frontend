@@ -57,7 +57,12 @@ const CustomerMainDashboard: React.FC<CustomerMainDashboardProps> = ({
           <div className="p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 max-w-full">
             <div className="max-w-7xl mx-auto">
               {activeSection === 'dashboard' ? (
-                <CustomerDashboardOverview customerName={customerName} showProfile={showProfile} setShowProfile={setShowProfile} />
+                <CustomerDashboardOverview 
+                  customerName={customerName} 
+                  showProfile={showProfile} 
+                  setShowProfile={setShowProfile}
+                  onNavigate={setActiveSection}
+                />
               ) : renderContent()}
             </div>
           </div>

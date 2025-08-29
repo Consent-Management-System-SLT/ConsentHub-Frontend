@@ -20,6 +20,7 @@ interface CustomerDashboardOverviewProps {
   customerName: string;
   showProfile?: boolean;
   setShowProfile?: (open: boolean) => void;
+  onNavigate?: (section: string) => void;
 }
 
 interface ConsentSummary {
@@ -46,7 +47,12 @@ interface Activity {
   description?: string;
 }
 
-const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ customerName, showProfile, setShowProfile }) => {
+const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ 
+  customerName, 
+  showProfile, 
+  setShowProfile, 
+  onNavigate 
+}) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardOverview | null>(null);
@@ -74,12 +80,12 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
     }
   };
 
-  // Use real data if available, otherwise use fallback data
-  const consentSummary = dashboardData?.consentStats || {
-    granted: dashboardData?.activeConsents || 0,
-    revoked: 0,
-    expired: 0,
-    pending: 0
+  // Use real data from backend response structure
+  const consentSummary = {
+    granted: dashboardData?.data?.consents?.active || dashboardData?.consents?.active || 0,
+    revoked: dashboardData?.data?.consents?.revoked || dashboardData?.consents?.revoked || 0,
+    expired: dashboardData?.data?.consents?.expired || dashboardData?.consents?.expired || 0,
+    pending: dashboardData?.data?.consents?.pending || dashboardData?.consents?.pending || 0
   };
 
   const currentCustomerName = dashboardData?.userProfile?.name || user?.name || customerName;
@@ -87,43 +93,44 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
   const quickStats: QuickStat[] = [
     {
       label: t('customerDashboard.overview.activeConsents'),
-      value: String(dashboardData?.activeConsents || 0),
+      value: String(dashboardData?.data?.consents?.active || dashboardData?.consents?.active || 0),
       icon: <CheckCircle className="w-6 h-6" />,
       color: 'text-green-600 bg-green-50 border-green-200',
-      trend: t('customerDashboard.overview.monthlyTrend', { count: dashboardData?.activeConsents || 0 })
+      trend: `+${dashboardData?.data?.consents?.active || dashboardData?.consents?.active || 0} this month`
     },
     {
       label: t('customerDashboard.overview.communicationChannels'),
-      value: String(dashboardData?.activePreferences || 0),
+      value: String(dashboardData?.data?.communicationChannels?.total || dashboardData?.communicationChannels?.total || 0),
       icon: <Settings className="w-6 h-6" />,
       color: 'text-myslt-primary bg-myslt-service-card border-myslt-primary/30',
-      trend: t('customerDashboard.overview.channelTypes')
+      trend: (dashboardData?.data?.communicationChannels?.channels || dashboardData?.communicationChannels?.channels || []).join(', ') || 'None configured'
     },
     {
       label: t('customerDashboard.overview.privacyNotices'),
-      value: String(dashboardData?.totalPrivacyNotices || 0),
+      value: String(dashboardData?.data?.privacyNotices?.total || dashboardData?.privacyNotices?.total || 0),
       icon: <FileText className="w-6 h-6" />,
       color: 'text-purple-600 bg-purple-50 border-purple-200',
-      trend: t('customerDashboard.overview.pendingReviewCount', { count: dashboardData?.acknowledgedPrivacyNotices || 0 })
+      trend: `${dashboardData?.data?.privacyNotices?.pending || dashboardData?.privacyNotices?.pending || 0} pending review`
     },
     {
       label: t('customerDashboard.overview.dsarRequests'),
-      value: String(dashboardData?.totalDSARRequests || 0),
+      value: String(dashboardData?.data?.dsarRequests?.total || dashboardData?.dsarRequests?.total || 0),
       icon: <Download className="w-6 h-6" />,
       color: 'text-orange-600 bg-orange-50 border-orange-200',
-      trend: (dashboardData?.pendingDSARRequests || 0) > 0 ? t('customerDashboard.overview.inProgress') : t('customerDashboard.overview.completed')
+      trend: (dashboardData?.data?.dsarRequests?.pending || dashboardData?.dsarRequests?.pending || 0) > 0 ? 
+        'In progress' : 'completed'
     }
   ];
 
-  const recentActivity = dashboardData?.recentActivity?.map((activity, index) => ({
+  const recentActivity = (dashboardData?.data?.recentActivity || dashboardData?.recentActivity || [])?.map((activity: any, index: number) => ({
     id: activity.id || index,
     action: activity.action || activity.description,
-    timestamp: new Date(activity.timestamp).toLocaleDateString(),
+    timestamp: activity.date || new Date(activity.timestamp).toLocaleDateString(),
     type: activity.type,
     icon: activity.type === 'consent_granted' ? <CheckCircle className="w-4 h-4 text-green-600" /> :
           activity.type === 'profile_updated' ? <User className="w-4 h-4 text-myslt-primary" /> :
-          activity.type === 'preference' ? <Settings className="w-4 h-4 text-myslt-primary" /> :
-          activity.type === 'privacy' ? <FileText className="w-4 h-4 text-purple-600" /> :
+          activity.type === 'preferences_updated' ? <Settings className="w-4 h-4 text-myslt-primary" /> :
+          activity.type === 'privacy_notice_acknowledged' ? <FileText className="w-4 h-4 text-purple-600" /> :
           <Download className="w-4 h-4 text-orange-600" />
   })) || [
     {
@@ -187,45 +194,66 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
     }
   ];
 
+  const privacyStatus = dashboardData?.data?.privacyStatus || dashboardData?.privacyStatus;
   const privacyStatusItems = [
     {
       id: 'privacy-policy',
       title: 'Privacy Policy Accepted',
-      description: 'Version 2.1 - Current',
-      status: 'Active',
-      icon: <CheckCircle className="w-5 h-5 text-myslt-success mt-0.5 flex-shrink-0" />,
+      description: `Version ${privacyStatus?.version || '2.1'} - Current`,
+      status: privacyStatus?.privacyPolicyAccepted ? 'Active' : 'Pending',
+      icon: privacyStatus?.privacyPolicyAccepted 
+        ? <CheckCircle className="w-5 h-5 text-myslt-success mt-0.5 flex-shrink-0" />
+        : <Clock className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />,
       bgColor: 'bg-myslt-service-card',
-      borderColor: 'border-myslt-success/30',
+      borderColor: privacyStatus?.privacyPolicyAccepted 
+        ? 'border-myslt-success/30' 
+        : 'border-yellow-300/30',
       textColor: 'text-myslt-text-primary',
       descColor: 'text-myslt-text-secondary',
-      statusBg: 'bg-myslt-success/10',
-      statusText: 'text-myslt-success'
+      statusBg: privacyStatus?.privacyPolicyAccepted 
+        ? 'bg-myslt-success/10' 
+        : 'bg-yellow-100/50',
+      statusText: privacyStatus?.privacyPolicyAccepted 
+        ? 'text-myslt-success' 
+        : 'text-yellow-600'
     },
     {
       id: 'communication-prefs',
       title: 'Communication Preferences',
-      description: 'Last updated 1 day ago',
-      status: 'Configured',
-      icon: <Settings className="w-5 h-5 text-myslt-primary mt-0.5 flex-shrink-0" />,
+      description: `Last updated ${privacyStatus?.communicationLastUpdated || '1 day ago'}`,
+      status: privacyStatus?.communicationPrefsConfigured ? 'Configured' : 'Not Configured',
+      icon: privacyStatus?.communicationPrefsConfigured 
+        ? <Settings className="w-5 h-5 text-myslt-primary mt-0.5 flex-shrink-0" />
+        : <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />,
       bgColor: 'bg-myslt-service-card',
-      borderColor: 'border-myslt-primary/30',
+      borderColor: privacyStatus?.communicationPrefsConfigured 
+        ? 'border-myslt-primary/30'
+        : 'border-yellow-300/30',
       textColor: 'text-myslt-text-primary',
       descColor: 'text-myslt-text-secondary',
-      statusBg: 'bg-myslt-primary/10',
-      statusText: 'text-myslt-primary'
+      statusBg: privacyStatus?.communicationPrefsConfigured 
+        ? 'bg-myslt-primary/10'
+        : 'bg-yellow-100/50',
+      statusText: privacyStatus?.communicationPrefsConfigured 
+        ? 'text-myslt-primary'
+        : 'text-yellow-600'
     },
     {
       id: 'dsar-request',
-      title: 'Pending DSAR Request',
-      description: 'Data export in progress',
-      status: 'Processing',
-      icon: <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />,
-      bgColor: 'bg-yellow-50',
-      borderColor: 'border-yellow-200',
-      textColor: 'text-yellow-900',
-      descColor: 'text-yellow-700',
-      statusBg: 'bg-yellow-100',
-      statusText: 'text-yellow-600'
+      title: 'DSAR Request Status',
+      description: privacyStatus?.pendingDSARStatus || 'No pending requests',
+      status: privacyStatus?.dsarProcessingStatus || 'None',
+      icon: privacyStatus?.dsarProcessingStatus === 'Processing' 
+        ? <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+        : privacyStatus?.dsarProcessingStatus === 'Completed'
+        ? <CheckCircle className="w-5 h-5 text-myslt-success mt-0.5 flex-shrink-0" />
+        : <XCircle className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />,
+      bgColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'bg-yellow-50' : 'bg-myslt-service-card',
+      borderColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'border-yellow-200' : 'border-gray-200',
+      textColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-900' : 'text-myslt-text-primary',
+      descColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-700' : 'text-myslt-text-secondary',
+      statusBg: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'bg-yellow-100' : 'bg-gray-100',
+      statusText: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-600' : 'text-gray-600'
     }
   ];
 
@@ -330,8 +358,11 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ c
               key={action.action}
               className={`p-3 sm:p-4 lg:p-6 rounded-lg sm:rounded-xl border-2 transition-all duration-200 text-left hover:shadow-lg hover:transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-myslt-primary/50 myslt-card-hover-effect ${action.color}`}
               onClick={() => {
-                // This would be handled by the parent component
-                console.log(`Navigate to ${action.action}`);
+                if (onNavigate) {
+                  onNavigate(action.action);
+                } else {
+                  console.log(`Navigate to ${action.action}`);
+                }
               }}
             >
               <div className="flex items-start space-x-2 sm:space-x-3 lg:space-x-4 mb-2 sm:mb-3 lg:mb-4">

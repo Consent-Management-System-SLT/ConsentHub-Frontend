@@ -39,32 +39,32 @@ class WebSocketService {
       });
 
       this.socket.on('connect', () => {
-        console.log('🔌 Connected to WebSocket server');
-        console.log('🔌 Socket ID:', this.socket?.id);
-        console.log('🔌 Socket connected:', this.socket?.connected);
+        console.log('Connected to WebSocket server');
+        console.log('Socket ID:', this.socket?.id);
+        console.log('Socket connected:', this.socket?.connected);
         this.reconnectAttempts = 0;
       });
 
       this.socket.on('disconnect', (reason) => {
-        console.log('🔌 Disconnected from WebSocket server:', reason);
+        console.log('Disconnected from WebSocket server:', reason);
       });
 
       this.socket.on('connect_error', (error) => {
-        console.error('🔌 WebSocket connection error:', error);
+        console.error('WebSocket connection error:', error);
         this.reconnectAttempts++;
         
         if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-          console.error('🔌 Max reconnection attempts reached');
+          console.error('Max reconnection attempts reached');
         }
       });
 
       this.socket.on('reconnect', (attemptNumber) => {
-        console.log('🔌 Reconnected to WebSocket server after', attemptNumber, 'attempts');
+        console.log('Reconnected to WebSocket server after', attemptNumber, 'attempts');
         this.reconnectAttempts = 0;
       });
 
     } catch (error) {
-      console.error('🔌 Failed to initialize WebSocket connection:', error);
+      console.error('Failed to initialize WebSocket connection:', error);
     }
   }
 
@@ -72,11 +72,11 @@ class WebSocketService {
   joinCSRDashboard(): void {
     if (this.socket && this.socket.connected) {
       this.socket.emit('join-csr-dashboard');
-      console.log('👨‍💼 Joined CSR dashboard room for real-time updates');
-      console.log('👨‍💼 Socket status:', this.socket.connected ? 'Connected' : 'Disconnected');
+      console.log('Joined CSR dashboard room for real-time updates');
+      console.log('Socket status:', this.socket.connected ? 'Connected' : 'Disconnected');
     } else {
-      console.warn('👨‍💼 Cannot join CSR dashboard - WebSocket not connected');
-      console.log('👨‍💼 Socket status:', this.socket ? (this.socket.connected ? 'Connected' : 'Disconnected') : 'Not initialized');
+      console.warn('Cannot join CSR dashboard - WebSocket not connected');
+      console.log('Socket status:', this.socket ? (this.socket.connected ? 'Connected' : 'Disconnected') : 'Not initialized');
     }
   }
 
@@ -84,23 +84,23 @@ class WebSocketService {
   leaveCSRDashboard(): void {
     if (this.socket && this.socket.connected) {
       this.socket.emit('leave-csr-dashboard');
-      console.log('👨‍💼 Left CSR dashboard room');
+      console.log('Left CSR dashboard room');
     }
   }
 
   // Listen for consent updates
   onConsentUpdate(callback: (event: ConsentUpdateEvent) => void): void {
     if (this.socket) {
-      console.log('📡 Setting up consent-updated listener');
+      console.log('Setting up consent-updated listener');
       this.socket.on('consent-updated', (event: ConsentUpdateEvent) => {
-        console.log('📡 Received real-time consent update:', event);
-        console.log('📡 Event type:', event.type);
-        console.log('📡 Consent ID:', event.consent?.id);
-        console.log('📡 User email:', event.user?.email);
+        console.log('Received real-time consent update:', event);
+        console.log('Event type:', event.type);
+        console.log('Consent ID:', event.consent?.id);
+        console.log('User email:', event.user?.email);
         callback(event);
       });
     } else {
-      console.error('📡 Cannot set up consent listener - WebSocket not initialized');
+      console.error('Cannot set up consent listener - WebSocket not initialized');
     }
   }
 
@@ -114,16 +114,16 @@ class WebSocketService {
   // Listen for customer preference updates (when customer updates their own preferences)
   onCustomerPreferenceUpdate(callback: (event: PreferenceUpdateEvent) => void): void {
     if (this.socket) {
-      console.log('📡 Setting up customerPreferencesUpdated listener for CSR dashboard');
+      console.log('Setting up customerPreferencesUpdated listener for CSR dashboard');
       this.socket.on('customerPreferencesUpdated', (event: PreferenceUpdateEvent) => {
-        console.log('📡 Received real-time customer preference update:', event);
-        console.log('📡 Customer ID:', event.customerId);
-        console.log('📡 Updated by:', event.updatedBy);
-        console.log('📡 Source:', event.source);
+        console.log('Received real-time customer preference update:', event);
+        console.log('Customer ID:', event.customerId);
+        console.log('Updated by:', event.updatedBy);
+        console.log('Source:', event.source);
         callback(event);
       });
     } else {
-      console.error('📡 Cannot set up customer preference listener - WebSocket not initialized');
+      console.error('Cannot set up customer preference listener - WebSocket not initialized');
     }
   }
 
@@ -137,16 +137,16 @@ class WebSocketService {
   // Listen for CSR preference updates (when CSR updates customer preferences)
   onCSRPreferenceUpdate(callback: (event: PreferenceUpdateEvent) => void): void {
     if (this.socket) {
-      console.log('📡 Setting up csrPreferencesUpdated listener for customer dashboard');
+      console.log('Setting up csrPreferencesUpdated listener for customer dashboard');
       this.socket.on('csrPreferencesUpdated', (event: PreferenceUpdateEvent) => {
-        console.log('📡 Received real-time CSR preference update:', event);
-        console.log('📡 Customer ID:', event.customerId);
-        console.log('📡 Updated by:', event.updatedBy);
-        console.log('📡 Source:', event.source);
+        console.log('Received real-time CSR preference update:', event);
+        console.log('Customer ID:', event.customerId);
+        console.log('Updated by:', event.updatedBy);
+        console.log('Source:', event.source);
         callback(event);
       });
     } else {
-      console.error('📡 Cannot set up CSR preference listener - WebSocket not initialized');
+      console.error('Cannot set up CSR preference listener - WebSocket not initialized');
     }
   }
 

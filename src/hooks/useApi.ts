@@ -70,13 +70,13 @@ export function usePreferences(partyId?: string): { data: PrivacyPreference | Pr
       // For customer users, use the comprehensive customer preferences endpoint
       const userRole = localStorage.getItem('userRole');
       if (userRole === 'customer') {
-        console.log('🔄 Loading customer preferences from MongoDB Atlas');
+        console.log('Loading customer preferences from MongoDB Atlas');
         return preferenceService.getCustomerPreferences().then(r => {
-          console.log('📊 MongoDB response received:', r.success);
+          console.log('MongoDB response received:', r.success);
           
           // Transform the response to match expected format
           if (r.data && r.data.preferences) {
-            console.log('✅ Preferences loaded from MongoDB Atlas:', r.data.preferences.length);
+            console.log('Preferences loaded from MongoDB Atlas:', r.data.preferences.length);
             return r.data.preferences;
           }
           return r.data || [];

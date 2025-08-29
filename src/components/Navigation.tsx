@@ -32,7 +32,7 @@ export const Navigation: React.FC<NavigationProps> = ({
         { id: 'notices', label: 'Privacy Notices', icon: FileText }
   ];
 
-  // ✅ Automatically select default tab "consents"
+  // Automatically select default tab "consents"
   useEffect(() => {
     if (!activeTab) {
       onTabChange('consents');

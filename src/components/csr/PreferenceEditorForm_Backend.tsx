@@ -86,14 +86,14 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
 
   // Set up real-time preference update listener
   useEffect(() => {
-    console.log('🔄 Setting up real-time preference update listener in CSR dashboard');
+    console.log('Setting up real-time preference update listener in CSR dashboard');
     
     const handleCustomerPreferenceUpdate = (event: PreferenceUpdateEvent) => {
-      console.log('🔄 CSR received customer preference update:', event);
+      console.log('CSR received customer preference update:', event);
       
       // Only update if it's for the currently selected customer
       if (selectedCustomer && event.customerId === selectedCustomer && event.source === 'customer') {
-        console.log('🔄 Refreshing CSR view for customer preference update');
+        console.log('Refreshing CSR view for customer preference update');
         loadPreferences(); // Reload preferences to get latest data
         setSaveStatus('idle'); // Reset any save status
         setHasChanges(false); // Reset changes flag
@@ -105,7 +105,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
 
     // Cleanup listener on unmount
     return () => {
-      console.log('🔄 Cleaning up preference update listener in CSR dashboard');
+      console.log('Cleaning up preference update listener in CSR dashboard');
       websocketService.offCustomerPreferenceUpdate();
     };
   }, [selectedCustomer]); // Re-setup when selected customer changes
@@ -171,9 +171,9 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
           updatedBy: customerPrefs.updatedBy
         });
         
-        console.log('🔍 Loaded actual customer preferences:', customerPrefs);
+        console.log('Loaded actual customer preferences:', customerPrefs);
       } else {
-        console.log('ℹ️ No preferences found for customer, using defaults');
+        console.log('No preferences found for customer, using defaults');
       }
     } catch (error) {
       console.error('Error loading customer preferences:', error);
@@ -269,7 +269,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       // Use the CSR service to update customer preferences in real-time
       const result = await csrDashboardService.updateCustomerPreferences(selectedCustomer, backendPreferences);
       
-      console.log('✅ CSR successfully updated customer preferences:', result);
+      console.log('CSR successfully updated customer preferences:', result);
       
       setIsEditing(false);
       setHasChanges(false);
@@ -278,7 +278,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       // Clear success message after 3 seconds
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
-      console.error('❌ Error saving customer preferences:', error);
+      console.error('Error saving customer preferences:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {

@@ -439,7 +439,7 @@ export const ConsentManagement: React.FC<ConsentManagementProps> = ({ selectedCu
           </div>
         </div>
 
-        {/* 🔍 Search Input and Create Button */}
+        {/* Search Input and Create Button */}
         <div className="mb-4 flex justify-between items-center">
           <button
             onClick={() => setShowCreateModal(true)}

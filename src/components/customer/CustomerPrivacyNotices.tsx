@@ -63,12 +63,12 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
     setIsLoading(true);
     setError(null);
     try {
-      console.log('📋 Loading privacy notices from backend...');
+      console.log('Loading privacy notices from backend...');
       const response = await apiClient.get('/api/v1/customer/privacy-notices');
       
       if (response.data.success && response.data.data.notices) {
         const noticesData = response.data.data.notices;
-        console.log(`✅ Loaded ${noticesData.length} privacy notices`);
+        console.log(`Loaded ${noticesData.length} privacy notices`);
         
         // Process and normalize the notices data
         const processedNotices = noticesData.map((notice: any) => ({
@@ -97,12 +97,12 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
         setNotices(processedNotices);
         setFilteredNotices(processedNotices);
       } else {
-        console.log('⚠️ No notices found or unexpected response format');
+        console.log('No notices found or unexpected response format');
         setNotices([]);
         setFilteredNotices([]);
       }
     } catch (error: any) {
-      console.error('❌ Error loading privacy notices:', error);
+      console.error('Error loading privacy notices:', error);
       setError(error.response?.data?.message || 'Failed to load privacy notices');
     } finally {
       setIsLoading(false);
@@ -115,14 +115,14 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
     setError(null);
     
     try {
-      console.log(`📋 ${decision === 'accept' ? 'Accepting' : 'Declining'} privacy notice: ${noticeId}`);
+      console.log(`${decision === 'accept' ? 'Accepting' : 'Declining'} privacy notice: ${noticeId}`);
       
       const response = await apiClient.post(`/api/v1/privacy-notices/${noticeId}/acknowledge`, {
         decision: decision
       });
 
       if (response.data.success) {
-        console.log(`✅ Privacy notice ${decision}ed successfully`);
+        console.log(`Privacy notice ${decision}ed successfully`);
         
         // Update the notice in state
         setNotices(prevNotices => 
@@ -162,7 +162,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
         setError(`Failed to ${decision} privacy notice`);
       }
     } catch (error: any) {
-      console.error(`❌ Error ${decision}ing privacy notice:`, error);
+      console.error(`Error ${decision}ing privacy notice:`, error);
       setError(error.response?.data?.message || `Failed to ${decision} privacy notice`);
     } finally {
       setIsProcessing(null);
