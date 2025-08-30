@@ -7289,6 +7289,198 @@ app.get("/api/v1/customer/privacy-notices", verifyToken, async (req, res) => {
     }
 });
 
+// ========================================
+// BACKWARD COMPATIBILITY ROUTES (Non-versioned)
+// ========================================
+
+// Backward compatibility for customer preferences
+app.get("/customer/preferences", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({
+                error: true,
+                message: 'Access denied'
+            });
+        }
+        
+        console.log('✅ [Backward Compatibility] Fetching comprehensive preferences for customer:', req.user.id);
+        
+        let allPreferences = [];
+        
+        try {
+            // Import models here to avoid issues
+            const mongoose = require('mongoose');
+            const UserPreference = mongoose.model('UserPreference');
+            
+            // 1. Fetch UserPreferences (individual preferences)
+            const userPreferences = await UserPreference.find({ 
+                userId: req.user.id 
+            }).lean();
+            
+            console.log(`Found ${userPreferences.length} user preferences`);
+            
+            // Transform UserPreferences to the expected format
+            userPreferences.forEach(pref => {
+                allPreferences.push({
+                    id: pref._id.toString(),
+                    partyId: pref.userId,
+                    preferenceType: 'individual',
+                    category: pref.category || 'general',
+                    name: pref.preferenceName,
+                    value: pref.preferenceValue,
+                    consentDate: pref.consentDate,
+                    expiryDate: pref.expiryDate,
+                    status: pref.status || 'active',
+                    updatedAt: pref.updatedAt,
+                    source: 'user_preferences'
+                });
+            });
+            
+        } catch (userPrefError) {
+            console.log('UserPreference model not available, using memory data');
+            
+            // Fallback to memory data if model not available
+            const customerPrefs = customerPreferences.filter(p => p.partyId === req.user.id);
+            allPreferences = customerPrefs.map(pref => ({
+                ...pref,
+                source: 'memory'
+            }));
+        }
+        
+        console.log(`Total preferences found: ${allPreferences.length}`);
+        
+        res.json({
+            success: true,
+            data: {
+                preferences: allPreferences,
+                totalCount: allPreferences.length,
+                customerId: req.user.id
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching customer preferences:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error',
+            details: error.message
+        });
+    }
+});
+
+app.post("/customer/preferences", verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'customer') {
+            return res.status(403).json({
+                error: true,
+                message: 'Access denied'
+            });
+        }
+        
+        console.log('✅ [Backward Compatibility] Updating preferences for customer:', req.user.id);
+        console.log('Update data:', req.body);
+        
+        const updateData = req.body;
+        const updatedPreferences = [];
+        
+        // Handle communication preferences if provided
+        if (updateData.communicationChannels || updateData.topicSubscriptions) {
+            try {
+                const mongoose = require('mongoose');
+                const CommunicationPreference = mongoose.model('CommunicationPreference');
+                
+                const communicationPreference = await CommunicationPreference.findOneAndUpdate(
+                    { partyId: req.user.id },
+                    {
+                        partyId: req.user.id,
+                        preferredChannels: updateData.communicationChannels || [],
+                        topicSubscriptions: updateData.topicSubscriptions || [],
+                        metadata: {
+                            lastUpdated: new Date(),
+                            source: 'customer_dashboard',
+                            userAgent: req.headers['user-agent']
+                        },
+                        frequency: updateData.frequency || 'immediate',
+                        timezone: updateData.timezone || 'UTC',
+                        language: updateData.language || 'en',
+                        updatedAt: new Date(),
+                        updatedBy: req.user.id
+                    },
+                    { 
+                        new: true,
+                        upsert: true,
+                        runValidators: true
+                    }
+                );
+                
+                updatedPreferences.push({
+                    id: communicationPreference._id.toString(),
+                    partyId: communicationPreference.partyId,
+                    preferenceType: 'communication',
+                    category: 'communication',
+                    preferredChannels: communicationPreference.preferredChannels,
+                    topicSubscriptions: communicationPreference.topicSubscriptions,
+                    frequency: communicationPreference.frequency,
+                    timezone: communicationPreference.timezone,
+                    language: communicationPreference.language,
+                    updatedAt: communicationPreference.updatedAt,
+                    source: 'database'
+                });
+                
+            } catch (dbError) {
+                console.log('Database update failed, using memory fallback');
+                
+                // Update in-memory data as fallback
+                const existingIndex = customerPreferences.findIndex(p => 
+                    p.partyId === req.user.id && p.preferenceType === 'communication'
+                );
+                
+                const preference = {
+                    id: existingIndex >= 0 ? customerPreferences[existingIndex].id : 'comm_' + Date.now(),
+                    partyId: req.user.id,
+                    preferenceType: 'communication',
+                    category: 'communication',
+                    preferredChannels: updateData.communicationChannels || [],
+                    topicSubscriptions: updateData.topicSubscriptions || [],
+                    frequency: updateData.frequency || 'immediate',
+                    timezone: updateData.timezone || 'UTC',
+                    language: updateData.language || 'en',
+                    updatedAt: new Date().toISOString(),
+                    source: 'memory'
+                };
+                
+                if (existingIndex >= 0) {
+                    customerPreferences[existingIndex] = preference;
+                } else {
+                    customerPreferences.push(preference);
+                }
+                
+                updatedPreferences.push(preference);
+            }
+        }
+        
+        res.json({
+            success: true,
+            message: 'Preferences updated successfully',
+            data: {
+                preferences: updatedPreferences,
+                customerId: req.user.id,
+                timestamp: new Date().toISOString()
+            }
+        });
+    } catch (error) {
+        console.error('Error updating customer preferences:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error',
+            details: error.message
+        });
+    }
+});
+
+// ========================================
+// DSAR (Data Subject Access Request) Routes
+// ========================================
+
 app.get("/api/v1/customer/dsar", verifyToken, async (req, res) => {
     try {
         if (req.user.role !== 'customer') {
@@ -7297,6 +7489,31 @@ app.get("/api/v1/customer/dsar", verifyToken, async (req, res) => {
                 message: 'Access denied'
             });
         }
+        
+        console.log('✅ Fetching DSAR requests for customer:', req.user.id);
+        
+        // Get customer-specific DSAR requests from in-memory data
+        const customerDsarRequests = dsarRequests.filter(request => 
+            request.customerId === req.user.id
+        );
+        
+        console.log(`Found ${customerDsarRequests.length} DSAR requests for customer ${req.user.id}`);
+        
+        res.json({
+            success: true,
+            data: {
+                requests: customerDsarRequests
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching DSAR requests:', error);
+        res.status(500).json({
+            error: true,
+            message: 'Internal server error',
+            details: error.message
+        });
+    }
+});
         
         console.log('✅ Fetching DSAR requests for customer:', req.user.id);
         
@@ -7925,13 +8142,11 @@ app.post("/api/v1/privacy-notices/:id/acknowledge", verifyToken, async (req, res
         const noticeId = req.params.id;
         const { decision } = req.body; // 'accept' or 'decline'
         
-        console.log('� DEBUGGING ACKNOWLEDGMENT ENDPOINT:');
+        console.log('📋 DEBUGGING ACKNOWLEDGMENT ENDPOINT:');
         console.log(`   - Notice ID: ${noticeId}`);
         console.log(`   - Decision: ${decision}`);
         console.log(`   - User ID: ${req.user?.id}`);
         console.log(`   - User Email: ${req.user?.email}`);
-        console.log(`   - Request Body:`, JSON.stringify(req.body, null, 2));
-        console.log(`   - User Object:`, JSON.stringify(req.user, null, 2));
         
         if (!decision || !['accept', 'decline'].includes(decision)) {
             console.log('❌ Invalid decision provided');
@@ -7941,15 +8156,204 @@ app.post("/api/v1/privacy-notices/:id/acknowledge", verifyToken, async (req, res
             });
         }
         
-        // Find the privacy notice using multiple possible ID formats
-        console.log('🔍 Searching for privacy notice...');
-        let notice = await PrivacyNotice.findOne({ 
-            $or: [
-                { _id: noticeId },
-                { noticeId: noticeId },
-                { 'metadata.originalId': noticeId }
-            ]
+        try {
+            // Try to find the privacy notice in database
+            console.log('🔍 Searching for privacy notice in database...');
+            let notice = await PrivacyNotice.findOne({ 
+                $or: [
+                    { _id: noticeId },
+                    { noticeId: noticeId },
+                    { 'metadata.originalId': noticeId }
+                ]
+            });
+            
+            if (!notice) {
+                console.log(`❌ Notice not found in database with ID: ${noticeId}, trying in-memory data...`);
+                
+                // Fallback to in-memory privacy notices
+                const memoryNotice = privacyNotices.find(n => 
+                    n.id === noticeId || 
+                    n.noticeId === noticeId ||
+                    n._id === noticeId
+                );
+                
+                if (!memoryNotice) {
+                    console.log(`❌ Notice not found in memory either with ID: ${noticeId}`);
+                    return res.status(404).json({
+                        success: false,
+                        error: "Privacy notice not found"
+                    });
+                }
+                
+                // Use memory notice and update in-memory data
+                console.log(`✅ Found notice in memory: ${memoryNotice.title}`);
+                
+                // Find or create acknowledgment in memory
+                if (!memoryNotice.acknowledgments) {
+                    memoryNotice.acknowledgments = [];
+                }
+                
+                const existingAckIndex = memoryNotice.acknowledgments.findIndex(
+                    ack => ack.userId === req.user.id || ack.userEmail === req.user.email
+                );
+                
+                const acknowledgment = {
+                    userId: req.user.id,
+                    userEmail: req.user.email,
+                    decision: decision,
+                    acknowledgedAt: new Date(),
+                    ipAddress: req.ip,
+                    userAgent: req.headers['user-agent']
+                };
+                
+                if (existingAckIndex >= 0) {
+                    memoryNotice.acknowledgments[existingAckIndex] = acknowledgment;
+                    console.log('🔄 Updated existing memory acknowledgment');
+                } else {
+                    memoryNotice.acknowledgments.push(acknowledgment);
+                    console.log('➕ Added new memory acknowledgment');
+                }
+                
+                return res.json({
+                    success: true,
+                    message: `Privacy notice ${decision}ed successfully`,
+                    data: {
+                        acknowledgment: acknowledgment,
+                        notice: {
+                            id: memoryNotice.id,
+                            title: memoryNotice.title,
+                            decision: decision
+                        }
+                    }
+                });
+            }
+            
+            // Database notice found, proceed with database update
+            console.log(`✅ Found notice in database: ${notice.title} (MongoDB ID: ${notice._id})`);
+            
+            // Check if customer has already acknowledged this notice
+            const existingAcknowledgment = notice.acknowledgments?.find(
+                ack => ack.userId === req.user.id || ack.userEmail === req.user.email
+            );
+            
+            if (existingAcknowledgment) {
+                // Update existing acknowledgment
+                console.log('🔄 Updating existing database acknowledgment...');
+                existingAcknowledgment.decision = decision;
+                existingAcknowledgment.acknowledgedAt = new Date();
+                existingAcknowledgment.ipAddress = req.ip;
+                existingAcknowledgment.userAgent = req.headers['user-agent'];
+            } else {
+                // Add new acknowledgment
+                console.log('➕ Adding new database acknowledgment...');
+                if (!notice.acknowledgments) {
+                    notice.acknowledgments = [];
+                }
+                notice.acknowledgments.push({
+                    userId: req.user.id,
+                    userEmail: req.user.email,
+                    decision: decision,
+                    acknowledgedAt: new Date(),
+                    ipAddress: req.ip,
+                    userAgent: req.headers['user-agent']
+                });
+            }
+            
+            // Save the updated notice
+            await notice.save();
+            
+            const acknowledgment = notice.acknowledgments.find(
+                ack => ack.userId === req.user.id || ack.userEmail === req.user.email
+            );
+            
+            console.log(`✅ Successfully ${decision}ed privacy notice: ${notice.title}`);
+            
+            res.json({
+                success: true,
+                message: `Privacy notice ${decision}ed successfully`,
+                data: {
+                    acknowledgment: acknowledgment,
+                    notice: {
+                        id: notice._id,
+                        title: notice.title,
+                        decision: decision
+                    }
+                }
+            });
+            
+        } catch (dbError) {
+            console.error('❌ Database error in privacy notice acknowledgment:', dbError);
+            
+            // Fallback to in-memory data
+            console.log('🔄 Falling back to in-memory privacy notice data...');
+            
+            const memoryNotice = privacyNotices.find(n => 
+                n.id === noticeId || 
+                n.noticeId === noticeId ||
+                n._id === noticeId
+            );
+            
+            if (!memoryNotice) {
+                console.log(`❌ Notice not found in memory with ID: ${noticeId}`);
+                return res.status(404).json({
+                    success: false,
+                    error: "Privacy notice not found"
+                });
+            }
+            
+            // Use memory notice and update in-memory data
+            console.log(`✅ Found notice in memory (fallback): ${memoryNotice.title}`);
+            
+            // Find or create acknowledgment in memory
+            if (!memoryNotice.acknowledgments) {
+                memoryNotice.acknowledgments = [];
+            }
+            
+            const existingAckIndex = memoryNotice.acknowledgments.findIndex(
+                ack => ack.userId === req.user.id || ack.userEmail === req.user.email
+            );
+            
+            const acknowledgment = {
+                userId: req.user.id,
+                userEmail: req.user.email,
+                decision: decision,
+                acknowledgedAt: new Date(),
+                ipAddress: req.ip,
+                userAgent: req.headers['user-agent']
+            };
+            
+            if (existingAckIndex >= 0) {
+                memoryNotice.acknowledgments[existingAckIndex] = acknowledgment;
+                console.log('🔄 Updated existing memory acknowledgment (fallback)');
+            } else {
+                memoryNotice.acknowledgments.push(acknowledgment);
+                console.log('➕ Added new memory acknowledgment (fallback)');
+            }
+            
+            return res.json({
+                success: true,
+                message: `Privacy notice ${decision}ed successfully`,
+                data: {
+                    acknowledgment: acknowledgment,
+                    notice: {
+                        id: memoryNotice.id,
+                        title: memoryNotice.title,
+                        decision: decision
+                    }
+                }
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Error acknowledging privacy notice:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error',
+            message: error.message,
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
+    }
+});
         
         if (!notice) {
             console.log(`❌ Notice not found with ID: ${noticeId}`);
