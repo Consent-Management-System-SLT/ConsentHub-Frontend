@@ -2,6 +2,54 @@ import React, { useState, useEffect } from 'react';
 import { Users, Plus, Search, Edit, Trash2, Shield, UserCheck, RefreshCw, Eye, EyeOff, X, UserX, Pause, Play, AlertTriangle } from 'lucide-react';
 import { useCRUDNotifications } from '../shared/withNotifications';
 
+// Utility function to format dates
+const formatDateTime = (dateString: string | null) => {
+  if (!dateString) return 'Never';
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    // Less than 1 minute
+    if (diffInSeconds < 60) {
+      return 'Just now';
+    }
+    
+    // Less than 1 hour
+    if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    }
+    
+    // Less than 24 hours
+    if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    }
+    
+    // Less than 7 days
+    if (diffInSeconds < 604800) {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    }
+    
+    // Format as full date
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid Date';
+  }
+};
+
 interface User {
   id: string;
   name: string;
@@ -16,6 +64,7 @@ interface User {
   company?: string;
   emailVerified?: boolean;
   permissions: string[];
+  hasNeverLoggedIn?: boolean; // New flag to distinguish never logged in vs recent login
   // Guardian-specific fields
   address?: string;
   relationship?: string;
@@ -117,6 +166,7 @@ const UserManagement: React.FC = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   // Edit guardian state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -209,7 +259,8 @@ const UserManagement: React.FC = () => {
           phone: guardian.phone || '',
           role: 'guardian' as const,
           status: guardian.isActive !== false ? 'active' : 'inactive',
-          lastLogin: null,
+          lastLogin: guardian.lastLoginAt, // Don't fallback to createdAt
+          hasNeverLoggedIn: !guardian.lastLoginAt, // Explicit flag for guardians too
           createdAt: guardian.createdAt,
           address: guardian.address || '',
           relationship: guardian.relationship || '',
@@ -222,6 +273,7 @@ const UserManagement: React.FC = () => {
       const allUsers = [...regularUsers, ...guardians];
       setUsers(allUsers);
       setTotalCount(allUsers.length);
+      setLastRefresh(new Date()); // Track when data was last refreshed for real-time login updates
     } catch (err) {
       console.error('❌ UserManagement: Error fetching users:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch users');
@@ -587,9 +639,17 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  // Load users on component mount
+  // Load users on component mount and set up auto-refresh for real-time last login updates
   useEffect(() => {
     fetchUsers();
+    
+    // Set up auto-refresh every 30 seconds for real-time last login updates
+    const refreshInterval = setInterval(() => {
+      fetchUsers();
+    }, 30000);
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(refreshInterval);
   }, []);
 
   const handleEditUser = (user: User) => {
@@ -759,6 +819,25 @@ const UserManagement: React.FC = () => {
     return shouldInclude;
   });
 
+  // Sort users by last login time - most recent first
+  const sortedUsers = filteredUsers.sort((a, b) => {
+    // Users who have never logged in go to the bottom
+    if (a.hasNeverLoggedIn && !b.hasNeverLoggedIn) return 1;
+    if (!a.hasNeverLoggedIn && b.hasNeverLoggedIn) return -1;
+    if (a.hasNeverLoggedIn && b.hasNeverLoggedIn) {
+      // Both never logged in, sort by creation date (newest first)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    
+    // Both have logged in, sort by last login time (most recent first)
+    if (a.lastLogin && b.lastLogin) {
+      return new Date(b.lastLogin).getTime() - new Date(a.lastLogin).getTime();
+    }
+    
+    // Fallback to creation date if login times are missing
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
   const getRoleIcon = (role: string) => {
     switch (role.toLowerCase()) {
       case 'admin':
@@ -847,10 +926,16 @@ const UserManagement: React.FC = () => {
             onClick={fetchUsers}
             disabled={loading}
             className="px-3 sm:px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
+            title={lastRefresh ? `Last updated: ${lastRefresh.toLocaleTimeString()}` : 'Click to refresh'}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
+          {lastRefresh && (
+            <span className="text-xs text-gray-500 hidden sm:block">
+              Updated: {formatDateTime(lastRefresh.toISOString())}
+            </span>
+          )}
         </div>
       </div>
       
@@ -1025,13 +1110,16 @@ const UserManagement: React.FC = () => {
                   <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">User</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Role</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Last Login</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">
+                    Last Login
+                    <span className="ml-1 text-xs text-green-600" title="Sorted by most recent login first">↓</span>
+                  </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Department</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-myslt-card divide-y divide-myslt-accent/20">
-                {filteredUsers.length === 0 ? (
+                {sortedUsers.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-8 text-center">
                       <div className="text-myslt-text-secondary">
@@ -1043,7 +1131,7 @@ const UserManagement: React.FC = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredUsers.map((user, index) => (
+                  sortedUsers.map((user, index) => (
                 <tr key={`${user.id}-${user.email || 'no-email'}-${index}`} className="hover:bg-myslt-background">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -1078,7 +1166,39 @@ const UserManagement: React.FC = () => {
                       <option value="suspended">Suspended</option>
                     </select>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">{user.lastLogin}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">
+                    <div className="flex flex-col">
+                      {user.hasNeverLoggedIn ? (
+                        <>
+                          <span className="font-medium text-gray-400">Never logged in</span>
+                          <span className="text-xs text-gray-500">
+                            Created: {new Date(user.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="font-medium text-gray-900">
+                            {formatDateTime(user.lastLogin)}
+                          </span>
+                          {user.lastLogin && (
+                            <span className="text-xs text-gray-500">
+                              {new Date(user.lastLogin).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">{user.department || 'N/A'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-1">

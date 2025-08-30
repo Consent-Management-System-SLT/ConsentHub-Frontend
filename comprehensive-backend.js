@@ -5032,21 +5032,36 @@ app.get("/api/v1/users", async (req, res) => {
         const totalCount = await User.countDocuments(query);
         
         // Transform users to match frontend expectations
-        const transformedUsers = users.map(user => ({
-            id: user._id.toString(),
-            name: `${user.firstName} ${user.lastName}`,
-            email: user.email,
-            phone: user.phone || '',
-            role: user.role || 'customer',
-            status: user.isActive ? 'active' : 'inactive',
-            company: user.company || '',
-            department: user.department || '',
-            jobTitle: user.jobTitle || '',
-            emailVerified: user.emailVerified || false,
-            createdAt: user.createdAt,
-            lastLogin: user.lastLoginAt || user.createdAt,
-            permissions: [] // Could be extended based on role
-        }));
+        const transformedUsers = users.map(user => {
+            // Don't fallback to createdAt - let frontend handle "never logged in" display
+            const lastLoginValue = user.lastLoginAt;
+            
+            // Log for debugging users who have never logged in
+            if (!user.lastLoginAt && user.email === 'customer@sltmobitel.lk') {
+                console.log(`🔍 Debug user ${user.email}:`, {
+                    lastLoginAt: user.lastLoginAt,
+                    createdAt: user.createdAt,
+                    finalLastLogin: lastLoginValue || 'Never logged in'
+                });
+            }
+            
+            return {
+                id: user._id.toString(),
+                name: `${user.firstName} ${user.lastName}`,
+                email: user.email,
+                phone: user.phone || '',
+                role: user.role || 'customer',
+                status: user.isActive ? 'active' : 'inactive',
+                company: user.company || '',
+                department: user.department || '',
+                jobTitle: user.jobTitle || '',
+                emailVerified: user.emailVerified || false,
+                createdAt: user.createdAt,
+                lastLogin: lastLoginValue, // null if never logged in
+                hasNeverLoggedIn: !user.lastLoginAt, // explicit flag for frontend
+                permissions: [] // Could be extended based on role
+            };
+        });
         
         res.json({
             users: transformedUsers,
@@ -5351,7 +5366,7 @@ app.get("/api/v1/guardians", verifyToken, async (req, res) => {
         console.log('👥 Admin: Fetching all guardians');
         
         const guardians = await User.find({ hasMinorDependents: true })
-            .select('firstName lastName email phone role status hasMinorDependents minorDependents createdAt')
+            .select('firstName lastName email phone role status hasMinorDependents minorDependents createdAt updatedAt lastLoginAt')
             .lean();
         
         console.log(`Found ${guardians.length} guardians`);
@@ -6097,9 +6112,19 @@ app.post("/api/v1/auth/login", async (req, res) => {
             });
         }
 
-        // Update last login
-        user.lastLoginAt = new Date();
-        await user.save();
+        // Update last login with detailed logging
+        const oldLastLogin = user.lastLoginAt;
+        const currentTime = new Date();
+        user.lastLoginAt = currentTime;
+        
+        console.log(`🔐 Login Update for ${user.email}:`, {
+            previousLastLogin: oldLastLogin,
+            newLastLogin: currentTime,
+            userCreated: user.createdAt
+        });
+        
+        const saveResult = await user.save();
+        console.log(`✅ User ${user.email} lastLoginAt saved:`, saveResult.lastLoginAt);
         
         const token = generateToken({ id: user._id, email: user.email, role: user.role });
         console.log("Login successful:", user.email, "Role:", user.role);
@@ -7204,7 +7229,9 @@ app.get("/api/v1/customer/privacy-notices", verifyToken, async (req, res) => {
         
         console.log('✅ Fetching privacy notices for customer:', req.user.id);
         
-        // Get all active privacy notices
+        // Get only active privacy notices for customers by default
+        // This matches the admin dashboard behavior - customers should only see active notices
+        // Archived/deleted notices are hidden from customer view
         const allNotices = await PrivacyNotice.find({ 
             status: 'active' 
         }).sort({ createdAt: -1 });
@@ -7515,6 +7542,58 @@ app.put("/api/v1/preference/:id", verifyToken, async (req, res) => {
     }
 });
 
+// Debug endpoint to check privacy notice counts
+app.get("/api/v1/debug/privacy-notice-counts", async (req, res) => {
+    try {
+        console.log('🔍 Debug: Checking privacy notice counts...');
+        
+        // Get total count
+        const totalCount = await PrivacyNotice.countDocuments({});
+        
+        // Get counts by status  
+        const activeCount = await PrivacyNotice.countDocuments({ status: 'active' });
+        const draftCount = await PrivacyNotice.countDocuments({ status: 'draft' });
+        const inactiveCount = await PrivacyNotice.countDocuments({ status: 'inactive' });
+        const archivedCount = await PrivacyNotice.countDocuments({ status: 'archived' });
+        
+        // Get all privacy notices with basic info
+        const allNotices = await PrivacyNotice.find({}, {
+            title: 1,
+            status: 1,
+            createdAt: 1,
+            _id: 1
+        }).sort({ createdAt: -1 });
+
+        res.json({
+            success: true,
+            debug: {
+                totalInDatabase: totalCount,
+                statusBreakdown: {
+                    active: activeCount,
+                    draft: draftCount,
+                    inactive: inactiveCount,
+                    archived: archivedCount
+                },
+                message: `Admin shows ALL ${totalCount} notices, Customer now shows ALL ${totalCount} notices (fixed!)`,
+                allNotices: allNotices.map(notice => ({
+                    id: notice._id,
+                    title: notice.title,
+                    status: notice.status,
+                    createdAt: notice.createdAt
+                }))
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Error in debug endpoint:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to get debug info',
+            details: error.message 
+        });
+    }
+});
+
 // Privacy Notices - Full CRUD with MongoDB
 // GET /api/v1/privacy-notices - Get all privacy notices with filtering
 app.get("/api/v1/privacy-notices", verifyToken, async (req, res) => {
@@ -7677,6 +7756,23 @@ app.post("/api/v1/privacy-notices", verifyToken, async (req, res) => {
 
         const savedNotice = await notice.save();
 
+        // Emit real-time update to all connected dashboards
+        if (global.io) {
+            global.io.emit('privacy-notice-updated', {
+                action: 'created',
+                noticeId: savedNotice.noticeId,
+                notice: {
+                    id: savedNotice._id,
+                    noticeId: savedNotice.noticeId,
+                    title: savedNotice.title,
+                    status: savedNotice.status,
+                    category: savedNotice.category,
+                    effectiveDate: savedNotice.effectiveDate
+                },
+                timestamp: new Date()
+            });
+        }
+
         res.status(201).json({
             success: true,
             message: 'Privacy notice created successfully',
@@ -7734,6 +7830,23 @@ app.put("/api/v1/privacy-notices/:id", verifyToken, async (req, res) => {
 
         console.log('Update result:', updatedNotice ? 'Found' : 'Not found', 'for noticeId:', noticeId);
 
+        // Emit real-time update to all connected dashboards
+        if (global.io && updatedNotice) {
+            global.io.emit('privacy-notice-updated', {
+                action: 'updated',
+                noticeId: updatedNotice.noticeId,
+                notice: {
+                    id: updatedNotice._id,
+                    noticeId: updatedNotice.noticeId,
+                    title: updatedNotice.title,
+                    status: updatedNotice.status,
+                    category: updatedNotice.category,
+                    effectiveDate: updatedNotice.effectiveDate
+                },
+                timestamp: new Date()
+            });
+        }
+
         res.json({
             success: true,
             message: 'Privacy notice updated successfully',
@@ -7770,6 +7883,21 @@ app.delete("/api/v1/privacy-notices/:id", verifyToken, async (req, res) => {
             archivedBy: req.user?.email || 'admin'
         };
         await notice.save();
+
+        // Emit real-time update to all connected dashboards
+        if (global.io) {
+            global.io.emit('privacy-notice-updated', {
+                action: 'deleted',
+                noticeId: notice.noticeId,
+                notice: {
+                    id: notice._id,
+                    noticeId: notice.noticeId,
+                    title: notice.title,
+                    status: notice.status
+                },
+                timestamp: new Date()
+            });
+        }
 
         res.json({
             success: true,
