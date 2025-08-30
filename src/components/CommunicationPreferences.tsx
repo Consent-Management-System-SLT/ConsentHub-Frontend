@@ -63,7 +63,7 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
   // Load dynamic preference configuration
   const loadPreferenceConfig = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/v1/customer/preference-config');
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/customer/preference-config`);
       const data = await response.json();
       if (data.success) {
         setPreferenceConfig(data.config);

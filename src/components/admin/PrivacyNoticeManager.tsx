@@ -27,7 +27,7 @@ const PrivacyNoticeManager: React.FC = () => {
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch('http://localhost:3001/api/v1/privacy-notices', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/privacy-notices`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

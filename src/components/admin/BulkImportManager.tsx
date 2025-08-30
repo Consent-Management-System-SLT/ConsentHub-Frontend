@@ -81,7 +81,7 @@ const BulkImportManager: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // API Base URL
-  const API_BASE_URL = 'http://localhost:3001/api/v1';
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1`;
 
   // Get auth token
   const getAuthToken = () => {

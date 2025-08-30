@@ -44,7 +44,7 @@ const CustomerManagement: React.FC = () => {
       const token = localStorage.getItem('authToken');
       
       // Fetch all users and filter customers
-      const response = await fetch('http://localhost:3001/api/v1/users', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/users`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

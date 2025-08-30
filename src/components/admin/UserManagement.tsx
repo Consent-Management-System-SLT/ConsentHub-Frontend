@@ -222,7 +222,7 @@ const UserManagement: React.FC = () => {
       const token = localStorage.getItem('authToken');
       
       // Fetch regular users
-      const usersResponse = await fetch('http://localhost:3001/api/v1/users', {
+      const usersResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/users`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -242,7 +242,7 @@ const UserManagement: React.FC = () => {
       }));
       
       // Fetch guardians
-      const guardiansResponse = await fetch('http://localhost:3001/api/v1/guardians', {
+      const guardiansResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/guardians`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -381,7 +381,7 @@ const UserManagement: React.FC = () => {
       
       if (newUser.role === 'guardian') {
         // Create guardian with dependents
-        response = await fetch('http://localhost:3001/api/v1/guardians', {
+        response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/guardians`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -416,7 +416,7 @@ const UserManagement: React.FC = () => {
         setUsers([...users, guardianAsUser]);
       } else {
         // Create regular user
-        response = await fetch('http://localhost:3001/api/v1/users', {
+        response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/users`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

@@ -43,7 +43,7 @@ const DSARManager: React.FC = () => {
       }
       
       // Direct API call to match our working test
-      const response = await fetch('http://localhost:3001/api/v1/dsar/requests', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/dsar/requests`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -156,7 +156,7 @@ const DSARManager: React.FC = () => {
       }
       
       console.log('Export: Making request to CSV endpoint...');
-      const response = await fetch('http://localhost:3001/api/v1/dsar/export/csv', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/dsar/export/csv`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

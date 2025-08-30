@@ -122,7 +122,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
       setTemplates(templatesData);
       
       // Load pre-built templates from notification service
-      const preBuiltResponse = await fetch('http://localhost:3001/api/csr/notifications/templates');
+      const preBuiltResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/csr/notifications/templates`);
       if (preBuiltResponse.ok) {
         const preBuiltData = await preBuiltResponse.json();
         setPreBuiltTemplates(preBuiltData.data || []);

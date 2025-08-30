@@ -29,7 +29,7 @@ const ComplianceRulesManager = () => {
     try {
       setLoading(true);
       const token = getAuthToken();
-      const response = await fetch('http://localhost:3001/api/v1/compliance-rules', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/compliance-rules`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -54,7 +54,7 @@ const ComplianceRulesManager = () => {
   const handleAddRule = async () => {
     try {
       const token = getAuthToken();
-      const response = await fetch('http://localhost:3001/api/v1/compliance-rules', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/compliance-rules`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

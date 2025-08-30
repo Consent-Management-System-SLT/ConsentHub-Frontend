@@ -217,7 +217,7 @@ const PreferenceManagement: React.FC = () => {
 
     try {
       // Save to backend first
-      const response = await fetch('http://localhost:3001/api/v1/admin/preference-channels', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/admin/preference-channels`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -270,7 +270,7 @@ const PreferenceManagement: React.FC = () => {
 
     try {
       // Save to backend first
-      const response = await fetch('http://localhost:3001/api/v1/admin/preference-topics', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/admin/preference-topics`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
