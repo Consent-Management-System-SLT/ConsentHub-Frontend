@@ -36,11 +36,16 @@ simple-test.js
 
 # Debugging and development scripts
 add-consents-via-api.js
+add-debug-endpoint.js
+analyze-privacy-notice-status.js
+check-admin-filtering.js
 check-atlas-database.js
 check-customer-data.js
 check-database.js
 check-dinuka-account.js
 check-dinuka-mongodb.js
+check-login-data.js
+check-ojitha-status.js
 check-user-roles.js
 comprehensive-debug.js
 create-additional-data.js
@@ -48,6 +53,15 @@ create-pramodh-preferences.js
 create-user-preferences.js
 customer-dashboard-test.html
 customer-data-provisioning.js
+debug-notice-ids.js
+debug-ojitha-login.js
+debug-privacy-creation.js
+debug-privacy-notice-count.js
+demo-user-flow.js
+reset-ojitha-password.js
+simulate-admin-view.js
+test-delete.html
+verify-sync.js
 debug-dashboard-endpoint.js
 debug-dinuka-data.js
 debug-privacy-notices.js
