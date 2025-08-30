@@ -18,11 +18,11 @@ class ApiClient {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    this.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
     
     this.axiosInstance = axios.create({
       baseURL: this.baseURL,
-      timeout: 10000,
+      timeout: 60000, // Increased to 60 seconds for bulk operations
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

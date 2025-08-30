@@ -1,35 +1,20 @@
 import React, { useState } from 'react';
-import { 
-  BarChart3, 
-  Shield, 
-  Settings, 
-  FileText, 
-  Database, 
-  Activity, 
-  Upload, 
-  Webhook, 
-  Users, 
-  AlertTriangle,
-  TrendingUp,
-  CheckCircle,
-  Clock,
-  Eye,
-  Download,
-  Filter
-} from 'lucide-react';
 
 // Import admin components
 import AdminHeader from './admin/AdminHeader';
 import AdminSidebar from './admin/AdminSidebar';
 import DashboardHome from './admin/DashboardHome';
 import ConsentOverviewTable from './admin/ConsentOverviewTable';
-import PreferenceManager from './admin/PreferenceManager';
-import PrivacyNoticeManager from './admin/PrivacyNoticeManager';
+import GuardianConsent from './admin/GuardianConsent';
+import PreferenceManagement from './admin/PreferenceManagementNew';
+import { PrivacyNotices } from './PrivacyNotices';
 import DSARManager from './admin/DSARManager';
+import DSARAutomation from './admin/DSARAutomation';
 import AuditLogViewer from './admin/AuditLogViewer';
 import BulkImportManager from './admin/BulkImportManager';
 import EventListenerManager from './admin/EventListenerManager';
 import UserManagement from './admin/UserManagement';
+import CustomerManagement from './admin/CustomerManagement';
 import ComplianceRulesManager from './admin/ComplianceRulesManager';
 import ServerConnectionAlert from './shared/ServerConnectionAlert';
 
@@ -48,12 +33,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
         return <DashboardHome />;
       case 'consents':
         return <ConsentOverviewTable />;
-      case 'preferences':
-        return <PreferenceManager />;
+      case 'guardian-consent':
+        return <GuardianConsent />;
+      case 'preference-management':
+        return <PreferenceManagement />;
       case 'privacy-notices':
-        return <PrivacyNoticeManager />;
+        return <PrivacyNotices />;
       case 'dsar-requests':
         return <DSARManager />;
+      case 'dsar-automation':
+        return <DSARAutomation />;
       case 'audit-logs':
         return <AuditLogViewer />;
       case 'bulk-import':
@@ -62,6 +51,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
         return <EventListenerManager />;
       case 'user-management':
         return <UserManagement />;
+      case 'customer-management':
+        return <CustomerManagement />;
       case 'compliance-rules':
         return <ComplianceRulesManager />;
       default:
@@ -70,7 +61,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 flex ${className}`}>
+    <div className={`min-h-screen bg-myslt-background flex flex-col lg:flex-row ${className}`}>
       {/* Server Connection Alert */}
       {showConnectionAlert && (
         <ServerConnectionAlert 
@@ -89,14 +80,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
       />
       
       {/* Main content area */}
-      <div className="flex-1 lg:ml-0 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
         <AdminHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
         
         {/* Main Content */}
-        <main className="flex-1 overflow-auto">
-          <div className="p-4 sm:p-6 lg:p-8">
-            {renderContent()}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto">
+          <div className="p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 max-w-full">
+            <div className="max-w-7xl mx-auto">
+              {renderContent()}
+            </div>
           </div>
         </main>
       </div>

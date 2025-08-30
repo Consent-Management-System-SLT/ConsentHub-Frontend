@@ -10,14 +10,34 @@ import {
   RefreshCw, 
   Search,
   Clock,
-  Volume2,
   VolumeX,
   CheckCircle,
   AlertCircle,
-  Globe,
-  Smartphone
+  Smartphone,
+  X
 } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
+import { websocketService, PreferenceUpdateEvent } from '../../services/websocketService';
+
+interface PreferenceConfig {
+  communicationChannels: Array<{
+    key: string;
+    name: string;
+    description: string;
+    icon: string;
+    enabled: boolean;
+    isDefault: boolean;
+  }>;
+  topicSubscriptions: Array<{
+    key: string;
+    name: string;
+    description: string;
+    category: string;
+    enabled: boolean;
+    isDefault: boolean;
+    priority: string;
+  }>;
+}
 
 interface PreferenceEditorFormProps {
   className?: string;
@@ -27,26 +47,11 @@ interface PreferenceEditorFormProps {
 const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className = '', customerId }) => {
   const [selectedCustomer, setSelectedCustomer] = useState<string>(customerId || '');
   const [customers, setCustomers] = useState<any[]>([]);
+  const [preferenceConfig, setPreferenceConfig] = useState<PreferenceConfig | null>(null);
   const [preferences, setPreferences] = useState<any>({
-    // Communication Channels
-    channels: {
-      email: true,
-      sms: true,
-      push: false,
-      inApp: true,
-      phone: false
-    },
-    // Topic Subscriptions  
-    topics: {
-      offers: true,
-      productUpdates: true,
-      serviceAlerts: true,
-      billing: true,
-      security: true,
-      newsletters: false,
-      marketing: false,
-      promotions: false
-    },
+    // Initialize with empty dynamic preferences - will be populated from config
+    channels: {},
+    topics: {},
     // Do Not Disturb Settings
     dndSettings: {
       enabled: true,
@@ -72,17 +77,86 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
   const [hasChanges, setHasChanges] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  // Load customers
+  // Load customers and preference configuration on component mount
   useEffect(() => {
     loadCustomers();
+    loadPreferenceConfig();
   }, []);
 
   // Load preferences when customer is selected
   useEffect(() => {
-    if (selectedCustomer) {
+    if (selectedCustomer && preferenceConfig) {
       loadPreferences();
     }
-  }, [selectedCustomer]);
+  }, [selectedCustomer, preferenceConfig]);
+
+  // Set up real-time preference update listener
+  useEffect(() => {
+    console.log('Setting up real-time preference update listener in CSR dashboard');
+    
+    const handleCustomerPreferenceUpdate = (event: PreferenceUpdateEvent) => {
+      console.log('CSR received customer preference update:', event);
+      
+      // Only update if it's for the currently selected customer
+      if (selectedCustomer && event.customerId === selectedCustomer && event.source === 'customer') {
+        console.log('Refreshing CSR view for customer preference update');
+        loadPreferences(); // Reload preferences to get latest data
+        setSaveStatus('idle'); // Reset any save status
+        setHasChanges(false); // Reset changes flag
+      }
+    };
+
+    // Set up the listener
+    websocketService.onCustomerPreferenceUpdate(handleCustomerPreferenceUpdate);
+
+    // Cleanup listener on unmount
+    return () => {
+      console.log('Cleaning up preference update listener in CSR dashboard');
+      websocketService.offCustomerPreferenceUpdate();
+    };
+  }, [selectedCustomer]); // Re-setup when selected customer changes
+
+  const loadPreferenceConfig = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/v1/customer/preference-config');
+      const data = await response.json();
+      if (data.success) {
+        setPreferenceConfig(data.config);
+        console.log('📋 CSR Dashboard - Dynamic config loaded:', data.config);
+        console.log('📺 Available Channels:', data.config.communicationChannels?.length || 0);
+        console.log('📰 Available Topics:', data.config.topicSubscriptions?.length || 0);
+        
+        // Initialize default preferences based on config
+        initializeDefaultPreferences(data.config);
+      }
+    } catch (error) {
+      console.error('Failed to load preference configuration in CSR dashboard:', error);
+    }
+  };
+
+  // Initialize default preferences based on config
+  const initializeDefaultPreferences = (config: PreferenceConfig) => {
+    setPreferences((prev: any) => {
+      const defaultChannels: { [key: string]: boolean } = {};
+      const defaultTopics: { [key: string]: boolean } = {};
+      
+      // Set default channel preferences (use isDefault from config)
+      config.communicationChannels?.forEach(channel => {
+        defaultChannels[channel.key] = channel.isDefault || false;
+      });
+      
+      // Set default topic preferences (use isDefault from config)
+      config.topicSubscriptions?.forEach(topic => {
+        defaultTopics[topic.key] = topic.isDefault || false;
+      });
+      
+      return {
+        ...prev,
+        channels: defaultChannels,
+        topics: defaultTopics
+      };
+    });
+  };
 
   const loadCustomers = async () => {
     try {
@@ -96,41 +170,61 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
   };
 
   const loadPreferences = async () => {
-    if (!selectedCustomer) return;
+    if (!selectedCustomer || !preferenceConfig) return;
     
     setLoading(true);
     try {
-      const commPrefs = await csrDashboardService.getCommunicationPreferences();
-      const customerPrefs = commPrefs.find((pref: any) => pref.partyId === selectedCustomer);
+      // Use the new CSR customer preferences endpoint to get actual customer data
+      const customerPrefs = await csrDashboardService.getCustomerPreferences(selectedCustomer);
       
       if (customerPrefs) {
-        // Merge loaded preferences with default structure
-        setPreferences((prev: any) => ({
-          ...prev,
-          ...customerPrefs,
-          channels: {
-            ...prev.channels,
-            ...(customerPrefs.channels || {}),
-            // Map from communication preferences
-            email: customerPrefs.preferredChannels?.email ?? prev.channels.email,
-            sms: customerPrefs.preferredChannels?.sms ?? prev.channels.sms,
-            phone: customerPrefs.preferredChannels?.phone ?? prev.channels.phone,
-            push: customerPrefs.preferredChannels?.push ?? prev.channels.push
+        console.log('📋 CSR Dashboard - Raw customer preferences:', customerPrefs);
+        
+        // Map channels using dynamic configuration
+        const channelMappings: { [key: string]: boolean } = {};
+        preferenceConfig.communicationChannels.forEach(channel => {
+          channelMappings[channel.key] = customerPrefs.preferredChannels?.[channel.key] || false;
+        });
+        
+        // Map topics using dynamic configuration
+        const topicMappings: { [key: string]: boolean } = {};
+        preferenceConfig.topicSubscriptions.forEach(topic => {
+          topicMappings[topic.key] = customerPrefs.topicSubscriptions?.[topic.key] || false;
+        });
+        
+        // Map the actual customer data to the form structure
+        setPreferences({
+          channels: channelMappings,
+          topics: topicMappings,
+          dndSettings: {
+            enabled: customerPrefs.doNotDisturb?.enabled ?? customerPrefs.quietHours?.enabled ?? false,
+            startTime: customerPrefs.doNotDisturb?.start ?? customerPrefs.quietHours?.start ?? '22:00',
+            endTime: customerPrefs.doNotDisturb?.end ?? customerPrefs.quietHours?.end ?? '08:00'
           },
-          topics: {
-            ...prev.topics,
-            ...(customerPrefs.topics || {}),
-            // Map from communication preferences
-            marketing: customerPrefs.topicSubscriptions?.marketing ?? prev.topics.marketing,
-            promotions: customerPrefs.topicSubscriptions?.promotions ?? prev.topics.promotions,
-            serviceAlerts: customerPrefs.topicSubscriptions?.serviceUpdates ?? prev.topics.serviceAlerts,
-            billing: customerPrefs.topicSubscriptions?.billing ?? prev.topics.billing,
-            security: customerPrefs.topicSubscriptions?.security ?? prev.topics.security
-          }
-        }));
+          frequency: {
+            maxEmailsPerDay: customerPrefs.frequency?.maxEmailsPerDay ?? 3,
+            maxSmsPerDay: customerPrefs.frequency?.maxSmsPerDay ?? 2,
+            digestMode: customerPrefs.frequency?.digestMode ?? false,
+            immediateAlerts: customerPrefs.frequency?.immediateAlerts ?? ['security', 'billing']
+          },
+          language: customerPrefs.language ?? 'en',
+          timezone: customerPrefs.timezone ?? 'Asia/Colombo',
+          lastUpdated: customerPrefs.lastUpdated,
+          updatedBy: customerPrefs.updatedBy
+        });
+        
+        console.log('✅ CSR Dashboard - Mapped customer preferences:', {
+          channels: channelMappings,
+          topics: topicMappings
+        });
+      } else {
+        console.log('No preferences found for customer, using config defaults');
+        // Use defaults from config if no customer preferences exist
+        initializeDefaultPreferences(preferenceConfig);
       }
     } catch (error) {
-      console.error('Error loading preferences:', error);
+      console.error('Error loading customer preferences:', error);
+      // Keep default preferences if loading fails
     } finally {
       setLoading(false);
     }
@@ -182,22 +276,47 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
   };
 
   const handleSave = async () => {
-    if (!preferences || !selectedCustomer) return;
+    if (!preferences || !selectedCustomer || !preferenceConfig) return;
     
     setSaving(true);
     setSaveStatus('idle');
     try {
-      const updatedPreferences = {
-        ...preferences,
-        partyId: selectedCustomer,
-        lastUpdated: new Date().toISOString(),
-        // Maintain backward compatibility
-        preferredChannels: preferences.channels,
-        topicSubscriptions: preferences.topics
-      };
+      // Build dynamic channel preferences based on admin configuration
+      const dynamicChannels: { [key: string]: boolean } = {};
+      preferenceConfig.communicationChannels.forEach(channel => {
+        dynamicChannels[channel.key] = preferences.channels[channel.key] || false;
+      });
       
-      // For demo purposes, just update local state
-      console.log('Saving preferences (demo mode):', updatedPreferences);
+      // Build dynamic topic preferences based on admin configuration  
+      const dynamicTopics: { [key: string]: boolean } = {};
+      preferenceConfig.topicSubscriptions.forEach(topic => {
+        dynamicTopics[topic.key] = preferences.topics[topic.key] || false;
+      });
+      
+      // Map frontend preferences to backend structure using dynamic configuration
+      const backendPreferences = {
+        preferredChannels: dynamicChannels,
+        topicSubscriptions: dynamicTopics,
+        doNotDisturb: {
+          enabled: preferences.dndSettings?.enabled ?? false,
+          start: preferences.dndSettings?.startTime ?? '22:00',
+          end: preferences.dndSettings?.endTime ?? '08:00'
+        },
+        frequency: preferences.frequency?.digestMode ? 'daily' : 'immediate',
+        timezone: preferences.timezone ?? 'Asia/Colombo',
+        language: preferences.language ?? 'en'
+      };
+
+      console.log('🔄 CSR saving dynamic preferences:', {
+        channels: dynamicChannels,
+        topics: dynamicTopics,
+        config: preferenceConfig
+      });
+
+      // Use the CSR service to update customer preferences in real-time
+      const result = await csrDashboardService.updateCustomerPreferences(selectedCustomer, backendPreferences);
+      
+      console.log('✅ CSR successfully updated customer preferences:', result);
       
       setIsEditing(false);
       setHasChanges(false);
@@ -206,7 +325,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       // Clear success message after 3 seconds
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      console.error('Error saving customer preferences:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
@@ -216,7 +335,9 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
 
   const filteredCustomers = customers.filter(customer =>
     customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.phone?.includes(searchTerm) ||
+    customer.id?.includes(searchTerm)
   );
 
   return (
@@ -224,21 +345,32 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Communication Preferences</h1>
-          <p className="text-gray-600 mt-2">Manage customer communication preferences and settings</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">Communication Preferences</h1>
+          <p className="text-myslt-text-secondary mt-2">Manage customer communication preferences and settings</p>
+          {selectedCustomer && (
+            <div className="flex items-center space-x-2 mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-sm text-green-700 font-medium">
+                Displaying actual data from {customers.find(c => c.id === selectedCustomer)?.name}'s preference dashboard
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Customer Selection */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20">
+        <div className="p-6 border-b border-myslt-accent/20">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <User className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Customer Selection</h2>
-              <p className="text-sm text-gray-500">Search and select a customer to manage preferences</p>
+              <h2 className="text-lg font-semibold text-myslt-text-primary">Customer Selection</h2>
+              <p className="text-sm text-gray-500">Search and select a customer to manage their communication preferences</p>
+              <div className="mt-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block">
+                💡 Tip: Search by name, email, phone number, or customer ID
+              </div>
             </div>
           </div>
         </div>
@@ -252,12 +384,18 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search customers..."
-                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Search by name, email, phone, or customer ID..."
+                  className="pl-10 pr-16 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
+                <button
+                  onClick={() => setSearchTerm(' ')}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs px-2 py-1 text-blue-600 hover:text-blue-800 bg-blue-50 rounded"
+                >
+                  Show All
+                </button>
               </div>
               {searchTerm && (
-                <div className="mt-2 max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
+                <div className="mt-2 max-h-60 overflow-y-auto border border-myslt-accent/20 rounded-lg">
                   {filteredCustomers.map(customer => (
                     <div
                       key={customer.id}
@@ -265,13 +403,30 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                         setSelectedCustomer(customer.id);
                         setSearchTerm('');
                       }}
-                      className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      className="p-3 hover:bg-myslt-service-card cursor-pointer border-b border-myslt-border last:border-b-0 transition-colors"
                     >
-                      <div className="flex items-center space-x-3">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <div>
-                          <div className="font-medium">{customer.name}</div>
-                          <div className="text-sm text-gray-500">{customer.email}</div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <User className="w-5 h-5 text-gray-500" />
+                          <div>
+                            <div className="font-medium text-myslt-text-primary">{customer.name}</div>
+                            <div className="text-sm text-gray-500">{customer.email}</div>
+                            <div className="text-xs text-gray-400">ID: {customer.id} • {customer.phone}</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-xs px-2 py-1 rounded-full ${
+                            customer.status === 'active' ? 'bg-green-100 text-green-800' :
+                            customer.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {customer.status}
+                          </div>
+                          {customer.totalConsents && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              {customer.totalConsents} consents
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -282,16 +437,36 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 </div>
               )}
             </div>
-            {selectedCustomer && (
-              <div className="flex items-end">
+            <div className="flex items-end space-x-2">
+              {selectedCustomer && (
+                <div className="flex items-center space-x-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                  <User className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-800">
+                    {customers.find(c => c.id === selectedCustomer)?.name || `Customer ${selectedCustomer}`}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setSelectedCustomer('');
+                      setIsEditing(false);
+                      setHasChanges(false);
+                    }}
+                    className="text-blue-600 hover:text-blue-800"
+                    title="Clear selection"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+              {selectedCustomer && (
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
                 >
-                  {isEditing ? 'Cancel' : 'Edit Preferences'}
+                  <Settings className="w-4 h-4" />
+                  <span>{isEditing ? 'Cancel Edit' : 'Edit Preferences'}</span>
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -315,301 +490,234 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
         </div>
       )}
 
-      {/* Preferences Content */}
+      {/* Preferences Content - Matching Customer Dashboard Layout */}
       {selectedCustomer && !loading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Communication Channels */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Bell className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Communication Channels</h2>
-                  <p className="text-sm text-gray-500">Choose how the customer receives notifications</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              {[
-                { key: 'email', label: 'Email Notifications', icon: Mail, desc: 'Receive notifications via email' },
-                { key: 'sms', label: 'SMS Notifications', icon: MessageCircle, desc: 'Receive text messages' },
-                { key: 'push', label: 'Push Notifications', icon: Smartphone, desc: 'Mobile app notifications' },
-                { key: 'inApp', label: 'In-App Notifications', icon: Bell, desc: 'Notifications within the app' },
-                { key: 'phone', label: 'Phone Calls', icon: Phone, desc: 'Receive phone calls for urgent matters' }
-              ].map((channel, index) => {
-                const Icon = channel.icon;
-                return (
-                  <div key={channel.key} className={`flex items-center justify-between py-4 ${index < 4 ? 'border-b border-gray-100' : ''}`}>
-                    <div className="flex items-center space-x-3">
-                      <Icon className="w-5 h-5 text-gray-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{channel.label}</p>
-                        <p className="text-xs text-gray-500">{channel.desc}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => isEditing && updateChannelPreference(channel.key, !preferences.channels[channel.key])}
-                      disabled={!isEditing}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                        preferences.channels[channel.key] ? 'bg-blue-600' : 'bg-gray-200'
-                      } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          preferences.channels[channel.key] ? 'translate-x-6' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Topic Subscriptions */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Settings className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Topic Preferences</h2>
-                  <p className="text-sm text-gray-500">Control what types of content the customer receives</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              {[
-                { key: 'offers', label: 'Special Offers', desc: 'Promotional offers and discounts' },
-                { key: 'productUpdates', label: 'Product Updates', desc: 'New features and improvements' },
-                { key: 'serviceAlerts', label: 'Service Alerts', desc: 'Service disruptions and maintenance' },
-                { key: 'billing', label: 'Billing & Payments', desc: 'Bills, payments, and account changes' },
-                { key: 'security', label: 'Security Alerts', desc: 'Account security and suspicious activity' },
-                { key: 'newsletters', label: 'Newsletters', desc: 'Company news and updates' }
-              ].map((topic, index) => (
-                <div key={topic.key} className={`flex items-center justify-between py-4 ${index < 5 ? 'border-b border-gray-100' : ''}`}>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{topic.label}</p>
-                    <p className="text-xs text-gray-500">{topic.desc}</p>
-                  </div>
-                  <button
-                    onClick={() => isEditing && updateTopicPreference(topic.key, !preferences.topics[topic.key])}
-                    disabled={!isEditing}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      preferences.topics[topic.key] ? 'bg-blue-600' : 'bg-gray-200'
-                    } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        preferences.topics[topic.key] ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : selectedCustomer && loading ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading preferences...</p>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Settings className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Customer Selected</h3>
-            <p className="text-gray-500">Select a customer to view and edit their communication preferences</p>
-          </div>
-        </div>
-      )}
-
-      {/* Advanced Settings Section */}
-      {selectedCustomer && !loading && (
         <div className="space-y-6">
-          {/* Do Not Disturb Settings */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  {preferences.dndSettings.enabled ? (
-                    <VolumeX className="w-5 h-5 text-purple-600" />
-                  ) : (
-                    <Volume2 className="w-5 h-5 text-purple-600" />
-                  )}
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Do Not Disturb</h2>
-                  <p className="text-sm text-gray-500">Control quiet hours for non-urgent notifications</p>
+          {/* Main Grid - Communication Channels and Topic Subscriptions Side by Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* Communication Channels Section */}
+            <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl shadow-lg border border-blue-700/30 text-white">
+              <div className="p-6 border-b border-blue-700/30">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                    <Settings className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-white">Communication Channels</h2>
+                    <p className="text-blue-200 text-sm">Choose how you'd like to receive notifications</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between py-4 border-b border-gray-100">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Enable Do Not Disturb</p>
-                    <p className="text-xs text-gray-500">Pause non-urgent notifications during specified hours</p>
+              <div className="p-6 space-y-4">
+                {preferenceConfig?.communicationChannels?.filter(channel => channel.enabled).map((channel) => (
+                  <div key={channel.key} className="flex items-center justify-between py-3 border-b border-blue-700/20 last:border-0">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-white text-base">{channel.name}</h3>
+                      <p className="text-blue-200 text-sm">{channel.description}</p>
+                    </div>
+                    <div className="ml-4">
+                      <button
+                        onClick={() => isEditing && updateChannelPreference(channel.key, !preferences.channels[channel.key])}
+                        disabled={!isEditing}
+                        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none ${
+                          preferences.channels[channel.key] ? 'bg-blue-500' : 'bg-gray-400'
+                        } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                      >
+                        <span
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm ${
+                            preferences.channels[channel.key] ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => isEditing && updateDndSettings('enabled', !preferences.dndSettings.enabled)}
-                    disabled={!isEditing}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      preferences.dndSettings.enabled ? 'bg-blue-600' : 'bg-gray-200'
-                    } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        preferences.dndSettings.enabled ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
+                )) || (
+                  <div className="text-center py-8 text-blue-200">
+                    <p>Loading communication channels...</p>
+                  </div>
+                )}
+              </div>
+            </div>
 
-                {preferences.dndSettings.enabled && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <Clock className="inline w-4 h-4 mr-1" />
-                        Start Time
-                      </label>
-                      <input
-                        type="time"
-                        value={preferences.dndSettings.startTime}
-                        onChange={(e) => isEditing && updateDndSettings('startTime', e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                      />
+            {/* Topic Subscriptions Section */}
+            <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl shadow-lg border border-blue-700/30 text-white">
+              <div className="p-6 border-b border-blue-700/30">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
+                    <Bell className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-white">Topic Subscriptions</h2>
+                    <p className="text-blue-200 text-sm">Select the types of communications you want to receive</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 space-y-4">
+                {preferenceConfig?.topicSubscriptions?.filter(topic => topic.enabled).map((topic) => (
+                  <div key={topic.key} className="flex items-center justify-between py-3 border-b border-blue-700/20 last:border-0">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-white text-base">{topic.name}</h3>
+                      <p className="text-blue-200 text-sm">{topic.description}</p>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <Clock className="inline w-4 h-4 mr-1" />
-                        End Time
-                      </label>
-                      <input
-                        type="time"
-                        value={preferences.dndSettings.endTime}
-                        onChange={(e) => isEditing && updateDndSettings('endTime', e.target.value)}
+                    <div className="ml-4">
+                      <button
+                        onClick={() => isEditing && updateTopicPreference(topic.key, !preferences.topics[topic.key])}
                         disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                      />
+                        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none ${
+                          preferences.topics[topic.key] ? 'bg-blue-500' : 'bg-gray-400'
+                        } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                      >
+                        <span
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm ${
+                            preferences.topics[topic.key] ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
                     </div>
+                  </div>
+                )) || (
+                  <div className="text-center py-8 text-blue-200">
+                    <p>Loading topic subscriptions...</p>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Frequency Control & Language Settings */}
+          {/* Bottom Grid - Do Not Disturb and Frequency Limits */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Frequency Control */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
+            
+            {/* Do Not Disturb Section */}
+            <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl shadow-lg border border-blue-700/30 text-white">
+              <div className="p-6 border-b border-blue-700/30">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <RefreshCw className="w-5 h-5 text-orange-600" />
+                  <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
+                    <VolumeX className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Frequency Control</h2>
-                    <p className="text-sm text-gray-500">Manage communication limits</p>
+                    <h2 className="text-xl font-semibold text-white">Do Not Disturb</h2>
+                    <p className="text-blue-200 text-sm">Set quiet hours for notifications</p>
                   </div>
                 </div>
               </div>
               <div className="p-6 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Max Emails Per Day</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="20"
-                    value={preferences.frequency.maxEmailsPerDay}
-                    onChange={(e) => isEditing && updateFrequencySettings('maxEmailsPerDay', parseInt(e.target.value))}
-                    disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Max SMS Per Day</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="10"
-                    value={preferences.frequency.maxSmsPerDay}
-                    onChange={(e) => isEditing && updateFrequencySettings('maxSmsPerDay', parseInt(e.target.value))}
-                    disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                  />
+                <div className="flex items-center justify-between py-3">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-white text-base">Enable Do Not Disturb</h3>
+                    <p className="text-blue-200 text-sm">Suppress non-urgent notifications during specified hours</p>
+                  </div>
+                  <div className="ml-4">
+                    <button
+                      onClick={() => isEditing && updateDndSettings('enabled', !preferences.dndSettings.enabled)}
+                      disabled={!isEditing}
+                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none ${
+                        preferences.dndSettings.enabled ? 'bg-blue-500' : 'bg-gray-400'
+                      } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm ${
+                          preferences.dndSettings.enabled ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
                 
-                <div className="flex items-center justify-between py-4 border-t border-gray-100">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Digest Mode</p>
-                    <p className="text-xs text-gray-500">Bundle notifications into daily summaries</p>
+                {preferences.dndSettings.enabled && (
+                  <div className="space-y-4 mt-4 pt-4 border-t border-blue-700/20">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-blue-200 mb-2">Start Time</label>
+                        <input
+                          type="time"
+                          value={preferences.dndSettings.startTime}
+                          onChange={(e) => isEditing && updateDndSettings('startTime', e.target.value)}
+                          disabled={!isEditing}
+                          className="w-full px-3 py-2 bg-blue-800 border border-blue-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-blue-200 mb-2">End Time</label>
+                        <input
+                          type="time"
+                          value={preferences.dndSettings.endTime}
+                          onChange={(e) => isEditing && updateDndSettings('endTime', e.target.value)}
+                          disabled={!isEditing}
+                          className="w-full px-3 py-2 bg-blue-800 border border-blue-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => isEditing && updateFrequencySettings('digestMode', !preferences.frequency.digestMode)}
-                    disabled={!isEditing}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      preferences.frequency.digestMode ? 'bg-blue-600' : 'bg-gray-200'
-                    } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        preferences.frequency.digestMode ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
+                )}
               </div>
             </div>
 
-            {/* Language & Timezone */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
+            {/* Frequency Limits Section */}
+            <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl shadow-lg border border-blue-700/30 text-white">
+              <div className="p-6 border-b border-blue-700/30">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                    <Globe className="w-5 h-5 text-indigo-600" />
+                  <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Language & Region</h2>
-                    <p className="text-sm text-gray-500">Localization preferences</p>
+                    <h2 className="text-xl font-semibold text-white">Frequency Limits</h2>
+                    <p className="text-blue-200 text-sm">Control how often you receive notifications</p>
                   </div>
                 </div>
               </div>
-              <div className="p-6 space-y-4">
+              <div className="p-6 space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                  <label className="block text-sm font-medium text-blue-200 mb-3">Maximum Emails per Day</label>
                   <select
-                    value={preferences.language}
-                    onChange={(e) => isEditing && setPreferences((prev: any) => ({ ...prev, language: e.target.value }))}
+                    value={preferences.frequency.maxEmailsPerDay || 3}
+                    onChange={(e) => isEditing && updateFrequencySettings('maxEmailsPerDay', parseInt(e.target.value))}
                     disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                   >
-                    <option value="en">English</option>
-                    <option value="si">Sinhala</option>
-                    <option value="ta">Tamil</option>
+                    <option value={1}>1 email per day</option>
+                    <option value={3}>3 emails per day</option>
+                    <option value={5}>5 emails per day</option>
+                    <option value={10}>10 emails per day</option>
+                    <option value={999}>No limit</option>
                   </select>
                 </div>
+                
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+                  <label className="block text-sm font-medium text-blue-200 mb-3">Maximum SMS per Day</label>
                   <select
-                    value={preferences.timezone}
-                    onChange={(e) => isEditing && setPreferences((prev: any) => ({ ...prev, timezone: e.target.value }))}
+                    value={preferences.frequency.maxSmsPerDay || 2}
+                    onChange={(e) => isEditing && updateFrequencySettings('maxSmsPerDay', parseInt(e.target.value))}
                     disabled={!isEditing}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                   >
-                    <option value="Asia/Colombo">Asia/Colombo (UTC+05:30)</option>
-                    <option value="UTC">UTC (UTC+00:00)</option>
-                    <option value="Asia/Dubai">Asia/Dubai (UTC+04:00)</option>
+                    <option value={1}>1 SMS per day</option>
+                    <option value={2}>2 SMS per day</option>
+                    <option value={5}>5 SMS per day</option>
+                    <option value={999}>No limit</option>
                   </select>
+                </div>
+                
+                <div className="flex items-center justify-between py-3 border-t border-blue-700/20">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-white text-base">Daily Digest Mode</h3>
+                    <p className="text-blue-200 text-sm">Receive a single daily summary instead of individual notifications</p>
+                  </div>
+                  <div className="ml-4">
+                    <button
+                      onClick={() => isEditing && updateFrequencySettings('digestMode', !preferences.frequency.digestMode)}
+                      disabled={!isEditing}
+                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none ${
+                        preferences.frequency.digestMode ? 'bg-blue-500' : 'bg-gray-400'
+                      } ${!isEditing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm ${
+                          preferences.frequency.digestMode ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -624,14 +732,14 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   setHasChanges(false);
                   loadPreferences(); // Reload to reset changes
                 }}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="px-6 py-2 border border-blue-300 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={!hasChanges || saving}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 transition-colors"
               >
                 {saving ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
@@ -642,6 +750,23 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
               </button>
             </div>
           )}
+        </div>
+      ) : selectedCustomer && loading ? (
+        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-myslt-text-secondary">Loading preferences...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-12">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-myslt-service-card rounded-full flex items-center justify-center mx-auto mb-4">
+              <Settings className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-myslt-text-primary mb-2">No Customer Selected</h3>
+            <p className="text-gray-500">Select a customer to view and edit their communication preferences</p>
+          </div>
         </div>
       )}
     </div>

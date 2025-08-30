@@ -3,247 +3,429 @@ import {
   Users, 
   Shield, 
   Database,
+  CheckCircle,
+  AlertTriangle,
+  Clock,
   Activity,
+  TrendingUp,
+  Server,
+  RefreshCw,
+  Calendar,
   FileText,
-  Eye,
-  RefreshCw
+  BarChart3,
+  Bell
 } from 'lucide-react';
-import { useConsents, usePreferences, useParties, useDSARRequests } from '../../hooks/useApi';
+import { useAuth } from '../../contexts/AuthContext';
+import { useCRUDNotifications } from '../shared/withNotifications';
 
-interface DashboardHomeProps {}
-
-const DashboardHome: React.FC<DashboardHomeProps> = () => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectedTimeRange, setSelectedTimeRange] = useState('7d');
-  const [autoRefresh, setAutoRefresh] = useState(true);
-
-  // Load real data from backend
-  const { data: consentsData, loading: consentsLoading, refetch: refetchConsents } = useConsents();
-  const { data: preferencesData, loading: preferencesLoading, refetch: refetchPreferences } = usePreferences();
-  const { data: partiesData, loading: partiesLoading, refetch: refetchParties } = useParties();
-  const { data: dsarData, loading: dsarLoading, refetch: refetchDSAR } = useDSARRequests();
-
-  // Auto-refresh functionality
-  useEffect(() => {
-    if (autoRefresh) {
-      const interval = setInterval(() => {
-        console.log('Auto-refreshing dashboard data...');
-        refetchConsents();
-        refetchPreferences();
-        refetchParties();
-        refetchDSAR();
-      }, 30000); // Refresh every 30 seconds
-      return () => clearInterval(interval);
-    }
-  }, [autoRefresh, refetchConsents, refetchPreferences, refetchParties, refetchDSAR]);
-
-  // Handle manual refresh
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([
-        refetchConsents(),
-        refetchPreferences(),
-        refetchParties(),
-        refetchDSAR()
-      ]);
-    } catch (error) {
-      console.error('Error refreshing data:', error);
-    } finally {
-      setIsRefreshing(false);
-    }
+interface DashboardData {
+  systemOverview: {
+    totalConsents: number;
+    grantedConsents: number;
+    revokedConsents: number;
+    totalPreferences: number;
+    totalParties: number;
+    totalDSAR: number;
+    pendingDSAR: number;
+    totalUsers: number;
   };
+  complianceMetrics: {
+    complianceScore: number;
+    consentGrantRate: number;
+    averageResponseTime: number;
+    overdueItems: number;
+    upcomingDeadlines: number;
+  };
+  systemHealth: {
+    servicesOnline: string[];
+    systemUptime: number;
+    lastBackup: string;
+    databaseConnected: boolean;
+  };
+  recentActivity: Array<{
+    id: string;
+    type: string;
+    action: string;
+    purpose: string;
+    partyId: string;
+    timestamp: string;
+    description: string;
+  }>;
+  dataFreshness: string;
+}
 
-  // Calculate real statistics
-  const isLoading = consentsLoading || preferencesLoading || partiesLoading || dsarLoading;
+const DashboardHome: React.FC = () => {
+  const { getAuthToken } = useAuth();
+  const { notifyCustom } = useCRUDNotifications();
   
-  // Helper function to safely get array length
-  const getArrayLength = (data: any): number => {
-    if (!data) return 0;
-    if (Array.isArray(data)) return data.length;
-    if (data.consents && Array.isArray(data.consents)) return data.consents.length;
-    if (data.preferences && Array.isArray(data.preferences)) return data.preferences.length;
-    if (data.parties && Array.isArray(data.parties)) return data.parties.length;
-    if (data.requests && Array.isArray(data.requests)) return data.requests.length;
-    return 0;
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [selectedPeriod, setSelectedPeriod] = useState('7d');
+
+  // Test notification function
+  const testNotification = () => {
+    const notifications = [
+      { type: 'success', title: 'System Update', message: 'Dashboard data refreshed successfully' },
+      { type: 'info', title: 'New Feature', message: 'Notification system is now active!' },
+      { type: 'warning', title: 'Maintenance Alert', message: 'System maintenance scheduled for tonight' },
+      { type: 'urgent', title: 'Action Required', message: 'High priority DSAR request needs attention' }
+    ] as const;
+
+    const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
+    
+    notifyCustom(
+      'system',
+      randomNotification.type,
+      randomNotification.title,
+      randomNotification.message,
+      { source: 'dashboard_test' }
+    );
   };
 
-  const totalConsents = getArrayLength(consentsData);
-  const totalParties = getArrayLength(partiesData);
-  const totalPreferences = getArrayLength(preferencesData);
-  const totalDSAR = getArrayLength(dsarData);
+  useEffect(() => {
+    fetchDashboardData();
+    const interval = setInterval(fetchDashboardData, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
+  }, [selectedPeriod]);
 
-  // Calculate consent status stats
-  const grantedConsents = Array.isArray(consentsData) ? 
-    consentsData.filter((c: any) => c.status === 'granted').length : 0;
-  const revokedConsents = Array.isArray(consentsData) ? 
-    consentsData.filter((c: any) => c.status === 'revoked').length : 0;
-  const pendingDSAR = Array.isArray(dsarData) ? 
-    dsarData.filter((d: any) => d.status === 'pending').length : 0;
+  const fetchDashboardData = async () => {
+    try {
+      setError(null);
+      const token = getAuthToken();
+      
+      if (!token) {
+        setError('Authentication required');
+        return;
+      }
 
-  // Loading state
-  if (isLoading) {
+      const response = await fetch(`http://localhost:3001/api/v1/admin/dashboard/overview`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError('Authentication failed');
+          return;
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        setDashboardData(data.data);
+        setLastUpdated(new Date().toLocaleTimeString());
+      } else {
+        throw new Error(data.message || 'Invalid response format');
+      }
+
+    } catch (err) {
+      console.error('Dashboard Error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatUptime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-gray-600">Loading dashboard data...</span>
+      <div className="flex items-center justify-center min-h-96">
+        <div className="flex items-center space-x-3">
+          <RefreshCw className="w-6 h-6 animate-spin text-myslt-accent" />
+          <span className="text-lg text-myslt-text-secondary">Loading dashboard data...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="bg-myslt-danger/20 border border-myslt-danger/30 rounded-lg p-6">
+          <div className="flex items-center space-x-3">
+            <AlertTriangle className="w-6 h-6 text-myslt-danger" />
+            <div>
+              <h3 className="text-lg font-semibold text-myslt-text-primary">Dashboard Error</h3>
+              <p className="text-myslt-text-secondary mt-1">{error}</p>
+              <button 
+                onClick={fetchDashboardData}
+                className="myslt-btn-primary mt-3 px-4 py-2"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <div className="p-4 sm:p-8">
+        <div className="text-center text-myslt-text-muted">
+          <Database className="w-12 h-12 mx-auto mb-4 text-myslt-text-muted" />
+          <p>No dashboard data available</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
-          <p className="text-gray-600 mt-1">ConsentHub Administrative Dashboard</p>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-myslt-text-primary truncate">Admin Dashboard</h1>
+          <p className="text-myslt-text-secondary mt-1 text-sm sm:text-base">
+            Real-time system overview and compliance monitoring
+          </p>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 shrink-0">
+          <div className="text-xs sm:text-sm text-myslt-text-muted text-center sm:text-left">
+            Last updated: {lastUpdated}
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button 
+              onClick={fetchDashboardData}
+              className="myslt-btn-primary flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 text-sm sm:text-base"
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span>Refresh</span>
+            </button>
+            <button 
+              onClick={testNotification}
+              className="myslt-btn-secondary flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 text-sm sm:text-base"
+            >
+              <Bell className="w-4 h-4" />
+              <span>Test</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* System Overview Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        <div className="myslt-card p-4 sm:p-6">
+          <div className="flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Total Consents</p>
+              <p className="text-xl sm:text-2xl font-bold text-myslt-text-primary">{dashboardData.systemOverview.totalConsents}</p>
+            </div>
+            <Shield className="w-6 sm:w-8 h-6 sm:h-8 text-myslt-accent shrink-0" />
+          </div>
+          <div className="mt-3 sm:mt-4 text-xs sm:text-sm">
+            <span className="text-myslt-success font-medium">
+              {dashboardData.systemOverview.grantedConsents} granted
+            </span>
+            <span className="text-myslt-text-muted mx-2">|</span>
+            <span className="text-myslt-danger font-medium">
+              {dashboardData.systemOverview.revokedConsents} revoked
+            </span>
+          </div>
+        </div>
+
+        <div className="myslt-card p-4 sm:p-6">
+          <div className="flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Total Users</p>
+              <p className="text-xl sm:text-2xl font-bold text-myslt-text-primary">{dashboardData.systemOverview.totalUsers}</p>
+            </div>
+            <Users className="w-6 sm:w-8 h-6 sm:h-8 text-myslt-success shrink-0" />
+          </div>
+          <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-myslt-text-secondary">
+            Active system users
+          </div>
+        </div>
+
+        <div className="myslt-card p-4 sm:p-6">
+          <div className="flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">DSAR Requests</p>
+              <p className="text-xl sm:text-2xl font-bold text-myslt-text-primary">{dashboardData.systemOverview.totalDSAR}</p>
+            </div>
+            <FileText className="w-6 sm:w-8 h-6 sm:h-8 text-myslt-info shrink-0" />
+          </div>
+          <div className="mt-3 sm:mt-4 text-xs sm:text-sm">
+            <span className="text-myslt-warning font-medium">
+              {dashboardData.systemOverview.pendingDSAR} pending
+            </span>
+          </div>
+        </div>
+
+        <div className="myslt-card p-4 sm:p-6">
+          <div className="flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary truncate">Preferences</p>
+              <p className="text-xl sm:text-2xl font-bold text-myslt-text-primary">{dashboardData.systemOverview.totalPreferences}</p>
+            </div>
+            <BarChart3 className="w-6 sm:w-8 h-6 sm:h-8 text-myslt-accent shrink-0" />
+          </div>
+          <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-myslt-text-secondary">
+            User preference profiles
+          </div>
+        </div>
+      </div>
+
+      {/* Compliance Metrics */}
+      <div className="myslt-card p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-semibold text-myslt-text-primary mb-3 sm:mb-4 flex items-center space-x-2">
+          <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5" />
+          <span>Compliance Metrics</span>
+        </h2>
+        
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-success">
+              {dashboardData.complianceMetrics.complianceScore}%
+            </div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary mt-1">Compliance Score</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-accent">
+              {dashboardData.complianceMetrics.consentGrantRate}%
+            </div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary mt-1">Consent Grant Rate</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-info">
+              {dashboardData.complianceMetrics.averageResponseTime}ms
+            </div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary mt-1">Avg Response Time</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-warning">
+              {dashboardData.complianceMetrics.overdueItems}
+            </div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary mt-1">Overdue Items</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-myslt-danger">
+              {dashboardData.complianceMetrics.upcomingDeadlines}
+            </div>
+            <div className="text-xs sm:text-sm text-myslt-text-secondary mt-1">Upcoming Deadlines</div>
+          </div>
+        </div>
+      </div>
+
+      {/* System Health and Recent Activity */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+        {/* System Health */}
+        <div className="myslt-card p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-myslt-text-primary mb-3 sm:mb-4 flex items-center space-x-2">
+            <Server className="w-4 sm:w-5 h-4 sm:h-5" />
+            <span>System Health</span>
+          </h2>
+          
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-myslt-text-secondary text-sm sm:text-base">Database</span>
+              <div className="flex items-center space-x-2">
+                {dashboardData.systemHealth.databaseConnected ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 text-myslt-success" />
+                    <span className="text-myslt-success text-xs sm:text-sm font-medium">Connected</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertTriangle className="w-4 h-4 text-myslt-danger" />
+                    <span className="text-myslt-danger text-xs sm:text-sm font-medium">Disconnected</span>
+                  </>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-myslt-text-secondary text-sm sm:text-base">System Uptime</span>
+              <span className="text-myslt-text-primary font-medium text-sm sm:text-base">
+                {formatUptime(dashboardData.systemHealth.systemUptime)}
+              </span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-myslt-text-secondary text-sm sm:text-base">Services Online</span>
+              <span className="text-myslt-success font-medium text-sm sm:text-base">
+                {dashboardData.systemHealth.servicesOnline.length}/4
+              </span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-myslt-text-secondary text-sm sm:text-base">Last Backup</span>
+              <span className="text-myslt-text-primary font-medium text-xs sm:text-sm">
+                {formatDate(dashboardData.systemHealth.lastBackup)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="myslt-card p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-myslt-text-primary mb-3 sm:mb-4 flex items-center space-x-2">
+            <Activity className="w-4 sm:w-5 h-4 sm:h-5" />
+            <span>Recent Activity</span>
+          </h2>
+          
+          <div className="space-y-2 sm:space-y-3 max-h-64 overflow-y-auto">
+            {dashboardData.recentActivity.map((activity) => (
+              <div key={activity.id} className="flex items-center space-x-2 sm:space-x-3 p-2 hover:bg-myslt-muted/10 rounded">
+                <div className="flex-shrink-0">
+                  {activity.action === 'granted' ? (
+                    <CheckCircle className="w-4 h-4 text-myslt-success" />
+                  ) : activity.action === 'revoked' ? (
+                    <AlertTriangle className="w-4 h-4 text-myslt-danger" />
+                  ) : (
+                    <Clock className="w-4 h-4 text-myslt-text-muted" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm text-myslt-text-primary truncate">{activity.description}</p>
+                  <p className="text-xs text-myslt-text-muted">
+                    {formatDate(activity.timestamp)} • <span className="truncate max-w-[100px] sm:max-w-none inline-block">{activity.partyId}</span>
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Time Period Selector */}
+      <div className="myslt-card p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700">Auto-refresh:</label>
-            <input
-              type="checkbox"
-              checked={autoRefresh}
-              onChange={(e) => setAutoRefresh(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
+            <Calendar className="w-4 sm:w-5 h-4 sm:h-5 text-myslt-text-muted" />
+            <span className="text-myslt-text-primary font-medium text-sm sm:text-base">Data Period:</span>
           </div>
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          <select 
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+            className="myslt-input px-3 py-2 text-sm sm:text-base min-w-0"
           >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Consents</p>
-              <p className="text-2xl font-bold text-gray-900">{totalConsents}</p>
-              <p className="text-xs text-green-600 mt-1">
-                {grantedConsents} granted, {revokedConsents} revoked
-              </p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <Shield className="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Parties</p>
-              <p className="text-2xl font-bold text-gray-900">{totalParties}</p>
-              <p className="text-xs text-blue-600 mt-1">Registered users</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <Users className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Preferences</p>
-              <p className="text-2xl font-bold text-gray-900">{totalPreferences}</p>
-              <p className="text-xs text-purple-600 mt-1">Communication settings</p>
-            </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <Database className="w-6 h-6 text-purple-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">DSAR Requests</p>
-              <p className="text-2xl font-bold text-gray-900">{totalDSAR}</p>
-              <p className="text-xs text-orange-600 mt-1">
-                {pendingDSAR} pending
-              </p>
-            </div>
-            <div className="p-3 bg-orange-100 rounded-full">
-              <FileText className="w-6 h-6 text-orange-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
-          <button className="text-sm text-blue-600 hover:text-blue-800 flex items-center space-x-1">
-            <Eye className="w-4 h-4" />
-            <span>View all</span>
-          </button>
-        </div>
-        <div className="space-y-3">
-          {Array.isArray(consentsData) && consentsData.slice(0, 5).map((consent: any) => (
-            <div key={consent.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <div className="p-2 bg-blue-100 rounded-full">
-                <Shield className="w-4 h-4 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{consent.purpose}</p>
-                <p className="text-xs text-gray-600">
-                  Status: {consent.status} • Party: {consent.partyId}
-                </p>
-              </div>
-              <div className="text-xs text-gray-500">
-                {new Date(consent.createdAt).toLocaleDateString()}
-              </div>
-            </div>
-          ))}
-          {(!consentsData || !Array.isArray(consentsData) || consentsData.length === 0) && (
-            <div className="text-center py-8 text-gray-500">
-              <Activity className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <p>No recent activity</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* System Status */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">System Status</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm font-medium text-gray-700">MongoDB Connected</span>
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm font-medium text-gray-700">API Gateway Online</span>
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm font-medium text-gray-700">All Services Running</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Time Range Filter */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Time Range</h2>
-        <div className="flex items-center space-x-4">
-          <label className="text-sm font-medium text-gray-700">View data for:</label>
-          <select
-            value={selectedTimeRange}
-            onChange={(e) => setSelectedTimeRange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="24h">Last 24 hours</option>
+            <option value="1d">Last 24 hours</option>
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
             <option value="90d">Last 90 days</option>

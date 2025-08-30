@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Settings,
   Mail,
@@ -9,17 +9,47 @@ import {
   Save,
   X,
   Search,
+  Smartphone,
 } from 'lucide-react';
 import { PrivacyPreference, Party } from '../types/consent';
 import { usePreferences, useParties, usePreferenceMutation } from '../hooks/useApi';
+import { io, Socket } from 'socket.io-client';
 
 interface CommunicationPreferencesProps {
   selectedCustomer?: Party;
 }
 
+// Types for dynamic preference configuration
+interface PreferenceChannel {
+  _id: string;
+  name: string;
+  key: string;
+  description: string;
+  icon: string;
+  enabled: boolean;
+  isDefault: boolean;
+}
+
+interface PreferenceTopic {
+  _id: string;
+  name: string;
+  key: string;
+  description: string;
+  category: string;
+  enabled: boolean;
+  isDefault: boolean;
+  priority: 'low' | 'medium' | 'high';
+}
+
+interface PreferenceConfig {
+  communicationChannels: PreferenceChannel[];
+  topicSubscriptions: PreferenceTopic[];
+}
+
 export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> = ({ selectedCustomer }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<PrivacyPreference>>({});
+  const [preferenceConfig, setPreferenceConfig] = useState<PreferenceConfig | null>(null);
 
   // Search state
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,7 +58,50 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
   // Load data from backend
   const { data: preferencesData, loading: preferencesLoading, refetch: refetchPreferences } = usePreferences(filteredCustomer?.id);
   const { data: partiesData, loading: partiesLoading } = useParties();
-  const { updatePreference, loading: mutationLoading } = usePreferenceMutation();
+  const { updatePreference, updateCommunicationPreferences, loading: mutationLoading } = usePreferenceMutation();
+
+  // Load dynamic preference configuration
+  const loadPreferenceConfig = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/v1/customer/preference-config');
+      const data = await response.json();
+      if (data.success) {
+        setPreferenceConfig(data.config);
+        console.log('📋 Preference configuration loaded:', data.config);
+        console.log('📺 Communication Channels:', data.config.communicationChannels?.length || 0);
+        console.log('📰 Topic Subscriptions:', data.config.topicSubscriptions?.length || 0);
+      }
+    } catch (error) {
+      console.error('Failed to load preference configuration:', error);
+      // Fallback to hardcoded defaults
+      setPreferenceConfig({
+        communicationChannels: [
+          { _id: 'default_email', name: 'Email Notifications', key: 'email', description: 'Receive notifications via email', icon: 'Mail', enabled: true, isDefault: true },
+          { _id: 'default_sms', name: 'SMS Notifications', key: 'sms', description: 'Receive notifications via SMS', icon: 'MessageSquare', enabled: true, isDefault: false }
+        ],
+        topicSubscriptions: [
+          { _id: 'default_marketing', name: 'Marketing Communications', key: 'marketing', description: 'Promotional offers and marketing updates', category: 'marketing', enabled: true, isDefault: false, priority: 'medium' },
+          { _id: 'default_security', name: 'Security Alerts', key: 'security', description: 'Account security and privacy updates', category: 'security', enabled: true, isDefault: true, priority: 'high' }
+        ]
+      });
+    }
+  };
+
+  useEffect(() => {
+    loadPreferenceConfig();
+
+    // Connect to WebSocket for real-time preference config updates
+    const socket = io('http://localhost:3001');
+    
+    socket.on('preference-config-updated', (data) => {
+      console.log('🔄 Preference configuration updated by admin, reloading...', data);
+      loadPreferenceConfig();
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   // Transform data to ensure it's an array
   const preferences = Array.isArray(preferencesData) ? preferencesData : 
@@ -70,14 +143,29 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
   };
 
   const handleSave = async () => {
-    if (editingId && editForm) {
+    if (editingId && editForm && filteredCustomer) {
       try {
-        await updatePreference(editingId, editForm);
+        // Check if this is a bulk preference update (has preferredChannels or topicSubscriptions)
+        if (editForm.preferredChannels || editForm.topicSubscriptions || editForm.doNotDisturb) {
+          // Use the new bulk update method for communication preferences
+          await updateCommunicationPreferences(filteredCustomer.id, {
+            preferredChannels: editForm.preferredChannels,
+            topicSubscriptions: editForm.topicSubscriptions,
+            doNotDisturb: editForm.doNotDisturb,
+            frequency: (editForm as any).frequency,
+            timezone: (editForm as any).timezone,
+            language: (editForm as any).language
+          });
+        } else {
+          // Fallback to individual preference update
+          await updatePreference(editingId, editForm);
+        }
         await refetchPreferences(); // Refresh the data
         setEditingId(null);
         setEditForm({});
       } catch (error) {
         console.error('Failed to update preference:', error);
+        // You could add toast notification here
       }
     }
   };
@@ -87,26 +175,42 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
     setEditForm({});
   };
 
-  const getChannelIcon = (channel: string) => {
-    switch (channel) {
-      case 'email':
-        return <Mail className="h-4 w-4" />;
-      case 'sms':
-        return <MessageSquare className="h-4 w-4" />;
-      case 'push':
-        return <Bell className="h-4 w-4" />;
-      case 'voice':
-        return <Phone className="h-4 w-4" />;
+  const getChannelIcon = (iconName: string) => {
+    const iconProps = { className: "h-4 w-4" };
+    switch (iconName) {
+      case 'Mail':
+        return <Mail {...iconProps} />;
+      case 'MessageSquare':
+        return <MessageSquare {...iconProps} />;
+      case 'Bell':
+        return <Bell {...iconProps} />;
+      case 'Phone':
+        return <Phone {...iconProps} />;
+      case 'Smartphone':
+        return <Smartphone {...iconProps} />;
       default:
-        return null;
+        return <Bell {...iconProps} />; // Default fallback
     }
   };
 
-  const ChannelToggle = ({ channel, enabled, onChange }: { channel: string; enabled: boolean; onChange: (enabled: boolean) => void }) => {
+  const ChannelToggle = ({ 
+    channel, 
+    enabled, 
+    onChange 
+  }: { 
+    channel: PreferenceChannel; 
+    enabled: boolean; 
+    onChange: (enabled: boolean) => void 
+  }) => {
     return (
-      <div className="flex items-center space-x-2">
-        {getChannelIcon(channel)}
-        <span className="text-sm font-medium text-gray-700 capitalize">{channel}</span>
+      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center space-x-3">
+          {getChannelIcon(channel.icon)}
+          <div>
+            <span className="text-sm font-medium text-gray-700">{channel.name}</span>
+            <p className="text-xs text-gray-500">{channel.description}</p>
+          </div>
+        </div>
         <button
           onClick={() => onChange(!enabled)}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${enabled ? 'bg-blue-600' : 'bg-gray-200'}`}
@@ -119,10 +223,36 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
     );
   };
 
-  const TopicToggle = ({ topic, label, enabled, onChange }: { topic: string; label: string; enabled: boolean; onChange: (enabled: boolean) => void }) => {
+  const TopicToggle = ({ 
+    topic, 
+    enabled, 
+    onChange 
+  }: { 
+    topic: PreferenceTopic; 
+    enabled: boolean; 
+    onChange: (enabled: boolean) => void 
+  }) => {
+    const getPriorityColor = (priority: string) => {
+      switch (priority) {
+        case 'high': return 'text-red-600 bg-red-50';
+        case 'medium': return 'text-yellow-600 bg-yellow-50';
+        case 'low': return 'text-green-600 bg-green-50';
+        default: return 'text-gray-600 bg-gray-50';
+      }
+    };
+
     return (
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-700">{label}</span>
+      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="flex-1">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-medium text-gray-700">{topic.name}</span>
+            <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(topic.priority)}`}>
+              {topic.priority}
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">{topic.description}</p>
+          <span className="text-xs text-gray-400 capitalize">Category: {topic.category}</span>
+        </div>
         <button
           onClick={() => onChange(!enabled)}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${enabled ? 'bg-blue-600' : 'bg-gray-200'}`}
@@ -213,61 +343,66 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
                 </div>
               </div>
 
-              {/* Channel Toggles */}
+              {/* Channel Toggles - Dynamic from Admin Configuration */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h4 className="text-sm font-medium text-gray-900 mb-3">Preferred Channels</h4>
                   <div className="space-y-3">
-                    {Object.entries(preference.preferredChannels).map(([channel, enabled]) => (
-                      <ChannelToggle
-                        key={channel}
-                        channel={channel}
-                        enabled={editingId === preference.id
-                          ? editForm.preferredChannels?.[channel as keyof typeof editForm.preferredChannels] ?? enabled
-                          : enabled
-                        }
-                        onChange={(newEnabled) => {
-                          if (editingId === preference.id) {
-                            setEditForm(prev => ({
-                              ...prev,
-                              preferredChannels: {
-                                ...prev.preferredChannels,
-                                [channel]: newEnabled
-                              }
-                            }));
+                    {preferenceConfig?.communicationChannels?.map((channel) => {
+                      const currentValue = (preference as any).preferredChannels?.[channel.key] ?? channel.isDefault;
+                      return (
+                        <ChannelToggle
+                          key={channel.key}
+                          channel={channel}
+                          enabled={editingId === preference.id
+                            ? editForm.preferredChannels?.[channel.key as keyof typeof editForm.preferredChannels] ?? currentValue
+                            : currentValue
                           }
-                        }}
-                      />
-                    ))}
+                          onChange={(newEnabled) => {
+                            if (editingId === preference.id) {
+                              setEditForm(prev => ({
+                                ...prev,
+                                preferredChannels: {
+                                  ...prev.preferredChannels,
+                                  [channel.key]: newEnabled
+                                }
+                              }));
+                            }
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Topic Toggles */}
+                {/* Topic Toggles - Dynamic from Admin Configuration */}
                 <div>
                   <h4 className="text-sm font-medium text-gray-900 mb-3">Topic Subscriptions</h4>
                   <div className="space-y-3">
-                    {Object.entries(preference.topicSubscriptions).map(([topic, enabled]) => (
-                      <TopicToggle
-                        key={topic}
-                        topic={topic}
-                        label={topic.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        enabled={editingId === preference.id
-                          ? editForm.topicSubscriptions?.[topic as keyof typeof editForm.topicSubscriptions] ?? enabled
-                          : enabled
-                        }
-                        onChange={(newEnabled) => {
-                          if (editingId === preference.id) {
-                            setEditForm(prev => ({
-                              ...prev,
-                              topicSubscriptions: {
-                                ...prev.topicSubscriptions,
-                                [topic]: newEnabled
-                              }
-                            }));
+                    {preferenceConfig?.topicSubscriptions?.map((topic) => {
+                      const currentValue = (preference as any).topicSubscriptions?.[topic.key] ?? topic.isDefault;
+                      return (
+                        <TopicToggle
+                          key={topic.key}
+                          topic={topic}
+                          enabled={editingId === preference.id
+                            ? editForm.topicSubscriptions?.[topic.key as keyof typeof editForm.topicSubscriptions] ?? currentValue
+                            : currentValue
                           }
-                        }}
-                      />
-                    ))}
+                          onChange={(newEnabled) => {
+                            if (editingId === preference.id) {
+                              setEditForm(prev => ({
+                                ...prev,
+                                topicSubscriptions: {
+                                  ...prev.topicSubscriptions,
+                                  [topic.key]: newEnabled
+                                }
+                              }));
+                            }
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </div>

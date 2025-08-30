@@ -1,103 +1,628 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Eye, Download, Globe, Calendar, CheckCircle, XCircle, RefreshCw, AlertTriangle } from 'lucide-react';
-import { PrivacyNotice } from '../types/consent';
-import { apiClient } from '../services/apiClient';
+import { 
+  FileText, 
+  Eye, 
+  Download, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Search, 
+  RefreshCw, 
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Calendar,
+  Users,
+  Save,
+  X
+} from 'lucide-react';
+import { 
+  privacyNoticeService, 
+  PrivacyNotice, 
+  PrivacyNoticeCreateRequest, 
+  PrivacyNoticeUpdateRequest,
+  PrivacyNoticeQuery
+} from '../services/privacyNoticeService';
+import { io, Socket } from 'socket.io-client';
 
+// Form component for creating/editing privacy notices
+const PrivacyNoticeForm: React.FC<{
+  notice?: PrivacyNotice;
+  onSave: (notice: PrivacyNoticeCreateRequest | PrivacyNoticeUpdateRequest) => Promise<void>;
+  onCancel: () => void;
+  isLoading: boolean;
+}> = ({ notice, onSave, onCancel, isLoading }) => {
+  const [formData, setFormData] = useState<PrivacyNoticeCreateRequest>({
+    title: notice?.title || '',
+    description: notice?.description || '',
+    content: notice?.content || '',
+    contentType: notice?.contentType || 'text/plain',
+    category: notice?.category || 'general',
+    purposes: notice?.purposes || [],
+    legalBasis: notice?.legalBasis || 'consent',
+    dataCategories: notice?.dataCategories || [],
+    recipients: notice?.recipients || [],
+    retentionPeriod: notice?.retentionPeriod || { duration: '1 year' },
+    rights: notice?.rights || ['access', 'rectification', 'erasure'],
+    contactInfo: notice?.contactInfo || {
+      organization: {
+        name: 'SLT Mobitel',
+        email: 'privacy@sltmobitel.lk'
+      }
+    },
+    effectiveDate: notice?.effectiveDate ? new Date(notice.effectiveDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    status: notice?.status || 'draft',
+    language: notice?.language || 'en',
+    applicableRegions: notice?.applicableRegions || ['sri_lanka']
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSave(formData);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold">
+            {notice ? 'Edit Privacy Notice' : 'Create New Privacy Notice'}
+          </h3>
+          <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Title *
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="general">General</option>
+                <option value="marketing">Marketing</option>
+                <option value="analytics">Analytics</option>
+                <option value="cookies">Cookies</option>
+                <option value="third-party">Third Party</option>
+                <option value="location">Location</option>
+                <option value="children">Children</option>
+                <option value="employment">Employment</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Legal Basis
+              </label>
+              <select
+                value={formData.legalBasis}
+                onChange={(e) => setFormData({ ...formData, legalBasis: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="consent">Consent</option>
+                <option value="contract">Contract</option>
+                <option value="legal_obligation">Legal Obligation</option>
+                <option value="vital_interests">Vital Interests</option>
+                <option value="public_task">Public Task</option>
+                <option value="legitimate_interests">Legitimate Interests</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="draft">Draft</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Language
+              </label>
+              <select
+                value={formData.language}
+                onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="en">English</option>
+                <option value="si">Sinhala</option>
+                <option value="ta">Tamil</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Effective Date
+              </label>
+              <input
+                type="date"
+                value={formData.effectiveDate}
+                onChange={(e) => setFormData({ ...formData, effectiveDate: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Brief description of the privacy notice"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Content *
+            </label>
+            <textarea
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              rows={8}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Privacy notice content..."
+              required
+            />
+          </div>
+
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              disabled={isLoading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="px-4 py-2 bg-myslt-primary text-white rounded-md hover:bg-myslt-primary-dark disabled:opacity-50 flex items-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  {notice ? 'Update' : 'Create'}
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// View Modal Component
+interface ViewModalProps {
+  notice: PrivacyNotice | null;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
+  if (!isOpen || !notice) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">{notice.title}</h2>
+            <div className="flex items-center space-x-4 mt-2">
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                notice.status === 'active' ? 'bg-green-100 text-green-800' : 
+                notice.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 
+                'bg-gray-100 text-gray-800'
+              }`}>
+                {notice.status}
+              </span>
+              <span className="text-sm text-gray-500">Version {notice.version}</span>
+              <span className="text-sm text-gray-500">
+                Last updated: {new Date(notice.updatedAt).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="px-6 py-6">
+          {/* Basic Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <p className="text-gray-900">{notice.category || 'Not specified'}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+              <p className="text-gray-900">{notice.language || 'Not specified'}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Effective Date</label>
+              <p className="text-gray-900">
+                {notice.effectiveDate ? new Date(notice.effectiveDate).toLocaleDateString() : 'Not set'}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+              <p className="text-gray-900">
+                {notice.expirationDate ? new Date(notice.expirationDate).toLocaleDateString() : 'No expiry'}
+              </p>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="mb-8">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+            <div className="bg-gray-50 rounded-lg p-4 border">
+              <div 
+                className="prose max-w-none text-gray-800"
+                dangerouslySetInnerHTML={{ 
+                  __html: typeof notice.content === 'string' 
+                    ? notice.content.replace(/\n/g, '<br>') 
+                    : JSON.stringify(notice.content, null, 2).replace(/\n/g, '<br>')
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Acknowledgments */}
+          {notice.acknowledgments && notice.acknowledgments.length > 0 && (
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Acknowledgments</label>
+              <div className="bg-gray-50 rounded-lg p-4 border">
+                <p className="text-sm text-gray-600 mb-2">
+                  Total acknowledgments: {notice.acknowledgments.length}
+                </p>
+                <div className="max-h-32 overflow-y-auto">
+                  {notice.acknowledgments.slice(0, 5).map((ack, index) => (
+                    <div key={index} className="text-xs text-gray-500 border-b border-gray-200 py-1">
+                      User ID: {ack.userId} - {new Date(ack.acknowledgedAt).toLocaleString()}
+                    </div>
+                  ))}
+                  {notice.acknowledgments.length > 5 && (
+                    <p className="text-xs text-gray-400 mt-2">
+                      And {notice.acknowledgments.length - 5} more...
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main component
 export const PrivacyNotices: React.FC = () => {
   const [notices, setNotices] = useState<PrivacyNotice[]>([]);
-  const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [editingNotice, setEditingNotice] = useState<PrivacyNotice | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
+  const [viewingNotice, setViewingNotice] = useState<PrivacyNotice | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState<PrivacyNoticeQuery>({
+    status: 'active', // Default to showing only active notices (archived ones are hidden)
+    category: '',
+    language: '',
+    limit: 20,
+    offset: 0
+  });
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    draft: 0,
+    archived: 0
+  });
 
   useEffect(() => {
     loadNotices();
+  }, [filters]);
+
+  // Real-time updates via Socket.IO
+  useEffect(() => {
+    let socket: Socket | null = null;
+
+    try {
+      // Connect to Socket.IO server
+      socket = io('http://localhost:3001');
+
+      console.log('🔌 Admin Privacy Notices: Connected to real-time updates');
+
+      // Listen for privacy notice updates
+      socket.on('privacy-notice-updated', (data) => {
+        console.log('📡 Admin received real-time update:', data);
+
+        if (data.action === 'deleted' || data.action === 'updated' || data.action === 'created') {
+          // Reload notices to get the latest data
+          console.log('🔄 Refreshing admin privacy notices due to real-time update');
+          loadNotices();
+        }
+      });
+
+      // Handle connection events
+      socket.on('connect', () => {
+        console.log('✅ Admin dashboard connected to real-time updates');
+      });
+
+      socket.on('disconnect', () => {
+        console.log('❌ Admin dashboard disconnected from real-time updates');
+      });
+
+    } catch (error) {
+      console.error('❌ Admin failed to connect to real-time updates:', error);
+    }
+
+    // Cleanup on component unmount
+    return () => {
+      if (socket) {
+        socket.disconnect();
+        console.log('🔌 Admin Privacy Notices: Disconnected from real-time updates');
+      }
+    };
   }, []);
 
   const loadNotices = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiClient.get('/api/v1/privacy-notice');
-      const data = response.data as any;
-      setNotices(data.notices || data);
+      
+      const query: PrivacyNoticeQuery = {
+        ...filters,
+        search: searchTerm || undefined
+      };
+      
+      // Remove empty values
+      Object.keys(query).forEach(key => {
+        if (query[key as keyof PrivacyNoticeQuery] === '') {
+          delete query[key as keyof PrivacyNoticeQuery];
+        }
+      });
+
+      const response = await privacyNoticeService.getPrivacyNotices(query);
+      
+      if (response.data) {
+        setNotices(response.data.notices);
+        setStats(response.data.stats);
+      }
     } catch (err) {
       console.error('Error loading privacy notices:', err);
-      setError('Failed to load privacy notices. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to load privacy notices');
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredNotices = notices.filter((notice: any) => {
-    if (filter === 'active') return notice.active;
-    if (filter === 'inactive') return !notice.active;
-    return true;
-  });
-
-  const getStatusIcon = (active: boolean) => {
-    return active 
-      ? <CheckCircle className="h-4 w-4 text-green-500" />
-      : <XCircle className="h-4 w-4 text-red-500" />;
+  const handleCreateNotice = async (noticeData: PrivacyNoticeCreateRequest) => {
+    try {
+      setFormLoading(true);
+      const response = await privacyNoticeService.createPrivacyNotice(noticeData);
+      
+      if (response.data) {
+        setShowForm(false);
+        // Don't manually update state - let Socket.IO real-time updates handle it
+        console.log('✅ Privacy notice created successfully:', response.data.notice.title);
+      }
+    } catch (err) {
+      console.error('Error creating notice:', err);
+      alert('Failed to create notice: ' + (err instanceof Error ? err.message : 'Unknown error'));
+    } finally {
+      setFormLoading(false);
+    }
   };
 
-  const getStatusColor = (active: boolean) => {
-    return active 
-      ? 'bg-green-100 text-green-800'
-      : 'bg-red-100 text-red-800';
+  const handleUpdateNotice = async (noticeData: PrivacyNoticeUpdateRequest) => {
+    if (!editingNotice) return;
+
+    try {
+      setFormLoading(true);
+      const response = await privacyNoticeService.updatePrivacyNotice(editingNotice.id, noticeData);
+      
+      if (response.data) {
+        setShowForm(false);
+        setEditingNotice(null);
+        // Don't manually update state - let Socket.IO real-time updates handle it
+        console.log('✅ Privacy notice updated successfully:', response.data.notice.title);
+      }
+    } catch (err) {
+      console.error('Error updating notice:', err);
+      alert('Failed to update notice: ' + (err instanceof Error ? err.message : 'Unknown error'));
+    } finally {
+      setFormLoading(false);
+    }
   };
 
-  const getJurisdictionColor = (jurisdiction: string) => {
-    switch (jurisdiction) {
-      case 'US':
-        return 'bg-blue-100 text-blue-800';
-      case 'EU':
-        return 'bg-purple-100 text-purple-800';
-      case 'UK':
+  const handleDeleteNotice = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this privacy notice?')) return;
+
+    try {
+      console.log('🗑️ Attempting to delete privacy notice with ID:', id);
+      const response = await privacyNoticeService.deletePrivacyNotice(id);
+      console.log('✅ Delete response:', response);
+      
+      if (response.data) {
+        console.log('🔄 Delete successful - letting real-time update handle the refresh');
+        
+        // Don't manually update state here - let the real-time update handle it
+        // The real-time Socket.IO event will trigger loadNotices() automatically
+        
+        // Show success message
+        alert('Privacy notice archived successfully!');
+      }
+    } catch (err) {
+      console.error('❌ Error deleting notice:', err);
+      console.error('❌ Full error details:', err);
+      alert('Failed to delete notice: ' + (err instanceof Error ? err.message : 'Unknown error'));
+    }
+  };
+
+  const handleExport = async (format: 'json' | 'csv') => {
+    try {
+      console.log('🚀 Starting export for format:', format);
+      
+      // Test the URL construction
+      const baseURL = 'http://localhost:3001';
+      const testUrl = `${baseURL}/api/v1/privacy-notices/export/${format}`;
+      console.log('🌐 Test URL:', testUrl);
+      
+      // Get token from correct localStorage key
+      const token = localStorage.getItem('authToken'); // Changed from 'token' to 'authToken'
+      console.log('🔑 Token present:', !!token);
+      console.log('🔑 Token preview:', token ? token.substring(0, 20) + '...' : 'null');
+      
+      if (!token) {
+        throw new Error('No authentication token found. Please login again.');
+      }
+      
+      // Make a direct fetch request for testing
+      console.log('Making fetch request...');
+      const response = await fetch(testUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Response status:', response.status);
+      console.log('📄 Response ok:', response.ok);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Export failed: ${response.status} - ${errorText}`);
+      }
+      
+      // Create and download the file
+      const blob = await response.blob();
+      console.log('📦 Blob size:', blob.size);
+      
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `privacy-notices.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+    } catch (err) {
+      console.error('❌ Export error:', err);
+      alert('Failed to export notices: ' + (err instanceof Error ? err.message : 'Unknown error'));
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'inactive':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      case 'draft':
+        return <Edit className="h-4 w-4 text-yellow-500" />;
+      case 'archived':
+        return <FileText className="h-4 w-4 text-gray-500" />;
+      default:
+        return <FileText className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
         return 'bg-green-100 text-green-800';
+      case 'inactive':
+        return 'bg-red-100 text-red-800';
+      case 'draft':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'archived':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const toggleNoticeStatus = async (id: string) => {
-    try {
-      const notice = notices.find(n => n.id === id);
-      if (!notice) return;
-
-      await apiClient.patch(`/api/v1/privacy-notice/${id}`, {
-        active: !notice.active
-      });
-
-      setNotices(prev => prev.map(n => 
-        n.id === id 
-          ? { ...n, active: !n.active }
-          : n
-      ));
-    } catch (err) {
-      console.error('Error updating notice status:', err);
-    }
-  };
-
-  if (loading) {
+  if (loading && notices.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-myslt-background flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-myslt-primary" />
           <p className="text-gray-600">Loading privacy notices...</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error && notices.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-myslt-background flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="h-8 w-8 mx-auto mb-4 text-red-600" />
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={loadNotices}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            className="bg-myslt-primary text-white px-4 py-2 rounded-md hover:bg-myslt-primary-dark transition-colors"
           >
             Retry
           </button>
@@ -108,289 +633,231 @@ export const PrivacyNotices: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-            <FileText className="h-5 w-5 mr-2 text-blue-600" />
-            Privacy Notices
-          </h2>
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-lg font-semibold text-myslt-text-primary flex items-center">
+              <FileText className="h-5 w-5 mr-2 text-myslt-primary" />
+              Privacy Notices Management
+            </h2>
+            <p className="text-sm text-myslt-text-secondary mt-1">
+              Showing <span className="font-medium">{filters.status === 'active' ? 'Active' : filters.status === 'archived' ? 'Archived (Deleted)' : filters.status || 'All'}</span> notices. 
+              {filters.status === 'active' && <span className="text-myslt-text-muted"> Deleted notices are archived and hidden.</span>}
+            </p>
+          </div>
           <div className="flex space-x-2">
             <button
-              onClick={loadNotices}
-              className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+              onClick={() => setShowForm(true)}
+              className="bg-myslt-primary text-white px-4 py-2 rounded-md hover:bg-myslt-primary-dark transition-colors flex items-center gap-2"
             >
-              <RefreshCw className="h-4 w-4" />
-              Refresh
+              <Plus className="h-4 w-4" />
+              Create Notice
             </button>
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value as any)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            <button
+              onClick={() => handleExport('json')}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
             >
-              <option value="all">All Notices</option>
-              <option value="active">Active Only</option>
-              <option value="inactive">Inactive Only</option>
-            </select>
+              <Download className="h-4 w-4" />
+              Export JSON
+            </button>
+            <button
+              onClick={() => handleExport('csv')}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export CSV
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNotices.map((notice) => (
-            <div key={notice.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  {getStatusIcon(notice.active)}
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(notice.active)}`}>
-                    {notice.active ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-                <button
-                  onClick={() => toggleNoticeStatus(notice.id)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                    notice.active
-                      ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                      : 'bg-green-100 text-green-700 hover:bg-green-200'
-                  }`}
-                >
-                  {notice.active ? 'Deactivate' : 'Activate'}
-                </button>
+        {/* Stats */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+            <div className="text-sm text-blue-600">Total</div>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+            <div className="text-sm text-green-600">Active</div>
+          </div>
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-yellow-600">{stats.draft}</div>
+            <div className="text-sm text-yellow-600">Draft</div>
+          </div>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-gray-600">{stats.archived}</div>
+            <div className="text-sm text-gray-600">Archived</div>
+          </div>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          <div className="flex-1 min-w-64">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search notices..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && loadNotices()}
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          
+          <select
+            value={filters.status || ''}
+            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            title="Filter notices by status. Deleted notices are archived and hidden by default."
+          >
+            <option value="">All Statuses</option>
+            <option value="active">Active (Default)</option>
+            <option value="draft">Draft</option>
+            <option value="inactive">Inactive</option>
+            <option value="archived">Archived (Deleted)</option>
+          </select>
+
+          <select
+            value={filters.category || ''}
+            onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">All Categories</option>
+            <option value="general">General</option>
+            <option value="marketing">Marketing</option>
+            <option value="analytics">Analytics</option>
+            <option value="cookies">Cookies</option>
+          </select>
+
+          <select
+            value={filters.language || ''}
+            onChange={(e) => setFilters({ ...filters, language: e.target.value })}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">All Languages</option>
+            <option value="en">English</option>
+            <option value="si">Sinhala</option>
+            <option value="ta">Tamil</option>
+          </select>
+
+          <button
+            onClick={loadNotices}
+            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Notices Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {notices.map((notice) => (
+          <div key={notice.id} className="bg-myslt-card border border-myslt-accent/20 rounded-lg p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                {getStatusIcon(notice.status)}
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(notice.status)}`}>
+                  {notice.status.charAt(0).toUpperCase() + notice.status.slice(1)}
+                </span>
               </div>
-
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {notice.title}
-              </h3>
-
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center space-x-2">
-                  {/* <span className="text-sm text-gray-500">Version:</span>
-                  <span className="text-sm font-medium text-gray-900">{notice.version}</span> */}
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Globe className="h-4 w-4 text-gray-400" />
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getJurisdictionColor(notice.jurisdiction)}`}>
-                    {notice.jurisdiction}
-                  </span>
-                  <span className="text-xs text-gray-500">({notice.language})</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-500">
-                    Published: {new Date(notice.publishedAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex space-x-2">
+              <div className="flex space-x-1">
                 <button
-                  onClick={() => window.open(notice.documentUrl, '_blank')}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  onClick={() => {
+                    setEditingNotice(notice);
+                    setShowForm(true);
+                  }}
+                  className="text-blue-600 hover:text-blue-800 p-1"
+                  title="Edit"
                 >
-                  <Eye className="h-4 w-4 mr-2" />
-                  View
+                  <Edit className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={() => window.open(notice.documentUrl, '_blank')}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  onClick={() => handleDeleteNotice(notice.id)}
+                  className="text-red-600 hover:text-red-800 p-1"
+                  title="Delete"
                 >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download
+                  <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             </div>
-          ))}
-        </div>
 
-        {filteredNotices.length === 0 && (
-          <div className="text-center py-12">
-            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No privacy notices found matching your filter.</p>
+            <h3 className="text-lg font-medium text-myslt-text-primary mb-2 line-clamp-2">
+              {notice.title}
+            </h3>
+
+            <div className="space-y-2 mb-4 text-sm text-myslt-text-secondary">
+              <div className="flex items-center space-x-2">
+                <FileText className="h-4 w-4 text-myslt-text-muted" />
+                <span>{notice.category}</span>
+                <span className="text-xs bg-myslt-accent/20 text-myslt-text-primary px-2 py-1 rounded">{notice.language}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Calendar className="h-4 w-4 text-myslt-text-muted" />
+                <span>
+                  Effective: {new Date(notice.effectiveDate).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Users className="h-4 w-4 text-myslt-text-muted" />
+                <span>{notice.acknowledgments.length} acknowledgments</span>
+              </div>
+            </div>
+
+            {notice.description && (
+              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                {notice.description}
+              </p>
+            )}
+
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setViewingNotice(notice)}
+                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-myslt-card hover:bg-myslt-service-card transition-colors"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                View
+              </button>
+            </div>
           </div>
-        )}
+        ))}
       </div>
+
+      {notices.length === 0 && !loading && (
+        <div className="text-center py-12 bg-myslt-card rounded-lg">
+          <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500 mb-4">No privacy notices found.</p>
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-myslt-primary text-white px-4 py-2 rounded-md hover:bg-myslt-primary-dark transition-colors"
+          >
+            Create your first notice
+          </button>
+        </div>
+      )}
+
+      {/* Form Modal */}
+      {showForm && (
+        <PrivacyNoticeForm
+          notice={editingNotice || undefined}
+          onSave={(notice) => editingNotice ? handleUpdateNotice(notice as PrivacyNoticeUpdateRequest) : handleCreateNotice(notice as PrivacyNoticeCreateRequest)}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingNotice(null);
+          }}
+          isLoading={formLoading}
+        />
+      )}
+
+      {/* View Modal */}
+      <ViewModal
+        notice={viewingNotice}
+        isOpen={!!viewingNotice}
+        onClose={() => setViewingNotice(null)}
+      />
     </div>
   );
 };
-
-// import React, { useEffect, useState } from 'react';
-// import { FileText, Eye, Download, Calendar, CheckCircle, XCircle } from 'lucide-react';
-
-// // Typescript interface matching your backend schema (simplified for display)
-// interface PrivacyNotice {
-//   id: string;
-//   version: string;
-//   title: string;
-//   content: string;
-//   contentType: 'text/plain' | 'text/html' | 'text/markdown';
-//   category: string;
-//   purposes: string[];
-//   legalBasis: string;
-//   effectiveDate: string; // ISO string
-//   expirationDate?: string;
-//   status: 'draft' | 'active' | 'inactive' | 'archived';
-//   language: 'en' | 'si' | 'ta';
-//   metadata: {
-//     createdBy: string;
-//   };
-// }
-
-// const PrivacyNotices: React.FC = () => {
-//   const [notices, setNotices] = useState<PrivacyNotice[]>([]);
-//   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
-//   const [loading, setLoading] = useState<boolean>(true);
-//   const [error, setError] = useState<string | null>(null);
-
-//   useEffect(() => {
-//     const fetchNotices = async () => {
-//       try {
-//         setLoading(true);
-//         setError(null);
-//         const response = await fetch(
-//           'https://consenthub-backend.onrender.com/api-docs/api/v1/privacy-notice/privacyNotice'
-//         );
-//         if (!response.ok) {
-//           throw new Error(`HTTP error! status: ${response.status}`);
-//         }
-//         const data = await response.json();
-//         // Assuming data is an array of PrivacyNotice objects, or maybe wrapped
-//         // Adjust here if your API wraps data, e.g. { items: [...] }
-//         setNotices(data);
-//       } catch (err: any) {
-//         setError(err.message || 'Failed to fetch notices');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchNotices();
-//   }, []);
-
-//   const filteredNotices = notices.filter((notice) => {
-//     if (filter === 'active') return notice.status === 'active';
-//     if (filter === 'inactive') return notice.status === 'inactive';
-//     return true;
-//   });
-
-//   const getStatusIcon = (status: string) =>
-//     status === 'active' ? (
-//       <CheckCircle className="h-4 w-4 text-green-500" />
-//     ) : (
-//       <XCircle className="h-4 w-4 text-red-500" />
-//     );
-
-//   const getStatusColor = (status: string) =>
-//     status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-
-//   return (
-//     <div className="space-y-6 p-6 max-w-7xl mx-auto">
-//       <h2 className="text-2xl font-semibold mb-4 flex items-center text-gray-900">
-//         <FileText className="h-6 w-6 mr-2 text-blue-600" />
-//         Privacy Notices
-//       </h2>
-
-//       <div className="mb-6 flex items-center space-x-4">
-//         <label htmlFor="statusFilter" className="font-medium text-gray-700">
-//           Filter by status:
-//         </label>
-//         <select
-//           id="statusFilter"
-//           value={filter}
-//           onChange={(e) => setFilter(e.target.value as any)}
-//           className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-//         >
-//           <option value="all">All Notices</option>
-//           <option value="active">Active Only</option>
-//           <option value="inactive">Inactive Only</option>
-//         </select>
-//       </div>
-
-//       {loading && (
-//         <div className="text-center text-gray-500 py-12">Loading privacy notices...</div>
-//       )}
-
-//       {error && (
-//         <div className="text-center text-red-600 py-12">
-//           Error loading notices: {error}
-//         </div>
-//       )}
-
-//       {!loading && !error && filteredNotices.length === 0 && (
-//         <div className="text-center py-12 text-gray-500">
-//           No privacy notices found matching your filter.
-//         </div>
-//       )}
-
-//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//         {!loading &&
-//           !error &&
-//           filteredNotices.map((notice) => (
-//             <div
-//               key={notice.id}
-//               className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
-//             >
-//               <div className="flex items-center justify-between mb-4">
-//                 <div className="flex items-center space-x-2">
-//                   {getStatusIcon(notice.status)}
-//                   <span
-//                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-//                       notice.status
-//                     )}`}
-//                   >
-//                     {notice.status.charAt(0).toUpperCase() + notice.status.slice(1)}
-//                   </span>
-//                 </div>
-//               </div>
-
-//               <h3 className="text-lg font-medium text-gray-900 mb-2">{notice.title}</h3>
-
-//               <div className="space-y-1 mb-4 text-sm text-gray-700">
-//                 <div>
-//                   <strong>Version:</strong> {notice.version}
-//                 </div>
-//                 <div>
-//                   <strong>Category:</strong> {notice.category}
-//                 </div>
-//                 <div>
-//                   <strong>Language:</strong> {notice.language}
-//                 </div>
-//                 <div className="flex items-center space-x-1">
-//                   <Calendar className="h-4 w-4 text-gray-400" />
-//                   <span>
-//                     Effective Date: {new Date(notice.effectiveDate).toLocaleDateString()}
-//                   </span>
-//                 </div>
-//                 {notice.expirationDate && (
-//                   <div className="flex items-center space-x-1">
-//                     <Calendar className="h-4 w-4 text-gray-400" />
-//                     <span>
-//                       Expiration Date: {new Date(notice.expirationDate).toLocaleDateString()}
-//                     </span>
-//                   </div>
-//                 )}
-//               </div>
-
-//               <div className="text-gray-700 line-clamp-3 mb-4">{notice.content}</div>
-
-//               <div className="flex space-x-2">
-//                 <button
-//                   onClick={() => alert('View content feature coming soon!')}
-//                   className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-//                 >
-//                   <Eye className="h-4 w-4 mr-2" />
-//                   View
-//                 </button>
-//                 <button
-//                   onClick={() => alert('Download feature coming soon!')}
-//                   className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
-//                 >
-//                   <Download className="h-4 w-4 mr-2" />
-//                   Download
-//                 </button>
-//               </div>
-//             </div>
-//           ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default PrivacyNotices;

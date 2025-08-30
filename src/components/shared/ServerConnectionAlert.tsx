@@ -24,7 +24,7 @@ const ServerConnectionAlert: React.FC<ServerConnectionAlertProps> = ({
   const [retryCount, setRetryCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const BACKEND_URL = 'https://consenthub-backend.onrender.com';
+  const BACKEND_URL = 'http://localhost:3001';
   const MAX_RETRIES = 3;
 
   const testServerConnection = async (attempt = 1) => {
@@ -137,7 +137,7 @@ const ServerConnectionAlert: React.FC<ServerConnectionAlertProps> = ({
     switch (connectionStatus) {
       case 'testing':
         return {
-          icon: <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />,
+          icon: <Loader2 className="w-5 h-5 text-myslt-primary animate-spin" />,
           bgColor: 'bg-blue-50',
           borderColor: 'border-blue-200',
           textColor: 'text-blue-800',
@@ -174,7 +174,7 @@ const ServerConnectionAlert: React.FC<ServerConnectionAlertProps> = ({
       default:
         return {
           icon: <AlertTriangle className="w-5 h-5 text-gray-600" />,
-          bgColor: 'bg-gray-50',
+          bgColor: 'bg-myslt-service-card',
           borderColor: 'border-gray-200',
           textColor: 'text-gray-800',
           title: 'Unknown Status',

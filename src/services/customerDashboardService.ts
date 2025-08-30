@@ -1,7 +1,145 @@
 import { multiServiceApiClient } from './multiServiceApiClient';
 
 export interface DashboardOverview {
-  customer: {
+  // Backend response structure
+  data?: {
+    consents: {
+      total: number;
+      active: number;
+      revoked: number;
+      expired: number;
+      pending: number;
+    };
+    communicationChannels: {
+      total: number;
+      channels: string[];
+      summary: string;
+      lastUpdated: string;
+      configured: boolean;
+    };
+    privacyNotices: {
+      total: number;
+      acknowledged: number;
+      pending: number;
+      pendingReview: number;
+    };
+    dsarRequests: {
+      total: number;
+      pending: number;
+      processing: number;
+      completed: number;
+      status: string;
+    };
+    recentActivity: Array<{
+      type: string;
+      description: string;
+      timestamp: string;
+      date: string;
+    }>;
+    quickStats: {
+      totalConsents: number;
+      activeConsents: number;
+      totalPreferences: number;
+      totalPrivacyNotices: number;
+      totalDSARRequests: number;
+      pendingActions: number;
+    };
+    privacyStatus: {
+      privacyPolicyAccepted: boolean;
+      version: string;
+      status: string;
+      communicationPrefsConfigured: boolean;
+      communicationLastUpdated: string;
+      pendingDSARStatus: string;
+      dsarProcessingStatus: string;
+    };
+    userProfile: {
+      name: string;
+      email: string;
+      phone: string;
+      memberSince: string;
+      lastLogin: string;
+      isActive: boolean;
+    };
+  };
+
+  // Direct access for backward compatibility
+  consents?: {
+    total: number;
+    active: number;
+    revoked: number;
+    expired: number;
+    pending: number;
+  };
+  communicationChannels?: {
+    total: number;
+    channels: string[];
+    summary: string;
+    lastUpdated: string;
+    configured: boolean;
+  };
+  privacyNotices?: {
+    total: number;
+    acknowledged: number;
+    pending: number;
+    pendingReview: number;
+  };
+  dsarRequests?: {
+    total: number;
+    pending: number;
+    processing: number;
+    completed: number;
+    status: string;
+  };
+  privacyStatus?: {
+    privacyPolicyAccepted: boolean;
+    version: string;
+    status: string;
+    communicationPrefsConfigured: boolean;
+    communicationLastUpdated: string;
+    pendingDSARStatus: string;
+    dsarProcessingStatus: string;
+  };
+  
+  // Direct stats from backend
+  totalConsents?: number;
+  activeConsents?: number;
+  totalPreferences?: number;
+  activePreferences?: number;
+  totalPrivacyNotices?: number;
+  acknowledgedPrivacyNotices?: number;
+  totalDSARRequests?: number;
+  pendingDSARRequests?: number;
+  
+  // User profile from backend
+  userProfile?: {
+    name: string;
+    email: string;
+    phone: string;
+    company?: string;
+    memberSince: string;
+  };
+  
+  // Arrays from backend
+  recentActivity?: Array<{
+    id?: string;
+    type: string;
+    action?: string;
+    description: string;
+    timestamp: string;
+  }>;
+  
+  // Calculated stats
+  stats?: {
+    consentGrants: number;
+    consentDenials: number;
+    activePreferences: number;
+    totalPrivacyNotices: number;
+    totalDSARRequests: number;
+  };
+  
+  // Legacy fields for backward compatibility
+  customer?: {
     id: string;
     name: string;
     email: string;
@@ -9,32 +147,25 @@ export interface DashboardOverview {
     joinDate: string;
     lastLogin: string;
   };
-  consentStats: {
+  consentStats?: {
     total: number;
     granted: number;
     revoked: number;
     expired: number;
     pending: number;
   };
-  preferenceStats: {
+  preferenceStats?: {
     total: number;
     enabled: number;
     disabled: number;
   };
-  dsarStats: {
+  dsarStats?: {
     total: number;
     pending: number;
     completed: number;
     inProgress: number;
   };
-  recentActivity: Array<{
-    id: string;
-    type: string;
-    action: string;
-    description: string;
-    timestamp: string;
-  }>;
-  notifications: Array<{
+  notifications?: Array<{
     id: string;
     type: string;
     message: string;
@@ -145,6 +276,9 @@ class CustomerDashboardService {
    */
   async getDashboardOverview(): Promise<DashboardOverview> {
     try {
+      console.log('Fetching dashboard overview from:', `${this.baseUrl}/overview`);
+      
+      // Try to fetch from backend API first
       const response = await multiServiceApiClient.makeRequest(
         'GET',
         `${this.baseUrl}/overview`,
@@ -152,15 +286,60 @@ class CustomerDashboardService {
         'customer'
       );
 
+      console.log('Dashboard API response:', response);
+      
+      // Also fetch real consent statistics
+      const consentStats = await this.getConsentStats();
+      console.log('Real consent statistics:', consentStats);
+
       if (response.success && response.data) {
-        return response.data;
+        console.log('Dashboard data received:', response.data);
+        // Merge with real consent stats
+        const enhancedData = {
+          ...response.data,
+          consentStats: consentStats,
+          activeConsents: consentStats.granted,
+          totalConsents: consentStats.total
+        };
+        console.log('Enhanced dashboard data with real consent stats:', enhancedData);
+        return enhancedData;
       }
 
-      throw new Error('Failed to fetch dashboard overview');
+      if (response && !response.success) {
+        console.error('API returned success=false:', response);
+        throw new Error('API returned success=false');
+      }
+
+      throw new Error('Failed to fetch dashboard overview - no data');
     } catch (error: any) {
       console.error('Dashboard overview error:', error);
-      // Return mock data as fallback
-      return this.getMockDashboardData();
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        stack: error.stack
+      });
+      
+      // Even in fallback mode, try to get real consent statistics
+      try {
+        console.log('Getting real consent stats for fallback data...');
+        const consentStats = await this.getConsentStats();
+        console.log('Real consent statistics (fallback mode):', consentStats);
+        
+        const mockData = this.getMockDashboardData();
+        const enhancedMockData = {
+          ...mockData,
+          consentStats: consentStats,
+          activeConsents: consentStats.granted,
+          totalConsents: consentStats.total
+        };
+        
+        console.log('Returning enhanced mock data with real consent stats:', enhancedMockData);
+        return enhancedMockData;
+      } catch (consentError) {
+        console.error('Failed to get consent stats in fallback mode:', consentError);
+        console.log('Returning basic mock data as final fallback');
+        return this.getMockDashboardData();
+      }
     }
   }
 
@@ -171,14 +350,20 @@ class CustomerDashboardService {
     try {
       const response = await multiServiceApiClient.makeRequest(
         'GET',
-        '/api/v1/consents',
+        '/api/v1/customer/consents',
         undefined,
-        'customer',
-        'consent'
+        'customer'
       );
 
-      const consents = response?.data || response || [];
-      return consents.map((consent: any) => ({
+      // Handle the response structure: {success: true, data: {consents: [...]}}
+      const consentsData = response?.data?.consents || response?.consents || [];
+      
+      if (!Array.isArray(consentsData)) {
+        console.warn('Consents data is not an array:', consentsData);
+        return [];
+      }
+
+      return consentsData.map((consent: any) => ({
         id: consent.id || consent._id,
         purpose: consent.purpose || 'General Data Processing',
         dataCategory: consent.dataCategory || 'Personal Information',
@@ -192,6 +377,67 @@ class CustomerDashboardService {
     } catch (error) {
       console.error('Error fetching consents:', error);
       return [];
+    }
+  }
+
+  /**
+   * Get detailed consent statistics
+   */
+  async getConsentStats(): Promise<{
+    granted: number;
+    revoked: number;
+    expired: number;
+    pending: number;
+    total: number;
+  }> {
+    try {
+      console.log('Fetching consent statistics...');
+      const consents = await this.getConsents();
+      
+      const now = new Date();
+      const stats = {
+        granted: 0,
+        revoked: 0,
+        expired: 0,
+        pending: 0,
+        total: consents.length
+      };
+      
+      consents.forEach(consent => {
+        switch (consent.status?.toLowerCase()) {
+          case 'granted':
+            // Check if expired
+            if (consent.expiresAt && new Date(consent.expiresAt) < now) {
+              stats.expired++;
+            } else {
+              stats.granted++;
+            }
+            break;
+          case 'revoked':
+          case 'denied':
+            stats.revoked++;
+            break;
+          case 'pending':
+          case 'requested':
+            stats.pending++;
+            break;
+          default:
+            // Handle any other status as pending
+            stats.pending++;
+        }
+      });
+      
+      console.log('Consent statistics calculated:', stats);
+      return stats;
+    } catch (error) {
+      console.error('Error calculating consent statistics:', error);
+      return {
+        granted: 0,
+        revoked: 0,
+        expired: 0,
+        pending: 0,
+        total: 0
+      };
     }
   }
 
@@ -575,6 +821,25 @@ class CustomerDashboardService {
    */
   private getMockDashboardData(): DashboardOverview {
     return {
+      // Backend format fields
+      totalConsents: 12,
+      activeConsents: 8,
+      totalPreferences: 6,
+      activePreferences: 4,
+      totalPrivacyNotices: 5,
+      acknowledgedPrivacyNotices: 3,
+      totalDSARRequests: 3,
+      pendingDSARRequests: 1,
+      
+      userProfile: {
+        name: 'Robert Johnson',
+        email: 'robert.johnson@example.com',
+        phone: '+94123456789',
+        company: 'Individual',
+        memberSince: '2024-01-15'
+      },
+      
+      // Legacy format for backward compatibility
       customer: {
         id: 'customer_123',
         name: 'Robert Johnson',

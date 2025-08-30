@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Audit Trail Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+        }
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-live {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status-offline {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .audit-entry {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 4px solid transparent;
+        }
+        .audit-entry.new {
+            background: #dbeafe;
+            border-left-color: #3b82f6;
+            animation: highlight 1s ease-out;
+        }
+        .audit-entry.realtime {
+            background: #dcfce7;
+            border-left-color: #22c55e;
+        }
+        @keyframes highlight {
+            0% { background: #bfdbfe; }
+            100% { background: #dbeafe; }
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-new {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .badge-live {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .badge-granted {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .badge-revoked {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .feature-card {
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+        }
+        .feature-card h3 {
+            margin: 0 0 10px 0;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔴 Real-Time Consent History & Audit Trail</h1>
+    
+    <div class="demo-section">
+        <h2>📊 Live Connection Status</h2>
+        <p>The audit trail now shows real-time connection status:</p>
+        
+        <div style="margin: 16px 0;">
+            <span class="status-indicator status-live">
+                📶 Live <div class="pulse"></div>
+            </span>
+            <span style="margin-left: 20px;">Connected and receiving real-time updates</span>
+        </div>
+        
+        <div style="margin: 16px 0;">
+            <span class="status-indicator status-offline">
+                📵 Offline
+            </span>
+            <span style="margin-left: 20px;">Disconnected - showing historical data only</span>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>⚡ Real-Time Update Examples</h2>
+        <p>Here's how new consent grants and revokes appear in real-time:</p>
+        
+        <div class="audit-entry new">
+            <div>
+                <strong>2024-08-30 14:35:22</strong>
+                <span class="badge badge-new">NEW</span>
+            </div>
+            <div>
+                <span class="badge badge-granted">Consent Granted</span>
+                <strong>Marketing Email</strong> - Customer: CUST-001
+            </div>
+        </div>
+
+        <div class="audit-entry realtime">
+            <div>
+                <strong>2024-08-30 14:34:18</strong>
+                <span class="badge badge-live">LIVE</span>
+            </div>
+            <div>
+                <span class="badge badge-revoked">Consent Revoked</span>
+                <strong>SMS Marketing</strong> - Customer: DINUKA-001
+            </div>
+        </div>
+
+        <div class="audit-entry">
+            <div>
+                <strong>2024-08-30 14:32:45</strong>
+            </div>
+            <div>
+                <span class="badge" style="background: #f3f4f6; color: #6b7280;">Preference Update</span>
+                <strong>Communication Settings</strong> - Customer: OJITHA-001
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>🎯 Key Features Implemented</h2>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>🔴 Real-Time WebSocket Connection</h3>
+                <ul>
+                    <li>Live connection status indicator</li>
+                    <li>Automatic reconnection handling</li>
+                    <li>Connection health monitoring</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>⚡ Instant Updates</h3>
+                <ul>
+                    <li>Consent grants/revokes appear immediately</li>
+                    <li>Preference updates show in real-time</li>
+                    <li>No page refresh required</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🎨 Visual Indicators</h3>
+                <ul>
+                    <li>Blue highlighting for brand new entries</li>
+                    <li>Green highlighting for real-time data</li>
+                    <li>"NEW" and "LIVE" badges on timestamps</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>📊 Enhanced Filtering</h3>
+                <ul>
+                    <li>Filter real-time and historical data</li>
+                    <li>Search across all entry types</li>
+                    <li>Statistics showing real-time count</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>🚀 How to Test the Implementation</h2>
+        
+        <ol>
+            <li><strong>Start the Backend:</strong> <code>node comprehensive-backend.js</code></li>
+            <li><strong>Start the Frontend:</strong> <code>npm run dev</code></li>
+            <li><strong>Navigate to Audit Trail:</strong> Open the Consent History & Audit Trail page</li>
+            <li><strong>Run the Test Script:</strong> <code>node test-real-time-audit.js</code></li>
+            <li><strong>Observe Real-Time Updates:</strong> Watch as consent and preference updates appear with highlighting</li>
+        </ol>
+
+        <p><strong>Test Script Features:</strong></p>
+        <ul>
+            <li>Simulates consent grants and revokes every 5 seconds</li>
+            <li>Creates random customer preference updates</li>
+            <li>Both CSR and customer-initiated changes</li>
+            <li>Stores data in MongoDB and emits WebSocket events</li>
+        </ul>
+    </div>
+
+    <div class="demo-section">
+        <h2>🛠 Technical Implementation</h2>
+        
+        <h3>Frontend Changes:</h3>
+        <ul>
+            <li>Enhanced <code>AuditTrail.tsx</code> with WebSocket integration</li>
+            <li>Real-time event handlers for consent and preference updates</li>
+            <li>Visual indicators and highlighting animations</li>
+            <li>Connection status monitoring</li>
+        </ul>
+
+        <h3>Backend Integration:</h3>
+        <ul>
+            <li>WebSocket events: <code>consent-updated</code>, <code>customerPreferencesUpdated</code>, <code>csrPreferencesUpdated</code></li>
+            <li>Real-time audit log creation with metadata</li>
+            <li>CSR dashboard room management</li>
+        </ul>
+
+        <h3>Data Structure:</h3>
+        <ul>
+            <li>Extended AuditLog interface with real-time fields</li>
+            <li>MongoDB persistence for all real-time events</li>
+            <li>Additional metadata for source tracking</li>
+        </ul>
+    </div>
+
+    <div class="demo-section">
+        <h2>✅ Benefits for Users</h2>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>👨‍💼 For CSR Representatives</h3>
+                <ul>
+                    <li>Immediate visibility into customer consent changes</li>
+                    <li>Real-time preference update notifications</li>
+                    <li>Enhanced customer service capabilities</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>👨‍💼 For Administrators</h3>
+                <ul>
+                    <li>Live compliance monitoring</li>
+                    <li>Real-time audit trail integrity</li>
+                    <li>System health monitoring</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🏢 For the Organization</h3>
+                <ul>
+                    <li>Improved regulatory compliance</li>
+                    <li>Faster response to customer actions</li>
+                    <li>Enhanced data transparency</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f0f9ff; border-radius: 8px;">
+        <h2>🎉 Implementation Complete!</h2>
+        <p>The Consent History & Audit Trail now displays real-time customer consent grants and revokes with full WebSocket integration, visual indicators, and comprehensive filtering capabilities.</p>
+    </div>
+
+    <script>
+        // Add some interactivity to demonstrate the features
+        setInterval(() => {
+            const newEntries = document.querySelectorAll('.audit-entry.new');
+            newEntries.forEach(entry => {
+                entry.classList.remove('new');
+                entry.classList.add('realtime');
+                
+                const badge = entry.querySelector('.badge-new');
+                if (badge) {
+                    badge.textContent = 'LIVE';
+                    badge.classList.remove('badge-new');
+                    badge.classList.add('badge-live');
+                }
+            });
+        }, 10000);
+    </script>
+</body>
+</html>

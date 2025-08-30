@@ -7,14 +7,14 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import RoleBasedDashboard from './components/RoleBasedDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import ToastContainer from './components/ToastContainer';
-import UserManagement from './components/UserManagement';
+import UserManagement from './components/admin/UserManagement';
 
 function App() {
   return (
     <AuthProvider>
       <NotificationProvider>
         <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-myslt-background">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />

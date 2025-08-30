@@ -1,188 +1,529 @@
-// TMF632 Extended - Communication Preference Management API Service
-import { apiClient, ApiResponse } from './apiClient';
-import { PrivacyPreference } from '../types/consent';
+import { 
+  PreferenceCategory, 
+  PreferenceItem, 
+  UserPreference, 
+  PreferenceTemplate,
+  PreferenceAudit,
+  PreferenceStats 
+} from '../types/preference';
+
+const API_BASE_URL = 'http://localhost:3001/api/v1';
+
+// API Response interfaces
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+  error?: string;
+}
+
+interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+// Request interfaces
+export interface CategoryCreateRequest {
+  name: string;
+  description: string;
+  icon: string;
+  priority: number;
+}
 
 export interface PreferenceCreateRequest {
-  partyId: string;
-  preferredChannels: {
-    email: boolean;
-    sms: boolean;
-    push: boolean;
-    voice: boolean;
+  categoryId: string;
+  name: string;
+  description: string;
+  type: 'boolean' | 'string' | 'number' | 'array' | 'object' | 'enum';
+  required: boolean;
+  defaultValue: any;
+  options?: string[];
+  validation?: {
+    min?: number;
+    max?: number;
+    pattern?: string;
+    allowedValues?: any[];
   };
-  topicSubscriptions: {
-    product_updates: boolean;
-    promotions: boolean;
-    billing_alerts: boolean;
-    service_notifications: boolean;
-  };
-  doNotDisturb?: {
-    start: string;
-    end: string;
-  };
-  frequencyLimits?: {
-    email: number;
-    sms: number;
-  };
+  priority: number;
 }
 
-export interface PreferenceUpdateRequest {
-  preferredChannels?: {
-    email?: boolean;
-    sms?: boolean;
-    push?: boolean;
-    voice?: boolean;
-  };
-  topicSubscriptions?: {
-    product_updates?: boolean;
-    promotions?: boolean;
-    billing_alerts?: boolean;
-    service_notifications?: boolean;
-  };
-  doNotDisturb?: {
-    start?: string;
-    end?: string;
-  };
-  frequencyLimits?: {
-    email?: number;
-    sms?: number;
-  };
+export interface PreferenceUpdateRequest extends Partial<PreferenceCreateRequest> {
+  enabled?: boolean;
 }
 
-export interface PreferenceQuery {
-  partyId?: string;
-  channel?: string;
-  topic?: string;
+export interface PreferenceFilters {
+  search?: string;
+  categoryId?: string;
+  enabled?: boolean;
+  type?: string;
   limit?: number;
   offset?: number;
 }
 
-export interface PreferenceListResponse {
-  preferences: PrivacyPreference[];
-  totalCount: number;
-  hasMore: boolean;
+export interface BulkPreferenceUpdate {
+  preferenceIds: string[];
+  action: 'enable' | 'disable' | 'delete';
+  categoryId?: string;
 }
 
-class PreferenceService {
-  private readonly basePath = '/api/v1';
-
-  /**
-   * TMF632 Extended - Get list of privacy preferences
-   */
-  async getPreferences(query: PreferenceQuery = {}): Promise<ApiResponse<PreferenceListResponse>> {
-    const params = new URLSearchParams();
+// Utility function for making API requests
+const apiRequest = async <T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<T>> => {
+  try {
+    const url = `${API_BASE_URL}${endpoint}`;
     
-    Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined) {
-        params.append(key, value.toString());
-      }
-    });
-
-    const queryString = params.toString();
-    const url = `${this.basePath}/preference${queryString ? `?${queryString}` : ''}`;
+    // Get auth token from localStorage
+    const token = localStorage.getItem('authToken');
     
-    return apiClient.get<PreferenceListResponse>(url);
+    const defaultOptions: RequestInit = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      },
+    };
+
+    const response = await fetch(url, { ...defaultOptions, ...options });
+    
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorData}`);
+    }
+
+    const data = await response.json();
+    return {
+      success: true,
+      data,
+    };
+  } catch (error) {
+    console.error(`API Request Error [${endpoint}]:`, error);
+    return {
+      success: false,
+      data: null as any,
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
+    };
   }
+};
+
+export const preferenceService = {
+  // ==================== CATEGORY MANAGEMENT ====================
+  
+  /**
+   * Get all preference categories
+   */
+  async getCategories(): Promise<ApiResponse<{ categories: PreferenceCategory[] }>> {
+    return apiRequest<{ categories: PreferenceCategory[] }>('/preferences/categories');
+  },
 
   /**
-   * TMF632 Extended - Get specific preference by ID
+   * Create a new preference category
    */
-  async getPreferenceById(id: string): Promise<ApiResponse<PrivacyPreference>> {
-    return apiClient.get<PrivacyPreference>(`${this.basePath}/privacyPreference/${id}`);
-  }
-
-  /**
-   * TMF632 Extended - Get preference by party ID
-   */
-  async getPreferenceByPartyId(partyId: string): Promise<ApiResponse<PrivacyPreference>> {
-    return apiClient.get<PrivacyPreference>(`${this.basePath}/privacyPreference/party/${partyId}`);
-  }
-
-  /**
-   * TMF632 Extended - Create new preference
-   */
-  async createPreference(preference: PreferenceCreateRequest): Promise<ApiResponse<PrivacyPreference>> {
-    return apiClient.post<PrivacyPreference>(`${this.basePath}/privacyPreference`, preference);
-  }
-
-  /**
-   * TMF632 Extended - Update existing preference
-   */
-  async updatePreference(id: string, updates: PreferenceUpdateRequest): Promise<ApiResponse<PrivacyPreference>> {
-    return apiClient.patch<PrivacyPreference>(`${this.basePath}/privacyPreference/${id}`, updates);
-  }
-
-  /**
-   * TMF632 Extended - Update preference by party ID
-   */
-  async updatePreferenceByPartyId(partyId: string, updates: PreferenceUpdateRequest): Promise<ApiResponse<PrivacyPreference>> {
-    return apiClient.patch<PrivacyPreference>(`${this.basePath}/privacyPreference/party/${partyId}`, updates);
-  }
-
-  /**
-   * TMF632 Extended - Delete preference
-   */
-  async deletePreference(id: string): Promise<ApiResponse<void>> {
-    return apiClient.delete<void>(`${this.basePath}/privacyPreference/${id}`);
-  }
-
-  /**
-   * Check if communication is allowed
-   */
-  async checkCommunicationAllowed(partyId: string, channel: string, topic?: string): Promise<ApiResponse<{
-    allowed: boolean;
-    reason?: string;
-    nextAllowedTime?: string;
-  }>> {
-    const params = new URLSearchParams({
-      partyId,
-      channel,
-      ...(topic && { topic })
+  async createCategory(categoryData: CategoryCreateRequest): Promise<ApiResponse<PreferenceCategory>> {
+    return apiRequest<PreferenceCategory>('/preferences/categories', {
+      method: 'POST',
+      body: JSON.stringify(categoryData),
     });
-
-    return apiClient.get<any>(`${this.basePath}/privacyPreference/check-communication?${params}`);
-  }
+  },
 
   /**
-   * Get communication preferences summary
+   * Update a preference category
    */
-  async getPreferencesSummary(partyId: string): Promise<ApiResponse<{
-    allowedChannels: string[];
-    subscribedTopics: string[];
-    doNotDisturbActive: boolean;
-    frequencyLimitsReached: boolean;
-  }>> {
-    return apiClient.get<any>(`${this.basePath}/privacyPreference/summary/${partyId}`);
-  }
+  async updateCategory(
+    categoryId: string,
+    categoryData: Partial<CategoryCreateRequest>
+  ): Promise<ApiResponse<PreferenceCategory>> {
+    return apiRequest<PreferenceCategory>(`/preferences/categories/${categoryId}`, {
+      method: 'PUT',
+      body: JSON.stringify(categoryData),
+    });
+  },
 
   /**
-   * Bulk update preferences for multiple parties
+   * Delete a preference category
    */
-  async bulkUpdatePreferences(updates: Array<{
-    partyId: string;
-    updates: PreferenceUpdateRequest;
-  }>): Promise<ApiResponse<PrivacyPreference[]>> {
-    return apiClient.post<PrivacyPreference[]>(`${this.basePath}/privacyPreference/bulk`, { updates });
-  }
+  async deleteCategory(categoryId: string): Promise<ApiResponse<{ message: string }>> {
+    return apiRequest<{ message: string }>(`/preferences/categories/${categoryId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // ==================== PREFERENCE MANAGEMENT ====================
 
   /**
-   * Reset preferences to default
+   * Get preferences with optional filters
    */
-  async resetPreferences(partyId: string): Promise<ApiResponse<PrivacyPreference>> {
-    return apiClient.post<PrivacyPreference>(`${this.basePath}/privacyPreference/reset/${partyId}`);
-  }
+  async getPreferences(filters: PreferenceFilters = {}): Promise<ApiResponse<{ preferences: PreferenceItem[]; total: number }>> {
+    const queryParams = new URLSearchParams();
+    
+    if (filters.search) queryParams.append('search', filters.search);
+    if (filters.categoryId) queryParams.append('categoryId', filters.categoryId);
+    if (filters.enabled !== undefined) queryParams.append('enabled', filters.enabled.toString());
+    if (filters.type) queryParams.append('type', filters.type);
+    if (filters.limit) queryParams.append('limit', filters.limit.toString());
+    if (filters.offset) queryParams.append('offset', filters.offset.toString());
+
+    const queryString = queryParams.toString();
+    const endpoint = queryString ? `/preferences/admin?${queryString}` : '/preferences/admin';
+    
+    return apiRequest<{ preferences: PreferenceItem[]; total: number }>(endpoint);
+  },
+
+  /**
+   * Get a specific preference by ID
+   */
+  async getPreference(preferenceId: string): Promise<ApiResponse<PreferenceItem>> {
+    return apiRequest<PreferenceItem>(`/preferences/admin/${preferenceId}`);
+  },
+
+  /**
+   * Create a new preference
+   */
+  async createPreference(preferenceData: PreferenceCreateRequest): Promise<ApiResponse<PreferenceItem>> {
+    return apiRequest<PreferenceItem>('/preferences/admin', {
+      method: 'POST',
+      body: JSON.stringify(preferenceData),
+    });
+  },
+
+  /**
+   * Update a preference
+   */
+  async updatePreference(
+    preferenceId: string,
+    preferenceData: PreferenceUpdateRequest
+  ): Promise<ApiResponse<PreferenceItem>> {
+    return apiRequest<PreferenceItem>(`/preferences/admin/${preferenceId}`, {
+      method: 'PUT',
+      body: JSON.stringify(preferenceData),
+    });
+  },
+
+  /**
+   * Delete a preference
+   */
+  async deletePreference(preferenceId: string): Promise<ApiResponse<{ message: string }>> {
+    return apiRequest<{ message: string }>(`/preferences/admin/${preferenceId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  /**
+   * Toggle preference enabled status
+   */
+  async togglePreference(preferenceId: string, enabled: boolean): Promise<ApiResponse<PreferenceItem>> {
+    return apiRequest<PreferenceItem>(`/preferences/admin/${preferenceId}/toggle`, {
+      method: 'PATCH',
+      body: JSON.stringify({ enabled }),
+    });
+  },
+
+  // ==================== USER PREFERENCES ====================
+
+  /**
+   * Get user preferences for a specific user
+   */
+  async getUserPreferences(userId: string): Promise<ApiResponse<{ preferences: UserPreference[] }>> {
+    return apiRequest<{ preferences: UserPreference[] }>(`/preference/users/${userId}`);
+  },
+
+  /**
+   * Set user preference value
+   */
+  async setUserPreference(
+    userId: string,
+    preferenceId: string,
+    value: any
+  ): Promise<ApiResponse<UserPreference>> {
+    return apiRequest<UserPreference>(`/preference/users/${userId}/${preferenceId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ value }),
+    });
+  },
+
+  /**
+   * Bulk update user preferences
+   */
+  async bulkUpdateUserPreferences(
+    userId: string,
+    preferences: { preferenceId: string; value: any }[]
+  ): Promise<ApiResponse<{ updated: number; preferences: UserPreference[] }>> {
+    return apiRequest<{ updated: number; preferences: UserPreference[] }>(`/preference/users/${userId}/bulk`, {
+      method: 'POST',
+      body: JSON.stringify({ preferences }),
+    });
+  },
+
+  /**
+   * Reset user preferences to defaults
+   */
+  async resetUserPreferences(userId: string): Promise<ApiResponse<{ message: string; reset: number }>> {
+    return apiRequest<{ message: string; reset: number }>(`/preference/users/${userId}/reset`, {
+      method: 'POST',
+    });
+  },
+
+  // ==================== BULK OPERATIONS ====================
+
+  /**
+   * Bulk update preferences
+   */
+  async bulkUpdatePreferences(updateData: BulkPreferenceUpdate): Promise<ApiResponse<{ affected: number; message: string }>> {
+    return apiRequest<{ affected: number; message: string }>('/preference/items/bulk', {
+      method: 'POST',
+      body: JSON.stringify(updateData),
+    });
+  },
+
+  // ==================== TEMPLATES ====================
+
+  /**
+   * Get preference templates
+   */
+  async getTemplates(): Promise<ApiResponse<{ templates: PreferenceTemplate[] }>> {
+    return apiRequest<{ templates: PreferenceTemplate[] }>('/preference/templates');
+  },
+
+  /**
+   * Create preference template
+   */
+  async createTemplate(
+    templateData: Omit<PreferenceTemplate, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<ApiResponse<PreferenceTemplate>> {
+    return apiRequest<PreferenceTemplate>('/preference/templates', {
+      method: 'POST',
+      body: JSON.stringify(templateData),
+    });
+  },
+
+  /**
+   * Apply template to user
+   */
+  async applyTemplate(
+    templateId: string,
+    userId: string
+  ): Promise<ApiResponse<{ applied: number; preferences: UserPreference[] }>> {
+    return apiRequest<{ applied: number; preferences: UserPreference[] }>(`/preference/templates/${templateId}/apply`, {
+      method: 'POST',
+      body: JSON.stringify({ userId }),
+    });
+  },
+
+  // ==================== STATISTICS & ANALYTICS ====================
 
   /**
    * Get preference statistics
    */
-  async getPreferenceStats(): Promise<ApiResponse<{
-    totalPreferences: number;
-    channelStats: Record<string, number>;
-    topicStats: Record<string, number>;
-    doNotDisturbCount: number;
-  }>> {
-    return apiClient.get<any>(`${this.basePath}/privacyPreference/stats`);
-  }
-}
+  async getStats(): Promise<ApiResponse<PreferenceStats>> {
+    return apiRequest<PreferenceStats>('/preferences/stats');
+  },
 
-export const preferenceService = new PreferenceService();
+  /**
+   * Get category statistics
+   */
+  async getCategoryStats(categoryId: string): Promise<ApiResponse<{
+    category: PreferenceCategory;
+    totalPreferences: number;
+    activePreferences: number;
+    userEngagement: number;
+    avgValue: number;
+  }>> {
+    return apiRequest<{
+      category: PreferenceCategory;
+      totalPreferences: number;
+      activePreferences: number;
+      userEngagement: number;
+      avgValue: number;
+    }>(`/preference/categories/${categoryId}/stats`);
+  },
+
+  // ==================== AUDIT TRAIL ====================
+
+  /**
+   * Get preference audit trail
+   */
+  async getAuditTrail(filters: {
+    userId?: string;
+    preferenceId?: string;
+    action?: string;
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<ApiResponse<{ audits: PreferenceAudit[]; total: number }>> {
+    const queryParams = new URLSearchParams();
+    
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined) {
+        queryParams.append(key, value.toString());
+      }
+    });
+
+    const queryString = queryParams.toString();
+    const endpoint = queryString ? `/preference/audit?${queryString}` : '/preference/audit';
+    
+    return apiRequest<{ audits: PreferenceAudit[]; total: number }>(endpoint);
+  },
+
+  // ==================== VALIDATION & UTILITIES ====================
+
+  /**
+   * Validate preference value against its definition
+   */
+  async validatePreferenceValue(
+    preferenceId: string,
+    value: any
+  ): Promise<ApiResponse<{ valid: boolean; errors?: string[] }>> {
+    return apiRequest<{ valid: boolean; errors?: string[] }>(`/preference/items/${preferenceId}/validate`, {
+      method: 'POST',
+      body: JSON.stringify({ value }),
+    });
+  },
+
+  /**
+   * Export preferences configuration
+   */
+  async exportPreferences(): Promise<ApiResponse<{
+    categories: PreferenceCategory[];
+    preferences: PreferenceItem[];
+    exportedAt: string;
+  }>> {
+    return apiRequest<{
+      categories: PreferenceCategory[];
+      preferences: PreferenceItem[];
+      exportedAt: string;
+    }>('/preference/export');
+  },
+
+  /**
+   * Import preferences configuration
+   */
+  async importPreferences(
+    configData: {
+      categories: Omit<PreferenceCategory, 'id' | 'createdAt' | 'updatedAt'>[];
+      preferences: Omit<PreferenceItem, 'id' | 'createdAt' | 'updatedAt'>[];
+    },
+    options: {
+      overwrite?: boolean;
+      skipDuplicates?: boolean;
+    } = {}
+  ): Promise<ApiResponse<{
+    imported: { categories: number; preferences: number };
+    skipped: { categories: number; preferences: number };
+    errors: string[];
+  }>> {
+    return apiRequest<{
+      imported: { categories: number; preferences: number };
+      skipped: { categories: number; preferences: number };
+      errors: string[];
+    }>('/preference/import', {
+      method: 'POST',
+      body: JSON.stringify({ ...configData, options }),
+    });
+  },
+
+  // ==================== CUSTOMER PREFERENCE METHODS ====================
+
+  /**
+   * Get preferences for a specific customer/party
+   */
+  async getPreferenceByPartyId(partyId: string): Promise<ApiResponse<any>> {
+    return apiRequest<any>(`/customer/preferences?partyId=${partyId}`);
+  },
+
+  /**
+   * Update preferences by party ID (for customer preference updates)
+   */
+  async updatePreferenceByPartyId(partyId: string, preferenceData: any): Promise<ApiResponse<any>> {
+    return apiRequest<any>(`/customer/preferences`, {
+      method: 'POST',
+      body: JSON.stringify({
+        ...preferenceData,
+        partyId: partyId
+      }),
+    });
+  },
+
+  /**
+   * Update communication preferences (bulk update)
+   */
+  async updateCommunicationPreferences(partyId: string, preferences: {
+    preferredChannels?: {
+      email?: boolean;
+      sms?: boolean;
+      phone?: boolean;
+      push?: boolean;
+      mail?: boolean;
+    };
+    topicSubscriptions?: {
+      marketing?: boolean;
+      promotions?: boolean;
+      serviceUpdates?: boolean;
+      billing?: boolean;
+      security?: boolean;
+      newsletter?: boolean;
+      surveys?: boolean;
+    };
+    frequency?: 'immediate' | 'daily' | 'weekly' | 'monthly' | 'quarterly';
+    timezone?: string;
+    language?: string;
+    doNotDisturb?: {
+      enabled?: boolean;
+      start?: string;
+      end?: string;
+    };
+  }): Promise<ApiResponse<any>> {
+    console.log('Updating communication preferences for party:', partyId);
+    return apiRequest<any>(`/customer/preferences`, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'communication',
+        updates: {
+          preferredChannels: preferences.preferredChannels || {},
+          topicSubscriptions: preferences.topicSubscriptions || {},
+          frequency: preferences.frequency || 'immediate',
+          timezone: preferences.timezone || 'UTC',
+          language: preferences.language || 'en',
+          quietHours: preferences.doNotDisturb ? {
+            enabled: preferences.doNotDisturb.enabled || false,
+            start: preferences.doNotDisturb.start || '22:00',
+            end: preferences.doNotDisturb.end || '08:00'
+          } : {
+            enabled: false,
+            start: '22:00',
+            end: '08:00'
+          }
+        }
+      }),
+    });
+  },
+
+  /**
+   * Get customer preferences (includes communication and user preferences)
+   */
+  async getCustomerPreferences(): Promise<ApiResponse<any>> {
+    console.log('Fetching customer preferences from comprehensive backend with cache-busting');
+    // Add cache-busting timestamp to URL instead of problematic headers
+    const cacheBuster = Date.now();
+    return apiRequest<any>(`/customer/preferences?_t=${cacheBuster}`);
+  },
+
+  /**
+   * Get customer preference summary
+   */
+  async getCustomerPreferenceSummary(partyId: string): Promise<ApiResponse<any>> {
+    return apiRequest<any>(`/customer/preferences/summary?partyId=${partyId}`);
+  },
+
+  /**
+   * Get customer preferences by channel
+   */
+  async getCustomerPreferencesByChannel(partyId: string): Promise<ApiResponse<any>> {
+    return apiRequest<any>(`/customer/preferences/by-channel?partyId=${partyId}`);
+  }
+};
+
+export default preferenceService;

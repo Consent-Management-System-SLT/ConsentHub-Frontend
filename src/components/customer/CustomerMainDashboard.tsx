@@ -38,7 +38,7 @@ const CustomerMainDashboard: React.FC<CustomerMainDashboardProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-myslt-background flex flex-col lg:flex-row">
       {/* Sidebar */}
       <CustomerSidebar
         activeSection={activeSection}
@@ -48,16 +48,23 @@ const CustomerMainDashboard: React.FC<CustomerMainDashboardProps> = ({
       />
 
       {/* Main content area */}
-      <div className="flex-1 lg:ml-0 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
         <CustomerHeader customerName={customerName} onLogout={onLogout} onProfileClick={() => setShowProfile(true)} />
 
         {/* Page content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
-          <div className="max-w-7xl mx-auto">
-            {activeSection === 'dashboard' ? (
-              <CustomerDashboardOverview customerName={customerName} showProfile={showProfile} setShowProfile={setShowProfile} />
-            ) : renderContent()}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto">
+          <div className="p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 max-w-full">
+            <div className="max-w-7xl mx-auto">
+              {activeSection === 'dashboard' ? (
+                <CustomerDashboardOverview 
+                  customerName={customerName} 
+                  showProfile={showProfile} 
+                  setShowProfile={setShowProfile}
+                  onNavigate={setActiveSection}
+                />
+              ) : renderContent()}
+            </div>
           </div>
         </main>
       </div>

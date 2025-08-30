@@ -71,6 +71,9 @@ export interface DSARRequest {
   status: string;
   submittedAt: string;
   completedAt?: string;
+  approvedAt?: string;
+  rejectedAt?: string;
+  startedAt?: string;
   description: string;
   requestorName: string;
   requestorEmail: string;
@@ -79,6 +82,8 @@ export interface DSARRequest {
   category?: string;
   legalBasis?: string;
   notes?: string;
+  processingNotes?: string;
+  processedBy?: string;
 }
 
 export interface AuditEvent {
@@ -96,6 +101,106 @@ export interface AuditEvent {
   severity?: string;
 }
 
+export interface AnalyticsData {
+  overview: {
+    totalSent: number;
+    totalDelivered: number;
+    totalOpened: number;
+    totalClicked: number;
+    totalFailed: number;
+    deliveryRate: number;
+    openRate: number;
+    clickRate: number;
+  };
+  channels: {
+    [key: string]: {
+      sent: number;
+      delivered: number;
+      deliveryRate: number;
+      opened: number;
+      openRate: number;
+      clicked: number;
+      clickRate: number;
+    };
+  };
+  trends: Array<{
+    date: string;
+    sent: number;
+    delivered: number;
+    opened: number;
+    clicked: number;
+  }>;
+  topPerformers: {
+    templates: Array<{
+      id: string;
+      name: string;
+      performance: number;
+    }>;
+    campaigns: Array<{
+      id: string;
+      name: string;
+      performance: number;
+    }>;
+  };
+}
+
+export interface NotificationTemplate {
+  id: string;
+  name: string;
+  description: string;
+  type: 'promotional' | 'informational' | 'alert' | 'survey';
+  channels: string[];
+  subject: string;
+  content: string;
+  variables: string[];
+  tags: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
+  usage: {
+    timesUsed: number;
+    lastUsed?: string;
+    averagePerformance?: number;
+  };
+}
+
+export interface CampaignData {
+  id: string;
+  name: string;
+  description: string;
+  status: 'draft' | 'active' | 'paused' | 'completed';
+  startDate: string;
+  endDate?: string;
+  audienceSize: number;
+  performance: {
+    sent: number;
+    delivered: number;
+    opened: number;
+    clicked: number;
+  };
+  channels: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NotificationLog {
+  id: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  channel: string;
+  subject: string;
+  message: string;
+  messageType: string;
+  status: 'pending' | 'sent' | 'delivered' | 'failed';
+  sentAt: string;
+  deliveredAt?: string;
+  openedAt?: string;
+  clickedAt?: string;
+}
+
 class CSRDashboardService {
   private readonly baseUrl = '/api/v1';
   private readonly statsUrl = '/api/csr/stats';
@@ -106,12 +211,12 @@ class CSRDashboardService {
    */
   async getCSRStats(): Promise<CSRStats> {
     try {
-      console.log('🔍 Fetching CSR stats from backend...');
+      console.log('[CSR] Fetching CSR stats from backend...');
       const response = await apiClient.get(this.statsUrl);
-      console.log('✅ CSR stats loaded successfully:', response.data);
+      console.log('[CSR] CSR stats loaded successfully:', response.data);
       return response.data;
     } catch (error) {
-      console.warn('⚠️ Backend CSR stats unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend CSR stats unavailable, using fallback data:', error);
       this.useOfflineMode = true;
       return this.getFallbackStats();
     }
@@ -122,65 +227,135 @@ class CSRDashboardService {
    */
   async getCustomers(): Promise<CustomerData[]> {
     try {
-      if (this.useOfflineMode) {
-        return this.getFallbackCustomers();
-      }
-      
+      console.log('[CSR] Fetching customers from /api/v1/party...');
       const response = await apiClient.get(`${this.baseUrl}/party`);
+      console.log('[CSR] Customers loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
       return Array.isArray(response.data) ? response.data : this.getFallbackCustomers();
     } catch (error) {
-      console.warn('⚠️ Backend customers unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend customers unavailable, using fallback data:', error);
       return this.getFallbackCustomers();
     }
   }
 
   /**
-   * Get all consents with fallback data
+   * Get all consents with real data from backend
    */
   async getConsents(): Promise<ConsentData[]> {
     try {
-      if (this.useOfflineMode) {
-        return this.getFallbackConsents();
-      }
-      
-      const response = await apiClient.get(`${this.baseUrl}/consent`);
+      console.log('[CSR] Fetching consents from /api/v1/csr/consent...');
+      const response = await apiClient.get(`${this.baseUrl}/csr/consent`);
+      console.log('[CSR] Consents loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
       return Array.isArray(response.data) ? response.data : this.getFallbackConsents();
     } catch (error) {
-      console.warn('⚠️ Backend consents unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend consents unavailable, using fallback data:', error);
       return this.getFallbackConsents();
     }
   }
 
   /**
-   * Get all DSAR requests with fallback data
+   * Get all DSAR requests with real data from backend
    */
   async getDSARRequests(): Promise<DSARRequest[]> {
     try {
-      if (this.useOfflineMode) {
+      console.log('[CSR] Fetching DSAR requests from /api/dsar-requests...');
+      const response = await apiClient.get('/api/dsar-requests');
+      console.log('[CSR] DSAR requests loaded successfully:', response.data);
+      
+      // Handle response - it should be directly an array with enhanced data
+      if (Array.isArray(response.data)) {
+        return response.data.map((req: any) => this.normalizeDBDSARRequest(req));
+      } else {
+        console.warn('Unexpected DSAR response structure, using fallback');
         return this.getFallbackDSARRequests();
       }
-      
-      const response = await apiClient.get(`${this.baseUrl}/dsar`);
-      return Array.isArray(response.data) ? response.data : this.getFallbackDSARRequests();
     } catch (error) {
-      console.warn('⚠️ Backend DSAR requests unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend DSAR requests unavailable, using fallback data:', error);
       return this.getFallbackDSARRequests();
     }
   }
 
   /**
-   * Get audit events with fallback data
+   * Update DSAR request status with real backend API call
+   */
+  async updateDSARRequest(requestId: string, updates: Partial<DSARRequest>): Promise<DSARRequest> {
+    try {
+      console.log('[CSR] Updating DSAR request:', requestId, updates);
+      
+      // Prepare update payload - map our interface to backend format
+      const updatePayload: any = {};
+
+      if (updates.status) {
+        // Map status values if needed - ensure we use valid enum values
+        const statusMap: { [key: string]: string } = {
+          'approved': 'in_progress', // Map approved to in_progress
+          'rejected': 'rejected',
+          'in_progress': 'in_progress',
+          'completed': 'completed',
+          'pending': 'pending',
+          'cancelled': 'cancelled'
+        };
+        updatePayload.status = statusMap[updates.status] || updates.status;
+      }
+
+      // Add processing note if we have processingNotes
+      if (updates.processingNotes) {
+        updatePayload.processingNote = updates.processingNotes;
+      }
+
+      // Add processed by information as assignedTo
+      if (updates.processedBy) {
+        updatePayload.assignedTo = {
+          userId: 'csr-current',
+          name: updates.processedBy,
+          email: 'csr@sltmobitel.lk' // TODO: Get from current user context
+        };
+      }
+
+      // Use the correct authenticated endpoint
+      const response = await apiClient.put(`/api/v1/dsar/requests/${requestId}`, updatePayload);
+      console.log('[CSR] DSAR request updated successfully:', response);
+      
+      // Transform response back to our interface format
+      const responseData = response.data as any;
+      const dsarData = responseData.data || responseData;
+      
+      const updatedRequest: DSARRequest = {
+        id: dsarData._id || dsarData.id,
+        partyId: dsarData.requesterId,
+        customerId: dsarData.requesterId,
+        requestType: dsarData.requestType,
+        status: dsarData.status,
+        submittedAt: dsarData.submittedAt,
+        completedAt: dsarData.completedAt,
+        approvedAt: dsarData.status === 'in_progress' ? dsarData.updatedAt : undefined,
+        rejectedAt: dsarData.status === 'rejected' ? dsarData.updatedAt : undefined,
+        description: dsarData.description,
+        requestorName: dsarData.requesterName,
+        requestorEmail: dsarData.requesterEmail,
+        priority: dsarData.priority || 'medium',
+        assignedTo: dsarData.assignedTo?.name,
+        processingNotes: updates.processingNotes || '',
+        processedBy: updates.processedBy || ''
+      };
+      
+      return updatedRequest;
+    } catch (error) {
+      console.error('[CSR] Failed to update DSAR request:', error);
+      throw new Error(`Failed to update DSAR request: ${error}`);
+    }
+  }
+
+  /**
+   * Get audit events with real data from backend
    */
   async getAuditEvents(): Promise<AuditEvent[]> {
     try {
-      if (this.useOfflineMode) {
-        return this.getFallbackAuditEvents();
-      }
-      
+      console.log('[CSR] Fetching audit events from /api/v1/event...');
       const response = await apiClient.get(`${this.baseUrl}/event`);
+      console.log('[CSR] Audit events loaded successfully:', Array.isArray(response.data) ? response.data.length : 0);
       return Array.isArray(response.data) ? response.data : this.getFallbackAuditEvents();
     } catch (error) {
-      console.warn('⚠️ Backend audit events unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend audit events unavailable, using fallback data:', error);
       return this.getFallbackAuditEvents();
     }
   }
@@ -202,7 +377,7 @@ class CSRDashboardService {
       // Return all preferences
       return this.getFallbackCommunicationPreferences();
     } catch (error) {
-      console.warn('⚠️ Backend communication preferences unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend communication preferences unavailable, using fallback data:', error);
       return this.getFallbackCommunicationPreferences(customerId);
     }
   }
@@ -219,7 +394,7 @@ class CSRDashboardService {
       const response = await apiClient.get(`${this.baseUrl}/consent/guardian`);
       return Array.isArray(response.data) ? response.data : this.getFallbackGuardianConsentData();
     } catch (error) {
-      console.warn('⚠️ Backend guardian consent data unavailable, using fallback data:', error);
+      console.warn('[CSR] Backend guardian consent data unavailable, using fallback data:', error);
       return this.getFallbackGuardianConsentData();
     }
   }
@@ -242,6 +417,51 @@ class CSRDashboardService {
       customer.id.includes(term) ||
       (customer.address && customer.address.toLowerCase().includes(term))
     );
+  }
+
+  /**
+   * Search customers for preferences (used by Communication Preferences component)
+   */
+  async searchCustomersForPreferences(searchTerm: string): Promise<{customers: CustomerData[], total: number}> {
+    try {
+      const response = await apiClient.get(`/api/v1/csr/customers/search`, {
+        params: { query: searchTerm }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error searching customers for preferences:', error);
+      // Fallback to local search
+      const customers = await this.searchCustomers(searchTerm);
+      return { customers, total: customers.length };
+    }
+  }
+
+  /**
+   * Get customer communication preferences
+   */
+  async getCustomerPreferences(customerId: string): Promise<any> {
+    try {
+      const response = await apiClient.get(`/api/v1/csr/customers/${customerId}/preferences`);
+      return response.data.preferences;
+    } catch (error) {
+      console.error('Error fetching customer preferences:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update customer communication preferences (CSR action)
+   */
+  async updateCustomerPreferences(customerId: string, preferences: any): Promise<any> {
+    try {
+      const response = await apiClient.put(`/api/v1/csr/customers/${customerId}/preferences`, {
+        preferences
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating customer preferences:', error);
+      throw error;
+    }
   }
 
   /**
@@ -277,6 +497,33 @@ class CSRDashboardService {
         offlineMode: true
       };
     }
+  }
+
+  // =================== DATA NORMALIZATION METHODS ===================
+
+  private normalizeDBDSARRequest(req: any): DSARRequest {
+    return {
+      id: req.id || req._id || req.requestId,
+      partyId: req.requesterId || req.partyId || req.customerId,
+      customerId: req.requesterId || req.partyId || req.customerId,
+      requestType: req.type || req.requestType,
+      status: req.status,
+      submittedAt: req.submittedAt || req.createdAt,
+      completedAt: req.completedAt,
+      approvedAt: req.approvedAt,
+      rejectedAt: req.rejectedAt,
+      startedAt: req.startedAt,
+      description: req.description,
+      requestorName: req.requesterName || req.requestorName || `Customer ${req.requesterId || req.partyId}`,
+      requestorEmail: req.requesterEmail || req.requestorEmail || '',
+      priority: req.priority || 'medium',
+      assignedTo: req.assignedTo,
+      category: req.category,
+      legalBasis: req.legalBasis,
+      notes: req.notes,
+      processingNotes: req.processingNotes,
+      processedBy: req.processedBy
+    };
   }
 
   // =================== FALLBACK DATA METHODS ===================
@@ -694,7 +941,7 @@ class CSRDashboardService {
         requestType: "data_access",
         status: "pending",
         submittedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-        description: "Request to access all personal data collected and processed",
+        description: "I need to see what personal data you have about me for my mortgage application",
         requestorName: "John Doe",
         requestorEmail: "john.doe@email.com",
         priority: "medium",
@@ -707,16 +954,17 @@ class CSRDashboardService {
         partyId: "2",
         customerId: "2",
         requestType: "data_deletion",
-        status: "completed",
+        status: "approved",
         submittedAt: new Date(Date.now() - 86400000 * 15).toISOString(),
-        completedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        description: "Request to delete marketing profile data and analytics cookies",
+        approvedAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+        description: "I want to delete my marketing data as I'm no longer interested in promotional content",
         requestorName: "Jane Smith",
         requestorEmail: "jane.smith@email.com",
         priority: "high",
         assignedTo: "Sarah Wilson",
         category: "Right to Erasure",
-        legalBasis: "GDPR Article 17"
+        legalBasis: "GDPR Article 17",
+        processingNotes: "Approved by CSR Manager - Ready for processing"
       },
       {
         id: "3",
@@ -725,7 +973,7 @@ class CSRDashboardService {
         requestType: "data_portability",
         status: "pending",
         submittedAt: new Date(Date.now() - 86400000 * 28).toISOString(),
-        description: "Request to export complete account data for transfer",
+        description: "I'm switching banks and need all my account data in a portable format",
         requestorName: "Robert Johnson",
         requestorEmail: "robert.j@email.com",
         priority: "high",
@@ -741,7 +989,7 @@ class CSRDashboardService {
         requestType: "data_rectification",
         status: "in_progress",
         submittedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
-        description: "Request to update incorrect address and phone information",
+        description: "My address and phone number changed after my recent move, please update my records",
         requestorName: "Emily Davis",
         requestorEmail: "emily.davis@email.com",
         priority: "medium",
@@ -757,7 +1005,7 @@ class CSRDashboardService {
         status: "completed",
         submittedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
         completedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
-        description: "Request to withdraw consent for location tracking",
+        description: "I no longer want you to track my location for promotional purposes",
         requestorName: "Michael Chen",
         requestorEmail: "michael.chen@email.com",
         priority: "low",
@@ -772,7 +1020,7 @@ class CSRDashboardService {
         requestType: "data_access",
         status: "in_progress",
         submittedAt: new Date(Date.now() - 86400000 * 12).toISOString(),
-        description: "Request for complete personal data report including third-party data",
+        description: "I need a complete copy of my data including what you've shared with partners",
         requestorName: "Priya Perera",
         requestorEmail: "priya.perera@email.com",
         priority: "medium",
@@ -788,7 +1036,7 @@ class CSRDashboardService {
         requestType: "data_restriction",
         status: "pending",
         submittedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        description: "Request to restrict processing of biometric data pending review",
+        description: "Please stop processing my fingerprint data while I review your new privacy policy",
         requestorName: "David Wilson",
         requestorEmail: "david.wilson@email.com",
         priority: "high",
@@ -803,7 +1051,7 @@ class CSRDashboardService {
         requestType: "guardian_data_access",
         status: "pending",
         submittedAt: new Date(Date.now() - 86400000 * 8).toISOString(),
-        description: "Guardian request to access child's account data and consent history",
+        description: "As my daughter's guardian, I need to see what data you have on her account",
         requestorName: "Sarah Fernando",
         requestorEmail: "sarah.fernando@email.com",
         priority: "medium",
@@ -820,7 +1068,7 @@ class CSRDashboardService {
         status: "rejected",
         submittedAt: new Date(Date.now() - 86400000 * 20).toISOString(),
         completedAt: new Date(Date.now() - 86400000 * 18).toISOString(),
-        description: "Request to correct employment information - insufficient documentation",
+        description: "My employment status changed - please correct my job title and income bracket",
         requestorName: "John Doe",
         requestorEmail: "john.doe@email.com",
         priority: "low",
@@ -836,7 +1084,7 @@ class CSRDashboardService {
         requestType: "objection_processing",
         status: "in_progress",
         submittedAt: new Date(Date.now() - 86400000 * 6).toISOString(),
-        description: "Objection to direct marketing processing based on legitimate interests",
+        description: "I object to receiving marketing calls and emails - please stop all promotional outreach",
         requestorName: "Robert Johnson",
         requestorEmail: "robert.j@email.com",
         priority: "medium",
@@ -1346,6 +1594,230 @@ class CSRDashboardService {
         ]
       }
     ];
+  }
+
+  /**
+   * Update customer consent status
+   */
+  async updateConsentStatus(consentId: string, status: 'granted' | 'denied' | 'withdrawn', notes?: string): Promise<ConsentData> {
+    try {
+      console.log(`[CSR] Updating consent ${consentId} to status: ${status}`);
+      
+      const updateData = {
+        status,
+        notes: notes || `Updated by CSR agent on ${new Date().toLocaleDateString()}`,
+        updatedAt: new Date().toISOString(),
+        updatedBy: 'csr-agent' // You can get this from auth context
+      };
+
+      const response = await apiClient.put(`${this.baseUrl}/consent/${consentId}`, updateData);
+      console.log('[CSR] Consent updated successfully:', response.data);
+      
+      return response.data as ConsentData;
+    } catch (error) {
+      console.warn('[CSR] Backend consent update unavailable, simulating update:', error);
+      
+      // Simulate successful update for demo purposes
+      return {
+        id: consentId,
+        partyId: '',
+        customerId: '',
+        type: '',
+        purpose: '',
+        status,
+        grantedAt: status === 'granted' ? new Date().toISOString() : undefined,
+        deniedAt: status === 'denied' ? new Date().toISOString() : undefined,
+        source: 'csr-update',
+        lawfulBasis: 'consent',
+        category: 'updated'
+      };
+    }
+  }
+
+  /**
+   * Get customer-specific consents
+   */
+  async getCustomerConsents(customerId: string): Promise<ConsentData[]> {
+    try {
+      console.log(`[CSR] Fetching consents for customer: ${customerId}`);
+      const response = await apiClient.get(`${this.baseUrl}/consent/customer/${customerId}`);
+      console.log('[CSR] Customer consents loaded:', Array.isArray(response.data) ? response.data.length : 0);
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error) {
+      console.warn(`[CSR] Backend customer consents unavailable for ${customerId}, using filtered fallback:`, error);
+      
+      // Filter fallback consents for the specific customer
+      const allConsents = this.getFallbackConsents();
+      return allConsents.filter(consent => 
+        consent.customerId === customerId || consent.partyId === customerId
+      );
+    }
+  }
+
+  // Notification methods
+  async getNotificationAnalytics(): Promise<{ data: AnalyticsData }> {
+    try {
+      console.log('[CSR] Fetching notification analytics...');
+      const response = await apiClient.get('/api/csr/notifications/analytics');
+      console.log('[CSR] Notification analytics loaded successfully:', response.data);
+      return { data: response.data.data || response.data as AnalyticsData };
+    } catch (error) {
+      console.warn('[CSR] Backend notification analytics unavailable, using fallback:', error);
+      
+      // Return fallback analytics data
+      return {
+        data: {
+          overview: {
+            totalSent: 0,
+            totalDelivered: 0,
+            totalOpened: 0,
+            totalClicked: 0,
+            totalFailed: 0,
+            deliveryRate: 0,
+            openRate: 0,
+            clickRate: 0
+          },
+          channels: {},
+          trends: [],
+          topPerformers: {
+            templates: [],
+            campaigns: []
+          }
+        }
+      };
+    }
+  }
+
+  async sendNotifications(data: {
+    customerIds: string[];
+    channels: string[];
+    subject: string;
+    message: string;
+    messageType: string;
+  }): Promise<any> {
+    try {
+      console.log('[CSR] Sending notifications...', data);
+      const response = await apiClient.post('/api/csr/notifications/send', data);
+      console.log('[CSR] Notifications sent successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('[CSR] Failed to send notifications:', error);
+      throw error;
+    }
+  }
+
+  async getNotificationCustomers(): Promise<{ data: any[] }> {
+    try {
+      console.log('[CSR] Fetching customers for notifications...');
+      const response = await apiClient.get('/api/csr/customers');
+      const responseData = response.data as any;
+      console.log('[CSR] Customers loaded successfully for notifications:', responseData?.data?.length || 0);
+      return { data: responseData?.data || [] };
+    } catch (error) {
+      console.warn('[CSR] Backend customers unavailable for notifications, using fallback:', error);
+      
+      // Try to get customers from the existing getCustomers method as fallback
+      try {
+        const customers = await this.getCustomers();
+        return {
+          data: customers.map((customer: any) => ({
+            id: customer.id,
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone || customer.mobile,
+            organization: customer.company,
+            createdAt: customer.createdAt
+          }))
+        };
+      } catch (fallbackError) {
+        console.error('[CSR] Fallback customer fetch failed:', fallbackError);
+        return { data: [] };
+      }
+    }
+  }
+
+  // Get pre-built notification templates
+  async getNotificationTemplates() {
+    console.log('[CSR] Fetching notification templates...');
+    
+    try {
+      const response = await apiClient.get('/api/csr/notifications/templates');
+      console.log('[CSR] Templates loaded successfully:', response.data.count);
+      return response.data;
+    } catch (error) {
+      console.error('[CSR] Failed to fetch templates:', error);
+      
+      // Fallback with local templates
+      return {
+        data: [
+          {
+            id: 'welcome',
+            name: 'Welcome Message',
+            subject: 'Welcome to SLT Mobitel Services',
+            message: 'Welcome to SLT Mobitel! We are excited to have you as our valued customer.',
+            type: 'promotional',
+            channels: ['email', 'sms']
+          },
+          {
+            id: 'payment_reminder',
+            name: 'Payment Reminder',
+            subject: 'Payment Reminder - Your Bill is Due',
+            message: 'This is a friendly reminder that your monthly bill is due.',
+            type: 'reminder',
+            channels: ['email', 'sms', 'push']
+          }
+        ]
+      };
+    }
+  }
+
+  // Send bulk notifications to all customers
+  async sendBulkNotifications(data: {
+    channels: string[];
+    subject: string;
+    message: string;
+    messageType: string;
+  }) {
+    console.log('[CSR] Sending bulk notifications...', data);
+    
+    try {
+      const response = await apiClient.post('/api/csr/notifications/send/bulk', data);
+      console.log('[CSR] Bulk notifications sent successfully:', response.data.summary);
+      return response.data;
+    } catch (error: any) {
+      console.error('[CSR] Failed to send bulk notifications:', error.response?.data || error.message);
+      throw {
+        message: 'An error occurred',
+        status: error.response?.status || 500,
+        details: error.response?.data || error.message
+      };
+    }
+  }
+
+  // Send welcome email to customer
+  async sendWelcomeEmail(data: {
+    email: string;
+    customerName?: string;
+    createdBy?: 'admin' | 'self';
+  }) {
+    console.log('[CSR] Sending welcome email...', data);
+    
+    try {
+      const response = await apiClient.post('/api/csr/notifications/welcome', {
+        email: data.email,
+        customerName: data.customerName,
+        createdBy: data.createdBy || 'admin'
+      });
+      console.log('[CSR] Welcome email sent successfully:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('[CSR] Failed to send welcome email:', error.response?.data || error.message);
+      throw {
+        message: error.response?.data?.error || 'Failed to send welcome email',
+        status: error.response?.status || 500,
+        details: error.response?.data || error.message
+      };
+    }
   }
 }
 

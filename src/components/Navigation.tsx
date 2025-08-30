@@ -32,7 +32,7 @@ export const Navigation: React.FC<NavigationProps> = ({
         { id: 'notices', label: 'Privacy Notices', icon: FileText }
   ];
 
-  // ✅ Automatically select default tab "consents"
+  // Automatically select default tab "consents"
   useEffect(() => {
     if (!activeTab) {
       onTabChange('consents');
@@ -47,26 +47,27 @@ export const Navigation: React.FC<NavigationProps> = ({
   return (
     <div className="bg-white shadow-sm border-b border-gray-200">
       {/* Header Row */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
         {/* Logo and Title */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           <img
-            src="/SLTMobitel_Logo.svg.png"
+            src="/Logo-SLT.png"
             alt="Logo"
-            className="h-10 w-auto"
+            className="h-8 sm:h-10 w-auto"
           />
-          <h1 className="text-2xl font-bold text-gray-900">
-            Consent Management Hub - CSR Dashboard
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+            <span className="hidden md:inline">Consent Management Hub - CSR Dashboard</span>
+            <span className="md:hidden">CSR Dashboard</span>
           </h1>
         </div>
 
         {/* Logout Button */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           <button
             onClick={handleLogout}
-            className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
+            className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Logout</span>
           </button>
         </div>
@@ -74,21 +75,24 @@ export const Navigation: React.FC<NavigationProps> = ({
 
       {/* Navigation Tabs */}
       <div className="border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex space-x-1 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-1.5 sm:py-2 flex space-x-0.5 sm:space-x-1 overflow-x-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
               <button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                   activeTab === item.id
                     ? 'bg-blue-100 text-blue-700'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
-                <Icon className="h-4 w-4" />
-                <span>{item.label}</span>
+                <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline lg:inline">{item.label}</span>
+                <span className="sm:hidden">
+                  {item.label.split(' ')[0]}
+                </span>
               </button>
             );
           })}

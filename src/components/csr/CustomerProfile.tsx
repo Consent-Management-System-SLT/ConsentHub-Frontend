@@ -175,7 +175,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
         <div className="flex items-center space-x-4">
           <button
             onClick={onBack}
-            className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+            className="flex items-center px-4 py-2 text-myslt-text-secondary hover:text-myslt-text-primary transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Search
@@ -218,8 +218,8 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
         {/* Customer Information */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Customer Information</h2>
+          <div className="bg-myslt-card-solid rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-myslt-text-primary mb-6">Customer Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
@@ -231,7 +231,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 ) : (
-                  <p className="flex items-center text-gray-900">
+                  <p className="flex items-center text-myslt-text-primary">
                     <User className="w-4 h-4 mr-2 text-gray-500" />
                     {customerData.name}
                   </p>
@@ -247,7 +247,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 ) : (
-                  <p className="flex items-center text-gray-900">
+                  <p className="flex items-center text-myslt-text-primary">
                     <Mail className="w-4 h-4 mr-2 text-gray-500" />
                     {customerData.email}
                   </p>
@@ -263,7 +263,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 ) : (
-                  <p className="flex items-center text-gray-900">
+                  <p className="flex items-center text-myslt-text-primary">
                     <Phone className="w-4 h-4 mr-2 text-gray-500" />
                     {customerData.phone}
                   </p>
@@ -279,7 +279,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 ) : (
-                  <p className="flex items-center text-gray-900">
+                  <p className="flex items-center text-myslt-text-primary">
                     <MapPin className="w-4 h-4 mr-2 text-gray-500" />
                     {customerData.address || 'Not provided'}
                   </p>
@@ -287,7 +287,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Customer Since</label>
-                <p className="flex items-center text-gray-900">
+                <p className="flex items-center text-myslt-text-primary">
                   <Calendar className="w-4 h-4 mr-2 text-gray-500" />
                   {new Date(customerData.createdAt).toLocaleDateString()}
                 </p>
@@ -296,8 +296,8 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
           </div>
 
           {/* Statistics */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Account Overview</h2>
+          <div className="bg-myslt-card-solid rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-myslt-text-primary mb-6">Account Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <Shield className="w-8 h-8 text-green-600 mx-auto mb-2" />
@@ -318,15 +318,15 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
           </div>
 
           {/* Recent Activities */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Recent Activities</h2>
+          <div className="bg-myslt-card-solid rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold text-myslt-text-primary mb-6">Recent Activities</h2>
             {recentActivities.length > 0 ? (
               <div className="space-y-4">
                 {recentActivities.map((activity, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-start space-x-3 p-4 bg-myslt-service-card rounded-lg">
                     <Activity className="w-5 h-5 text-gray-500 mt-1" />
                     <div className="flex-1">
-                      <p className="text-sm text-gray-900">{activity.description}</p>
+                      <p className="text-sm text-myslt-text-primary">{activity.description}</p>
                       <p className="text-xs text-gray-500 mt-1">{getRelativeTime(activity.createdAt)}</p>
                     </div>
                   </div>
@@ -341,8 +341,8 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
         {/* Quick Actions Sidebar */}
         <div className="space-y-6">
           {/* Quick Actions */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <div className="bg-myslt-card-solid rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Quick Actions</h3>
             <div className="space-y-3">
               <button
                 onClick={() => onSectionChange('consent-history')}
@@ -376,11 +376,11 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
               </button>
               <button
                 onClick={() => onSectionChange('audit-logs')}
-                className="w-full flex items-center px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                className="w-full flex items-center px-4 py-3 text-left bg-myslt-service-card hover:bg-myslt-card-solid rounded-lg transition-colors"
               >
-                <Activity className="w-5 h-5 text-gray-600 mr-3" />
+                <Activity className="w-5 h-5 text-myslt-text-secondary mr-3" />
                 <div>
-                  <p className="font-medium text-gray-900">View Audit Trail</p>
+                  <p className="font-medium text-myslt-text-primary">View Audit Trail</p>
                   <p className="text-sm text-gray-700">Complete history</p>
                 </div>
               </button>
@@ -388,8 +388,8 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
           </div>
 
           {/* Status Alerts */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Status Alerts</h3>
+          <div className="bg-myslt-card-solid rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Status Alerts</h3>
             <div className="space-y-3">
               {dsarStatus.pending > 0 && (
                 <div className="flex items-center p-3 bg-yellow-50 rounded-lg">

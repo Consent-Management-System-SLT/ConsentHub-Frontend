@@ -24,8 +24,8 @@ export const customerApi = axios.create({
   baseURL: SERVICES.CUSTOMER,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer customer-demo-token-123'
+    'Content-Type': 'application/json'
+    // Authorization will be added dynamically in makeRequest
   }
 });
 
