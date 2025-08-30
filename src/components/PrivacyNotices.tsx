@@ -23,6 +23,7 @@ import {
   PrivacyNoticeUpdateRequest,
   PrivacyNoticeQuery
 } from '../services/privacyNoticeService';
+import { io, Socket } from 'socket.io-client';
 
 // Form component for creating/editing privacy notices
 const PrivacyNoticeForm: React.FC<{
@@ -361,7 +362,7 @@ export const PrivacyNotices: React.FC = () => {
   const [viewingNotice, setViewingNotice] = useState<PrivacyNotice | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<PrivacyNoticeQuery>({
-    status: '',
+    status: 'active', // Default to showing only active notices (archived ones are hidden)
     category: '',
     language: '',
     limit: 20,
@@ -377,6 +378,49 @@ export const PrivacyNotices: React.FC = () => {
   useEffect(() => {
     loadNotices();
   }, [filters]);
+
+  // Real-time updates via Socket.IO
+  useEffect(() => {
+    let socket: Socket | null = null;
+
+    try {
+      // Connect to Socket.IO server
+      socket = io('http://localhost:3001');
+
+      console.log('🔌 Admin Privacy Notices: Connected to real-time updates');
+
+      // Listen for privacy notice updates
+      socket.on('privacy-notice-updated', (data) => {
+        console.log('📡 Admin received real-time update:', data);
+
+        if (data.action === 'deleted' || data.action === 'updated' || data.action === 'created') {
+          // Reload notices to get the latest data
+          console.log('🔄 Refreshing admin privacy notices due to real-time update');
+          loadNotices();
+        }
+      });
+
+      // Handle connection events
+      socket.on('connect', () => {
+        console.log('✅ Admin dashboard connected to real-time updates');
+      });
+
+      socket.on('disconnect', () => {
+        console.log('❌ Admin dashboard disconnected from real-time updates');
+      });
+
+    } catch (error) {
+      console.error('❌ Admin failed to connect to real-time updates:', error);
+    }
+
+    // Cleanup on component unmount
+    return () => {
+      if (socket) {
+        socket.disconnect();
+        console.log('🔌 Admin Privacy Notices: Disconnected from real-time updates');
+      }
+    };
+  }, []);
 
   const loadNotices = async () => {
     try {
@@ -415,9 +459,9 @@ export const PrivacyNotices: React.FC = () => {
       const response = await privacyNoticeService.createPrivacyNotice(noticeData);
       
       if (response.data) {
-        setNotices(prev => [response.data!.notice, ...prev]);
         setShowForm(false);
-        setStats(prev => ({ ...prev, total: prev.total + 1, draft: prev.draft + 1 }));
+        // Don't manually update state - let Socket.IO real-time updates handle it
+        console.log('✅ Privacy notice created successfully:', response.data.notice.title);
       }
     } catch (err) {
       console.error('Error creating notice:', err);
@@ -435,11 +479,10 @@ export const PrivacyNotices: React.FC = () => {
       const response = await privacyNoticeService.updatePrivacyNotice(editingNotice.id, noticeData);
       
       if (response.data) {
-        setNotices(prev => prev.map(n => 
-          n.id === editingNotice.id ? response.data!.notice : n
-        ));
         setShowForm(false);
         setEditingNotice(null);
+        // Don't manually update state - let Socket.IO real-time updates handle it
+        console.log('✅ Privacy notice updated successfully:', response.data.notice.title);
       }
     } catch (err) {
       console.error('Error updating notice:', err);
@@ -453,14 +496,22 @@ export const PrivacyNotices: React.FC = () => {
     if (!confirm('Are you sure you want to delete this privacy notice?')) return;
 
     try {
+      console.log('🗑️ Attempting to delete privacy notice with ID:', id);
       const response = await privacyNoticeService.deletePrivacyNotice(id);
+      console.log('✅ Delete response:', response);
       
       if (response.data) {
-        setNotices(prev => prev.filter(n => n.id !== id));
-        setStats(prev => ({ ...prev, total: prev.total - 1 }));
+        console.log('🔄 Delete successful - letting real-time update handle the refresh');
+        
+        // Don't manually update state here - let the real-time update handle it
+        // The real-time Socket.IO event will trigger loadNotices() automatically
+        
+        // Show success message
+        alert('Privacy notice archived successfully!');
       }
     } catch (err) {
-      console.error('Error deleting notice:', err);
+      console.error('❌ Error deleting notice:', err);
+      console.error('❌ Full error details:', err);
       alert('Failed to delete notice: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };
@@ -585,10 +636,16 @@ export const PrivacyNotices: React.FC = () => {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-myslt-text-primary flex items-center">
-            <FileText className="h-5 w-5 mr-2 text-myslt-primary" />
-            Privacy Notices Management
-          </h2>
+          <div>
+            <h2 className="text-lg font-semibold text-myslt-text-primary flex items-center">
+              <FileText className="h-5 w-5 mr-2 text-myslt-primary" />
+              Privacy Notices Management
+            </h2>
+            <p className="text-sm text-myslt-text-secondary mt-1">
+              Showing <span className="font-medium">{filters.status === 'active' ? 'Active' : filters.status === 'archived' ? 'Archived (Deleted)' : filters.status || 'All'}</span> notices. 
+              {filters.status === 'active' && <span className="text-myslt-text-muted"> Deleted notices are archived and hidden.</span>}
+            </p>
+          </div>
           <div className="flex space-x-2">
             <button
               onClick={() => setShowForm(true)}
@@ -654,12 +711,13 @@ export const PrivacyNotices: React.FC = () => {
             value={filters.status || ''}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            title="Filter notices by status. Deleted notices are archived and hidden by default."
           >
             <option value="">All Statuses</option>
-            <option value="active">Active</option>
+            <option value="active">Active (Default)</option>
             <option value="draft">Draft</option>
             <option value="inactive">Inactive</option>
-            <option value="archived">Archived</option>
+            <option value="archived">Archived (Deleted)</option>
           </select>
 
           <select

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { apiClient } from '../../services/apiClient';
+import { io, Socket } from 'socket.io-client';
 
 interface PrivacyNotice {
   id: string;
@@ -199,6 +200,49 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
   // Load notices on component mount
   useEffect(() => {
     loadPrivacyNotices();
+  }, []);
+
+  // Real-time updates via Socket.IO
+  useEffect(() => {
+    let socket: Socket | null = null;
+
+    try {
+      // Connect to Socket.IO server
+      socket = io('http://localhost:3001');
+
+      console.log('🔌 Customer Privacy Notices: Connected to real-time updates');
+
+      // Listen for privacy notice updates
+      socket.on('privacy-notice-updated', (data) => {
+        console.log('📡 Real-time update received:', data);
+
+        if (data.action === 'deleted' || data.action === 'updated' || data.action === 'created') {
+          // Reload notices to get the latest data
+          console.log('🔄 Refreshing privacy notices due to real-time update');
+          loadPrivacyNotices();
+        }
+      });
+
+      // Handle connection events
+      socket.on('connect', () => {
+        console.log('✅ Customer dashboard connected to real-time updates');
+      });
+
+      socket.on('disconnect', () => {
+        console.log('❌ Customer dashboard disconnected from real-time updates');
+      });
+
+    } catch (error) {
+      console.error('❌ Failed to connect to real-time updates:', error);
+    }
+
+    // Cleanup on component unmount
+    return () => {
+      if (socket) {
+        socket.disconnect();
+        console.log('🔌 Customer Privacy Notices: Disconnected from real-time updates');
+      }
+    };
   }, []);
 
   // Get status icon and color

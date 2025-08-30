@@ -182,7 +182,17 @@ class PrivacyNoticeService {
    * Delete (archive) privacy notice
    */
   async deletePrivacyNotice(id: string): Promise<ApiResponse<{ message: string }>> {
-    return apiClient.delete<{ message: string }>(`${this.basePath}/${id}`);
+    console.log(`🗑️ PrivacyNoticeService: Deleting notice with ID: ${id}`);
+    console.log(`🌐 DELETE request to: ${this.basePath}/${id}`);
+    
+    try {
+      const response = await apiClient.delete<{ message: string }>(`${this.basePath}/${id}`);
+      console.log('✅ Delete response received:', response);
+      return response;
+    } catch (error) {
+      console.error('❌ Delete request failed:', error);
+      throw error;
+    }
   }
 
   /**
