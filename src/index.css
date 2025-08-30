@@ -58,12 +58,13 @@
   }
   
   .myslt-card-hover {
-    @apply myslt-card hover:shadow-xl transition-all duration-200;
+    @apply bg-myslt-card rounded-xl shadow-lg border border-myslt-accent/20 hover:shadow-xl transition-all duration-200;
   }
 
   /* Button Components */
   .myslt-btn-primary {
-    @apply bg-success-gradient text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-myslt-success/50;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(22, 163, 74, 0.9) 100%);
+    @apply text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500/50;
   }
   
   .myslt-btn-secondary {
@@ -131,11 +132,11 @@
 
   /* Gradient Backgrounds */
   .myslt-gradient-bg {
-    @apply bg-myslt-gradient;
+    background: linear-gradient(135deg, rgba(30, 144, 255, 0.9) 0%, rgba(37, 99, 235, 0.9) 100%);
   }
   
   .myslt-success-bg {
-    @apply bg-success-gradient;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(22, 163, 74, 0.9) 100%);
   }
 
   /* Input Components */
