@@ -2,7 +2,6 @@ import React from 'react';
 import { 
   BarChart3, 
   Shield, 
-  Settings, 
   FileText, 
   Database, 
   Activity, 
@@ -14,8 +13,8 @@ import {
   X,
   ChevronRight,
   UserCheck,
-  MessageSquare,
-  Zap
+  Zap,
+  Cog
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -35,8 +34,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, description: 'Overview and analytics' },
     { id: 'consents', label: 'Consents', icon: Shield, description: 'Manage all customer consents' },
     { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Manage guardian consent for minors' },
-    { id: 'preferences', label: 'Preferences', icon: Settings, description: 'View customer preferences' },
-    { id: 'topic-preferences', label: 'Topic Preferences', icon: MessageSquare, description: 'Manage topic-based communications' },
+    { id: 'preference-management', label: 'Preference Management', icon: Cog, description: 'Configure communication channels & topic preferences' },
     { id: 'privacy-notices', label: 'Privacy Notices', icon: FileText, description: 'Manage privacy policies' },
     { id: 'dsar-requests', label: 'DSAR Requests', icon: Database, description: 'Data subject access requests' },
     { id: 'dsar-automation', label: 'DSAR Automation', icon: Zap, description: 'Automated DSAR processing' },

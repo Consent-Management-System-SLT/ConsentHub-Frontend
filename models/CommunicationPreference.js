@@ -14,55 +14,25 @@ const communicationPreferenceSchema = new mongoose.Schema({
     ref: 'Party'
   },
   preferredChannels: {
-    email: {
-      type: Boolean,
-      default: true
-    },
-    sms: {
-      type: Boolean,
-      default: false
-    },
-    phone: {
-      type: Boolean,
-      default: false
-    },
-    push: {
-      type: Boolean,
-      default: true
-    },
-    mail: {
-      type: Boolean,
-      default: false
+    type: mongoose.Schema.Types.Mixed,
+    default: {
+      email: true,
+      sms: false,
+      phone: false,
+      push: true,
+      mail: false
     }
   },
   topicSubscriptions: {
-    marketing: {
-      type: Boolean,
-      default: false
-    },
-    promotions: {
-      type: Boolean,
-      default: false
-    },
-    serviceUpdates: {
-      type: Boolean,
-      default: true
-    },
-    billing: {
-      type: Boolean,
-      default: true
-    },
-    security: {
-      type: Boolean,
-      default: true
-    },
-    newsletter: {
-      type: Boolean,
-      default: false
-    },
-    surveys: {
-      type: Boolean,
-      default: false
+    type: mongoose.Schema.Types.Mixed,
+    default: {
+      marketing: false,
+      promotions: false,
+      serviceUpdates: true,
+      billing: true,
+      security: true,
+      newsletter: false,
+      surveys: false
     }
   },
   quietHours: {

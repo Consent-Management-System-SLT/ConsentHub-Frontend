@@ -19,6 +19,26 @@ import {
 import { csrDashboardService } from '../../services/csrDashboardService';
 import { websocketService, PreferenceUpdateEvent } from '../../services/websocketService';
 
+interface PreferenceConfig {
+  communicationChannels: Array<{
+    key: string;
+    name: string;
+    description: string;
+    icon: string;
+    enabled: boolean;
+    isDefault: boolean;
+  }>;
+  topicSubscriptions: Array<{
+    key: string;
+    name: string;
+    description: string;
+    category: string;
+    enabled: boolean;
+    isDefault: boolean;
+    priority: string;
+  }>;
+}
+
 interface PreferenceEditorFormProps {
   className?: string;
   customerId?: string;
@@ -27,26 +47,11 @@ interface PreferenceEditorFormProps {
 const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className = '', customerId }) => {
   const [selectedCustomer, setSelectedCustomer] = useState<string>(customerId || '');
   const [customers, setCustomers] = useState<any[]>([]);
+  const [preferenceConfig, setPreferenceConfig] = useState<PreferenceConfig | null>(null);
   const [preferences, setPreferences] = useState<any>({
-    // Communication Channels
-    channels: {
-      email: true,
-      sms: true,
-      push: false,
-      inApp: true,
-      phone: false
-    },
-    // Topic Subscriptions  
-    topics: {
-      offers: true,
-      productUpdates: true,
-      serviceAlerts: true,
-      billing: true,
-      security: true,
-      newsletters: false,
-      marketing: false,
-      promotions: false
-    },
+    // Initialize with empty dynamic preferences - will be populated from config
+    channels: {},
+    topics: {},
     // Do Not Disturb Settings
     dndSettings: {
       enabled: true,
@@ -72,17 +77,18 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
   const [hasChanges, setHasChanges] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  // Load customers
+  // Load customers and preference configuration on component mount
   useEffect(() => {
     loadCustomers();
+    loadPreferenceConfig();
   }, []);
 
   // Load preferences when customer is selected
   useEffect(() => {
-    if (selectedCustomer) {
+    if (selectedCustomer && preferenceConfig) {
       loadPreferences();
     }
-  }, [selectedCustomer]);
+  }, [selectedCustomer, preferenceConfig]);
 
   // Set up real-time preference update listener
   useEffect(() => {
@@ -110,6 +116,48 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
     };
   }, [selectedCustomer]); // Re-setup when selected customer changes
 
+  const loadPreferenceConfig = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/v1/customer/preference-config');
+      const data = await response.json();
+      if (data.success) {
+        setPreferenceConfig(data.config);
+        console.log('📋 CSR Dashboard - Dynamic config loaded:', data.config);
+        console.log('📺 Available Channels:', data.config.communicationChannels?.length || 0);
+        console.log('📰 Available Topics:', data.config.topicSubscriptions?.length || 0);
+        
+        // Initialize default preferences based on config
+        initializeDefaultPreferences(data.config);
+      }
+    } catch (error) {
+      console.error('Failed to load preference configuration in CSR dashboard:', error);
+    }
+  };
+
+  // Initialize default preferences based on config
+  const initializeDefaultPreferences = (config: PreferenceConfig) => {
+    setPreferences((prev: any) => {
+      const defaultChannels: { [key: string]: boolean } = {};
+      const defaultTopics: { [key: string]: boolean } = {};
+      
+      // Set default channel preferences (use isDefault from config)
+      config.communicationChannels?.forEach(channel => {
+        defaultChannels[channel.key] = channel.isDefault || false;
+      });
+      
+      // Set default topic preferences (use isDefault from config)
+      config.topicSubscriptions?.forEach(topic => {
+        defaultTopics[topic.key] = topic.isDefault || false;
+      });
+      
+      return {
+        ...prev,
+        channels: defaultChannels,
+        topics: defaultTopics
+      };
+    });
+  };
+
   const loadCustomers = async () => {
     try {
       const customers = await csrDashboardService.getCustomers();
@@ -122,7 +170,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
   };
 
   const loadPreferences = async () => {
-    if (!selectedCustomer) return;
+    if (!selectedCustomer || !preferenceConfig) return;
     
     setLoading(true);
     try {
@@ -130,34 +178,28 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       const customerPrefs = await csrDashboardService.getCustomerPreferences(selectedCustomer);
       
       if (customerPrefs) {
+        console.log('📋 CSR Dashboard - Raw customer preferences:', customerPrefs);
+        
+        // Map channels using dynamic configuration
+        const channelMappings: { [key: string]: boolean } = {};
+        preferenceConfig.communicationChannels.forEach(channel => {
+          channelMappings[channel.key] = customerPrefs.preferredChannels?.[channel.key] || false;
+        });
+        
+        // Map topics using dynamic configuration
+        const topicMappings: { [key: string]: boolean } = {};
+        preferenceConfig.topicSubscriptions.forEach(topic => {
+          topicMappings[topic.key] = customerPrefs.topicSubscriptions?.[topic.key] || false;
+        });
+        
         // Map the actual customer data to the form structure
         setPreferences({
-          channels: {
-            email: customerPrefs.preferredChannels?.email ?? false,
-            sms: customerPrefs.preferredChannels?.sms ?? false,
-            push: customerPrefs.preferredChannels?.push ?? false,
-            inApp: customerPrefs.preferredChannels?.push ?? false, // Map push to inApp for UI consistency
-            phone: customerPrefs.preferredChannels?.phone ?? false
-          },
-          topics: {
-            offers: customerPrefs.topicSubscriptions?.marketing ?? false, // Map marketing to offers
-            productUpdates: customerPrefs.topicSubscriptions?.serviceUpdates ?? false,
-            serviceAlerts: customerPrefs.topicSubscriptions?.security ?? false, // Map security to serviceAlerts  
-            billing: customerPrefs.topicSubscriptions?.billing ?? false,
-            security: customerPrefs.topicSubscriptions?.security ?? false,
-            newsletters: customerPrefs.topicSubscriptions?.newsletter ?? false,
-            marketing: customerPrefs.topicSubscriptions?.marketing ?? false,
-            promotions: customerPrefs.topicSubscriptions?.promotions ?? false
-          },
+          channels: channelMappings,
+          topics: topicMappings,
           dndSettings: {
-            enabled: customerPrefs.quietHours?.enabled ?? customerPrefs.doNotDisturb?.enabled ?? false,
-            startTime: customerPrefs.quietHours?.start ?? customerPrefs.doNotDisturb?.start ?? '22:00',
-            endTime: customerPrefs.quietHours?.end ?? customerPrefs.doNotDisturb?.end ?? '08:00'
-          },
-          dndSettings: {
-            enabled: customerPrefs.doNotDisturb?.enabled ?? false,
-            startTime: customerPrefs.doNotDisturb?.startTime ?? '22:00',
-            endTime: customerPrefs.doNotDisturb?.endTime ?? '08:00'
+            enabled: customerPrefs.doNotDisturb?.enabled ?? customerPrefs.quietHours?.enabled ?? false,
+            startTime: customerPrefs.doNotDisturb?.start ?? customerPrefs.quietHours?.start ?? '22:00',
+            endTime: customerPrefs.doNotDisturb?.end ?? customerPrefs.quietHours?.end ?? '08:00'
           },
           frequency: {
             maxEmailsPerDay: customerPrefs.frequency?.maxEmailsPerDay ?? 3,
@@ -171,9 +213,14 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
           updatedBy: customerPrefs.updatedBy
         });
         
-        console.log('Loaded actual customer preferences:', customerPrefs);
+        console.log('✅ CSR Dashboard - Mapped customer preferences:', {
+          channels: channelMappings,
+          topics: topicMappings
+        });
       } else {
-        console.log('No preferences found for customer, using defaults');
+        console.log('No preferences found for customer, using config defaults');
+        // Use defaults from config if no customer preferences exist
+        initializeDefaultPreferences(preferenceConfig);
       }
     } catch (error) {
       console.error('Error loading customer preferences:', error);
@@ -229,47 +276,47 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
   };
 
   const handleSave = async () => {
-    if (!preferences || !selectedCustomer) return;
+    if (!preferences || !selectedCustomer || !preferenceConfig) return;
     
     setSaving(true);
     setSaveStatus('idle');
     try {
-      // Map frontend preferences to backend structure (FIX: Use correct field names that backend expects)
+      // Build dynamic channel preferences based on admin configuration
+      const dynamicChannels: { [key: string]: boolean } = {};
+      preferenceConfig.communicationChannels.forEach(channel => {
+        dynamicChannels[channel.key] = preferences.channels[channel.key] || false;
+      });
+      
+      // Build dynamic topic preferences based on admin configuration  
+      const dynamicTopics: { [key: string]: boolean } = {};
+      preferenceConfig.topicSubscriptions.forEach(topic => {
+        dynamicTopics[topic.key] = preferences.topics[topic.key] || false;
+      });
+      
+      // Map frontend preferences to backend structure using dynamic configuration
       const backendPreferences = {
-        channels: {
-          email: preferences.channels?.email ?? false,
-          sms: preferences.channels?.sms ?? false, 
-          push: preferences.channels?.push ?? false,
-          phone: preferences.channels?.phone ?? false,
-          inApp: preferences.channels?.inApp ?? false
-        },
-        topics: {
-          marketing: preferences.topics?.marketing ?? false,
-          promotions: preferences.topics?.promotions ?? false,
-          productUpdates: preferences.topics?.productUpdates ?? false, // Keep original field name
-          serviceUpdates: preferences.topics?.productUpdates ?? false, // Also map to serviceUpdates
-          billing: preferences.topics?.billing ?? false,
-          security: preferences.topics?.security ?? false,
-          newsletters: preferences.topics?.newsletters ?? false, // Keep original field name
-          newsletter: preferences.topics?.newsletters ?? false, // Also map to newsletter
-          surveys: false // Default value
-        },
-        dndSettings: {
+        preferredChannels: dynamicChannels,
+        topicSubscriptions: dynamicTopics,
+        doNotDisturb: {
           enabled: preferences.dndSettings?.enabled ?? false,
-          startTime: preferences.dndSettings?.startTime ?? '22:00',
-          endTime: preferences.dndSettings?.endTime ?? '08:00'
+          start: preferences.dndSettings?.startTime ?? '22:00',
+          end: preferences.dndSettings?.endTime ?? '08:00'
         },
-        frequency: {
-          digestMode: preferences.frequency?.digestMode ?? false
-        },
+        frequency: preferences.frequency?.digestMode ? 'daily' : 'immediate',
         timezone: preferences.timezone ?? 'Asia/Colombo',
         language: preferences.language ?? 'en'
       };
 
+      console.log('🔄 CSR saving dynamic preferences:', {
+        channels: dynamicChannels,
+        topics: dynamicTopics,
+        config: preferenceConfig
+      });
+
       // Use the CSR service to update customer preferences in real-time
       const result = await csrDashboardService.updateCustomerPreferences(selectedCustomer, backendPreferences);
       
-      console.log('CSR successfully updated customer preferences:', result);
+      console.log('✅ CSR successfully updated customer preferences:', result);
       
       setIsEditing(false);
       setHasChanges(false);
@@ -463,16 +510,11 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 </div>
               </div>
               <div className="p-6 space-y-4">
-                {[
-                  { key: 'email', label: 'Email Notifications', desc: 'Receive notifications via email' },
-                  { key: 'sms', label: 'SMS Notifications', desc: 'Receive notifications via SMS' },
-                  { key: 'push', label: 'Push Notifications', desc: 'Receive push notifications on your mobile device' },
-                  { key: 'inApp', label: 'In-App Notifications', desc: 'Receive notifications within the application' }
-                ].map((channel) => (
+                {preferenceConfig?.communicationChannels?.filter(channel => channel.enabled).map((channel) => (
                   <div key={channel.key} className="flex items-center justify-between py-3 border-b border-blue-700/20 last:border-0">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-white text-base">{channel.label}</h3>
-                      <p className="text-blue-200 text-sm">{channel.desc}</p>
+                      <h3 className="font-semibold text-white text-base">{channel.name}</h3>
+                      <p className="text-blue-200 text-sm">{channel.description}</p>
                     </div>
                     <div className="ml-4">
                       <button
@@ -490,7 +532,11 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                       </button>
                     </div>
                   </div>
-                ))}
+                )) || (
+                  <div className="text-center py-8 text-blue-200">
+                    <p>Loading communication channels...</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -508,18 +554,11 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 </div>
               </div>
               <div className="p-6 space-y-4">
-                {[
-                  { key: 'offers', label: 'Special Offers & Promotions', desc: 'Promotional offers and discounts' },
-                  { key: 'productUpdates', label: 'Product Updates', desc: 'New features and service updates' },
-                  { key: 'serviceAlerts', label: 'Service Alerts', desc: 'Important service notifications and outages' },
-                  { key: 'billing', label: 'Billing & Payments', desc: 'Bill notifications and payment reminders' },
-                  { key: 'security', label: 'Security Alerts', desc: 'Account security and privacy updates' },
-                  { key: 'newsletters', label: 'Newsletters', desc: 'Company news and industry insights' }
-                ].map((topic) => (
+                {preferenceConfig?.topicSubscriptions?.filter(topic => topic.enabled).map((topic) => (
                   <div key={topic.key} className="flex items-center justify-between py-3 border-b border-blue-700/20 last:border-0">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-white text-base">{topic.label}</h3>
-                      <p className="text-blue-200 text-sm">{topic.desc}</p>
+                      <h3 className="font-semibold text-white text-base">{topic.name}</h3>
+                      <p className="text-blue-200 text-sm">{topic.description}</p>
                     </div>
                     <div className="ml-4">
                       <button
@@ -537,7 +576,11 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                       </button>
                     </div>
                   </div>
-                ))}
+                )) || (
+                  <div className="text-center py-8 text-blue-200">
+                    <p>Loading topic subscriptions...</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -3901,6 +3901,21 @@ async function triggerSingleWebhook(webhook, eventType, data) {
 global.triggerWebhooks = triggerWebhooks;
 
 // ================================
+// PREFERENCE MANAGEMENT API ENDPOINTS
+// ================================
+
+// Import preference management routes
+const { 
+    channelRouter, 
+    topicRouter, 
+    customerConfigRouter 
+} = require('./preference-routes.js');
+
+app.use('/api/v1/admin/preference-channels', channelRouter);
+app.use('/api/v1/admin/preference-topics', topicRouter);
+app.use('/api/v1/customer/preference-config', customerConfigRouter);
+
+// ================================
 // COMPLIANCE RULES API ENDPOINTS
 // ================================
 
@@ -9627,30 +9642,34 @@ app.put("/api/v1/csr/customers/:customerId/preferences", verifyToken, async (req
             {
                 partyId: customerId,
                 preferredChannels: {
-                    email: preferences.channels?.email ?? true,
-                    sms: preferences.channels?.sms ?? false,
-                    push: preferences.channels?.push ?? true,
-                    phone: preferences.channels?.phone ?? false,
-                    inApp: preferences.channels?.inApp ?? true
+                    // Use the actual preference structure from CSR (preferences.preferredChannels)
+                    // and only apply defaults for missing values, not false values
+                    email: preferences.preferredChannels?.email !== undefined ? preferences.preferredChannels.email : true,
+                    sms: preferences.preferredChannels?.sms !== undefined ? preferences.preferredChannels.sms : false,
+                    whatsapp: preferences.preferredChannels?.whatsapp !== undefined ? preferences.preferredChannels.whatsapp : false,
+                    push: preferences.preferredChannels?.push !== undefined ? preferences.preferredChannels.push : false,
+                    inapp: preferences.preferredChannels?.inapp !== undefined ? preferences.preferredChannels.inapp : false,
+                    test: preferences.preferredChannels?.test !== undefined ? preferences.preferredChannels.test : false,
+                    "test 2": preferences.preferredChannels?.["test 2"] !== undefined ? preferences.preferredChannels["test 2"] : false
                 },
                 topicSubscriptions: {
-                    marketing: preferences.topics?.marketing ?? false,
-                    promotions: preferences.topics?.promotions ?? false, // Keep consistent field names
-                    serviceUpdates: preferences.topics?.serviceUpdates ?? preferences.topics?.productUpdates ?? false, // Map productUpdates to serviceUpdates
-                    billing: preferences.topics?.billing ?? false,
-                    security: preferences.topics?.security ?? false,
-                    newsletter: preferences.topics?.newsletters ?? preferences.topics?.newsletter ?? false, // Handle both field names
-                    surveys: preferences.topics?.surveys ?? false
+                    // Use the actual topic structure from CSR (preferences.topicSubscriptions)  
+                    // and preserve dynamic admin-configured topics
+                    offers: preferences.topicSubscriptions?.offers !== undefined ? preferences.topicSubscriptions.offers : false,
+                    product_updates: preferences.topicSubscriptions?.product_updates !== undefined ? preferences.topicSubscriptions.product_updates : false,
+                    billing: preferences.topicSubscriptions?.billing !== undefined ? preferences.topicSubscriptions.billing : false,
+                    security: preferences.topicSubscriptions?.security !== undefined ? preferences.topicSubscriptions.security : false,
+                    service_alerts: preferences.topicSubscriptions?.service_alerts !== undefined ? preferences.topicSubscriptions.service_alerts : false
                 },
                 quietHours: {
-                    enabled: preferences.dndSettings?.enabled ?? false,
-                    start: preferences.dndSettings?.startTime ?? '22:00',
-                    end: preferences.dndSettings?.endTime ?? '08:00'
+                    enabled: preferences.doNotDisturb?.enabled !== undefined ? preferences.doNotDisturb.enabled : false,
+                    start: preferences.doNotDisturb?.start || '22:00',
+                    end: preferences.doNotDisturb?.end || '08:00'
                 },
                 doNotDisturb: {
-                    enabled: preferences.dndSettings?.enabled ?? false,
-                    start: preferences.dndSettings?.startTime ?? '22:00',
-                    end: preferences.dndSettings?.endTime ?? '08:00'
+                    enabled: preferences.doNotDisturb?.enabled !== undefined ? preferences.doNotDisturb.enabled : false,
+                    start: preferences.doNotDisturb?.start || '22:00',
+                    end: preferences.doNotDisturb?.end || '08:00'
                 },
                 frequency: preferences.frequency?.digestMode ? 'daily' : 'immediate',
                 timezone: preferences.timezone ?? 'Asia/Colombo',

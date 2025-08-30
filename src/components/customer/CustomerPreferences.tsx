@@ -8,28 +8,47 @@ import {
   Save,
   RotateCcw,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Mail,
+  MessageSquare,
+  Phone,
+  Smartphone
 } from 'lucide-react';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { preferenceService } from '../../services/preferenceService';
 import { authService } from '../../services/authService';
 import { websocketService, PreferenceUpdateEvent } from '../../services/websocketService';
 
+interface PreferenceChannel {
+  _id: string;
+  name: string;
+  key: string;
+  description: string;
+  icon: string;
+  enabled: boolean;
+  isDefault: boolean;
+}
+
+interface PreferenceTopic {
+  _id: string;
+  name: string;
+  key: string;
+  description: string;
+  category: string;
+  enabled: boolean;
+  isDefault: boolean;
+  priority: string;
+}
+
+interface PreferenceConfig {
+  communicationChannels: PreferenceChannel[];
+  topicSubscriptions: PreferenceTopic[];
+  lastUpdated: string;
+}
+
 interface PreferenceSettings {
-  channels: {
-    email: boolean;
-    sms: boolean;
-    push: boolean;
-    inApp: boolean;
-  };
-  topics: {
-    offers: boolean;
-    productUpdates: boolean;
-    serviceAlerts: boolean;
-    billing: boolean;
-    security: boolean;
-    newsletters: boolean;
-  };
+  channels: { [key: string]: boolean };
+  topics: { [key: string]: boolean };
   dndSettings: {
     enabled: boolean;
     startTime: string;
@@ -49,21 +68,12 @@ interface CustomerPreferencesProps {
 }
 
 const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
+  // Dynamic preference configuration from admin
+  const [preferenceConfig, setPreferenceConfig] = useState<PreferenceConfig | null>(null);
+  
   const [preferences, setPreferences] = useState<PreferenceSettings>({
-    channels: {
-      email: true,
-      sms: true,
-      push: false,
-      inApp: true
-    },
-    topics: {
-      offers: true,
-      productUpdates: true,
-      serviceAlerts: true,
-      billing: true,
-      security: true,
-      newsletters: false
-    },
+    channels: {},
+    topics: {},
     dndSettings: {
       enabled: true,
       startTime: '22:00',
@@ -77,6 +87,49 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
     language: 'en',
     timezone: 'Asia/Colombo'
   });
+
+  // Load dynamic preference configuration from admin
+  const loadPreferenceConfig = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/v1/customer/preference-config');
+      const data = await response.json();
+      if (data.success) {
+        setPreferenceConfig(data.config);
+        console.log('📋 Customer Dashboard - Dynamic config loaded:', data.config);
+        console.log('📺 Available Channels:', data.config.communicationChannels?.length || 0);
+        console.log('📰 Available Topics:', data.config.topicSubscriptions?.length || 0);
+        
+        // Initialize default preferences based on config
+        initializeDefaultPreferences(data.config);
+      }
+    } catch (error) {
+      console.error('Failed to load customer preference configuration:', error);
+    }
+  };
+
+  // Initialize default preferences based on config
+  const initializeDefaultPreferences = (config: PreferenceConfig) => {
+    setPreferences(prev => {
+      const defaultChannels: { [key: string]: boolean } = {};
+      const defaultTopics: { [key: string]: boolean } = {};
+      
+      // Set default channel preferences (use isDefault from config)
+      config.communicationChannels?.forEach(channel => {
+        defaultChannels[channel.key] = channel.isDefault || false;
+      });
+      
+      // Set default topic preferences (use isDefault from config)
+      config.topicSubscriptions?.forEach(topic => {
+        defaultTopics[topic.key] = topic.isDefault || false;
+      });
+      
+      return {
+        ...prev,
+        channels: defaultChannels,
+        topics: defaultTopics
+      };
+    });
+  };
 
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -130,28 +183,31 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
 
         if (communicationPrefs) {
           console.log('Mapping backend preferences to UI format...');
-          console.log('Communication preferences:', communicationPrefs);          const updatedPreferences = { ...preferences };
+          console.log('Communication preferences:', communicationPrefs);
+          const updatedPreferences = { ...preferences };
           
-          // Map preferred channels
-          if (communicationPrefs.preferredChannels) {
-            updatedPreferences.channels = {
-              email: communicationPrefs.preferredChannels.email || false,
-              sms: communicationPrefs.preferredChannels.sms || false,
-              push: communicationPrefs.preferredChannels.push || false,
-              inApp: communicationPrefs.preferredChannels.push || false, // Map push to inApp for UI
-            };
+          // Map preferred channels using dynamic configuration
+          if (communicationPrefs.preferredChannels && preferenceConfig?.communicationChannels) {
+            const channelMappings: { [key: string]: boolean } = {};
+            preferenceConfig.communicationChannels.forEach(channel => {
+              channelMappings[channel.key] = communicationPrefs.preferredChannels[channel.key] || false;
+            });
+            updatedPreferences.channels = channelMappings;
+          } else if (communicationPrefs.preferredChannels) {
+            // Fallback to direct mapping if no config available
+            updatedPreferences.channels = communicationPrefs.preferredChannels;
           }
           
-          // Map topic subscriptions
-          if (communicationPrefs.topicSubscriptions) {
-            updatedPreferences.topics = {
-              offers: communicationPrefs.topicSubscriptions.marketing || false,
-              productUpdates: communicationPrefs.topicSubscriptions.serviceUpdates || false,
-              serviceAlerts: communicationPrefs.topicSubscriptions.serviceUpdates || false,
-              billing: communicationPrefs.topicSubscriptions.billing || false,
-              security: communicationPrefs.topicSubscriptions.security || false,
-              newsletters: communicationPrefs.topicSubscriptions.newsletter || false,
-            };
+          // Map topic subscriptions using dynamic configuration
+          if (communicationPrefs.topicSubscriptions && preferenceConfig?.topicSubscriptions) {
+            const topicMappings: { [key: string]: boolean } = {};
+            preferenceConfig.topicSubscriptions.forEach(topic => {
+              topicMappings[topic.key] = communicationPrefs.topicSubscriptions[topic.key] || false;
+            });
+            updatedPreferences.topics = topicMappings;
+          } else if (communicationPrefs.topicSubscriptions) {
+            // Fallback to direct mapping if no config available
+            updatedPreferences.topics = communicationPrefs.topicSubscriptions;
           }
           
           // Map do not disturb settings (handle both quietHours and doNotDisturb field names)
@@ -189,15 +245,23 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
     }
   };
 
-  // Load preferences on component mount
+  // Load preference configuration first, then preferences
   useEffect(() => {
-    loadPreferences();
+    const initializePreferences = async () => {
+      await loadPreferenceConfig(); // Load dynamic configuration from admin first
+      await loadPreferences(); // Then load user preferences with config available
+    };
+    
+    initializePreferences();
   }, []);
 
-  // Update preferences when data loads
+  // Reload preferences when preference config changes
   useEffect(() => {
-    // This is now handled by loadPreferences function
-  }, []);
+    if (preferenceConfig) {
+      console.log('Preference config loaded, reloading preferences with proper mapping');
+      loadPreferences();
+    }
+  }, [preferenceConfig]);
 
   // Set up real-time preference update listener for CSR changes
   useEffect(() => {
@@ -217,7 +281,12 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
           setHasChanges(false); // Reset changes flag
           
           // Show a notification that CSR made changes
-          addNotification('Your communication preferences have been updated by customer service.');
+          addNotification({
+            type: 'preference',
+            category: 'info',
+            title: 'Preferences Updated',
+            message: 'Your communication preferences have been updated by customer service.'
+          });
         }
       } catch (error) {
         console.error('Error handling CSR preference update:', error);
@@ -235,7 +304,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
   }, []); // Run once on mount
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  const updateChannelPreference = (channel: keyof PreferenceSettings['channels'], value: boolean) => {
+  const updateChannelPreference = (channel: string, value: boolean) => {
     setPreferences(prev => ({
       ...prev,
       channels: {
@@ -246,7 +315,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
     setHasChanges(true);
   };
 
-  const updateTopicPreference = (topic: keyof PreferenceSettings['topics'], value: boolean) => {
+  const updateTopicPreference = (topic: string, value: boolean) => {
     setPreferences(prev => ({
       ...prev,
       topics: {
@@ -255,6 +324,121 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
       }
     }));
     setHasChanges(true);
+  };
+
+  // Helper functions for dynamic rendering
+  const getChannelIcon = (iconName: string) => {
+    const iconProps = { className: "w-5 h-5 text-myslt-primary" };
+    switch (iconName) {
+      case 'Mail':
+        return <Mail {...iconProps} />;
+      case 'MessageSquare':
+        return <MessageSquare {...iconProps} />;
+      case 'Bell':
+        return <Bell {...iconProps} />;
+      case 'Phone':
+        return <Phone {...iconProps} />;
+      case 'Smartphone':
+        return <Smartphone {...iconProps} />;
+      default:
+        return <Settings {...iconProps} />; // Default fallback
+    }
+  };
+
+  const renderChannelToggles = () => {
+    if (!preferenceConfig?.communicationChannels) {
+      // Fallback to hardcoded channels if config not loaded
+      return (
+        <>
+          <ToggleSwitch
+            enabled={preferences.channels.email}
+            onChange={(value) => updateChannelPreference('email', value)}
+            label="Email Notifications"
+            description="Receive notifications via email"
+          />
+          <ToggleSwitch
+            enabled={preferences.channels.sms}
+            onChange={(value) => updateChannelPreference('sms', value)}
+            label="SMS Notifications"
+            description="Receive notifications via SMS"
+          />
+          <ToggleSwitch
+            enabled={preferences.channels.push}
+            onChange={(value) => updateChannelPreference('push', value)}
+            label="Push Notifications"
+            description="Receive push notifications on your mobile device"
+          />
+          <ToggleSwitch
+            enabled={preferences.channels.inApp}
+            onChange={(value) => updateChannelPreference('inApp', value)}
+            label="In-App Notifications"
+            description="Receive notifications within the application"
+          />
+        </>
+      );
+    }
+
+    // Dynamic rendering based on admin configuration
+    return preferenceConfig.communicationChannels.map((channel) => (
+      <ToggleSwitch
+        key={channel.key}
+        enabled={preferences.channels[channel.key as keyof typeof preferences.channels] ?? channel.isDefault}
+        onChange={(value) => updateChannelPreference(channel.key, value)}
+        label={channel.name}
+        description={channel.description}
+      />
+    ));
+  };
+
+  const renderTopicToggles = () => {
+    if (!preferenceConfig?.topicSubscriptions) {
+      // Fallback to hardcoded topics if config not loaded
+      return (
+        <>
+          <ToggleSwitch
+            enabled={preferences.topics.offers}
+            onChange={(value) => updateTopicPreference('offers', value)}
+            label="Special Offers & Promotions"
+            description="Promotional offers and discounts"
+          />
+          <ToggleSwitch
+            enabled={preferences.topics.productUpdates}
+            onChange={(value) => updateTopicPreference('productUpdates', value)}
+            label="Product Updates"
+            description="Notifications about new features and updates"
+          />
+          <ToggleSwitch
+            enabled={preferences.topics.serviceAlerts}
+            onChange={(value) => updateTopicPreference('serviceAlerts', value)}
+            label="Service Alerts"
+            description="Important service notifications and outages"
+          />
+          <ToggleSwitch
+            enabled={preferences.topics.billing}
+            onChange={(value) => updateTopicPreference('billing', value)}
+            label="Billing & Payments"
+            description="Bill notifications and payment reminders"
+          />
+          <ToggleSwitch
+            enabled={preferences.topics.security}
+            onChange={(value) => updateTopicPreference('security', value)}
+            label="Security Alerts"
+            description="Account security and privacy updates"
+          />
+        </>
+      );
+    }
+
+    // Dynamic rendering based on admin configuration
+    return preferenceConfig.topicSubscriptions.map((topic) => (
+      <ToggleSwitch
+        key={topic.key}
+        enabled={preferences.topics[topic.key as keyof typeof preferences.topics] ?? topic.isDefault}
+        onChange={(value) => updateTopicPreference(topic.key, value)}
+        label={topic.name}
+        description={topic.description}
+      />
+    ));
   };
 
   const updateDndSettings = (setting: keyof PreferenceSettings['dndSettings'], value: boolean | string) => {
@@ -288,24 +472,37 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
         throw new Error('User not authenticated');
       }
 
-      // Map frontend preference structure to backend format
-      const preferredChannels = {
-        email: preferences.channels.email,
-        sms: preferences.channels.sms,
-        push: preferences.channels.inApp, // Map inApp to push
-        phone: false, // Default value
-        mail: false   // Default value
-      };
+      console.log('🔄 Saving customer preferences...', { userId: userData.id, preferences });
 
-      const topicSubscriptions = {
-        marketing: preferences.topics.offers, // Map offers to marketing
-        promotions: preferences.topics.offers, // Map offers to promotions
-        serviceUpdates: preferences.topics.serviceAlerts, // Map serviceAlerts to serviceUpdates
-        billing: preferences.topics.billing,
-        security: preferences.topics.security,
-        newsletter: preferences.topics.newsletters, // Map newsletters to newsletter
-        surveys: false // Default value as it's not in the frontend
-      };
+      // Build dynamic channel preferences based on admin configuration
+      const preferredChannels: { [key: string]: boolean } = {};
+      if (preferenceConfig?.communicationChannels) {
+        preferenceConfig.communicationChannels.forEach(channel => {
+          preferredChannels[channel.key] = preferences.channels[channel.key] ?? channel.isDefault;
+        });
+      } else {
+        // Fallback to hardcoded if config not loaded
+        preferredChannels['email'] = preferences.channels.email;
+        preferredChannels['sms'] = preferences.channels.sms;
+        preferredChannels['push'] = preferences.channels.push;
+        preferredChannels['inApp'] = preferences.channels.inApp;
+      }
+
+      // Build dynamic topic subscriptions based on admin configuration
+      const topicSubscriptions: { [key: string]: boolean } = {};
+      if (preferenceConfig?.topicSubscriptions) {
+        preferenceConfig.topicSubscriptions.forEach(topic => {
+          topicSubscriptions[topic.key] = preferences.topics[topic.key] ?? topic.isDefault;
+        });
+      } else {
+        // Fallback to hardcoded if config not loaded
+        topicSubscriptions['offers'] = preferences.topics.offers;
+        topicSubscriptions['productUpdates'] = preferences.topics.productUpdates;
+        topicSubscriptions['serviceAlerts'] = preferences.topics.serviceAlerts;
+        topicSubscriptions['billing'] = preferences.topics.billing;
+        topicSubscriptions['security'] = preferences.topics.security;
+        topicSubscriptions['newsletters'] = preferences.topics.newsletters;
+      }
 
       const doNotDisturbSettings = {
         enabled: preferences.dndSettings.enabled,
@@ -313,23 +510,29 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
         end: preferences.dndSettings.endTime
       };
 
+      console.log('📤 Sending preference data:', {
+        preferredChannels,
+        topicSubscriptions,
+        doNotDisturbSettings
+      });
+
       // Use the preferenceService to update communication preferences
       const response = await preferenceService.updateCommunicationPreferences(userData.id, {
         preferredChannels,
         topicSubscriptions,
-        frequency: 'immediate', // Default frequency since the frontend has a different structure
+        frequency: 'immediate',
         timezone: preferences.timezone,
         language: preferences.language,
         doNotDisturb: doNotDisturbSettings
       });
 
       if (response.success) {
-        console.log('Preferences saved successfully');
+        console.log('✅ Preferences saved successfully to MongoDB');
         setSaveStatus('success');
         setHasChanges(false);
         
         // Reload preferences to ensure UI shows the saved state
-        console.log('Reloading preferences after save...');
+        console.log('🔄 Reloading preferences after save...');
         await loadPreferences();
         
         // Add notification for admin/CSR users
@@ -345,7 +548,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
       
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
-      console.error('Failed to save preferences:', error);
+      console.error('❌ Failed to save preferences:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
@@ -469,30 +672,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
             </div>
           </div>
           <div className="p-6">
-            <ToggleSwitch
-              enabled={preferences.channels.email}
-              onChange={(value) => updateChannelPreference('email', value)}
-              label="Email Notifications"
-              description="Receive notifications via email"
-            />
-            <ToggleSwitch
-              enabled={preferences.channels.sms}
-              onChange={(value) => updateChannelPreference('sms', value)}
-              label="SMS Notifications"
-              description="Receive notifications via SMS"
-            />
-            <ToggleSwitch
-              enabled={preferences.channels.push}
-              onChange={(value) => updateChannelPreference('push', value)}
-              label="Push Notifications"
-              description="Receive push notifications on your mobile device"
-            />
-            <ToggleSwitch
-              enabled={preferences.channels.inApp}
-              onChange={(value) => updateChannelPreference('inApp', value)}
-              label="In-App Notifications"
-              description="Receive notifications within the application"
-            />
+            {renderChannelToggles()}
           </div>
         </div>
 
@@ -510,42 +690,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
             </div>
           </div>
           <div className="p-6">
-            <ToggleSwitch
-              enabled={preferences.topics.offers}
-              onChange={(value) => updateTopicPreference('offers', value)}
-              label="Special Offers & Promotions"
-              description="Promotional offers and discounts"
-            />
-            <ToggleSwitch
-              enabled={preferences.topics.productUpdates}
-              onChange={(value) => updateTopicPreference('productUpdates', value)}
-              label="Product Updates"
-              description="New features and service updates"
-            />
-            <ToggleSwitch
-              enabled={preferences.topics.serviceAlerts}
-              onChange={(value) => updateTopicPreference('serviceAlerts', value)}
-              label="Service Alerts"
-              description="Important service notifications and outages"
-            />
-            <ToggleSwitch
-              enabled={preferences.topics.billing}
-              onChange={(value) => updateTopicPreference('billing', value)}
-              label="Billing & Payments"
-              description="Bill notifications and payment reminders"
-            />
-            <ToggleSwitch
-              enabled={preferences.topics.security}
-              onChange={(value) => updateTopicPreference('security', value)}
-              label="Security Alerts"
-              description="Account security and privacy updates"
-            />
-            <ToggleSwitch
-              enabled={preferences.topics.newsletters}
-              onChange={(value) => updateTopicPreference('newsletters', value)}
-              label="Newsletters"
-              description="Company news and industry insights"
-            />
+            {renderTopicToggles()}
           </div>
         </div>
 
