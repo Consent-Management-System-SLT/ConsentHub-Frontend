@@ -213,7 +213,7 @@ const DSARManager: React.FC = () => {
         updateData.processingNote = processingNote;
       }
 
-      const response = await fetch(`http://localhost:3001/api/v1/dsar/requests/${requestId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/dsar/requests/${requestId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

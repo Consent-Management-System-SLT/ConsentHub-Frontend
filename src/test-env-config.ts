@@ -25,7 +25,7 @@ if (isBrowser) {
 
     console.log('Current Environment Variables:');
     Object.entries(envVars).forEach(([key, value]) => {
-        const isCorrect = value && (value.includes('localhost:3001') || value.includes('http://localhost:3001'));
+        const isCorrect = value && (value.includes('localhost:3001') || value.includes((import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com')));
         const status = isCorrect ? 'CORRECT' : 'INCORRECT';
         console.log(`${status} ${key}: ${value || 'undefined'}`);
     });
@@ -37,7 +37,7 @@ if (isBrowser) {
     // Test actual API connectivity
     console.log('\nTesting Backend Connectivity...');
     
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const backendUrl = import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com');
     
     fetch(`${backendUrl}/api/csr/stats`)
         .then(response => response.json())

@@ -208,7 +208,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
 
     try {
       // Connect to Socket.IO server
-      socket = io('http://localhost:3001');
+      socket = io((import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'));
 
       console.log('🔌 Customer Privacy Notices: Connected to real-time updates');
 

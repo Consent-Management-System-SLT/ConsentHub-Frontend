@@ -104,7 +104,7 @@ const AuditLogViewer: React.FC = () => {
         params.append('outcome', selectedOutcome);
       }
 
-      const response = await fetch(`http://localhost:3001/api/v1/audit-logs?${params}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/audit-logs?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ const AuditLogViewer: React.FC = () => {
       if (selectedCategory) params.append('category', selectedCategory);
       if (selectedOutcome) params.append('outcome', selectedOutcome);
 
-      const response = await fetch(`http://localhost:3001/api/v1/audit-logs/export/csv?${params}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/audit-logs/export/csv?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

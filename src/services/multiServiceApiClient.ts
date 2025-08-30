@@ -1,19 +1,21 @@
 // Multi-service API client configuration for ConsentHub
 import axios, { AxiosInstance } from 'axios';
 
-// Service configurations - Updated for local development
+// Service configurations - Updated for deployment
+const RENDER_BASE_URL = 'https://consenthub-backend.onrender.com';
+
 const SERVICES = {
-  AUTH: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:3001',
-  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001',
-  CSR: import.meta.env.VITE_CSR_API_URL || 'http://localhost:3001',
-  GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001',
-  CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'http://localhost:3001',
-  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'http://localhost:3001',
-  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'http://localhost:3001',
-  DSAR: import.meta.env.VITE_DSAR_API_URL || 'http://localhost:3001',
-  PARTY: import.meta.env.VITE_PARTY_API_URL || 'http://localhost:3001',
-  EVENT: import.meta.env.VITE_EVENT_API_URL || 'http://localhost:3001',
-  CATALOG: import.meta.env.VITE_CATALOG_API_URL || 'http://localhost:3001',
+  AUTH: import.meta.env.VITE_AUTH_API_URL || RENDER_BASE_URL,
+  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || RENDER_BASE_URL,
+  CSR: import.meta.env.VITE_CSR_API_URL || RENDER_BASE_URL,
+  GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || RENDER_BASE_URL,
+  CONSENT: import.meta.env.VITE_CONSENT_API_URL || RENDER_BASE_URL,
+  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || RENDER_BASE_URL,
+  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || RENDER_BASE_URL,
+  DSAR: import.meta.env.VITE_DSAR_API_URL || RENDER_BASE_URL,
+  PARTY: import.meta.env.VITE_PARTY_API_URL || RENDER_BASE_URL,
+  EVENT: import.meta.env.VITE_EVENT_API_URL || RENDER_BASE_URL,
+  CATALOG: import.meta.env.VITE_CATALOG_API_URL || RENDER_BASE_URL,
 };
 
 // Debug logging for service URLs

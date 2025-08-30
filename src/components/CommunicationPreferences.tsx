@@ -91,7 +91,7 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
     loadPreferenceConfig();
 
     // Connect to WebSocket for real-time preference config updates
-    const socket = io('http://localhost:3001');
+    const socket = io((import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'));
     
     socket.on('preference-config-updated', (data) => {
       console.log('🔄 Preference configuration updated by admin, reloading...', data);

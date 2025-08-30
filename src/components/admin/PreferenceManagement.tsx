@@ -59,9 +59,10 @@ const PreferenceManagement: React.FC = () => {
     setError(null);
     try {
       // Load existing channels and topics from backend
+      const baseUrl = import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com';
       const [channelsResponse, topicsResponse] = await Promise.all([
-        fetch('http://localhost:3001/api/v1/admin/preference-channels'),
-        fetch('http://localhost:3001/api/v1/admin/preference-topics')
+        fetch(`${baseUrl}/api/v1/admin/preference-channels`),
+        fetch(`${baseUrl}/api/v1/admin/preference-topics`)
       ]);
 
       if (channelsResponse.ok) {

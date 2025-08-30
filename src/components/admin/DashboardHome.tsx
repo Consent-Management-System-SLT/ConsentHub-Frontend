@@ -100,7 +100,7 @@ const DashboardHome: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:3001/api/v1/admin/dashboard/overview`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/admin/dashboard/overview`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

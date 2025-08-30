@@ -195,7 +195,7 @@ const PreferenceManagement: React.FC = () => {
   const handleDeleteChannel = async (id: string, name: string) => {
     if (window.confirm(`Are you sure you want to delete the channel "${name}"?`)) {
       try {
-        const response = await fetch(`http://localhost:3001/api/v1/admin/preference-channels/${id}`, { 
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/admin/preference-channels/${id}`, { 
           method: 'DELETE' 
         });
 
@@ -215,7 +215,7 @@ const PreferenceManagement: React.FC = () => {
   const handleDeleteTopic = async (id: string, name: string) => {
     if (window.confirm(`Are you sure you want to delete the topic "${name}"?`)) {
       try {
-        const response = await fetch(`http://localhost:3001/api/v1/admin/preference-topics/${id}`, { 
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/admin/preference-topics/${id}`, { 
           method: 'DELETE' 
         });
 
@@ -237,7 +237,7 @@ const PreferenceManagement: React.FC = () => {
     if (!channel) return;
 
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/admin/preference-channels/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/admin/preference-channels/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !channel.enabled })
@@ -260,7 +260,7 @@ const PreferenceManagement: React.FC = () => {
     if (!topic) return;
 
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/admin/preference-topics/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/admin/preference-topics/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !topic.enabled })

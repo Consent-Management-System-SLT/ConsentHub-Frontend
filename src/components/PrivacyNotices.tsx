@@ -385,7 +385,7 @@ export const PrivacyNotices: React.FC = () => {
 
     try {
       // Connect to Socket.IO server
-      socket = io('http://localhost:3001');
+      socket = io((import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'));
 
       console.log('🔌 Admin Privacy Notices: Connected to real-time updates');
 
@@ -521,7 +521,7 @@ export const PrivacyNotices: React.FC = () => {
       console.log('🚀 Starting export for format:', format);
       
       // Test the URL construction
-      const baseURL = 'http://localhost:3001';
+      const baseURL = (import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com');
       const testUrl = `${baseURL}/api/v1/privacy-notices/export/${format}`;
       console.log('🌐 Test URL:', testUrl);
       

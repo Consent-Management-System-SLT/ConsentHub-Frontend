@@ -215,7 +215,7 @@ class PrivacyNoticeService {
     });
 
     const queryString = params.toString();
-    const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const baseURL = import.meta.env.VITE_API_URL || (import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com');
     const url = `${baseURL}${this.basePath}/export/${format}${queryString ? `?${queryString}` : ''}`;
     
     console.log('🌐 Export URL:', url);

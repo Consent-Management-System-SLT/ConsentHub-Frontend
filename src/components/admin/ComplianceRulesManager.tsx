@@ -91,7 +91,7 @@ const ComplianceRulesManager = () => {
 
     try {
       const token = getAuthToken();
-      const response = await fetch(`http://localhost:3001/api/v1/compliance-rules/${selectedRule._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/compliance-rules/${selectedRule._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -126,7 +126,7 @@ const ComplianceRulesManager = () => {
 
     try {
       const token = getAuthToken();
-      const response = await fetch(`http://localhost:3001/api/v1/compliance-rules/${ruleId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/compliance-rules/${ruleId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

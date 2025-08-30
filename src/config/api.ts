@@ -1,20 +1,24 @@
-// API Configuration for ConsentHub - Using Comprehensive Backend
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api/v1';
+// API Configuration for ConsentHub - Using Environment Variables
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://consenthub-backend.onrender.com/api/v1';
+
+// Get base URL from environment
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com';
+const API_PATH = '/api/v1';
 
 export const API_ENDPOINTS = {
-  // All services point to comprehensive backend
-  AUTH_SERVICE: 'http://localhost:3001/api/v1/auth',
-  ADMIN_SERVICE: 'http://localhost:3001/api/v1/admin',
-  CONSENT_SERVICE: 'http://localhost:3001/api/v1/consent',
-  PREFERENCE_SERVICE: 'http://localhost:3001/api/v1/preference', 
-  PARTY_SERVICE: 'http://localhost:3001/api/v1/party',
-  DSAR_SERVICE: 'http://localhost:3001/api/v1/dsar',
-  ANALYTICS_SERVICE: 'http://localhost:3001/api/v1/analytics',
-  EVENT_SERVICE: 'http://localhost:3001/api/v1/event',
-  PRIVACY_NOTICE_SERVICE: 'http://localhost:3001/api/v1/privacy-notices',
-  CSR_SERVICE: 'http://localhost:3001/api/v1/csr',
-  CUSTOMER_SERVICE: 'http://localhost:3001/api/v1/customer',
-  LEGACY: 'http://localhost:3001/api/v1'
+  // All services point to deployed backend
+  AUTH_SERVICE: `${BASE_URL}${API_PATH}/auth`,
+  ADMIN_SERVICE: `${BASE_URL}${API_PATH}/admin`,
+  CONSENT_SERVICE: `${BASE_URL}${API_PATH}/consent`,
+  PREFERENCE_SERVICE: `${BASE_URL}${API_PATH}/preference`, 
+  PARTY_SERVICE: `${BASE_URL}${API_PATH}/party`,
+  DSAR_SERVICE: `${BASE_URL}${API_PATH}/dsar`,
+  ANALYTICS_SERVICE: `${BASE_URL}${API_PATH}/analytics`,
+  EVENT_SERVICE: `${BASE_URL}${API_PATH}/event`,
+  PRIVACY_NOTICE_SERVICE: `${BASE_URL}${API_PATH}/privacy-notices`,
+  CSR_SERVICE: `${BASE_URL}${API_PATH}/csr`,
+  CUSTOMER_SERVICE: `${BASE_URL}${API_PATH}/customer`,
+  LEGACY: `${BASE_URL}${API_PATH}`
 };
 
 export const SERVICE_PORTS = {

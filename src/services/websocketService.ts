@@ -30,7 +30,10 @@ class WebSocketService {
 
   private connect() {
     try {
-      this.socket = io('http://localhost:3001', {
+      // Use environment variable or fallback to deployed backend URL
+      const socketUrl = import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com';
+      
+      this.socket = io(socketUrl, {
         transports: ['websocket', 'polling'],
         timeout: 10000,
         reconnection: true,

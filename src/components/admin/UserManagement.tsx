@@ -585,7 +585,7 @@ const UserManagement: React.FC = () => {
     
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/v1/guardians/${editGuardianData.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/guardians/${editGuardianData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -681,7 +681,7 @@ const UserManagement: React.FC = () => {
       setLoading(true);
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`http://localhost:3001/api/v1/users/${userToDelete.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/users/${userToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -736,7 +736,7 @@ const UserManagement: React.FC = () => {
       setLoading(true);
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`http://localhost:3001/api/v1/users/${userId}/status`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://consenthub-backend.onrender.com'}/api/v1/users/${userId}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
