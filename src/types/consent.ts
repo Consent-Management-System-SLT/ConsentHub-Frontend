@@ -85,6 +85,7 @@ export interface PrivacyNotice {
 
 export interface AuditLog {
   id: string;
+  _id?: string; // MongoDB ID for real-time logs
   entityType: 'consent' | 'preference' | 'notice';
   entityId: string;
   operation: 'create' | 'update' | 'revoke' | 'import' | 'view';
@@ -93,6 +94,20 @@ export interface AuditLog {
   timestamp: string;
   changes: Record<string, any>;
   source: string;
+  details?: {
+    realTime?: boolean;
+    [key: string]: any;
+  };
+  // Additional fields for comprehensive audit logs
+  auditId?: string;
+  action?: string;
+  entity?: string;
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
+  userRole?: string;
+  ipAddress?: string;
+  userAgent?: string;
 }
 
 export interface DSARRequest {

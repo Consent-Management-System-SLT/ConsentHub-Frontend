@@ -173,10 +173,18 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
           updatedConsents.push(event.consent);
         }
         
-        return updatedConsents.sort((a, b) => 
-          new Date(b.updatedAt || b.createdAt).getTime() - 
-          new Date(a.updatedAt || a.createdAt).getTime()
-        );
+        return updatedConsents.sort((a, b) => {
+          // Use the most recent date available for sorting
+          const getLatestDate = (consent: any) => {
+            const dates = [consent.grantedAt, consent.deniedAt, consent.updatedAt, consent.createdAt].filter(Boolean);
+            if (dates.length === 0) return new Date(0);
+            return new Date(Math.max(...dates.map(d => new Date(d).getTime())));
+          };
+          
+          const dateA = getLatestDate(a);
+          const dateB = getLatestDate(b);
+          return dateB.getTime() - dateA.getTime();
+        });
       });
       
       // Update last updated timestamp
@@ -207,10 +215,6 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
 
     return () => clearInterval(interval);
   }, [autoRefresh, customerId]);
-
-  const handleManualRefresh = async () => {
-    await loadConsentsAndCustomers();
-  };
 
   const loadConsentsAndCustomers = async () => {
     try {
@@ -286,7 +290,29 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       
       console.log('=== END DEBUG ===');
       
-      setConsents(filteredConsents);
+      // Sort consents by grantedAt/deniedAt in descending order (newest first)
+      const sortedConsents = filteredConsents.sort((a, b) => {
+        // Use the most recent date available (grantedAt or deniedAt)
+        const getLatestDate = (consent: any) => {
+          const dates = [consent.grantedAt, consent.deniedAt, consent.updatedAt, consent.createdAt].filter(Boolean);
+          if (dates.length === 0) return new Date(0);
+          return new Date(Math.max(...dates.map(d => new Date(d).getTime())));
+        };
+        
+        const dateA = getLatestDate(a);
+        const dateB = getLatestDate(b);
+        return dateB.getTime() - dateA.getTime();
+      });
+      
+      console.log('Sorted consents (first 5):', sortedConsents.slice(0, 5).map(c => ({
+        purpose: c.purpose,
+        customerId: c.customerId,
+        status: c.status,
+        grantedAt: c.grantedAt,
+        deniedAt: c.deniedAt
+      })));
+      
+      setConsents(sortedConsents);
       setCustomers(customerArray);
       setLastUpdated(new Date());
     } catch (err) {
