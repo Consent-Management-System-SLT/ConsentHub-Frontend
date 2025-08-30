@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "powershell -ExecutionPolicy Bypass -File start-system.ps1",
+    "start": "node comprehensive-backend.js",
     "start:system": "start-system.bat",
     "start:simple": "powershell -ExecutionPolicy Bypass -File start-simple.ps1",
     "start:mongodb": "powershell -ExecutionPolicy Bypass -File start-mongodb.ps1",
