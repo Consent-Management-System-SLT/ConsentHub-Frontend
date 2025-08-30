@@ -407,7 +407,9 @@ export const useNotificationService = () => {
   const { addNotification } = useNotifications();
   
   // Initialize the service when the hook is used
-  notificationService.init(addNotification);
+  if (addNotification) {
+    notificationService.init(addNotification);
+  }
   
   return notificationService;
 };

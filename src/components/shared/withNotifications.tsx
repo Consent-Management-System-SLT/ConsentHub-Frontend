@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNotificationService } from '../../services/notificationService';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 interface WithNotificationsProps {
   onCRUDOperation?: (operation: {
@@ -18,7 +18,7 @@ export function withNotifications<P extends object>(
 ) {
   const WithNotificationsComponent = (props: P & WithNotificationsProps) => {
     const { user } = useAuth();
-    const notificationService = useNotificationService();
+    const { addNotification } = useNotifications();
 
     // Enhanced CRUD operation handler that automatically sends notifications
     const handleCRUDOperation = React.useCallback((operation: {
@@ -30,9 +30,24 @@ export function withNotifications<P extends object>(
       // Send notification with default entity type if none provided
       const entityType = operation.entity || defaultEntityType;
       
-      notificationService.notifyCRUDOperation({
-        ...operation,
-        entity: entityType,
+      // Create a simple notification directly
+      const getActionMessage = (action: string, entity: string, entityName?: string) => {
+        const name = entityName || entity;
+        switch (action) {
+          case 'create': return `${name} has been created successfully.`;
+          case 'update': return `${name} has been updated.`;
+          case 'delete': return `${name} has been deleted.`;
+          case 'approve': return `${name} has been approved.`;
+          case 'reject': return `${name} has been rejected.`;
+          default: return `${action} operation completed for ${name}.`;
+        }
+      };
+      
+      addNotification({
+        type: 'system',
+        category: operation.action === 'delete' ? 'warning' : 'success',
+        title: `${operation.action.charAt(0).toUpperCase() + operation.action.slice(1)} ${entityType}`,
+        message: getActionMessage(operation.action, entityType, operation.entityName),
         userId: user?.id,
         metadata: {
           ...operation.metadata,
@@ -46,7 +61,7 @@ export function withNotifications<P extends object>(
       if (props.onCRUDOperation) {
         props.onCRUDOperation(operation);
       }
-    }, [user, notificationService, props]);
+    }, [user, addNotification, props]);
 
     return (
       <WrappedComponent
@@ -64,7 +79,7 @@ export function withNotifications<P extends object>(
 // Utility hook to easily send notifications from any component
 export const useCRUDNotifications = () => {
   const { user } = useAuth();
-  const notificationService = useNotificationService();
+  const { addNotification } = useNotifications();
 
   const notifyOperation = React.useCallback((
     action: 'create' | 'update' | 'delete' | 'view' | 'export' | 'import' | 'approve' | 'reject',
@@ -72,10 +87,24 @@ export const useCRUDNotifications = () => {
     entityName?: string,
     metadata?: Record<string, any>
   ) => {
-    notificationService.notifyCRUDOperation({
-      action,
-      entity,
-      entityName,
+    // Create a simple notification directly
+    const getActionMessage = (action: string, entity: string, entityName?: string) => {
+      const name = entityName || entity;
+      switch (action) {
+        case 'create': return `${name} has been created successfully.`;
+        case 'update': return `${name} has been updated.`;
+        case 'delete': return `${name} has been deleted.`;
+        case 'approve': return `${name} has been approved.`;
+        case 'reject': return `${name} has been rejected.`;
+        default: return `${action} operation completed for ${name}.`;
+      }
+    };
+    
+    addNotification({
+      type: 'system',
+      category: action === 'delete' ? 'warning' : 'success',
+      title: `${action.charAt(0).toUpperCase() + action.slice(1)} ${entity}`,
+      message: getActionMessage(action, entity, entityName),
       userId: user?.id,
       metadata: {
         ...metadata,
@@ -84,7 +113,7 @@ export const useCRUDNotifications = () => {
         userName: user?.firstName ? `${user.firstName} ${user.lastName}` : user?.email
       }
     });
-  }, [user, notificationService]);
+  }, [user, addNotification]);
 
   return {
     notifyCreate: (entity: string, entityName?: string, metadata?: Record<string, any>) => 
@@ -117,11 +146,17 @@ export const useCRUDNotifications = () => {
       title: string,
       message: string,
       metadata?: Record<string, any>
-    ) => notificationService.notify(type, category, title, message, {
-      ...metadata,
+    ) => addNotification({
+      type,
+      category,
+      title,
+      message,
       userId: user?.id,
-      userRole: user?.role,
-      userName: user?.firstName ? `${user.firstName} ${user.lastName}` : user?.email
+      metadata: {
+        ...metadata,
+        userRole: user?.role,
+        userName: user?.firstName ? `${user.firstName} ${user.lastName}` : user?.email
+      }
     })
   };
 };
