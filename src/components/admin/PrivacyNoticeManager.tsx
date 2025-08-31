@@ -27,7 +27,8 @@ const PrivacyNoticeManager: React.FC = () => {
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch('http://localhost:3001/api/v1/privacy-notices', {
+      const baseURL = import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/privacy-notices`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

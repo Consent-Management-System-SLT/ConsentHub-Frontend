@@ -43,7 +43,8 @@ const DSARManager: React.FC = () => {
       }
       
       // Direct API call to match our working test
-      const response = await fetch('http://localhost:3001/api/v1/dsar/requests', {
+      const baseURL = import.meta.env.VITE_DSAR_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/dsar/requests`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -156,7 +157,8 @@ const DSARManager: React.FC = () => {
       }
       
       console.log('Export: Making request to CSV endpoint...');
-      const response = await fetch('http://localhost:3001/api/v1/dsar/export/csv', {
+      const baseURL = import.meta.env.VITE_DSAR_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/dsar/export/csv`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -213,7 +215,8 @@ const DSARManager: React.FC = () => {
         updateData.processingNote = processingNote;
       }
 
-      const response = await fetch(`http://localhost:3001/api/v1/dsar/requests/${requestId}`, {
+      const baseURL = import.meta.env.VITE_DSAR_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/dsar/requests/${requestId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

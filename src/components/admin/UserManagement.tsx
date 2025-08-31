@@ -222,7 +222,8 @@ const UserManagement: React.FC = () => {
       const token = localStorage.getItem('authToken');
       
       // Fetch regular users
-      const usersResponse = await fetch('http://localhost:3001/api/v1/users', {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const usersResponse = await fetch(`${baseURL}/api/v1/users`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -242,7 +243,7 @@ const UserManagement: React.FC = () => {
       }));
       
       // Fetch guardians
-      const guardiansResponse = await fetch('http://localhost:3001/api/v1/guardians', {
+      const guardiansResponse = await fetch(`${baseURL}/api/v1/guardians`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -381,7 +382,8 @@ const UserManagement: React.FC = () => {
       
       if (newUser.role === 'guardian') {
         // Create guardian with dependents
-        response = await fetch('http://localhost:3001/api/v1/guardians', {
+        const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+        response = await fetch(`${baseURL}/api/v1/guardians`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -416,7 +418,8 @@ const UserManagement: React.FC = () => {
         setUsers([...users, guardianAsUser]);
       } else {
         // Create regular user
-        response = await fetch('http://localhost:3001/api/v1/users', {
+        const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+        response = await fetch(`${baseURL}/api/v1/users`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -585,7 +588,8 @@ const UserManagement: React.FC = () => {
     
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/v1/guardians/${editGuardianData.id}`, {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/guardians/${editGuardianData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -681,7 +685,8 @@ const UserManagement: React.FC = () => {
       setLoading(true);
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`http://localhost:3001/api/v1/users/${userToDelete.id}`, {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/users/${userToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -736,7 +741,8 @@ const UserManagement: React.FC = () => {
       setLoading(true);
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`http://localhost:3001/api/v1/users/${userId}/status`, {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/users/${userId}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

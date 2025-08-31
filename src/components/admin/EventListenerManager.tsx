@@ -116,7 +116,7 @@ const EventListenerManager: React.FC = () => {
   });
 
   // API Base URL
-  const API_BASE_URL = 'http://localhost:3001/api/v1';
+  const API_BASE_URL = `${import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001'}/api/v1`;
 
   // Get auth token
   const getAuthToken = () => {

@@ -104,7 +104,8 @@ const AuditLogViewer: React.FC = () => {
         params.append('outcome', selectedOutcome);
       }
 
-      const response = await fetch(`http://localhost:3001/api/v1/audit-logs?${params}`, {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/audit-logs?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -168,7 +169,8 @@ const AuditLogViewer: React.FC = () => {
       if (selectedCategory) params.append('category', selectedCategory);
       if (selectedOutcome) params.append('outcome', selectedOutcome);
 
-      const response = await fetch(`http://localhost:3001/api/v1/audit-logs/export/csv?${params}`, {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/audit-logs/export/csv?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
