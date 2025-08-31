@@ -43,8 +43,11 @@ const CustomerManagement: React.FC = () => {
       setError(null);
       const token = localStorage.getItem('authToken');
       
+      // Use environment variable for API URL
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      
       // Fetch all users and filter customers
-      const response = await fetch('http://localhost:3001/api/v1/users', {
+      const response = await fetch(`${baseURL}/api/v1/users`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
