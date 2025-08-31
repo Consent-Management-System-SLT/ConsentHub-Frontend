@@ -19,6 +19,8 @@ import {
 import { useConsents, useParties, useConsentMutation } from '../../hooks/useApi';
 import { ConsentCreateRequest } from '../../services/consentService';
 import { ConsentPurpose, ConsentStatus } from '../../types/consent';
+import { websocketService } from '../../services/websocketService';
+import { notificationManager } from '../shared/NotificationContainer';
 
 interface Consent {
   id: string;
@@ -26,13 +28,17 @@ interface Consent {
   customerName: string;
   email: string;
   consentType: 'marketing' | 'analytics' | 'functional' | 'necessary';
-  status: 'active' | 'withdrawn' | 'expired' | 'pending';
+  status: 'active' | 'withdrawn' | 'expired' | 'pending' | 'granted' | 'revoked';
   grantedDate: string;
   expiryDate?: string;
   lastUpdated: string;
   source: 'website' | 'mobile' | 'email' | 'phone' | 'in-person' | 'sms' | 'push' | 'all' | 'customer_service' | 'mobile_app' | 'registration';
   version: string;
   isRealUser?: boolean;
+  // Add raw timestamps for sorting
+  grantedAt?: string;
+  revokedAt?: string;
+  updatedAt?: string;
 }
 
 interface ConsentOverviewTableProps {}
@@ -48,6 +54,67 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [modalData, setModalData] = useState<Consent | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  // Helper function to format grant/revoke date with time and source
+  const formatGrantRevokeDateTime = (consent: any) => {
+    const formatDateTime = (dateString: string) => {
+      const date = new Date(dateString);
+      return {
+        date: date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit'
+        }),
+        time: date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        })
+      };
+    };
+
+    if (consent.status === 'granted' && consent.grantedAt) {
+      const formatted = formatDateTime(consent.grantedAt);
+      return {
+        action: 'Granted',
+        date: formatted.date,
+        time: formatted.time,
+        source: consent.source || 'customer-portal'
+      };
+    } else if ((consent.status === 'revoked' || consent.status === 'withdrawn') && consent.revokedAt) {
+      const formatted = formatDateTime(consent.revokedAt);
+      return {
+        action: 'Revoked',
+        date: formatted.date,
+        time: formatted.time,
+        source: consent.source || 'customer-portal'
+      };
+    } else if (consent.grantedAt) {
+      const formatted = formatDateTime(consent.grantedAt);
+      return {
+        action: 'Granted',
+        date: formatted.date,
+        time: formatted.time,
+        source: consent.source || 'customer-portal'
+      };
+    } else if (consent.validFrom) {
+      const formatted = formatDateTime(consent.validFrom);
+      return {
+        action: 'Created',
+        date: formatted.date,
+        time: formatted.time,
+        source: consent.source || 'system'
+      };
+    }
+
+    return {
+      action: 'Unknown',
+      date: 'N/A',
+      time: 'N/A',
+      source: 'unknown'
+    };
+  };
   const [itemsPerPage] = useState(5);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingConsent, setEditingConsent] = useState<Consent | null>(null);
@@ -98,6 +165,45 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, consentTypeFilter]);
 
+  // WebSocket real-time updates
+  useEffect(() => {
+    console.log('🔌 Admin Dashboard: Setting up WebSocket for real-time consent updates');
+    
+    // Join CSR dashboard room for real-time updates
+    websocketService.joinCSRDashboard();
+    
+    // Listen for consent updates
+    const handleConsentUpdate = (event: any) => {
+      console.log('📡 Admin Dashboard: Received real-time consent update:', event);
+      
+      // Show notification
+      const customerName = event.user?.email || 'Unknown Customer';
+      const actionType = event.type === 'granted' ? 'granted' : 'revoked';
+      const source = event.source === 'csr' ? 'CSR Staff' : 
+                    event.source === 'customer' ? 'Customer' : 'System';
+      
+      notificationManager.info(
+        `Consent ${actionType.charAt(0).toUpperCase() + actionType.slice(1)}`,
+        `${customerName} ${actionType} consent${source !== 'System' ? ` via ${source}` : ''}`
+      );
+      
+      // Refresh the data to get latest updates
+      refetchConsents();
+      
+      // Update last updated timestamp
+      setLastUpdated(new Date());
+    };
+    
+    // Set up the WebSocket listener
+    websocketService.onConsentUpdate(handleConsentUpdate);
+    
+    // Cleanup on unmount
+    return () => {
+      console.log('🔌 Admin Dashboard: Cleaning up WebSocket listeners');
+      websocketService.leaveCSRDashboard();
+    };
+  }, [refetchConsents]);
+
   // Create party lookup map for efficient customer data lookup
   const partyLookup = new Map();
   parties.forEach((party: any) => {
@@ -107,6 +213,20 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   // Transform consents data from API
   const rawConsents = Array.isArray(consentsData) ? consentsData : 
     (consentsData && (consentsData as any).consents ? (consentsData as any).consents : []);
+
+  // Helper function to get the latest action timestamp for true chronological sorting
+  const getLatestActionTimestamp = (consent: any) => {
+    const timestamps = [];
+    
+    // Add available timestamps
+    if (consent.grantedAt) timestamps.push(new Date(consent.grantedAt).getTime());
+    if (consent.revokedAt) timestamps.push(new Date(consent.revokedAt).getTime());
+    if (consent.updatedAt) timestamps.push(new Date(consent.updatedAt).getTime());
+    if (consent.lastModified) timestamps.push(new Date(consent.lastModified).getTime());
+    
+    // Return the most recent timestamp
+    return timestamps.length > 0 ? Math.max(...timestamps) : 0;
+  };
 
   // Transform API consent data to match UI interface
   const consents: Consent[] = rawConsents.map((consent: any) => {
@@ -224,20 +344,24 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       }) : '',
       source: consent.channel || consent.source || 'website',
       version: consent.versionAccepted || 'v1.0',
-      isRealUser: customerInfo.isRealUser // Add flag for sorting
+      isRealUser: customerInfo.isRealUser,
+      // Preserve raw timestamps for sorting
+      grantedAt: consent.grantedAt,
+      revokedAt: consent.revokedAt,
+      updatedAt: consent.updatedAt
     };
   })
   
-  // Sort to prioritize real MongoDB users first, then by date
+  // Sort to prioritize real MongoDB users first, then by latest action timestamp
   .sort((a: Consent, b: Consent) => {
     // First, sort by whether they are real users (real users first)
     if (a.isRealUser && !b.isRealUser) return -1;
     if (!a.isRealUser && b.isRealUser) return 1;
     
-    // Then sort by date (most recent first)
-    const dateA = new Date(a.grantedDate).getTime();
-    const dateB = new Date(b.grantedDate).getTime();
-    return dateB - dateA;
+    // Then sort by latest action timestamp (most recent first)
+    const timestampA = getLatestActionTimestamp(a);
+    const timestampB = getLatestActionTimestamp(b);
+    return timestampB - timestampA;
   });
 
   // Handle consent actions
@@ -461,7 +585,19 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     const matchesSearch = consent.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          consent.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          consent.customerId.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || consent.status === statusFilter;
+    
+    // Enhanced status filtering to support granted/revoked
+    let matchesStatus = false;
+    if (statusFilter === 'all') {
+      matchesStatus = true;
+    } else if (statusFilter === 'granted') {
+      matchesStatus = consent.status === 'active' || consent.status === 'granted';
+    } else if (statusFilter === 'revoked') {
+      matchesStatus = consent.status === 'withdrawn' || consent.status === 'revoked';
+    } else {
+      matchesStatus = consent.status === statusFilter;
+    }
+    
     const matchesType = consentTypeFilter === 'all' || consent.consentType === consentTypeFilter;
     return matchesSearch && matchesStatus && matchesType;
   });
@@ -471,7 +607,10 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     
     switch (sortBy) {
       case 'date':
-        comparison = new Date(a.lastUpdated).getTime() - new Date(b.lastUpdated).getTime();
+        // Use latest action timestamp for true chronological sorting
+        const timestampA = getLatestActionTimestamp(a);
+        const timestampB = getLatestActionTimestamp(b);
+        comparison = timestampA - timestampB;
         break;
       case 'name':
         comparison = a.customerName.localeCompare(b.customerName);
@@ -514,7 +653,13 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-myslt-text-primary">Consent Management</h1>
-          <p className="text-myslt-text-secondary mt-2">Manage and monitor all customer consents</p>
+          <div className="flex items-center space-x-4 mt-2">
+            <p className="text-myslt-text-secondary">Manage and monitor all customer consents</p>
+            <span className="text-xs text-myslt-text-muted flex items-center">
+              <RefreshCw className="w-3 h-3 mr-1" />
+              Last updated: {lastUpdated.toLocaleTimeString()}
+            </span>
+          </div>
         </div>
         <div className="flex items-center space-x-3">
           <button 
@@ -635,8 +780,10 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   className="appearance-none bg-myslt-card-solid border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 >
                   <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="withdrawn">Withdrawn</option>
+                  <option value="active">Active/Granted</option>
+                  <option value="withdrawn">Withdrawn/Revoked</option>
+                  <option value="granted">Granted</option>
+                  <option value="revoked">Revoked</option>
                   <option value="expired">Expired</option>
                   <option value="pending">Pending</option>
                 </select>
@@ -790,7 +937,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   }}
                 >
                   <div className="flex items-center space-x-1">
-                    <span>Granted Date</span>
+                    <span>Grant/Revoke Date</span>
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'date' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
                 </th>
@@ -844,7 +991,42 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                      {new Date(consent.grantedDate).toLocaleDateString()}
+                      <div>
+                        <div className="font-medium">
+                          {(() => {
+                            const rawConsent = rawConsents.find((c: any) => (c.id || c._id) === consent.id);
+                            if (!rawConsent) return new Date(consent.grantedDate).toLocaleDateString();
+                            const dateInfo = formatGrantRevokeDateTime(rawConsent);
+                            return (
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                dateInfo.action === 'Granted' ? 'bg-green-100 text-green-800' :
+                                dateInfo.action === 'Revoked' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {dateInfo.action}
+                              </span>
+                            );
+                          })()}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {(() => {
+                            const rawConsent = rawConsents.find((c: any) => (c.id || c._id) === consent.id);
+                            if (!rawConsent) return new Date(consent.grantedDate).toLocaleDateString();
+                            const dateInfo = formatGrantRevokeDateTime(rawConsent);
+                            return `${dateInfo.date} at ${dateInfo.time}`;
+                          })()}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          by {(() => {
+                            const rawConsent = rawConsents.find((c: any) => (c.id || c._id) === consent.id);
+                            if (!rawConsent) return 'Customer';
+                            const dateInfo = formatGrantRevokeDateTime(rawConsent);
+                            return dateInfo.source === 'csr-dashboard' ? 'CSR Staff' : 
+                                   dateInfo.source === 'customer-portal' ? 'Customer' :
+                                   dateInfo.source === 'admin-dashboard' ? 'Admin' : 'System';
+                          })()}
+                        </div>
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">
@@ -964,11 +1146,24 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Timeline</h4>
                 <div className="bg-myslt-service-card rounded-lg p-4 space-y-2">
-                  <p><span className="font-medium">Granted:</span> {new Date(modalData.grantedDate).toLocaleDateString()}</p>
-                  <p><span className="font-medium">Last Updated:</span> {new Date(modalData.lastUpdated).toLocaleDateString()}</p>
-                  {modalData.expiryDate && (
-                    <p><span className="font-medium">Expires:</span> {new Date(modalData.expiryDate).toLocaleDateString()}</p>
-                  )}
+                  {(() => {
+                    // Find the raw consent for full audit info
+                    const rawConsent = rawConsents.find((c: any) => (c.id || c._id) === modalData.id);
+                    const dateInfo = rawConsent ? formatGrantRevokeDateTime(rawConsent) : null;
+                    return (
+                      <>
+                        {dateInfo && (
+                          <p>
+                            <span className="font-medium">{dateInfo.action}:</span> {dateInfo.date} at {dateInfo.time} <span className="text-xs text-gray-400">by {dateInfo.source === 'csr-dashboard' ? 'CSR Staff' : dateInfo.source === 'customer-portal' ? 'Customer' : dateInfo.source === 'admin-dashboard' ? 'Admin' : 'System'}</span>
+                          </p>
+                        )}
+                        {modalData.expiryDate && (
+                          <p><span className="font-medium">Expires:</span> {new Date(modalData.expiryDate).toLocaleDateString()}</p>
+                        )}
+                        <p><span className="font-medium">Last Updated:</span> {new Date(modalData.lastUpdated).toLocaleDateString()}</p>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
               

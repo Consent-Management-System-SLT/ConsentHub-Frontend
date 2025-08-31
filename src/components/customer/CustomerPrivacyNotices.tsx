@@ -19,7 +19,7 @@ import {
   X
 } from 'lucide-react';
 import { authService } from '../../services/authService';
-import { apiClient } from '../../services/apiClient';
+import { multiServiceApiClient } from '../../services/multiServiceApiClient';
 import { io, Socket } from 'socket.io-client';
 
 interface PrivacyNotice {
@@ -65,10 +65,23 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
     setError(null);
     try {
       console.log('Loading privacy notices from backend...');
-      const response = await apiClient.get('/api/v1/customer/privacy-notices');
+      const response = await multiServiceApiClient.makeRequest(
+        'GET',
+        '/api/v1/customer/privacy-notices',
+        undefined,
+        'customer'
+      );
       
-      if (response.data.success && response.data.data.notices) {
-        const noticesData = response.data.data.notices;
+      console.log('Privacy notices API response:', response);
+      console.log('Response structure:', {
+        success: response.success,
+        hasData: !!response.data,
+        hasNotices: !!(response.data && response.data.notices),
+        noticesCount: response.data && response.data.notices ? response.data.notices.length : 0
+      });
+      
+      if (response.success && response.data && response.data.notices) {
+        const noticesData = response.data.notices;
         console.log(`Loaded ${noticesData.length} privacy notices`);
         
         // Process and normalize the notices data
@@ -118,11 +131,14 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
     try {
       console.log(`${decision === 'accept' ? 'Accepting' : 'Declining'} privacy notice: ${noticeId}`);
       
-      const response = await apiClient.post(`/api/v1/privacy-notices/${noticeId}/acknowledge`, {
-        decision: decision
-      });
+      const response = await multiServiceApiClient.makeRequest(
+        'POST',
+        `/api/v1/privacy-notices/${noticeId}/acknowledge`,
+        { decision: decision },
+        'customer'
+      );
 
-      if (response.data.success) {
+      if (response.success) {
         console.log(`Privacy notice ${decision}ed successfully`);
         
         // Update the notice in state
@@ -164,7 +180,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
       }
     } catch (error: any) {
       console.error(`Error ${decision}ing privacy notice:`, error);
-      setError(error.response?.data?.message || `Failed to ${decision} privacy notice`);
+      setError(error.message || `Failed to ${decision} privacy notice`);
     } finally {
       setIsProcessing(null);
     }

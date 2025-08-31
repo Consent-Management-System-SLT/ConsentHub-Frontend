@@ -32,7 +32,7 @@ const privacyNoticeSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['general', 'marketing', 'analytics', 'cookies', 'third-party', 'location', 'children', 'employment'],
+    enum: ['general', 'marketing', 'analytics', 'cookies', 'cookie_policy', 'privacy_policy', 'third-party', 'location', 'children', 'employment', 'terms'],
     default: 'general'
   },
   purposes: [{

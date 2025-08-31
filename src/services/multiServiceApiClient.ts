@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 
 // Service configurations - Updated for local development
 const SERVICES = {
-  AUTH: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:3001',
+  AUTH: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:3001/api/v1',
   CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001',
   CSR: import.meta.env.VITE_CSR_API_URL || 'http://localhost:3001',
   GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001',

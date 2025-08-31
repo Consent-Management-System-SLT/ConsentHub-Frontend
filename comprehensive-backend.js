@@ -4540,6 +4540,7 @@ app.post("/api/v1/consent", async (req, res) => {
 app.put("/api/v1/consent/:id", async (req, res) => {
     try {
         console.log('✅ CSR Dashboard: Updating consent:', req.params.id);
+        console.log('📝 Request body:', JSON.stringify(req.body, null, 2));
         const consentId = req.params.id;
         
         // Update in MongoDB first
@@ -4548,6 +4549,14 @@ app.put("/api/v1/consent/:id", async (req, res) => {
         if (updatedConsent) {
             // Update MongoDB document
             Object.assign(updatedConsent, req.body);
+            
+            // Mark as CSR-updated if this request comes from CSR (based on notes or updatedBy)
+            if ((req.body.notes && req.body.notes.includes('CSR')) || req.body.updatedBy === 'csr-agent') {
+                updatedConsent.source = 'csr-dashboard';
+                updatedConsent.recordSource = 'csr-dashboard';
+                updatedConsent.updatedBy = 'CSR Staff';
+                console.log('🏷️ Marking consent update as CSR-initiated');
+            }
             
             if (req.body.status === 'granted') {
                 updatedConsent.grantedAt = new Date();
@@ -4559,6 +4568,23 @@ app.put("/api/v1/consent/:id", async (req, res) => {
             
             await updatedConsent.save();
             console.log('✅ Consent updated in MongoDB:', consentId);
+            
+            // Emit real-time update to CSR dashboard
+            if (global.io && req.body.status) {
+                const eventType = req.body.status === 'granted' ? 'granted' : 'revoked';
+                global.io.to('csr-dashboard').emit('consent-updated', {
+                    type: eventType,
+                    consent: updatedConsent,
+                    timestamp: new Date(),
+                    user: {
+                        id: updatedConsent.partyId || updatedConsent.userId,
+                        email: updatedConsent.customerEmail || 'Unknown'
+                    },
+                    source: updatedConsent.source === 'csr-dashboard' ? 'csr' : 'system',
+                    updatedBy: updatedConsent.updatedBy || 'System'
+                });
+                console.log(`📡 Real-time update sent to CSR dashboard - consent ${eventType} via system`);
+            }
             
             // Also update in-memory array for compatibility
             const consentIndex = csrConsents.findIndex(c => c.id === consentId);
@@ -6080,13 +6106,33 @@ app.put("/api/v1/consent/:id", (req, res) => {
         return res.status(404).json({ error: "Consent not found" });
     }
     
+    const oldConsent = { ...csrConsents[consentIndex] };
+    
     csrConsents[consentIndex] = {
         ...csrConsents[consentIndex],
         ...req.body,
         updatedAt: new Date().toISOString()
     };
     
-    res.json(csrConsents[consentIndex]);
+    const updatedConsent = csrConsents[consentIndex];
+    
+    // Emit real-time update to CSR dashboard when status changes
+    if (global.io && oldConsent.status !== updatedConsent.status) {
+        const eventType = updatedConsent.status === 'granted' ? 'granted' : 'revoked';
+        global.io.to('csr-dashboard').emit('consent-updated', {
+            type: eventType,
+            consent: updatedConsent,
+            timestamp: new Date(),
+            user: {
+                id: updatedConsent.partyId || updatedConsent.customerId,
+                email: updatedConsent.customerEmail || 'Unknown'
+            },
+            source: 'csr'
+        });
+        console.log(`📡 Real-time update sent to CSR dashboard - consent ${eventType} by CSR`);
+    }
+    
+    res.json(updatedConsent);
 });
 
 // Authentication endpoints

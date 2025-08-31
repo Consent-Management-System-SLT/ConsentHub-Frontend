@@ -1599,7 +1599,7 @@ class CSRDashboardService {
   /**
    * Update customer consent status
    */
-  async updateConsentStatus(consentId: string, status: 'granted' | 'denied' | 'withdrawn', notes?: string): Promise<ConsentData> {
+  async updateConsentStatus(consentId: string, status: 'granted' | 'revoked', notes?: string): Promise<ConsentData> {
     try {
       console.log(`[CSR] Updating consent ${consentId} to status: ${status}`);
       
@@ -1626,7 +1626,7 @@ class CSRDashboardService {
         purpose: '',
         status,
         grantedAt: status === 'granted' ? new Date().toISOString() : undefined,
-        deniedAt: status === 'denied' ? new Date().toISOString() : undefined,
+        deniedAt: status === 'revoked' ? new Date().toISOString() : undefined,
         source: 'csr-update',
         lawfulBasis: 'consent',
         category: 'updated'

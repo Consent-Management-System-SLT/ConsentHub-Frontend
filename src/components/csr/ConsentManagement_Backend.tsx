@@ -5,8 +5,7 @@ import {
   Shield, 
   Check, 
   X, 
-  Clock, 
-  AlertTriangle,
+  Clock,
   RefreshCw,
   Edit,
   Eye,
@@ -18,6 +17,8 @@ import {
   Filter
 } from 'lucide-react';
 import { csrDashboardService, CustomerData, ConsentData } from '../../services/csrDashboardService';
+import { websocketService } from '../../services/websocketService';
+import { notificationManager } from '../shared/NotificationContainer';
 
 // Function to format consent purpose names properly
 const formatPurposeName = (purpose: string): string => {
@@ -130,6 +131,77 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
     }
   }, [selectedCustomer]);
 
+  // WebSocket real-time updates for consent changes
+  useEffect(() => {
+    console.log('🔌 ConsentManagement: Setting up WebSocket for real-time consent updates');
+    
+    // Join CSR dashboard for real-time updates
+    websocketService.joinCSRDashboard();
+    
+    // Listen for consent updates
+    const handleConsentUpdate = (event: any) => {
+      console.log('📡 ConsentManagement: Received real-time consent update:', event);
+      
+      // Show notification
+      const customerName = customers.find(c => c.id === event.consent.partyId)?.name || event.user.email;
+      const purposeName = formatPurposeName(event.consent.purpose);
+      
+      if (event.type === 'granted') {
+        notificationManager.success(
+          'Consent Granted',
+          `${customerName} granted consent for ${purposeName}`
+        );
+      } else {
+        notificationManager.warning(
+          'Consent Revoked',
+          `${customerName} revoked consent for ${purposeName}`
+        );
+      }
+      
+      // Update the customer consents list
+      if (selectedCustomer && (event.consent.partyId === selectedCustomer || event.consent.customerId === selectedCustomer)) {
+        setCustomerConsents(prevConsents => {
+          const updatedConsents = prevConsents.map(consent => {
+            if (consent.id === event.consent.id) {
+              return {
+                ...consent,
+                status: event.consent.status,
+                updatedAt: event.timestamp,
+                grantedAt: event.consent.status === 'granted' ? new Date().toISOString() : consent.grantedAt
+              };
+            }
+            return consent;
+          });
+          
+          return updatedConsents;
+        });
+      }
+      
+      // Update the all consents list
+      setConsents(prevConsents => {
+        const updatedConsents = prevConsents.map(consent => {
+          if (consent.id === event.consent.id) {
+            return {
+              ...consent,
+              status: event.consent.status,
+              updatedAt: event.timestamp,
+              grantedAt: event.consent.status === 'granted' ? new Date().toISOString() : consent.grantedAt
+            };
+          }
+          return consent;
+        });
+        
+        return updatedConsents;
+      });
+    };
+    
+    websocketService.onConsentUpdate(handleConsentUpdate);
+    
+    return () => {
+      websocketService.offConsentUpdate();
+    };
+  }, [customers, selectedCustomer]);
+
   const loadCustomers = async () => {
     try {
       const customersData = await csrDashboardService.getCustomers();
@@ -178,7 +250,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
     setSelectedCustomerInfo(customerInfo || null);
   };
 
-  const handleConsentUpdate = async (consentId: string, newStatus: 'granted' | 'denied' | 'withdrawn') => {
+  const handleConsentUpdate = async (consentId: string, newStatus: 'granted' | 'revoked') => {
     try {
       setSaving(consentId);
       
@@ -196,7 +268,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                 ...consent, 
                 status: newStatus,
                 grantedAt: newStatus === 'granted' ? new Date().toISOString() : consent.grantedAt,
-                deniedAt: newStatus === 'denied' ? new Date().toISOString() : consent.deniedAt
+                deniedAt: newStatus === 'revoked' ? new Date().toISOString() : consent.deniedAt
               }
             : consent
         )
@@ -235,8 +307,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       granted: { color: 'bg-green-100 text-green-800', icon: Check },
-      denied: { color: 'bg-red-100 text-red-800', icon: X },
-      withdrawn: { color: 'bg-orange-100 text-orange-800', icon: AlertTriangle },
+      revoked: { color: 'bg-red-100 text-red-800', icon: X },
       expired: { color: 'bg-gray-100 text-gray-800', icon: Clock }
     };
 
@@ -363,8 +434,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                   >
                     <option value="all">All Status</option>
                     <option value="granted">Granted</option>
-                    <option value="denied">Denied</option>
-                    <option value="withdrawn">Withdrawn</option>
+                    <option value="revoked">Revoked</option>
                   </select>
                 </div>
 
@@ -448,7 +518,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                         <span className="flex items-center">
                           <Calendar className="w-4 h-4 mr-1" />
                           {consent.grantedAt ? `Granted: ${new Date(consent.grantedAt).toLocaleDateString()}` : 
-                           consent.deniedAt ? `Denied: ${new Date(consent.deniedAt).toLocaleDateString()}` : 
+                           consent.deniedAt ? `Revoked: ${new Date(consent.deniedAt).toLocaleDateString()}` : 
                            'No date available'}
                         </span>
                         <span>Source: {consent.source}</span>
@@ -513,19 +583,11 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                                   </button>
                                   
                                   <button
-                                    onClick={() => handleConsentUpdate(consent.id, 'denied')}
+                                    onClick={() => handleConsentUpdate(consent.id, 'revoked')}
                                     disabled={saving === consent.id}
                                     className="flex-1 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
                                   >
-                                    {saving === consent.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" />Deny</>}
-                                  </button>
-                                  
-                                  <button
-                                    onClick={() => handleConsentUpdate(consent.id, 'withdrawn')}
-                                    disabled={saving === consent.id}
-                                    className="flex-1 px-3 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
-                                  >
-                                    {saving === consent.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><AlertTriangle className="w-4 h-4 mr-1" />Withdraw</>}
+                                    {saving === consent.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" />Revoke</>}
                                   </button>
                                 </div>
                                 
