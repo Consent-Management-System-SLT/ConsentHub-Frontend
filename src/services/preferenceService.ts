@@ -7,7 +7,7 @@ import {
   PreferenceStats 
 } from '../types/preference';
 
-const API_BASE_URL = import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001/api/v1';
+const API_BASE_URL = `${import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001'}/api/v1`;
 
 // API Response interfaces
 interface ApiResponse<T> {
