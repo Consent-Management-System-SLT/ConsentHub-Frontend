@@ -385,7 +385,8 @@ export const PrivacyNotices: React.FC = () => {
 
     try {
       // Connect to Socket.IO server
-      socket = io('http://localhost:3001');
+      const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3001';
+      socket = io(wsUrl);
 
       console.log('🔌 Admin Privacy Notices: Connected to real-time updates');
 
@@ -521,7 +522,7 @@ export const PrivacyNotices: React.FC = () => {
       console.log('🚀 Starting export for format:', format);
       
       // Test the URL construction
-      const baseURL = 'http://localhost:3001';
+      const baseURL = import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'http://localhost:3001';
       const testUrl = `${baseURL}/api/v1/privacy-notices/export/${format}`;
       console.log('🌐 Test URL:', testUrl);
       

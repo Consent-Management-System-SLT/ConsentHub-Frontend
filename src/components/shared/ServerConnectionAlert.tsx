@@ -24,7 +24,7 @@ const ServerConnectionAlert: React.FC<ServerConnectionAlertProps> = ({
   const [retryCount, setRetryCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const BACKEND_URL = 'http://localhost:3001';
+  const BACKEND_URL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
   const MAX_RETRIES = 3;
 
   const testServerConnection = async (attempt = 1) => {

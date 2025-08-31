@@ -224,7 +224,8 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
 
     try {
       // Connect to Socket.IO server
-      socket = io('http://localhost:3001');
+      const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3001';
+      socket = io(wsUrl);
 
       console.log('🔌 Customer Privacy Notices: Connected to real-time updates');
 
