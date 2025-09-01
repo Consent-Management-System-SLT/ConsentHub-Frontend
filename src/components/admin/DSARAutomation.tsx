@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Trash2, Upload, Edit, AlertTriangle, Clock, Info, BarChart, CheckCircle } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
+import { secureLog } from '../../utils/secureLogger';
 
 interface DSARRequest {
   id: string;
@@ -34,7 +35,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
   const loadDSARRequests = async () => {
     try {
       const response = await apiClient.get('/api/v1/dsar/requests');
-      console.log('DSAR requests response:', response.data);
+      secureLog.log('DSAR requests response:', response.data);
       const responseData = response.data as any;
       setRequests(responseData.requests || responseData);
     } catch (error) {
@@ -64,7 +65,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
   };
 
   const handleAutoProcess = async (dsarId: string) => {
-    console.log('Auto-processing DSAR with ID:', dsarId);
+    secureLog.log('Auto-processing DSAR with ID:', dsarId);
     setProcessingRequests(prev => new Set(prev).add(dsarId));
     
     try {

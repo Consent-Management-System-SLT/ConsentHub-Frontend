@@ -18,6 +18,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import ServerConnectionAlert from '../shared/ServerConnectionAlert';
+import { secureLog, logAuthOperation } from '../../utils/secureLogger';
 
 const DSARManager: React.FC = () => {
   const [requests, setRequests] = useState<any[]>([]);
@@ -34,7 +35,7 @@ const DSARManager: React.FC = () => {
     try {
       setLoading(true);
       setError('');
-      console.log('Loading DSAR requests...');
+      secureLog.log('Loading DSAR requests...');
       
       // Get token from localStorage (this is where the auth context stores it)
       const token = localStorage.getItem('authToken');
@@ -56,7 +57,7 @@ const DSARManager: React.FC = () => {
       }
       
       const data = await response.json();
-      console.log('DSAR response:', data);
+      secureLog.log('DSAR response:', data);
       
       // Handle the direct backend response structure
       let requestsArray: any[] = [];
@@ -80,7 +81,7 @@ const DSARManager: React.FC = () => {
         requestsArray = [];
       }
       
-      console.log('Setting requests:', requestsArray);
+      secureLog.log('Setting requests:', requestsArray);
       setRequests(requestsArray);
     } catch (err) {
       console.error('Failed to load DSAR requests:', err);
@@ -149,14 +150,14 @@ const DSARManager: React.FC = () => {
   const handleExport = async () => {
     try {
       const token = localStorage.getItem('authToken'); // Fixed: use 'authToken' not 'token'
-      console.log('Export: checking token...', token ? 'Token found' : 'No token found');
+      secureLog.log('Export: checking token...', token ? 'Token found' : 'No token found');
       
       if (!token) {
         alert('Please log in again to export data');
         throw new Error('No authentication token found');
       }
       
-      console.log('Export: Making request to CSV endpoint...');
+      secureLog.log('Export: Making request to CSV endpoint...');
       const baseURL = import.meta.env.VITE_DSAR_API_URL || 'http://localhost:3001';
       const response = await fetch(`${baseURL}/api/v1/dsar/export/csv`, {
         headers: {
@@ -165,7 +166,7 @@ const DSARManager: React.FC = () => {
         }
       });
       
-      console.log('Export: Response status:', response.status);
+      secureLog.log('Export: Response status:', response.status);
       
       if (!response.ok) {
         const errorData = await response.text();
@@ -174,7 +175,7 @@ const DSARManager: React.FC = () => {
       }
       
       const csvData = await response.text();
-      console.log('Export: CSV data length:', csvData.length);
+      secureLog.log('Export: CSV data length:', csvData.length);
       
       // Check if we actually got CSV data
       if (!csvData || csvData.trim().length === 0) {
@@ -192,7 +193,7 @@ const DSARManager: React.FC = () => {
       window.URL.revokeObjectURL(url);
       
       // Show success message
-      console.log('Export: Download completed successfully');
+      secureLog.log('Export: Download completed successfully');
       alert('DSAR requests exported successfully!');
     } catch (error) {
       console.error('Export failed:', error);
@@ -208,7 +209,7 @@ const DSARManager: React.FC = () => {
         throw new Error('No authentication token found');
       }
 
-      console.log(`🔄 Updating DSAR request ${requestId} to status: ${status}`);
+      secureLog.log(`🔄 Updating DSAR request ${requestId} to status: ${status}`);
 
       const updateData: any = { status };
       if (processingNote) {
@@ -231,7 +232,7 @@ const DSARManager: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log('✅ DSAR request updated successfully:', result);
+      secureLog.log('✅ DSAR request updated successfully:', result);
 
       // Reload requests to show updated status
       await loadDSARRequests();
@@ -249,7 +250,7 @@ const DSARManager: React.FC = () => {
         return;
       }
       
-      console.log('🟢 Approving DSAR request:', request);
+      secureLog.log('🟢 Approving DSAR request:', request);
       
       const processingNote = `Request approved by CSR on ${new Date().toLocaleDateString()}. Processing ${request.requestType} request for ${request.requesterEmail}`;
       
@@ -274,7 +275,7 @@ const DSARManager: React.FC = () => {
         return;
       }
 
-      console.log('🔴 Rejecting DSAR request:', request);
+      secureLog.log('🔴 Rejecting DSAR request:', request);
       
       const processingNote = `Request rejected by CSR on ${new Date().toLocaleDateString()}. Reason: ${reason}`;
       
@@ -292,7 +293,7 @@ const DSARManager: React.FC = () => {
         return;
       }
       
-      console.log('✅ Completing DSAR request:', request);
+      secureLog.log('✅ Completing DSAR request:', request);
       
       const processingNote = `Request completed by CSR on ${new Date().toLocaleDateString()}. ${request.requestType} has been fully processed for ${request.requesterEmail}`;
       

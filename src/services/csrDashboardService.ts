@@ -1,5 +1,6 @@
 // CSR Dashboard Service - Comprehensive Data Management with Fallbacks
 import { apiClient } from './apiClient';
+import { secureLog } from '../utils/secureLogger';
 
 export interface CSRStats {
   totalCustomers: number;
@@ -211,9 +212,9 @@ class CSRDashboardService {
    */
   async getCSRStats(): Promise<CSRStats> {
     try {
-      console.log('[CSR] Fetching CSR stats from backend...');
+      secureLog.log('[CSR] Fetching CSR stats from backend...');
       const response = await apiClient.get(this.statsUrl);
-      console.log('[CSR] CSR stats loaded successfully:', response.data);
+      secureLog.log('[CSR] CSR stats loaded successfully:', response.data);
       return response.data;
     } catch (error) {
       console.warn('[CSR] Backend CSR stats unavailable, using fallback data:', error);

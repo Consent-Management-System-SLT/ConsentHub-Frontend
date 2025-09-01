@@ -21,6 +21,7 @@ import { ConsentCreateRequest } from '../../services/consentService';
 import { ConsentPurpose, ConsentStatus } from '../../types/consent';
 import { websocketService } from '../../services/websocketService';
 import { notificationManager } from '../shared/NotificationContainer';
+import { secureLog } from '../../utils/secureLogger';
 
 interface Consent {
   id: string;
@@ -167,14 +168,14 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
 
   // WebSocket real-time updates
   useEffect(() => {
-    console.log('🔌 Admin Dashboard: Setting up WebSocket for real-time consent updates');
+    secureLog.log('🔌 Admin Dashboard: Setting up WebSocket for real-time consent updates');
     
     // Join CSR dashboard room for real-time updates
     websocketService.joinCSRDashboard();
     
     // Listen for consent updates
     const handleConsentUpdate = (event: any) => {
-      console.log('📡 Admin Dashboard: Received real-time consent update:', event);
+      secureLog.log('📡 Admin Dashboard: Received real-time consent update:', event);
       
       // Show notification
       const customerName = event.user?.email || 'Unknown Customer';
@@ -199,7 +200,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     
     // Cleanup on unmount
     return () => {
-      console.log('🔌 Admin Dashboard: Cleaning up WebSocket listeners');
+      secureLog.log('🔌 Admin Dashboard: Cleaning up WebSocket listeners');
       websocketService.leaveCSRDashboard();
     };
   }, [refetchConsents]);

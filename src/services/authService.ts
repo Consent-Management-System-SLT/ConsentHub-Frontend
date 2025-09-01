@@ -1,5 +1,6 @@
 // Authentication Service for ConsentHub - Real Backend Integration
 import { multiServiceApiClient } from './multiServiceApiClient';
+import { logAuthOperation, secureLog } from '../utils/secureLogger';
 
 export interface LoginRequest {
   email: string;
@@ -120,12 +121,12 @@ class AuthService {
    */
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
-      console.log('Starting login process for:', credentials.email);
+      logAuthOperation('Starting login process for', credentials.email);
       let response;
 
       // Try backend endpoint, fallback to demo mode on any error
       try {
-        console.log('Trying backend endpoint...');
+        secureLog.log('Trying backend endpoint...');
         response = await multiServiceApiClient.makeRequest(
           'POST',
           '/api/v1/auth/login',
@@ -133,10 +134,10 @@ class AuthService {
           'customer',
           'auth'
         );
-        console.log('Backend endpoint success');
+        secureLog.log('Backend endpoint success');
       } catch (backendError: any) {
-        console.log('Backend endpoint failed:', backendError.message);
-        console.log('Backend unavailable, using demo authentication');
+        secureLog.log('Backend endpoint failed:', backendError.message);
+        secureLog.log('Backend unavailable, using demo authentication');
         return this.demoLogin(credentials);
       }
 
