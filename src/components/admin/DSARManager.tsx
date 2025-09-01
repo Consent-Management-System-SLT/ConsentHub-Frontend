@@ -209,7 +209,7 @@ const DSARManager: React.FC = () => {
         throw new Error('No authentication token found');
       }
 
-      secureLog.log(`🔄 Updating DSAR request ${requestId} to status: ${status}`);
+      secureLog.log(`Updating DSAR request ${requestId} to status: ${status}`);
 
       const updateData: any = { status };
       if (processingNote) {
@@ -232,7 +232,7 @@ const DSARManager: React.FC = () => {
       }
 
       const result = await response.json();
-      secureLog.log('✅ DSAR request updated successfully:', result);
+      secureLog.log('DSAR request updated successfully:', result);
 
       // Reload requests to show updated status
       await loadDSARRequests();
@@ -250,7 +250,7 @@ const DSARManager: React.FC = () => {
         return;
       }
       
-      secureLog.log('🟢 Approving DSAR request:', request);
+      secureLog.log('Approving DSAR request:', request);
       
       const processingNote = `Request approved by CSR on ${new Date().toLocaleDateString()}. Processing ${request.requestType} request for ${request.requesterEmail}`;
       
@@ -275,7 +275,7 @@ const DSARManager: React.FC = () => {
         return;
       }
 
-      secureLog.log('🔴 Rejecting DSAR request:', request);
+      secureLog.log('Rejecting DSAR request:', request);
       
       const processingNote = `Request rejected by CSR on ${new Date().toLocaleDateString()}. Reason: ${reason}`;
       
@@ -293,7 +293,7 @@ const DSARManager: React.FC = () => {
         return;
       }
       
-      secureLog.log('✅ Completing DSAR request:', request);
+      secureLog.log('Completing DSAR request:', request);
       
       const processingNote = `Request completed by CSR on ${new Date().toLocaleDateString()}. ${request.requestType} has been fully processed for ${request.requesterEmail}`;
       

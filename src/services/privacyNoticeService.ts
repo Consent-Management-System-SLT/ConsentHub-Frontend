@@ -1,4 +1,5 @@
 import { apiClient, ApiResponse } from './apiClient';
+import { secureLog } from '../utils/secureLogger';
 
 // Types for Privacy Notice management
 export interface PrivacyNotice {
@@ -187,7 +188,7 @@ class PrivacyNoticeService {
     
     try {
       const response = await apiClient.delete<{ message: string }>(`${this.basePath}/${id}`);
-      console.log('✅ Delete response received:', response);
+      secureLog.log('Delete response received:', response);
       return response;
     } catch (error) {
       console.error('❌ Delete request failed:', error);
@@ -220,7 +221,7 @@ class PrivacyNoticeService {
     
     console.log('🌐 Export URL:', url);
     const token = localStorage.getItem('authToken'); // Changed from 'token' to 'authToken'
-    console.log('🔑 Token:', token ? 'Present' : 'Missing');
+    secureLog.log('Token:', token ? 'Present' : 'Missing');
     
     return fetch(url, {
       headers: {
