@@ -30,8 +30,8 @@ class WebSocketService {
 
   private connect() {
     try {
-      // Use environment variable for WebSocket URL, fallback to production
-      const wsUrl = import.meta.env.VITE_WS_URL || 'https://consenthub-backend.onrender.com';
+      // Use environment variable for WebSocket URL, fallback to localhost
+      const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3001';
       
       this.socket = io(wsUrl, {
         transports: ['websocket', 'polling'],

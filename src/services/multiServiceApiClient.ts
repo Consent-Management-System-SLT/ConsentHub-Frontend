@@ -2,19 +2,19 @@
 import axios, { AxiosInstance } from 'axios';
 import { logApiRequest, logApiResponse, secureLog } from '../utils/secureLogger';
 
-// Service configurations - Updated for production deployment
+// Service configurations - Updated for local development
 const SERVICES = {
-  AUTH: import.meta.env.VITE_AUTH_API_URL || 'https://consenthub-backend.onrender.com/api/v1',
-  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'https://consenthub-backend.onrender.com',
-  CSR: import.meta.env.VITE_CSR_API_URL || 'https://consenthub-backend.onrender.com',
-  GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'https://consenthub-backend.onrender.com',
-  CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'https://consenthub-backend.onrender.com',
-  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'https://consenthub-backend.onrender.com',
-  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'https://consenthub-backend.onrender.com',
-  DSAR: import.meta.env.VITE_DSAR_API_URL || 'https://consenthub-backend.onrender.com',
-  PARTY: import.meta.env.VITE_PARTY_API_URL || 'https://consenthub-backend.onrender.com',
-  EVENT: import.meta.env.VITE_EVENT_API_URL || 'https://consenthub-backend.onrender.com',
-  CATALOG: import.meta.env.VITE_CATALOG_API_URL || 'https://consenthub-backend.onrender.com',
+  AUTH: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:3001/api/v1',
+  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001',
+  CSR: import.meta.env.VITE_CSR_API_URL || 'http://localhost:3001',
+  GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001',
+  CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'http://localhost:3001',
+  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'http://localhost:3001',
+  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'http://localhost:3001',
+  DSAR: import.meta.env.VITE_DSAR_API_URL || 'http://localhost:3001',
+  PARTY: import.meta.env.VITE_PARTY_API_URL || 'http://localhost:3001',
+  EVENT: import.meta.env.VITE_EVENT_API_URL || 'http://localhost:3001',
+  CATALOG: import.meta.env.VITE_CATALOG_API_URL || 'http://localhost:3001',
 };
 
 // Debug logging for service URLs
