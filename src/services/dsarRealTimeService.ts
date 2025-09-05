@@ -26,7 +26,7 @@ class DSARRealTimeService {
 
       // Create new EventSource connection
       this.eventSource = new EventSource(
-        `http://localhost:3001/api/v1/dsar/updates/stream?token=${encodeURIComponent(token)}`
+        `${import.meta.env.VITE_DSAR_API_URL || 'http://localhost:3001'}/api/v1/dsar/updates/stream?token=${encodeURIComponent(token)}`
       );
 
       this.eventSource.onopen = () => {

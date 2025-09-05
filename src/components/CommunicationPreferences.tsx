@@ -63,7 +63,8 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
   // Load dynamic preference configuration
   const loadPreferenceConfig = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/v1/customer/preference-config');
+      const baseURL = import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/customer/preference-config`);
       const data = await response.json();
       if (data.success) {
         setPreferenceConfig(data.config);
@@ -91,7 +92,8 @@ export const CommunicationPreferences: React.FC<CommunicationPreferencesProps> =
     loadPreferenceConfig();
 
     // Connect to WebSocket for real-time preference config updates
-    const socket = io('http://localhost:3001');
+    const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3001';
+    const socket = io(wsUrl);
     
     socket.on('preference-config-updated', (data) => {
       console.log('🔄 Preference configuration updated by admin, reloading...', data);

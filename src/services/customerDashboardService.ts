@@ -1,4 +1,5 @@
 import { multiServiceApiClient } from './multiServiceApiClient';
+import { secureLog } from '../utils/secureLogger';
 
 export interface DashboardOverview {
   // Backend response structure
@@ -276,7 +277,7 @@ class CustomerDashboardService {
    */
   async getDashboardOverview(): Promise<DashboardOverview> {
     try {
-      console.log('Fetching dashboard overview from:', `${this.baseUrl}/overview`);
+      secureLog.log('Fetching dashboard overview from:', `${this.baseUrl}/overview`);
       
       // Try to fetch from backend API first
       const response = await multiServiceApiClient.makeRequest(
@@ -286,14 +287,14 @@ class CustomerDashboardService {
         'customer'
       );
 
-      console.log('Dashboard API response:', response);
+      secureLog.log('Dashboard API response:', response);
       
       // Also fetch real consent statistics
       const consentStats = await this.getConsentStats();
-      console.log('Real consent statistics:', consentStats);
+      secureLog.log('Real consent statistics:', consentStats);
 
       if (response.success && response.data) {
-        console.log('Dashboard data received:', response.data);
+        secureLog.log('Dashboard data received:', response.data);
         // Merge with real consent stats
         const enhancedData = {
           ...response.data,
@@ -301,7 +302,7 @@ class CustomerDashboardService {
           activeConsents: consentStats.granted,
           totalConsents: consentStats.total
         };
-        console.log('Enhanced dashboard data with real consent stats:', enhancedData);
+        secureLog.log('Enhanced dashboard data with real consent stats:', enhancedData);
         return enhancedData;
       }
 
@@ -321,9 +322,9 @@ class CustomerDashboardService {
       
       // Even in fallback mode, try to get real consent statistics
       try {
-        console.log('Getting real consent stats for fallback data...');
+        secureLog.log('Getting real consent stats for fallback data...');
         const consentStats = await this.getConsentStats();
-        console.log('Real consent statistics (fallback mode):', consentStats);
+        secureLog.log('Real consent statistics (fallback mode):', consentStats);
         
         const mockData = this.getMockDashboardData();
         const enhancedMockData = {
@@ -333,11 +334,11 @@ class CustomerDashboardService {
           totalConsents: consentStats.total
         };
         
-        console.log('Returning enhanced mock data with real consent stats:', enhancedMockData);
+        secureLog.log('Returning enhanced mock data with real consent stats:', enhancedMockData);
         return enhancedMockData;
       } catch (consentError) {
         console.error('Failed to get consent stats in fallback mode:', consentError);
-        console.log('Returning basic mock data as final fallback');
+        secureLog.log('Returning basic mock data as final fallback');
         return this.getMockDashboardData();
       }
     }
@@ -391,7 +392,7 @@ class CustomerDashboardService {
     total: number;
   }> {
     try {
-      console.log('Fetching consent statistics...');
+      secureLog.log('Fetching consent statistics...');
       const consents = await this.getConsents();
       
       const now = new Date();
@@ -427,7 +428,7 @@ class CustomerDashboardService {
         }
       });
       
-      console.log('Consent statistics calculated:', stats);
+      secureLog.log('Consent statistics calculated:', stats);
       return stats;
     } catch (error) {
       console.error('Error calculating consent statistics:', error);

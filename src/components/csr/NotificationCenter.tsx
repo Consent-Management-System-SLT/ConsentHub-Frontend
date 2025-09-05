@@ -122,7 +122,8 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
       setTemplates(templatesData);
       
       // Load pre-built templates from notification service
-      const preBuiltResponse = await fetch('http://localhost:3001/api/csr/notifications/templates');
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const preBuiltResponse = await fetch(`${baseURL}/api/csr/notifications/templates`);
       if (preBuiltResponse.ok) {
         const preBuiltData = await preBuiltResponse.json();
         setPreBuiltTemplates(preBuiltData.data || []);

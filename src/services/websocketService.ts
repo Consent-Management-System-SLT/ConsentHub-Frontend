@@ -30,16 +30,22 @@ class WebSocketService {
 
   private connect() {
     try {
-      this.socket = io('http://localhost:3001', {
+      // Use environment variable for WebSocket URL, fallback to production
+      const wsUrl = import.meta.env.VITE_WS_URL || 'https://consenthub-backend.onrender.com';
+      
+      this.socket = io(wsUrl, {
         transports: ['websocket', 'polling'],
         timeout: 10000,
         reconnection: true,
         reconnectionDelay: this.reconnectDelay,
-        reconnectionAttempts: this.maxReconnectAttempts
+        reconnectionAttempts: this.maxReconnectAttempts,
+        // Add CORS configuration for cross-origin connections
+        withCredentials: false,
+        forceNew: true
       });
 
       this.socket.on('connect', () => {
-        console.log('Connected to WebSocket server');
+        console.log(`Connected to WebSocket server at ${wsUrl}`);
         console.log('Socket ID:', this.socket?.id);
         console.log('Socket connected:', this.socket?.connected);
         this.reconnectAttempts = 0;

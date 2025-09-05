@@ -3,18 +3,18 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localho
 
 export const API_ENDPOINTS = {
   // All services point to comprehensive backend
-  AUTH_SERVICE: 'http://localhost:3001/api/v1/auth',
-  ADMIN_SERVICE: 'http://localhost:3001/api/v1/admin',
-  CONSENT_SERVICE: 'http://localhost:3001/api/v1/consent',
-  PREFERENCE_SERVICE: 'http://localhost:3001/api/v1/preference', 
-  PARTY_SERVICE: 'http://localhost:3001/api/v1/party',
-  DSAR_SERVICE: 'http://localhost:3001/api/v1/dsar',
-  ANALYTICS_SERVICE: 'http://localhost:3001/api/v1/analytics',
-  EVENT_SERVICE: 'http://localhost:3001/api/v1/event',
-  PRIVACY_NOTICE_SERVICE: 'http://localhost:3001/api/v1/privacy-notices',
-  CSR_SERVICE: 'http://localhost:3001/api/v1/csr',
-  CUSTOMER_SERVICE: 'http://localhost:3001/api/v1/customer',
-  LEGACY: 'http://localhost:3001/api/v1'
+  AUTH_SERVICE: `${import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001'}/api/v1/auth`,
+  ADMIN_SERVICE: `${import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001'}/api/v1/admin`,
+  CONSENT_SERVICE: `${import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001'}/api/v1/consent`,
+  PREFERENCE_SERVICE: `${import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001'}/api/v1/preference`, 
+  PARTY_SERVICE: `${import.meta.env.VITE_PARTY_API_URL || 'http://localhost:3001'}/api/v1/party`,
+  DSAR_SERVICE: `${import.meta.env.VITE_DSAR_API_URL || 'http://localhost:3001'}/api/v1/dsar`,
+  ANALYTICS_SERVICE: `${import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001'}/api/v1/analytics`,
+  EVENT_SERVICE: `${import.meta.env.VITE_EVENT_API_URL || 'http://localhost:3001'}/api/v1/event`,
+  PRIVACY_NOTICE_SERVICE: `${import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'http://localhost:3001'}/api/v1/privacy-notices`,
+  CSR_SERVICE: `${import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001'}/api/v1/csr`,
+  CUSTOMER_SERVICE: `${import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001'}/api/v1/customer`,
+  LEGACY: `${import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001'}/api/v1`
 };
 
 export const SERVICE_PORTS = {

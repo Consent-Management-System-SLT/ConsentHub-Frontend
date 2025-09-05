@@ -1,5 +1,6 @@
 // CSR Dashboard Service - Comprehensive Data Management with Fallbacks
 import { apiClient } from './apiClient';
+import { secureLog } from '../utils/secureLogger';
 
 export interface CSRStats {
   totalCustomers: number;
@@ -211,9 +212,9 @@ class CSRDashboardService {
    */
   async getCSRStats(): Promise<CSRStats> {
     try {
-      console.log('[CSR] Fetching CSR stats from backend...');
+      secureLog.log('[CSR] Fetching CSR stats from backend...');
       const response = await apiClient.get(this.statsUrl);
-      console.log('[CSR] CSR stats loaded successfully:', response.data);
+      secureLog.log('[CSR] CSR stats loaded successfully:', response.data);
       return response.data;
     } catch (error) {
       console.warn('[CSR] Backend CSR stats unavailable, using fallback data:', error);
@@ -1599,7 +1600,7 @@ class CSRDashboardService {
   /**
    * Update customer consent status
    */
-  async updateConsentStatus(consentId: string, status: 'granted' | 'denied' | 'withdrawn', notes?: string): Promise<ConsentData> {
+  async updateConsentStatus(consentId: string, status: 'granted' | 'revoked', notes?: string): Promise<ConsentData> {
     try {
       console.log(`[CSR] Updating consent ${consentId} to status: ${status}`);
       
@@ -1626,7 +1627,7 @@ class CSRDashboardService {
         purpose: '',
         status,
         grantedAt: status === 'granted' ? new Date().toISOString() : undefined,
-        deniedAt: status === 'denied' ? new Date().toISOString() : undefined,
+        deniedAt: status === 'revoked' ? new Date().toISOString() : undefined,
         source: 'csr-update',
         lawfulBasis: 'consent',
         category: 'updated'

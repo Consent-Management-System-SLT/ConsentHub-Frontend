@@ -29,7 +29,8 @@ const ComplianceRulesManager = () => {
     try {
       setLoading(true);
       const token = getAuthToken();
-      const response = await fetch('http://localhost:3001/api/v1/compliance-rules', {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/compliance-rules`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -54,7 +55,8 @@ const ComplianceRulesManager = () => {
   const handleAddRule = async () => {
     try {
       const token = getAuthToken();
-      const response = await fetch('http://localhost:3001/api/v1/compliance-rules', {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/compliance-rules`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -91,7 +93,8 @@ const ComplianceRulesManager = () => {
 
     try {
       const token = getAuthToken();
-      const response = await fetch(`http://localhost:3001/api/v1/compliance-rules/${selectedRule._id}`, {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/compliance-rules/${selectedRule._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -126,7 +129,8 @@ const ComplianceRulesManager = () => {
 
     try {
       const token = getAuthToken();
-      const response = await fetch(`http://localhost:3001/api/v1/compliance-rules/${ruleId}`, {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/compliance-rules/${ruleId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

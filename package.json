@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "powershell -ExecutionPolicy Bypass -File start-system.ps1",
+    "start:production": "powershell -ExecutionPolicy Bypass -File start-production.ps1",
     "start:system": "start-system.bat",
     "start:simple": "powershell -ExecutionPolicy Bypass -File start-simple.ps1",
     "start:mongodb": "powershell -ExecutionPolicy Bypass -File start-mongodb.ps1",

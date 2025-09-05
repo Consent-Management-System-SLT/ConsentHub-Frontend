@@ -80,28 +80,7 @@ const Login: React.FC = () => {
     }
   };
 
-  // Function to fill credentials for each role
-  const fillCredentials = (role: 'admin' | 'customer' | 'csr') => {
-    const credentials = {
-      admin: {
-        email: 'admin@sltmobitel.lk',
-        password: 'admin123'
-      },
-      customer: {
-        email: 'customer@sltmobitel.lk',
-        password: 'customer123'
-      },
-      csr: {
-        email: 'csr@sltmobitel.lk',
-        password: 'csr123'
-      }
-    };
 
-    setEmail(credentials[role].email);
-    setPassword(credentials[role].password);
-    setError(''); // Clear any existing errors
-    setSuccess('Credentials filled! Click Sign In to login.');
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-myslt-background py-4 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8">
@@ -118,54 +97,6 @@ const Login: React.FC = () => {
               {t('auth.signIn')}
             </h2>
             <p className="text-myslt-text-secondary text-sm sm:text-base">Consent Management System</p>
-          </div>
-
-          {/* Demo credentials */}
-          <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-myslt-card rounded-lg border border-myslt-accent/30">
-            <h3 className="text-sm font-medium text-myslt-text-primary mb-2 sm:mb-3">Quick Login - Click to Auto-Fill:</h3>
-            <div className="space-y-1.5 sm:space-y-2">
-              <button
-                type="button"
-                onClick={() => fillCredentials('customer')}
-                className="w-full text-left p-2 sm:p-2.5 bg-myslt-card-solid rounded border border-myslt-accent/40 hover:border-myslt-accent hover:bg-myslt-accent/10 transition-colors group"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium text-myslt-text-primary text-sm sm:text-base">Customer (Demo)</span>
-                    <div className="text-xs text-myslt-text-secondary">customer@sltmobitel.lk / customer123</div>
-                  </div>
-                  <span className="text-xs text-myslt-text-accent opacity-70 group-hover:opacity-100 hidden sm:inline">Click to fill</span>
-                </div>
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => fillCredentials('admin')}
-                className="w-full text-left p-2 sm:p-2.5 bg-myslt-card-solid rounded border border-myslt-accent/40 hover:border-myslt-accent hover:bg-myslt-accent/10 transition-colors group"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium text-myslt-text-primary text-sm sm:text-base">Admin (Demo)</span>
-                    <div className="text-xs text-myslt-text-secondary">admin@sltmobitel.lk / admin123</div>
-                  </div>
-                  <span className="text-xs text-myslt-text-accent opacity-70 group-hover:opacity-100 hidden sm:inline">Click to fill</span>
-                </div>
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => fillCredentials('csr')}
-                className="w-full text-left p-2 sm:p-2.5 bg-myslt-card-solid rounded border border-myslt-accent/40 hover:border-myslt-accent hover:bg-myslt-accent/10 transition-colors group"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium text-myslt-text-primary text-sm sm:text-base">CSR Admin (Demo)</span>
-                    <div className="text-xs text-myslt-text-secondary">csr@sltmobitel.lk / csr123</div>
-                  </div>
-                  <span className="text-xs text-myslt-text-accent opacity-70 group-hover:opacity-100 hidden sm:inline">Click to fill</span>
-                </div>
-              </button>
-            </div>
           </div>
 
           {/* Success message */}

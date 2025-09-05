@@ -100,7 +100,8 @@ const DashboardHome: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:3001/api/v1/admin/dashboard/overview`, {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/admin/dashboard/overview`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

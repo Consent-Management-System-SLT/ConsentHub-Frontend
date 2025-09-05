@@ -59,9 +59,10 @@ const PreferenceManagement: React.FC = () => {
     setError(null);
     try {
       // Load existing channels and topics from backend
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
       const [channelsResponse, topicsResponse] = await Promise.all([
-        fetch('http://localhost:3001/api/v1/admin/preference-channels'),
-        fetch('http://localhost:3001/api/v1/admin/preference-topics')
+        fetch(`${baseURL}/api/v1/admin/preference-channels`),
+        fetch(`${baseURL}/api/v1/admin/preference-topics`)
       ]);
 
       if (channelsResponse.ok) {
@@ -216,7 +217,8 @@ const PreferenceManagement: React.FC = () => {
 
     try {
       // Save to backend first
-      const response = await fetch('http://localhost:3001/api/v1/admin/preference-channels', {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/admin/preference-channels`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -269,7 +271,8 @@ const PreferenceManagement: React.FC = () => {
 
     try {
       // Save to backend first
-      const response = await fetch('http://localhost:3001/api/v1/admin/preference-topics', {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/admin/preference-topics`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

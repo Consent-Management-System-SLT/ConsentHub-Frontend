@@ -68,9 +68,10 @@ const PreferenceManagement: React.FC = () => {
     setError(null);
     try {
       // Load existing channels and topics from backend
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
       const [channelsResponse, topicsResponse] = await Promise.all([
-        fetch('http://localhost:3001/api/v1/admin/preference-channels'),
-        fetch('http://localhost:3001/api/v1/admin/preference-topics')
+        fetch(`${baseURL}/api/v1/admin/preference-channels`),
+        fetch(`${baseURL}/api/v1/admin/preference-topics`)
       ]);
 
       if (channelsResponse.ok) {
@@ -98,7 +99,8 @@ const PreferenceManagement: React.FC = () => {
 
     try {
       setError(null);
-      const response = await fetch('http://localhost:3001/api/v1/admin/preference-channels', {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/admin/preference-channels`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,7 +150,8 @@ const PreferenceManagement: React.FC = () => {
 
     try {
       setError(null);
-      const response = await fetch('http://localhost:3001/api/v1/admin/preference-topics', {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/admin/preference-topics`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -195,7 +198,8 @@ const PreferenceManagement: React.FC = () => {
   const handleDeleteChannel = async (id: string, name: string) => {
     if (window.confirm(`Are you sure you want to delete the channel "${name}"?`)) {
       try {
-        const response = await fetch(`http://localhost:3001/api/v1/admin/preference-channels/${id}`, { 
+        const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+        const response = await fetch(`${baseURL}/api/v1/admin/preference-channels/${id}`, { 
           method: 'DELETE' 
         });
 
@@ -215,7 +219,8 @@ const PreferenceManagement: React.FC = () => {
   const handleDeleteTopic = async (id: string, name: string) => {
     if (window.confirm(`Are you sure you want to delete the topic "${name}"?`)) {
       try {
-        const response = await fetch(`http://localhost:3001/api/v1/admin/preference-topics/${id}`, { 
+        const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+        const response = await fetch(`${baseURL}/api/v1/admin/preference-topics/${id}`, { 
           method: 'DELETE' 
         });
 
@@ -237,7 +242,8 @@ const PreferenceManagement: React.FC = () => {
     if (!channel) return;
 
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/admin/preference-channels/${id}`, {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/admin/preference-channels/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !channel.enabled })
@@ -260,7 +266,8 @@ const PreferenceManagement: React.FC = () => {
     if (!topic) return;
 
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/admin/preference-topics/${id}`, {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/admin/preference-topics/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !topic.enabled })
@@ -283,7 +290,8 @@ const PreferenceManagement: React.FC = () => {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:3001/api/v1/admin/preference-channels/initialize-standard', {
+      const baseURL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${baseURL}/api/v1/admin/preference-channels/initialize-standard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });

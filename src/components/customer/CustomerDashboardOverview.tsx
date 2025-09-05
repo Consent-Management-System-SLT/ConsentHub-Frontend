@@ -10,10 +10,12 @@ import {
   FileText, 
   Download,
   User,
-  RefreshCw
+  RefreshCw,
+  Bell,
+  Calendar
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { customerDashboardService, DashboardOverview } from '../../services/customerDashboardService';
+import { customerDashboardService, DashboardOverview, ConsentRecord } from '../../services/customerDashboardService';
 import UserProfile from '../UserProfile';
 
 interface CustomerDashboardOverviewProps {
@@ -23,28 +25,12 @@ interface CustomerDashboardOverviewProps {
   onNavigate?: (section: string) => void;
 }
 
-interface ConsentSummary {
-  granted: number;
-  revoked: number;
-  expired: number;
-  pending: number;
-}
-
 interface QuickStat {
   label: string;
   value: string;
   icon: React.ReactNode;
   color: string;
   trend?: string;
-}
-
-interface Activity {
-  id: string | number;
-  action: string;
-  timestamp: string;
-  type: string;
-  icon?: React.ReactNode;
-  description?: string;
 }
 
 const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({ 
@@ -56,6 +42,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
   const { t } = useTranslation();
   const { user } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardOverview | null>(null);
+  const [latestConsent, setLatestConsent] = useState<ConsentRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
@@ -63,17 +50,88 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
     loadDashboardData();
   }, []);
 
+  // Helper function to get the latest consent action details
+  const getLatestConsentAction = (consent: ConsentRecord) => {
+    const actions = [];
+    
+    if (consent.grantedAt) {
+      actions.push({
+        type: 'granted',
+        timestamp: new Date(consent.grantedAt).getTime(),
+        date: consent.grantedAt,
+        label: 'Granted'
+      });
+    }
+    
+    if (consent.revokedAt) {
+      actions.push({
+        type: 'revoked', 
+        timestamp: new Date(consent.revokedAt).getTime(),
+        date: consent.revokedAt,
+        label: 'Revoked'
+      });
+    }
+    
+    if (consent.lastModified && !consent.grantedAt && !consent.revokedAt) {
+      actions.push({
+        type: 'modified',
+        timestamp: new Date(consent.lastModified).getTime(),
+        date: consent.lastModified,
+        label: 'Updated'
+      });
+    }
+    
+    // Return the most recent action
+    return actions.length > 0 
+      ? actions.reduce((latest, current) => current.timestamp > latest.timestamp ? current : latest)
+      : null;
+  };
+
   const loadDashboardData = async () => {
     try {
       console.log('CustomerDashboardOverview: Starting to load dashboard data...');
       setIsLoading(true);
-      const data = await customerDashboardService.getDashboardOverview();
-      console.log('CustomerDashboardOverview: Dashboard data received:', data);
-      setDashboardData(data);
+      
+      // Load dashboard overview and consents in parallel
+      const [dashboardData, consents] = await Promise.all([
+        customerDashboardService.getDashboardOverview(),
+        customerDashboardService.getConsents()
+      ]);
+      
+      console.log('CustomerDashboardOverview: Dashboard data received:', dashboardData);
+      console.log('CustomerDashboardOverview: Consents received:', consents.length);
+      
+      setDashboardData(dashboardData);
+      
+      // Find the latest consent update (most recent consent action by date/time)
+      if (consents && consents.length > 0) {
+        const latest = consents.reduce((prev, current) => {
+          const prevAction = getLatestConsentAction(prev);
+          const currentAction = getLatestConsentAction(current);
+          
+          const prevTimestamp = prevAction ? prevAction.timestamp : 0;
+          const currentTimestamp = currentAction ? currentAction.timestamp : 0;
+          
+          return currentTimestamp > prevTimestamp ? current : prev;
+        });
+        setLatestConsent(latest);
+        
+        const latestAction = getLatestConsentAction(latest);
+        console.log('CustomerDashboardOverview: Latest consent action:', {
+          consentId: latest.id,
+          purpose: latest.purpose,
+          action: latestAction?.label,
+          timestamp: latestAction?.date
+        });
+      } else {
+        setLatestConsent(null);
+      }
+      
     } catch (error) {
       console.error('CustomerDashboardOverview: Failed to load dashboard data:', error);
       // Use fallback data
       setDashboardData(null);
+      setLatestConsent(null);
     } finally {
       setIsLoading(false);
       console.log('CustomerDashboardOverview: Loading complete, isLoading set to false');
@@ -328,6 +386,133 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Latest Consent Update */}
+      {isLoading ? (
+        <div className="bg-myslt-card rounded-lg sm:rounded-xl border border-myslt-accent/20 p-4 sm:p-6 shadow-sm animate-pulse">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0 p-2 rounded-lg bg-gray-200 w-9 h-9"></div>
+              <div>
+                <div className="h-5 bg-gray-200 rounded w-40 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-32"></div>
+              </div>
+            </div>
+            <div className="h-3 bg-gray-200 rounded w-24"></div>
+          </div>
+          <div className="bg-gray-100 rounded-lg p-4 border">
+            <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </div>
+      ) : latestConsent ? (
+        <div className="bg-myslt-card rounded-lg sm:rounded-xl border border-myslt-accent/20 p-4 sm:p-6 shadow-sm">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0 p-2 rounded-lg bg-myslt-accent/10">
+                <Bell className="w-5 h-5 text-myslt-accent" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-myslt-text-primary">Latest Consent Update</h3>
+                <p className="text-sm text-myslt-text-secondary">
+                  {(() => {
+                    const latestAction = getLatestConsentAction(latestConsent);
+                    if (latestAction) {
+                      const actionDate = new Date(latestAction.date);
+                      const now = new Date();
+                      const diffHours = Math.round((now.getTime() - actionDate.getTime()) / (1000 * 60 * 60));
+                      
+                      if (diffHours < 1) return 'Just now';
+                      if (diffHours === 1) return '1 hour ago';
+                      if (diffHours < 24) return `${diffHours} hours ago`;
+                      
+                      const diffDays = Math.round(diffHours / 24);
+                      if (diffDays === 1) return 'Yesterday';
+                      if (diffDays < 7) return `${diffDays} days ago`;
+                      
+                      return actionDate.toLocaleDateString();
+                    }
+                    return 'Your most recent consent change';
+                  })()}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2 text-xs text-myslt-text-muted">
+              <Calendar className="w-4 h-4" />
+              <span>
+                {(() => {
+                  const latestAction = getLatestConsentAction(latestConsent);
+                  if (latestAction) {
+                    return `${latestAction.label}: ${new Date(latestAction.date).toLocaleString()}`;
+                  }
+                  return `Updated: ${new Date(latestConsent.lastModified).toLocaleString()}`;
+                })()}
+              </span>
+            </div>
+          </div>
+          
+          <div className="bg-myslt-accent/5 rounded-lg p-4 border border-myslt-accent/10">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className={`flex-shrink-0 p-1.5 rounded-full ${
+                    latestConsent.status === 'granted' 
+                      ? 'bg-green-100 text-green-600' 
+                      : latestConsent.status === 'revoked' 
+                      ? 'bg-red-100 text-red-600'
+                      : 'bg-yellow-100 text-yellow-600'
+                  }`}>
+                    {latestConsent.status === 'granted' ? (
+                      <CheckCircle className="w-4 h-4" />
+                    ) : latestConsent.status === 'revoked' ? (
+                      <XCircle className="w-4 h-4" />
+                    ) : (
+                      <Clock className="w-4 h-4" />
+                    )}
+                  </div>
+                  <span className={`font-semibold text-sm ${
+                    latestConsent.status === 'granted' 
+                      ? 'text-green-700' 
+                      : latestConsent.status === 'revoked' 
+                      ? 'text-red-700'
+                      : 'text-yellow-700'
+                  }`}>
+                    {latestConsent.status.charAt(0).toUpperCase() + latestConsent.status.slice(1)}
+                  </span>
+                </div>
+                
+                <h4 className="font-medium text-myslt-text-primary mb-1">{latestConsent.purpose}</h4>
+                <p className="text-sm text-myslt-text-secondary mb-2">{latestConsent.description}</p>
+                
+                <div className="flex items-center space-x-4 text-xs text-myslt-text-muted">
+                  <span>Category: {latestConsent.dataCategory}</span>
+                  {latestConsent.grantedAt && (
+                    <span className={latestConsent.status === 'granted' ? 'font-medium text-green-600' : ''}>
+                      Granted: {new Date(latestConsent.grantedAt).toLocaleDateString()} at {new Date(latestConsent.grantedAt).toLocaleTimeString()}
+                    </span>
+                  )}
+                  {latestConsent.revokedAt && (
+                    <span className={latestConsent.status === 'revoked' ? 'font-medium text-red-600' : ''}>
+                      Revoked: {new Date(latestConsent.revokedAt).toLocaleDateString()} at {new Date(latestConsent.revokedAt).toLocaleTimeString()}
+                    </span>
+                  )}
+                  {latestConsent.expiresAt && (
+                    <span>Expires: {new Date(latestConsent.expiresAt).toLocaleDateString()}</span>
+                  )}
+                </div>
+              </div>
+              
+              <button
+                onClick={() => onNavigate && onNavigate('consent-center')}
+                className="ml-4 px-3 py-1.5 text-xs font-medium text-myslt-accent bg-myslt-accent/10 hover:bg-myslt-accent/20 rounded-lg transition-colors"
+              >
+                Manage
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">

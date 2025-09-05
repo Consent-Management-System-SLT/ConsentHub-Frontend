@@ -1,23 +1,24 @@
 // Multi-service API client configuration for ConsentHub
 import axios, { AxiosInstance } from 'axios';
+import { logApiRequest, logApiResponse, secureLog } from '../utils/secureLogger';
 
-// Service configurations - Updated for local development
+// Service configurations - Updated for production deployment
 const SERVICES = {
-  AUTH: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:3001',
-  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001',
-  CSR: import.meta.env.VITE_CSR_API_URL || 'http://localhost:3001',
-  GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001',
-  CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'http://localhost:3001',
-  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'http://localhost:3001',
-  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'http://localhost:3001',
-  DSAR: import.meta.env.VITE_DSAR_API_URL || 'http://localhost:3001',
-  PARTY: import.meta.env.VITE_PARTY_API_URL || 'http://localhost:3001',
-  EVENT: import.meta.env.VITE_EVENT_API_URL || 'http://localhost:3001',
-  CATALOG: import.meta.env.VITE_CATALOG_API_URL || 'http://localhost:3001',
+  AUTH: import.meta.env.VITE_AUTH_API_URL || 'https://consenthub-backend.onrender.com/api/v1',
+  CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'https://consenthub-backend.onrender.com',
+  CSR: import.meta.env.VITE_CSR_API_URL || 'https://consenthub-backend.onrender.com',
+  GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'https://consenthub-backend.onrender.com',
+  CONSENT: import.meta.env.VITE_CONSENT_API_URL || 'https://consenthub-backend.onrender.com',
+  PREFERENCE: import.meta.env.VITE_PREFERENCE_API_URL || 'https://consenthub-backend.onrender.com',
+  PRIVACY_NOTICE: import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'https://consenthub-backend.onrender.com',
+  DSAR: import.meta.env.VITE_DSAR_API_URL || 'https://consenthub-backend.onrender.com',
+  PARTY: import.meta.env.VITE_PARTY_API_URL || 'https://consenthub-backend.onrender.com',
+  EVENT: import.meta.env.VITE_EVENT_API_URL || 'https://consenthub-backend.onrender.com',
+  CATALOG: import.meta.env.VITE_CATALOG_API_URL || 'https://consenthub-backend.onrender.com',
 };
 
 // Debug logging for service URLs
-console.log('Service URLs Configuration:', SERVICES);
+secureLog.log('Service URLs Configuration:', SERVICES);
 
 // Service-specific API clients
 export const customerApi = axios.create({
@@ -121,8 +122,8 @@ export const catalogApi = axios.create({
 
 // Enhanced API response handler
 const handleApiResponse = (response: any) => {
-  console.log('handleApiResponse - Raw response:', response);
-  console.log('handleApiResponse - Response data:', response.data);
+  logApiResponse(response, 'handleApiResponse - Raw response');
+  logApiResponse(response.data, 'handleApiResponse - Response data');
   return response.data;
 };
 
@@ -361,9 +362,7 @@ export class MultiServiceApiClient {
         fullEndpoint = endpoint;
       }
 
-      console.log(`Making ${method} request to: ${fullEndpoint}`);
-      console.log('Request data:', data);
-      console.log('Request headers:', headers);
+      logApiRequest(method, fullEndpoint, data, headers);
 
       let response;
       switch (method) {
@@ -381,15 +380,15 @@ export class MultiServiceApiClient {
           break;
       }
       
-      console.log('makeRequest - Raw response:', response);
-      console.log('makeRequest - Response data after interceptors:', response);
+      logApiResponse(response, 'makeRequest - Raw response');
+      logApiResponse(response, 'makeRequest - Response data after interceptors');
       
       // The interceptors have already processed the response, so response IS the final data
       return response;
       
     } catch (error) {
       const errorResult = handleApiError(error);
-      console.log('makeRequest - Error result:', errorResult);
+      secureLog.error('makeRequest - Error result:', errorResult);
       
       // Throw the error instead of returning it so authService can catch it properly
       const errorToThrow = new Error(errorResult.message);

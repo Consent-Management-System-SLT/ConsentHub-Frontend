@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../../services/apiClient';
+import { secureLog } from '../../utils/secureLogger';
 
 interface GuardianConsentProps {
   guardianId?: string;
@@ -136,7 +137,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
         }))
       };
 
-      console.log('Sending guardian consent data:', consentData);
+      secureLog.log('Sending guardian consent data:', consentData);
       const response = await apiClient.post('/api/v1/guardian/consent', consentData);
       
       if (response.data && ((response.data as any).success || (response.data as any).guardianConsents)) {
@@ -156,7 +157,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
         
         setCreatedConsents(newConsents);
         setSuccess(true);
-        console.log('Guardian consent created successfully:', response.data);
+        secureLog.log('Guardian consent created successfully:', response.data);
         
         // Remove the automatic close timeout - let user manually close
         // setTimeout(() => { onClose?.(); }, 2000);
