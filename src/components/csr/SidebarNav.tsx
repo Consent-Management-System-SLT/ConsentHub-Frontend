@@ -11,7 +11,8 @@ import {
   X,
   UserCheck,
   Bell,
-  MessageSquare
+  MessageSquare,
+  Smartphone
 } from 'lucide-react';
 
 interface SidebarNavProps {
@@ -33,6 +34,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
     { id: 'consent-history', label: 'Consent History', icon: FileText, description: 'View customer consent history' },
     { id: 'consent-management', label: 'Consent Management', icon: Shield, description: 'Search customers and update their consents' },
     { id: 'preference-editor', label: 'Communication Preferences', icon: MessageSquare, description: 'Manage customer communication preferences and settings' },
+    { id: 'vas-management', label: 'VAS Management', icon: Smartphone, description: 'Manage customer Value Added Services subscriptions' },
     { id: 'notification-center', label: 'Notification Center', icon: Bell, description: 'Send notifications and manage campaigns' },
     { id: 'dsar-requests', label: 'DSAR Requests', icon: Database, description: 'Handle data subject access requests' },
     { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Manage guardian consent forms' },

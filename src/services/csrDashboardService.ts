@@ -428,12 +428,35 @@ class CSRDashboardService {
       const response = await apiClient.get(`/api/v1/csr/customers/search`, {
         params: { query: searchTerm }
       });
-      return response.data;
-    } catch (error) {
+      
+      // Handle the API response format where customers are in response.data.data
+      const responseData = response.data as any;
+      const customers = responseData?.data || [];
+      const total = responseData?.count || customers.length;
+      
+      console.log(`Found ${total} customers for search term: "${searchTerm}"`);
+      
+      return { customers, total };
+    } catch (error: any) {
       console.error('Error searching customers for preferences:', error);
-      // Fallback to local search
-      const customers = await this.searchCustomers(searchTerm);
-      return { customers, total: customers.length };
+      
+      // If it's a 404, return empty results
+      if (error.response?.status === 404) {
+        return { customers: [], total: 0 };
+      }
+      
+      // For other errors, fallback to local search
+      try {
+        const customers = await this.searchCustomers(searchTerm);
+        return { customers, total: customers.length };
+      } catch (fallbackError) {
+        console.error('Fallback search also failed:', fallbackError);
+        throw {
+          message: error.response?.data?.message || 'Customer not found',
+          status: error.response?.status || 500,
+          details: error.response?.data || error.message
+        };
+      }
     }
   }
 
@@ -1815,6 +1838,64 @@ class CSRDashboardService {
       console.error('[CSR] Failed to send welcome email:', error.response?.data || error.message);
       throw {
         message: error.response?.data?.error || 'Failed to send welcome email',
+        status: error.response?.status || 500,
+        details: error.response?.data || error.message
+      };
+    }
+  }
+
+  // VAS Management Methods
+  async getCustomerVASServices(customerId: string, customerEmail: string) {
+    console.log('[CSR] Getting customer VAS services...', { customerId, customerEmail });
+    
+    try {
+      const response = await apiClient.get('/api/csr/customer-vas', {
+        headers: {
+          'customer-id': customerId,
+          'customer-email': customerEmail
+        }
+      });
+      console.log('[CSR] Customer VAS services retrieved successfully:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('[CSR] Failed to get customer VAS services:', error.response?.data || error.message);
+      throw {
+        message: error.response?.data?.message || 'Failed to retrieve customer VAS services',
+        status: error.response?.status || 500,
+        details: error.response?.data || error.message
+      };
+    }
+  }
+
+  async toggleCustomerVASSubscription(
+    customerId: string, 
+    customerEmail: string, 
+    serviceId: string, 
+    action: 'subscribe' | 'unsubscribe'
+  ) {
+    console.log('[CSR] Toggling customer VAS subscription...', { 
+      customerId, 
+      customerEmail, 
+      serviceId, 
+      action 
+    });
+    
+    try {
+      const response = await apiClient.post(`/api/csr/customer-vas/${serviceId}/toggle`, 
+        { action },
+        {
+          headers: {
+            'customer-id': customerId,
+            'customer-email': customerEmail
+          }
+        }
+      );
+      console.log('[CSR] Customer VAS subscription toggled successfully:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('[CSR] Failed to toggle customer VAS subscription:', error.response?.data || error.message);
+      throw {
+        message: error.response?.data?.message || 'Failed to update customer VAS subscription',
         status: error.response?.status || 500,
         details: error.response?.data || error.message
       };

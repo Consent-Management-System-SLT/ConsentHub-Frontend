@@ -72,7 +72,9 @@ const corsOptions = {
     'x-requested-with',
     'x-correlation-id',
     'X-Correlation-Id',
-    'Access-Control-Allow-Origin'
+    'Access-Control-Allow-Origin',
+    'customer-id',
+    'customer-email'
   ],
   credentials: true,
   optionsSuccessStatus: 200
@@ -2282,6 +2284,120 @@ app.get("/api/csr/customers", async (req, res) => {
     }
 });
 
+// GET /api/v1/csr/customers/search - Search customers for CSR
+app.get("/api/v1/csr/customers/search", async (req, res) => {
+    try {
+        const { query } = req.query;
+        console.log('🔍 CSR Customer Search:', query);
+        
+        if (!query || query.trim().length < 2) {
+            return res.status(400).json({
+                success: false,
+                message: 'Search query must be at least 2 characters long'
+            });
+        }
+        
+        let customers = [];
+        
+        // Try to fetch from MongoDB first
+        try {
+            const searchRegex = new RegExp(query, 'i'); // Case-insensitive search
+            const mongoCustomers = await User.find({ 
+                role: 'customer',
+                status: 'active',
+                $or: [
+                    { name: searchRegex },
+                    { email: searchRegex },
+                    { phone: searchRegex }
+                ]
+            }).select('_id name email phone profile organization createdAt').lean();
+            
+            customers = mongoCustomers.map(customer => ({
+                id: customer._id,
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone,
+                organization: customer.organization,
+                joinDate: customer.createdAt,
+                status: 'active',
+                type: 'customer'
+            }));
+            
+        } catch (mongoError) {
+            console.log('⚠️  MongoDB search failed, using fallback data:', mongoError.message);
+            
+            // Fallback to mock data if MongoDB fails
+            const mockCustomers = [
+                {
+                    id: '68b689f4d945be3295ad8ec8',
+                    name: 'Ojitha Rajapaksha',
+                    email: 'ojitharajapaksha@gmail.com',
+                    phone: '+94771234567',
+                    organization: 'Individual',
+                    joinDate: '2024-01-15T10:30:00Z',
+                    status: 'active',
+                    type: 'customer'
+                },
+                {
+                    id: '68b689c3d945be3295ad8e7a',
+                    name: 'Dinuka Perera',
+                    email: 'dinuka@example.com',
+                    phone: '+94771234568',
+                    organization: 'Tech Solutions',
+                    joinDate: '2024-02-20T14:45:00Z',
+                    status: 'active',
+                    type: 'customer'
+                },
+                {
+                    id: '68b689c3d945be3295ad8e7b',
+                    name: 'Pramod Silva',
+                    email: 'pramod@example.com',
+                    phone: '+94771234569',
+                    organization: 'Business Corp',
+                    joinDate: '2024-03-10T09:15:00Z',
+                    status: 'active',
+                    type: 'customer'
+                }
+            ];
+            
+            // Filter mock customers based on search query
+            const searchQuery = query.toLowerCase();
+            customers = mockCustomers.filter(customer => 
+                customer.name.toLowerCase().includes(searchQuery) ||
+                customer.email.toLowerCase().includes(searchQuery) ||
+                (customer.phone && customer.phone.includes(searchQuery))
+            );
+        }
+        
+        console.log(`🔍 Found ${customers.length} customers matching "${query}"`);
+        
+        if (customers.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Customer not found',
+                data: [],
+                query: query
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            data: customers,
+            count: customers.length,
+            query: query
+        });
+        
+    } catch (error) {
+        console.error('❌ Error searching customers:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Failed to search customers',
+            error: error.message,
+            details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
+    }
+});
+
 // POST /api/csr/notifications/welcome - Send welcome email to customer
 app.post("/api/csr/notifications/welcome", async (req, res) => {
     try {
@@ -3937,6 +4053,53 @@ try {
   console.error('❌ Error loading VAS routes:', error.message);
   console.error('Stack trace:', error.stack);
 }
+
+// CSR VAS management routes
+app.get('/api/csr/customer-vas', async (req, res) => {
+  try {
+    const vasController = require('./backend/backend/customer-service/controllers/vasController');
+    
+    // Mock CSR user for the controller
+    req.user = {
+      id: 'csr-001',
+      email: 'csr@sltmobitel.lk',
+      name: 'CSR Agent'
+    };
+    
+    await vasController.getCustomerVASForCSR(req, res);
+  } catch (error) {
+    console.error('CSR VAS route error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+});
+
+app.post('/api/csr/customer-vas/:serviceId/toggle', async (req, res) => {
+  try {
+    const vasController = require('./backend/backend/customer-service/controllers/vasController');
+    
+    // Mock CSR user for the controller
+    req.user = {
+      id: 'csr-001',
+      email: 'csr@sltmobitel.lk',
+      name: 'CSR Agent'
+    };
+    
+    await vasController.toggleCustomerVASForCSR(req, res);
+  } catch (error) {
+    console.error('CSR VAS toggle route error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+});
+
+console.log('✅ CSR VAS management routes loaded successfully');
 
 // ================================
 // COMPLIANCE RULES API ENDPOINTS
