@@ -6,6 +6,7 @@ import ConsentCenter from './ConsentCenter';
 import CustomerPreferences from './CustomerPreferences';
 import CustomerPrivacyNotices from './CustomerPrivacyNotices';
 import CustomerDSARRequests from './CustomerDSARRequests';
+import ValueAddedServices from './ValueAddedServices';
 
 interface CustomerMainDashboardProps {
   customerName?: string;
@@ -28,6 +29,8 @@ const CustomerMainDashboard: React.FC<CustomerMainDashboardProps> = ({
         return <ConsentCenter />;
       case 'preferences':
         return <CustomerPreferences />;
+      case 'value-added-services':
+        return <ValueAddedServices />;
       case 'privacy-notices':
         return <CustomerPrivacyNotices />;
       case 'dsar-requests':

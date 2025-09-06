@@ -8,7 +8,8 @@ import {
   Download, 
   ChevronRight,
   Menu,
-  X 
+  X,
+  Zap
 } from 'lucide-react';
 
 interface CustomerSidebarProps {
@@ -44,6 +45,12 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
       label: t('customerDashboard.navigation.preferences'),
       icon: Settings,
       description: t('customerDashboard.navigation.preferencesDesc')
+    },
+    {
+      id: 'value-added-services',
+      label: t('customerDashboard.navigation.valueAddedServices'),
+      icon: Zap,
+      description: t('customerDashboard.navigation.valueAddedServicesDesc')
     },
     {
       id: 'privacy-notices',

@@ -3924,6 +3924,14 @@ app.use('/api/v1/admin/preference-topics', topicRouter);
 app.use('/api/v1/customer/preference-config', customerConfigRouter);
 
 // ================================
+// VALUE ADDED SERVICES (VAS) API ENDPOINTS
+// ================================
+
+// VAS routes for customer
+const vasRoutes = require('./backend/backend/customer-service/routes/vas');
+app.use('/api/customer/vas', vasRoutes);
+
+// ================================
 // COMPLIANCE RULES API ENDPOINTS
 // ================================
 
