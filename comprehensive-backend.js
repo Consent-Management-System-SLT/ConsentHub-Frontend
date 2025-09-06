@@ -19,6 +19,7 @@ const ComplianceRule = require('./models/ComplianceRule');
 const NotificationLog = require('./models/NotificationLog');
 const { Webhook, EventLog } = require('./models/Webhook');
 const CommunicationPreference = require('./models/CommunicationPreference');
+const VASSubscription = require('./models/VASSubscription');
 const { notificationService } = require('./services/notificationService');
 const { seedGuardians } = require('./seedGuardians');
 const { 
@@ -3928,8 +3929,14 @@ app.use('/api/v1/customer/preference-config', customerConfigRouter);
 // ================================
 
 // VAS routes for customer
-const vasRoutes = require('./backend/backend/customer-service/routes/vas');
-app.use('/api/customer/vas', vasRoutes);
+try {
+  const vasRoutes = require('./backend/backend/customer-service/routes/vas');
+  app.use('/api/customer/vas', vasRoutes);
+  console.log('✅ VAS routes loaded successfully');
+} catch (error) {
+  console.error('❌ Error loading VAS routes:', error.message);
+  console.error('Stack trace:', error.stack);
+}
 
 // ================================
 // COMPLIANCE RULES API ENDPOINTS

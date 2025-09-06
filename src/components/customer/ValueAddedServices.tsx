@@ -62,14 +62,18 @@ const ValueAddedServices: React.FC = () => {
         setLoading(true);
         
         // Get auth token from localStorage
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         
         const response = await fetch('/api/customer/vas/services', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
           },
         });
+        
+        console.log('VAS API Response Status:', response.status);
+        console.log('VAS API Response OK:', response.ok);
         
         if (response.ok) {
           const result = await response.json();
@@ -81,9 +85,13 @@ const ValueAddedServices: React.FC = () => {
               color: getColorForCategory(service.category),
             }));
             setServices(servicesWithIcons);
+            console.log('VAS Services loaded from API:', servicesWithIcons.length, 'services');
+            console.log('All services default to UNSUBSCRIBED');
+            console.log('Subscribed services:', servicesWithIcons.filter((s: VASService) => s.isSubscribed).map((s: VASService) => s.name));
           }
         } else {
-          // Fallback to 6 popular SLT services if API fails
+          console.log('API failed, using fallback services (all unsubscribed by default)');
+          // Fallback to 6 popular SLT services if API fails - ALL UNSUBSCRIBED
           const fallbackServices: VASService[] = [
             {
               id: 'slt-filmhall',
@@ -100,7 +108,7 @@ const ValueAddedServices: React.FC = () => {
                 'Offline viewing capability',
                 'Family sharing (up to 5 profiles)'
               ],
-              isSubscribed: false,
+              isSubscribed: false, // DEFAULT: UNSUBSCRIBED
               icon: Smartphone,
               color: 'text-myslt-primary bg-myslt-primary/10 border-myslt-primary/30',
               popularity: 95,
@@ -121,7 +129,7 @@ const ValueAddedServices: React.FC = () => {
                 '4K Ultra HD content',
                 'Multi-room viewing'
               ],
-              isSubscribed: true,
+              isSubscribed: false, // DEFAULT: UNSUBSCRIBED
               icon: Tv,
               color: 'text-myslt-secondary bg-myslt-secondary/10 border-myslt-secondary/30',
               popularity: 92,
@@ -142,7 +150,7 @@ const ValueAddedServices: React.FC = () => {
                 'Safe banking & shopping',
                 'Identity theft protection'
               ],
-              isSubscribed: false,
+              isSubscribed: false, // DEFAULT: UNSUBSCRIBED
               icon: Shield,
               color: 'text-myslt-warning bg-myslt-warning/10 border-myslt-warning/30',
               popularity: 88,
@@ -163,7 +171,7 @@ const ValueAddedServices: React.FC = () => {
                 '24/7 medical helpline',
                 'Specialist referrals'
               ],
-              isSubscribed: true,
+              isSubscribed: false, // DEFAULT: UNSUBSCRIBED
               icon: HeartHandshake,
               color: 'text-myslt-success bg-myslt-success/10 border-myslt-success/30',
               popularity: 86,
@@ -184,40 +192,128 @@ const ValueAddedServices: React.FC = () => {
                 'Version control & history',
                 'Enterprise-grade security'
               ],
-              isSubscribed: false,
+              isSubscribed: false, // DEFAULT: UNSUBSCRIBED
               icon: HardDrive,
               color: 'text-myslt-info bg-myslt-info/10 border-myslt-info/30',
               popularity: 78,
               benefits: ['Secure storage', 'Team collaboration', 'Business tools']
             },
             {
-              id: 'slt-wifi-plus',
-              name: 'SLT WiFi Plus',
-              description: 'Enhanced internet experience with priority bandwidth, parental controls, and premium support.',
+              id: 'slt-international-roaming',
+              name: 'International Roaming Plus',
+              description: 'Affordable international roaming with data packages and competitive call rates worldwide.',
               category: 'connectivity',
               provider: 'SLT Mobitel',
-              price: 'LKR 750/month',
+              price: 'LKR 950/month',
               features: [
-                'Priority bandwidth allocation',
-                'Advanced parental controls',
-                'Guest network management',
-                'Speed boost during peak hours',
-                'Premium technical support',
-                'Network security monitoring'
+                'Global roaming coverage',
+                'Discounted international calls',
+                'Data roaming packages',
+                'SMS bundles worldwide',
+                'Emergency support 24/7',
+                'Usage monitoring & alerts'
               ],
-              isSubscribed: true,
+              isSubscribed: false, // DEFAULT: UNSUBSCRIBED
               icon: Router,
               color: 'text-myslt-accent bg-myslt-accent/10 border-myslt-accent/30',
-              popularity: 83,
-              benefits: ['Faster speeds', 'Family safety', 'Priority support']
+              popularity: 75,
+              benefits: ['Global connectivity', 'Cost savings', 'Travel convenience']
             }
           ];
+          console.log('Using fallback: ALL services set to UNSUBSCRIBED');
           setServices(fallbackServices);
         }
       } catch (error) {
         console.error('Error fetching VAS services:', error);
-        // Set fallback data on error
-        setServices([]);
+        console.log('API Error - using fallback services (all unsubscribed)');
+        // Set fallback data on error - ALL UNSUBSCRIBED
+        const fallbackServices: VASService[] = [
+          {
+            id: 'slt-filmhall',
+            name: 'SLT Filmhall',
+            description: 'Premium OTT streaming platform with movies, TV shows, music, and games. Enjoy unlimited entertainment on any device.',
+            category: 'entertainment',
+            provider: 'SLT Mobitel',
+            price: 'LKR 299/month',
+            features: ['HD & 4K video streaming', 'Unlimited music downloads', 'Interactive gaming platform'],
+            isSubscribed: false, // FORCED UNSUBSCRIBED
+            icon: Smartphone,
+            color: 'text-myslt-primary bg-myslt-primary/10 border-myslt-primary/30',
+            popularity: 95,
+            benefits: ['Premium content', 'No ads', 'Family friendly']
+          },
+          {
+            id: 'peo-tv',
+            name: 'PEO TV Plus',
+            description: 'Complete IPTV solution with 200+ channels, sports packages, and premium entertainment content.',
+            category: 'entertainment',
+            provider: 'SLT Net',
+            price: 'LKR 1,200/month',
+            features: ['200+ live TV channels', 'Premium sports channels', 'Time-shift & catch-up TV'],
+            isSubscribed: false, // FORCED UNSUBSCRIBED
+            icon: Tv,
+            color: 'text-myslt-secondary bg-myslt-secondary/10 border-myslt-secondary/30',
+            popularity: 92,
+            benefits: ['Live sports', 'Premium channels', 'Family entertainment']
+          },
+          {
+            id: 'kaspersky-security',
+            name: 'Kaspersky Total Security',
+            description: 'Complete digital protection for your family with antivirus, VPN, password manager, and parental controls.',
+            category: 'security',
+            provider: 'Kaspersky Lab',
+            price: 'LKR 450/month',
+            features: ['Real-time antivirus protection', 'Secure VPN (unlimited data)', 'Password manager'],
+            isSubscribed: false, // FORCED UNSUBSCRIBED
+            icon: Shield,
+            color: 'text-myslt-warning bg-myslt-warning/10 border-myslt-warning/30',
+            popularity: 88,
+            benefits: ['Complete security', 'Family protection', 'Privacy shield']
+          },
+          {
+            id: 'e-channelling-plus',
+            name: 'e-Channelling Health+',
+            description: 'Comprehensive healthcare service with doctor consultations, lab bookings, and health monitoring.',
+            category: 'healthcare',
+            provider: 'e-Channelling (SLT)',
+            price: 'LKR 650/month',
+            features: ['Unlimited doctor consultations', 'Lab test bookings & home collection', 'Prescription delivery'],
+            isSubscribed: false, // FORCED UNSUBSCRIBED
+            icon: HeartHandshake,
+            color: 'text-myslt-success bg-myslt-success/10 border-myslt-success/30',
+            popularity: 86,
+            benefits: ['Healthcare access', 'Home services', 'Emergency support']
+          },
+          {
+            id: 'slt-cloud-pro',
+            name: 'SLT Cloud Pro',
+            description: 'Professional cloud storage and collaboration suite with advanced security and team features.',
+            category: 'cloud',
+            provider: 'SLT Digital Services',
+            price: 'LKR 850/month',
+            features: ['1TB secure cloud storage', 'Real-time collaboration tools', 'Advanced file sharing'],
+            isSubscribed: false, // FORCED UNSUBSCRIBED
+            icon: HardDrive,
+            color: 'text-myslt-info bg-myslt-info/10 border-myslt-info/30',
+            popularity: 78,
+            benefits: ['Secure storage', 'Team collaboration', 'Business tools']
+          },
+          {
+            id: 'slt-international-roaming',
+            name: 'International Roaming Plus',
+            description: 'Affordable international roaming with data packages and competitive call rates worldwide.',
+            category: 'connectivity',
+            provider: 'SLT Mobitel',
+            price: 'LKR 950/month',
+            features: ['Global roaming coverage', 'Discounted international calls', 'Data roaming packages'],
+            isSubscribed: false, // FORCED UNSUBSCRIBED
+            icon: Router,
+            color: 'text-myslt-accent bg-myslt-accent/10 border-myslt-accent/30',
+            popularity: 75,
+            benefits: ['Global connectivity', 'Cost savings', 'Travel convenience']
+          }
+        ];
+        setServices(fallbackServices);
       } finally {
         setLoading(false);
       }
@@ -286,7 +382,7 @@ const ValueAddedServices: React.FC = () => {
       console.log(`Request initiated at:`, new Date().toISOString());
       
       // Get auth token from localStorage
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       console.log(`Authentication:`, token ? 'Token found' : 'No token found');
       
       console.log(`Making API request to:`, `/api/customer/vas/services/${serviceId}/toggle`);
