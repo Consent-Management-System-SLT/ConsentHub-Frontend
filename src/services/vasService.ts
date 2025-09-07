@@ -123,6 +123,26 @@ class VASServiceAPI {
         } as VASToggleResponse;
       }
       
+      // Handle interceptor extracted data response {subscription: {...}, isSubscribed: boolean}
+      if (response && typeof response === 'object' && 
+          (response as any).subscription && typeof (response as any).isSubscribed === 'boolean') {
+        console.log(`VAS API: Interceptor extracted subscription data response`);
+        // This is the data extracted by the customerApi interceptor from the backend's success response
+        return {
+          success: true,
+          data: {
+            serviceId: serviceId,
+            serviceName: (response as any).subscription?.serviceName || 'Unknown Service',
+            isSubscribed: (response as any).isSubscribed,
+            action: action,
+            timestamp: new Date().toISOString(),
+            subscriptionId: (response as any).subscription?.id,
+            subscriptionHistory: (response as any).subscription?.subscriptionHistory
+          },
+          message: `Successfully ${action}d ${action === 'subscribe' ? 'to' : 'from'} service`
+        } as VASToggleResponse;
+      }
+      
       // Handle interceptor success response (response is already the data)
       console.log(`VAS API: Interceptor success response:`, response);
       
