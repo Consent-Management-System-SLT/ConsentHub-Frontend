@@ -95,8 +95,11 @@ const CSRCustomerVASManagement: React.FC = () => {
         customer.email
       );
       
-      setVasServices(response.data || []);
-      console.log(`CSR loaded ${response.data?.length || 0} VAS services for customer`);
+      // API returns {customer, services, totalServices, activeSubscriptions}
+      const responseData = response as any;
+      const services = responseData.services || responseData.data || [];
+      setVasServices(services);
+      console.log(`CSR loaded ${services.length} VAS services for customer`);
       
     } catch (error) {
       console.error('Failed to load customer VAS services:', error);
