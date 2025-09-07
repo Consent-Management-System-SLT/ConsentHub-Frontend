@@ -106,20 +106,8 @@ class VASServiceAPI {
         throw new Error(errorMsg);
       }
       
-      // Handle normal axios response
-      if (response && (response as any).data) {
-        console.log(`VAS API: Success response data:`, (response as any).data);
-        return (response as any).data as VASToggleResponse;
-      }
-      
-      // Handle backend success response format {success: true, action, message, data}
-      if (response && typeof response === 'object' && (response as any).success === true) {
-        console.log(`VAS API: Backend success response format detected`);
-        console.log(`VAS API: Returning backend response directly:`, response);
-        return response as unknown as VASToggleResponse;
-      }
-      
       // Handle interceptor extracted data response {subscription: {...}, isSubscribed: boolean}
+      // This happens MOST OFTEN due to customerApi interceptor extracting response.data
       if (response && typeof response === 'object' && 
           (response as any).subscription && typeof (response as any).isSubscribed === 'boolean') {
         console.log(`VAS API: Interceptor extracted subscription data response`);
@@ -137,6 +125,20 @@ class VASServiceAPI {
           },
           message: `Successfully ${action}d ${action === 'subscribe' ? 'to' : 'from'} service`
         } as VASToggleResponse;
+      }
+      
+      // Handle normal axios response
+      if (response && (response as any).data) {
+        console.log(`VAS API: Success response data:`, (response as any).data);
+        return (response as any).data as VASToggleResponse;
+      }
+      
+      // Handle backend success response format {success: true, action, message, data}
+      // This is rare since customerApi interceptor usually extracts data first
+      if (response && typeof response === 'object' && (response as any).success === true) {
+        console.log(`VAS API: Backend success response format detected`);
+        console.log(`VAS API: Returning backend response directly:`, response);
+        return response as unknown as VASToggleResponse;
       }
       
       // Handle interceptor success response (response is already the data)
