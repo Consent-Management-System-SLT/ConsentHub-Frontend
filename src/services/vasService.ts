@@ -114,13 +114,9 @@ class VASServiceAPI {
       
       // Handle backend success response format {success: true, action, message, data}
       if (response && typeof response === 'object' && (response as any).success === true) {
-        console.log(`VAS API: Backend success response format`);
-        return {
-          success: true,
-          data: (response as any).data,
-          message: (response as any).message,
-          action: (response as any).action
-        } as VASToggleResponse;
+        console.log(`VAS API: Backend success response format detected`);
+        console.log(`VAS API: Returning backend response directly:`, response);
+        return response as unknown as VASToggleResponse;
       }
       
       // Handle interceptor extracted data response {subscription: {...}, isSubscribed: boolean}
