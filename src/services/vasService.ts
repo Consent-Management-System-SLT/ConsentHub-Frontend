@@ -107,8 +107,35 @@ class VASServiceAPI {
         throw new Error(errorMsg);
       }
       
+      // Handle backend success response format {success: true, action, message, data}
+      // Backend data contains {subscription: {...}, isSubscribed: boolean}
+      if (response && typeof response === 'object' && (response as any).success === true && (response as any).data) {
+        console.log(`VAS API: Backend success response with data detected`);
+        const backendData = (response as any).data;
+        console.log(`VAS API: Backend data:`, backendData);
+        
+        // Check if data contains subscription info
+        if (backendData && typeof backendData === 'object' && 
+            backendData.subscription && typeof backendData.isSubscribed === 'boolean') {
+          console.log(`VAS API: Valid subscription data found in backend response`);
+          return {
+            success: true,
+            data: {
+              serviceId: serviceId,
+              serviceName: backendData.subscription?.serviceName || 'Unknown Service',
+              isSubscribed: backendData.isSubscribed,
+              action: action,
+              timestamp: new Date().toISOString(),
+              subscriptionId: backendData.subscription?.id,
+              subscriptionHistory: backendData.subscription?.subscriptionHistory
+            },
+            message: (response as any).message || `Successfully ${action}d ${action === 'subscribe' ? 'to' : 'from'} service`
+          } as VASToggleResponse;
+        }
+      }
+      
       // Handle interceptor extracted data response {subscription: {...}, isSubscribed: boolean}
-      // This happens MOST OFTEN due to customerApi interceptor extracting response.data
+      // This happens when customerApi interceptor extracts response.data BEFORE our service gets it
       if (response && typeof response === 'object' && 
           (response as any).subscription && typeof (response as any).isSubscribed === 'boolean') {
         console.log(`VAS API: Interceptor extracted subscription data response`);
@@ -128,18 +155,10 @@ class VASServiceAPI {
         } as VASToggleResponse;
       }
       
-      // Handle normal axios response
-      if (response && (response as any).data) {
-        console.log(`VAS API: Success response data:`, (response as any).data);
+      // Handle normal axios response with nested data
+      if (response && (response as any).data && !(response as any).success) {
+        console.log(`VAS API: Axios response with nested data:`, (response as any).data);
         return (response as any).data as VASToggleResponse;
-      }
-      
-      // Handle backend success response format {success: true, action, message, data}
-      // This is rare since customerApi interceptor usually extracts data first
-      if (response && typeof response === 'object' && (response as any).success === true) {
-        console.log(`VAS API: Backend success response format detected`);
-        console.log(`VAS API: Returning backend response directly:`, response);
-        return response as unknown as VASToggleResponse;
       }
       
       // Handle interceptor success response (response is already the data)
