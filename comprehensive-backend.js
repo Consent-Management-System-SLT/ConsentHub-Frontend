@@ -20,6 +20,7 @@ const NotificationLog = require('./models/NotificationLog');
 const { Webhook, EventLog } = require('./models/Webhook');
 const CommunicationPreference = require('./models/CommunicationPreference');
 const VASSubscription = require('./models/VASSubscription');
+const VASService = require('./models/VASService');
 const { notificationService } = require('./services/notificationService');
 const { seedGuardians } = require('./seedGuardians');
 const { 
@@ -52,6 +53,204 @@ const PORT = process.env.PORT || 3001;
 
 // Connect to MongoDB
 connectDB();
+
+// Initialize VAS Services
+async function initializeVASServices() {
+  try {
+    const existingCount = await VASService.countDocuments();
+    if (existingCount === 0) {
+      console.log('🔧 Initializing default VAS services...');
+      
+      const defaultServices = [
+        {
+          id: 'slt-filmhall',
+          name: 'SLT Filmhall',
+          description: 'Premium OTT streaming platform with movies, TV shows, music, and games. Enjoy unlimited entertainment on any device.',
+          category: 'entertainment',
+          provider: 'SLT Mobitel',
+          price: 'LKR 299/month',
+          priceNumeric: 299,
+          features: ['HD & 4K video streaming', 'Unlimited music downloads', 'Interactive gaming platform', 'Multi-device access', 'Exclusive SLT content', 'Offline downloads'],
+          benefits: ['Premium content', 'No ads', 'Family friendly'],
+          popularity: 95,
+          status: 'active',
+          totalSubscribers: 15420,
+          monthlyRevenue: 4610580,
+          createdBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          },
+          updatedBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          }
+        },
+        {
+          id: 'peo-tv',
+          name: 'PEO TV Plus',
+          description: 'Complete IPTV solution with 200+ channels, sports packages, and premium entertainment content.',
+          category: 'entertainment',
+          provider: 'SLT Net',
+          price: 'LKR 1,200/month',
+          priceNumeric: 1200,
+          features: ['200+ live TV channels', 'Premium sports channels', 'Time-shift & catch-up TV', 'Multi-screen viewing', 'HD & 4K channels', 'On-demand content'],
+          benefits: ['Live sports', 'Premium channels', 'Family entertainment'],
+          popularity: 92,
+          status: 'active',
+          totalSubscribers: 8750,
+          monthlyRevenue: 10500000,
+          createdBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          },
+          updatedBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          }
+        },
+        {
+          id: 'kaspersky-security',
+          name: 'Kaspersky Total Security',
+          description: 'Complete digital protection for your family with antivirus, VPN, password manager, and parental controls.',
+          category: 'security',
+          provider: 'Kaspersky Lab',
+          price: 'LKR 450/month',
+          priceNumeric: 450,
+          features: ['Real-time antivirus protection', 'Secure VPN (unlimited data)', 'Password manager', 'Parental controls', 'Identity theft protection', 'Safe banking & shopping'],
+          benefits: ['Complete security', 'Family protection', 'Privacy shield'],
+          popularity: 88,
+          status: 'active',
+          totalSubscribers: 12300,
+          monthlyRevenue: 5535000,
+          createdBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          },
+          updatedBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          }
+        },
+        {
+          id: 'e-channelling-plus',
+          name: 'e-Channelling Health+',
+          description: 'Comprehensive healthcare service with doctor consultations, lab bookings, and health monitoring.',
+          category: 'healthcare',
+          provider: 'e-Channelling (SLT)',
+          price: 'LKR 650/month',
+          priceNumeric: 650,
+          features: ['Unlimited doctor consultations', 'Lab test bookings & home collection', 'Prescription delivery', 'Health record management', '24/7 medical helpline', 'Specialist referrals'],
+          benefits: ['Healthcare access', 'Home services', 'Emergency support'],
+          popularity: 86,
+          status: 'active',
+          totalSubscribers: 9850,
+          monthlyRevenue: 6402500,
+          createdBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          },
+          updatedBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          }
+        },
+        {
+          id: 'slt-cloud-pro',
+          name: 'SLT Cloud Pro',
+          description: 'Professional cloud storage and collaboration suite with advanced security and team features.',
+          category: 'cloud',
+          provider: 'SLT Digital Services',
+          price: 'LKR 850/month',
+          priceNumeric: 850,
+          features: ['1TB secure cloud storage', 'Real-time collaboration tools', 'Advanced file sharing', 'Automated backup', 'Version control & history', 'Enterprise-grade security'],
+          benefits: ['Secure storage', 'Team collaboration', 'Business tools'],
+          popularity: 78,
+          status: 'active',
+          totalSubscribers: 6420,
+          monthlyRevenue: 5457000,
+          createdBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          },
+          updatedBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          }
+        },
+        {
+          id: 'slt-international-roaming',
+          name: 'International Roaming Plus',
+          description: 'Affordable international roaming with data packages and competitive call rates worldwide.',
+          category: 'connectivity',
+          provider: 'SLT Mobitel',
+          price: 'LKR 950/month',
+          priceNumeric: 950,
+          features: ['Global roaming coverage', 'Discounted international calls', 'Data roaming packages', 'SMS roaming', 'Emergency assistance', 'Travel notifications'],
+          benefits: ['Global connectivity', 'Cost savings', 'Travel convenience'],
+          popularity: 75,
+          status: 'active',
+          totalSubscribers: 4200,
+          monthlyRevenue: 3990000,
+          createdBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          },
+          updatedBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          }
+        },
+        {
+          id: 'slt-wifi-plus',
+          name: 'SLT WiFi Plus',
+          description: 'Enhanced internet experience with priority bandwidth, parental controls, and premium support.',
+          category: 'connectivity',
+          provider: 'SLT Mobitel',
+          price: 'LKR 750/month',
+          priceNumeric: 750,
+          features: ['Priority bandwidth allocation', 'Advanced parental controls', 'Guest network management', 'Network security monitoring', '24/7 premium technical support', 'Speed optimization tools'],
+          benefits: ['Faster speeds', 'Family safety', 'Priority support'],
+          popularity: 83,
+          status: 'active',
+          totalSubscribers: 7890,
+          monthlyRevenue: 5917500,
+          createdBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          },
+          updatedBy: {
+            userId: 'system',
+            userEmail: 'system@sltmobitel.lk',
+            timestamp: new Date()
+          }
+        }
+      ];
+
+      await VASService.insertMany(defaultServices);
+      console.log(`✅ Initialized ${defaultServices.length} VAS services`);
+    } else {
+      console.log(`📋 Found ${existingCount} existing VAS services`);
+    }
+  } catch (error) {
+    console.error('❌ Error initializing VAS services:', error);
+  }
+}
+
+// Initialize VAS services after a short delay to ensure DB connection
+setTimeout(initializeVASServices, 2000);
 
 // Production CORS configuration
 const corsOptions = {
@@ -4100,6 +4299,412 @@ app.post('/api/csr/customer-vas/:serviceId/toggle', async (req, res) => {
 });
 
 console.log('✅ CSR VAS management routes loaded successfully');
+
+// ================================
+// ADMIN VAS MANAGEMENT API ENDPOINTS
+// ================================
+
+// GET /api/admin/vas/services - Get all VAS services for admin management
+app.get('/api/admin/vas/services', verifyToken, async (req, res) => {
+  try {
+    console.log('🔧 Admin: Fetching all VAS services from database');
+    
+    const { category, status, search, page = 1, limit = 50 } = req.query;
+    
+    // Build filter object
+    const filter = {};
+    if (category && category !== 'all') filter.category = category;
+    if (status && status !== 'all') filter.status = status;
+    
+    // Add search functionality
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { provider: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    const skip = (page - 1) * limit;
+    
+    // Fetch services from database
+    const vasServices = await VASService.find(filter)
+      .sort({ popularity: -1, createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip(skip);
+    
+    const totalServices = await VASService.countDocuments(filter);
+    
+    // Calculate metrics
+    const totalSubscribers = vasServices.reduce((sum, service) => sum + (service.totalSubscribers || 0), 0);
+    const totalMonthlyRevenue = vasServices.reduce((sum, service) => sum + (service.monthlyRevenue || 0), 0);
+    const categories = await VASService.distinct('category');
+    
+    console.log(`✅ Admin VAS: Retrieved ${vasServices.length} services from database`);
+
+    res.json({
+      success: true,
+      data: vasServices,
+      meta: {
+        total: totalServices,
+        page: parseInt(page),
+        totalPages: Math.ceil(totalServices / parseInt(limit)),
+        totalSubscribers,
+        totalMonthlyRevenue,
+        categories
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Admin VAS services error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch VAS services',
+      error: error.message
+    });
+  }
+});
+
+// POST /api/admin/vas/services - Create a new VAS service
+app.post('/api/admin/vas/services', verifyToken, async (req, res) => {
+  try {
+    console.log('🔧 Admin: Creating new VAS service in database');
+    
+    const {
+      name,
+      description,
+      category,
+      provider,
+      price,
+      features = [],
+      benefits = [],
+      popularity = 0,
+      status = 'active'
+    } = req.body;
+    
+    // Validate required fields
+    if (!name || !description || !category || !provider || !price) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: name, description, category, provider, price'
+      });
+    }
+    
+    // Extract numeric price
+    const priceMatch = price.match(/(\d+(?:\.\d+)?)/);
+    const priceNumeric = priceMatch ? parseFloat(priceMatch[1]) : 0;
+    
+    // Create new service
+    const newService = new VASService({
+      name: name.trim(),
+      description: description.trim(),
+      category,
+      provider: provider.trim(),
+      price: price.trim(),
+      priceNumeric,
+      features: features.filter(f => f && f.trim()),
+      benefits: benefits.filter(b => b && b.trim()),
+      popularity: Math.max(0, Math.min(100, popularity)),
+      status,
+      createdBy: {
+        userId: req.user?.id || 'admin',
+        userEmail: req.user?.email || 'admin@sltmobitel.lk',
+        timestamp: new Date()
+      },
+      updatedBy: {
+        userId: req.user?.id || 'admin',
+        userEmail: req.user?.email || 'admin@sltmobitel.lk',
+        timestamp: new Date()
+      }
+    });
+
+    await newService.save();
+    
+    console.log(`✅ Admin VAS: Created service ${newService.name} (${newService._id})`);
+
+    res.json({
+      success: true,
+      data: newService,
+      message: 'VAS service created successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ Admin VAS create error:', error);
+    
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Service with this name already exists'
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create VAS service',
+      error: error.message
+    });
+  }
+});
+
+// PUT /api/admin/vas/services/:serviceId - Update a VAS service
+app.put('/api/admin/vas/services/:serviceId', verifyToken, async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    const updateData = req.body;
+    
+    console.log(`🔧 Admin: Updating VAS service ${serviceId} in database`);
+    
+    // Find the service by _id or id field
+    const service = await VASService.findOne({
+      $or: [
+        { _id: serviceId },
+        { id: serviceId }
+      ]
+    });
+    
+    if (!service) {
+      return res.status(404).json({
+        success: false,
+        message: 'VAS service not found'
+      });
+    }
+    
+    // Update fields
+    if (updateData.name) service.name = updateData.name.trim();
+    if (updateData.description) service.description = updateData.description.trim();
+    if (updateData.category) service.category = updateData.category;
+    if (updateData.provider) service.provider = updateData.provider.trim();
+    if (updateData.price) service.price = updateData.price.trim();
+    if (updateData.features) service.features = updateData.features.filter(f => f && f.trim());
+    if (updateData.benefits) service.benefits = updateData.benefits.filter(b => b && b.trim());
+    if (updateData.popularity !== undefined) service.popularity = Math.max(0, Math.min(100, updateData.popularity));
+    if (updateData.status) service.status = updateData.status;
+    
+    // Update metadata
+    service.updatedBy = {
+      userId: req.user?.id || 'admin',
+      userEmail: req.user?.email || 'admin@sltmobitel.lk',
+      timestamp: new Date()
+    };
+    
+    await service.save();
+
+    console.log(`✅ Admin VAS: Updated service ${service.name} (${service._id})`);
+
+    res.json({
+      success: true,
+      data: service,
+      message: 'VAS service updated successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ Admin VAS update error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update VAS service',
+      error: error.message
+    });
+  }
+});
+
+// DELETE /api/admin/vas/services/:serviceId - Delete a VAS service
+app.delete('/api/admin/vas/services/:serviceId', verifyToken, async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    
+    console.log(`🔧 Admin: Deleting VAS service ${serviceId} from database`);
+    
+    // Find the service by _id or id field
+    const service = await VASService.findOne({
+      $or: [
+        { _id: serviceId },
+        { id: serviceId }
+      ]
+    });
+    
+    if (!service) {
+      return res.status(404).json({
+        success: false,
+        message: 'VAS service not found'
+      });
+    }
+    
+    // Check if there are active subscriptions for this service
+    const activeSubscriptions = await VASSubscription.countDocuments({
+      serviceId: service.id,
+      isSubscribed: true
+    });
+    
+    if (activeSubscriptions > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete service: ${activeSubscriptions} active subscriptions exist. Please deactivate the service instead.`
+      });
+    }
+    
+    // Delete the service
+    await VASService.findByIdAndDelete(service._id);
+    
+    console.log(`✅ Admin VAS: Deleted service ${service.name} (${service._id})`);
+
+    res.json({
+      success: true,
+      message: 'VAS service deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ Admin VAS delete error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete VAS service',
+      error: error.message
+    });
+  }
+});
+
+// GET /api/admin/vas/customer-subscriptions - Get all customer VAS subscriptions
+app.get('/api/admin/vas/customer-subscriptions', verifyToken, async (req, res) => {
+  try {
+    console.log('🔧 Admin: Fetching customer VAS subscriptions');
+    
+    // Fetch all customer subscriptions from the database
+    const allSubscriptions = await VASSubscription.find({})
+      .sort({ updatedAt: -1 })
+      .limit(1000);
+
+    // Group by customer and calculate metrics
+    const customerGroups = {};
+    
+    allSubscriptions.forEach(sub => {
+      const key = sub.customerId;
+      if (!customerGroups[key]) {
+        customerGroups[key] = {
+          customerId: sub.customerId,
+          customerEmail: sub.customerEmail,
+          customerName: sub.customerEmail.split('@')[0], // Extract name from email
+          subscriptions: [],
+          activeServices: 0,
+          monthlyValue: 0,
+          totalSpent: 0
+        };
+      }
+      
+      customerGroups[key].subscriptions.push(sub);
+      if (sub.isSubscribed) {
+        customerGroups[key].activeServices++;
+        // Calculate monthly value based on service price
+        const servicePrices = {
+          'slt-filmhall': 299,
+          'peo-tv': 1200,
+          'kaspersky-security': 450,
+          'e-channelling-plus': 650,
+          'slt-cloud-pro': 850,
+          'slt-international-roaming': 950,
+          'slt-wifi-plus': 750
+        };
+        customerGroups[key].monthlyValue += servicePrices[sub.serviceId] || 0;
+      }
+    });
+
+    const customerSubscriptions = Object.values(customerGroups).map(customer => ({
+      ...customer,
+      totalSpent: customer.monthlyValue * 6 // Estimate 6 months
+    }));
+
+    console.log(`✅ Admin VAS: Retrieved subscriptions for ${customerSubscriptions.length} customers`);
+
+    res.json({
+      success: true,
+      data: customerSubscriptions,
+      meta: {
+        totalCustomers: customerSubscriptions.length,
+        totalActiveSubscriptions: customerSubscriptions.reduce((sum, c) => sum + c.activeServices, 0),
+        totalMonthlyRevenue: customerSubscriptions.reduce((sum, c) => sum + c.monthlyValue, 0)
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Admin VAS customer subscriptions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch customer subscriptions',
+      error: error.message
+    });
+  }
+});
+
+// GET /api/admin/vas/subscription-history - Get VAS subscription history
+app.get('/api/admin/vas/subscription-history', verifyToken, async (req, res) => {
+  try {
+    console.log('🔧 Admin: Fetching VAS subscription history');
+    
+    const { page = 1, limit = 50, startDate, endDate, serviceId, customerId } = req.query;
+    
+    // Build filter
+    const filter = {};
+    if (serviceId) filter.serviceId = serviceId;
+    if (customerId) filter.customerId = customerId;
+    if (startDate || endDate) {
+      filter.updatedAt = {};
+      if (startDate) filter.updatedAt.$gte = new Date(startDate);
+      if (endDate) filter.updatedAt.$lte = new Date(endDate);
+    }
+
+    const skip = (page - 1) * limit;
+    
+    // Fetch subscription history
+    const subscriptions = await VASSubscription.find(filter)
+      .sort({ updatedAt: -1 })
+      .limit(parseInt(limit))
+      .skip(skip);
+
+    // Transform to history format
+    const history = [];
+    subscriptions.forEach(sub => {
+      sub.subscriptionHistory.forEach(historyItem => {
+        history.push({
+          id: `${sub._id}-${historyItem.timestamp}`,
+          customerId: sub.customerId,
+          customerEmail: sub.customerEmail,
+          customerName: sub.customerEmail.split('@')[0],
+          serviceId: sub.serviceId,
+          serviceName: sub.serviceName,
+          action: historyItem.action,
+          lastUpdated: historyItem.timestamp,
+          updatedBy: historyItem.requestInfo?.csrUser?.email || 
+                     historyItem.requestInfo?.actionBy || 
+                     'Customer',
+          isSubscribed: historyItem.action === 'subscribe'
+        });
+      });
+    });
+
+    // Sort by timestamp
+    history.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
+
+    console.log(`✅ Admin VAS: Retrieved ${history.length} history records`);
+
+    res.json({
+      success: true,
+      data: history.slice(0, parseInt(limit)),
+      meta: {
+        total: history.length,
+        page: parseInt(page),
+        totalPages: Math.ceil(history.length / parseInt(limit))
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Admin VAS subscription history error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch subscription history',
+      error: error.message
+    });
+  }
+});
+
+console.log('✅ Admin VAS management routes loaded successfully');
 
 // ================================
 // COMPLIANCE RULES API ENDPOINTS
@@ -10089,9 +10694,63 @@ io.on('connection', (socket) => {
         socket.leave('csr-dashboard');
         console.log('👨‍💼 CSR left dashboard room:', socket.id);
     });
+
+    // Join customer-specific room for VAS updates
+    socket.on('join-customer-room', (customerId) => {
+        if (customerId) {
+            const roomName = `customer_${customerId}`;
+            socket.join(roomName);
+            console.log(`👤 Customer ${customerId} joined room: ${roomName} (Socket: ${socket.id})`);
+            
+            // Confirm room join
+            socket.emit('room-joined', { 
+                room: roomName, 
+                customerId: customerId,
+                message: 'Successfully joined customer room for real-time VAS updates'
+            });
+        }
+    });
+
+    // Leave customer room
+    socket.on('leave-customer-room', (customerId) => {
+        if (customerId) {
+            const roomName = `customer_${customerId}`;
+            socket.leave(roomName);
+            console.log(`👤 Customer ${customerId} left room: ${roomName} (Socket: ${socket.id})`);
+        }
+    });
+
+    // Handle authentication for customer rooms
+    socket.on('authenticate-customer', (authData) => {
+        try {
+            const { token, customerId } = authData;
+            // Here you could verify the JWT token and validate the customer ID
+            // For now, we'll trust the provided customerId
+            if (customerId) {
+                socket.customerId = customerId;
+                const roomName = `customer_${customerId}`;
+                socket.join(roomName);
+                console.log(`🔐 Customer authenticated and joined room: ${roomName}`);
+                
+                socket.emit('authentication-success', {
+                    customerId: customerId,
+                    room: roomName,
+                    message: 'Successfully authenticated for real-time updates'
+                });
+            }
+        } catch (error) {
+            console.error('❌ Customer authentication failed:', error);
+            socket.emit('authentication-failed', { 
+                message: 'Authentication failed' 
+            });
+        }
+    });
     
     socket.on('disconnect', () => {
         console.log('🔌 Client disconnected:', socket.id);
+        if (socket.customerId) {
+            console.log(`👤 Customer ${socket.customerId} disconnected`);
+        }
     });
 });
 

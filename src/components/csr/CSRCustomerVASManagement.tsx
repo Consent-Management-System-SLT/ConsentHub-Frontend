@@ -23,6 +23,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
+import { websocketService, VASSubscriptionUpdate } from '../../services/websocketService';
 
 interface Customer {
   id: string;
@@ -175,6 +176,33 @@ const CSRCustomerVASManagement: React.FC = () => {
       default: return 'bg-gray-500/10 text-gray-600 border-gray-200';
     }
   };
+
+  // Set up real-time VAS updates for CSR dashboard
+  useEffect(() => {
+    // Subscribe to real-time VAS updates
+    const handleVASUpdate = (update: VASSubscriptionUpdate) => {
+      console.log('CSR Dashboard received VAS update:', update);
+      
+      // Update VAS services if this customer is currently selected
+      if (selectedCustomer && update.customerId === selectedCustomer.id) {
+        setVasServices(prev => prev.map(service => 
+          service.id === update.serviceId 
+            ? { ...service, isSubscribed: update.isSubscribed }
+            : service
+        ));
+        
+        console.log(`CSR Dashboard: Updated ${update.serviceId} subscription status to ${update.isSubscribed} for customer ${selectedCustomer.email}`);
+      }
+    };
+
+    // Connect to WebSocket and listen for VAS updates
+    websocketService.onCSRVASUpdate(handleVASUpdate);
+
+    // Cleanup on component unmount
+    return () => {
+      websocketService.offCSRVASUpdate();
+    };
+  }, [selectedCustomer]);
 
   return (
     <div className="space-y-6 p-6 bg-myslt-background min-h-full">

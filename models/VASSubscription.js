@@ -21,7 +21,6 @@ const vasSubscriptionSchema = new mongoose.Schema({
   serviceId: {
     type: String,
     required: true,
-    enum: ['slt-filmhall', 'peo-tv', 'kaspersky-security', 'e-channelling-plus', 'slt-cloud-pro', 'slt-international-roaming', 'slt-wifi-plus'],
     index: true
   },
   serviceName: {
@@ -178,12 +177,28 @@ vasSubscriptionSchema.statics.updateSubscription = async function(customerId, cu
     
     // Update billing info for active subscriptions
     if (isSubscribed) {
-      subscription.billingInfo = {
-        startDate: new Date(),
-        nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-        amount: getServicePrice(serviceId),
-        currency: 'LKR'
-      };
+      try {
+        console.log(`💰 VAS: Getting price for service ${serviceId}...`);
+        const servicePrice = await getServicePrice(serviceId);
+        console.log(`💰 VAS: Price retrieved: ${servicePrice}`);
+        
+        subscription.billingInfo = {
+          startDate: new Date(),
+          nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+          amount: servicePrice,
+          currency: 'LKR'
+        };
+        console.log(`💰 VAS: Billing info updated for ${serviceId}`);
+      } catch (priceError) {
+        console.error(`❌ VAS: Error setting up billing for ${serviceId}:`, priceError);
+        // Use default price if there's an error
+        subscription.billingInfo = {
+          startDate: new Date(),
+          nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          amount: '500', // Default price
+          currency: 'LKR'
+        };
+      }
     } else {
       subscription.billingInfo = {
         startDate: null,
@@ -206,17 +221,54 @@ vasSubscriptionSchema.statics.updateSubscription = async function(customerId, cu
 };
 
 // Helper function to get service prices
-function getServicePrice(serviceId) {
-  const prices = {
+async function getServicePrice(serviceId) {
+  // Prices for predefined services (short IDs)
+  const predefinedPrices = {
     'slt-filmhall': '299',
-    'peo-tv': '1200',
+    'peo-tv': '1200', 
     'kaspersky-security': '450',
     'e-channelling-plus': '650',
     'slt-cloud-pro': '850',
     'slt-international-roaming': '950',
     'slt-wifi-plus': '750'
   };
-  return prices[serviceId] || '0';
+  
+  // Check if it's a predefined service
+  if (predefinedPrices[serviceId]) {
+    return predefinedPrices[serviceId];
+  }
+  
+  // For admin-created services, fetch price from database
+  try {
+    const mongoose = require('mongoose');
+    
+    // Avoid circular dependency by accessing the model through mongoose.models
+    let service = null;
+    
+    // Try to find by ObjectId first
+    if (mongoose.Types.ObjectId.isValid(serviceId)) {
+      service = await mongoose.models.VASService.findById(serviceId);
+    }
+    
+    // If not found, try custom id field
+    if (!service) {
+      service = await mongoose.models.VASService.findOne({ id: serviceId });
+    }
+    
+    if (service && service.price) {
+      // Extract numeric value from price string (e.g., "LKR 500/month" -> "500")
+      const priceMatch = service.price.match(/(\d+)/);
+      const extractedPrice = priceMatch ? priceMatch[1] : '500';
+      console.log(`💰 VAS: Found price for ${serviceId}: ${extractedPrice} (from: ${service.price})`);
+      return extractedPrice;
+    }
+  } catch (error) {
+    console.error(`❌ VAS: Error fetching price for service ${serviceId}:`, error.message);
+  }
+  
+  // Fallback to default price
+  console.log(`⚠️  VAS: Using default price for service ${serviceId}`);
+  return '500'; // Default price for new services
 }
 
 // Instance Methods
