@@ -429,10 +429,10 @@ class CSRDashboardService {
         params: { query: searchTerm }
       });
       
-      // Handle the API response format where customers are in response.data.data
+      // Handle the API response format - backend returns customers directly
       const responseData = response.data as any;
-      const customers = responseData?.data || [];
-      const total = responseData?.count || customers.length;
+      const customers = responseData?.customers || [];
+      const total = responseData?.total || customers.length;
       
       console.log(`Found ${total} customers for search term: "${searchTerm}"`);
       
@@ -1851,8 +1851,8 @@ class CSRDashboardService {
     try {
       const response = await apiClient.get('/api/csr/customer-vas', {
         headers: {
-          'customer-id': customerId,
-          'customer-email': customerEmail
+          'customerId': customerId,
+          'customerEmail': customerEmail
         }
       });
       console.log('[CSR] Customer VAS services retrieved successfully:', response.data);
@@ -1885,8 +1885,8 @@ class CSRDashboardService {
         { action },
         {
           headers: {
-            'customer-id': customerId,
-            'customer-email': customerEmail
+            'customerId': customerId,
+            'customerEmail': customerEmail
           }
         }
       );
