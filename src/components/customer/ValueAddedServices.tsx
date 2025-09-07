@@ -260,11 +260,12 @@ const ValueAddedServices: React.FC = () => {
   const handleSubscriptionToggle = async (serviceId: string) => {
     setSubscriptionLoading(serviceId);
     
+    // Declare variables outside try block for access in catch block
+    const currentService = services.find(s => s.id === serviceId);
+    const action = currentService?.isSubscribed ? 'unsubscribe' : 'subscribe';
+    const displayAction = action.toUpperCase(); // For display purposes
+    
     try {
-      const currentService = services.find(s => s.id === serviceId);
-      const action = currentService?.isSubscribed ? 'unsubscribe' : 'subscribe';
-      const displayAction = action.toUpperCase(); // For display purposes
-      
       console.group(`VAS Subscription ${displayAction}`);
       console.log(`Service Details:`, {
         serviceId,
@@ -307,6 +308,10 @@ const ValueAddedServices: React.FC = () => {
         
         console.log(`${displayAction} SUCCESSFUL for ${currentService?.name}`);
         
+        // Show success alert
+        const successMessage = `Successfully ${action === 'subscribe' ? 'subscribed to' : 'unsubscribed from'} ${currentService?.name}!`;
+        alert(successMessage);
+        
         // Show immediate feedback (WebSocket will update all connected clients)
         if (wsConnected) {
           setMessage(`${action === 'subscribe' ? 'Subscribed to' : 'Unsubscribed from'} ${currentService?.name}. Real-time update sent to all devices!`);
@@ -314,12 +319,15 @@ const ValueAddedServices: React.FC = () => {
           setMessage(`${action === 'subscribe' ? 'Subscribed to' : 'Unsubscribed from'} ${currentService?.name}. Update saved.`);
         }
         
-        // Clear message after 3 seconds
-        setTimeout(() => setMessage(''), 3000);
+        // Clear message after 5 seconds (longer for success messages)
+        setTimeout(() => setMessage(''), 5000);
       } else {
         console.error(`API Error:`, result?.message || 'Unknown error');
-        // Show error message to user
-        alert(`Error: ${result?.message || 'Unknown error occurred'}`);
+        // Show user-friendly error message
+        const errorMsg = result?.message || 'Unknown error occurred';
+        alert(`❌ Failed to ${action} ${currentService?.name}: ${errorMsg}`);
+        setMessage(`Failed to ${action} ${currentService?.name}. Please try again.`);
+        setTimeout(() => setMessage(''), 4000);
       }
     } catch (error: any) {
       console.error(`Subscription toggle error:`, {
@@ -329,17 +337,12 @@ const ValueAddedServices: React.FC = () => {
         stack: error.stack
       });
       
-      // Show detailed error to user
-      const errorMessage = error.message || 'Unknown error occurred';
-      alert(`API Error: ${errorMessage}`);
+      // Show user-friendly error alert
+      const errorMessage = error.message || 'Network error occurred';
+      alert(`❌ ${action === 'subscribe' ? 'Subscription' : 'Unsubscription'} failed: ${errorMessage}`);
       
-      // Fallback - toggle locally if API fails
-      setServices(prev => prev.map(service => 
-        service.id === serviceId 
-          ? { ...service, isSubscribed: !service.isSubscribed }
-          : service
-      ));
-      console.log(`Fallback: Local state toggled for ${serviceId}`);
+      setMessage(`Failed to ${action} ${currentService?.name}. Please check your connection and try again.`);
+      setTimeout(() => setMessage(''), 4000);
     } finally {
       setSubscriptionLoading(null);
       console.log(`Request completed at:`, new Date().toISOString());
