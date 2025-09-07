@@ -7,6 +7,7 @@ import DashboardHome from './admin/DashboardHome';
 import ConsentOverviewTable from './admin/ConsentOverviewTable';
 import GuardianConsent from './admin/GuardianConsent';
 import PreferenceManagement from './admin/PreferenceManagementNew';
+import VASManagement from './admin/VASManagement';
 import { PrivacyNotices } from './PrivacyNotices';
 import DSARManager from './admin/DSARManager';
 import DSARAutomation from './admin/DSARAutomation';
@@ -37,6 +38,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
         return <GuardianConsent />;
       case 'preference-management':
         return <PreferenceManagement />;
+      case 'vas-management':
+        return <VASManagement />;
       case 'privacy-notices':
         return <PrivacyNotices />;
       case 'dsar-requests':
