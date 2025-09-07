@@ -286,9 +286,8 @@ const ValueAddedServices: React.FC = () => {
       console.log(`API Response Type:`, typeof result);
       console.log(`API Response Keys:`, Object.keys(result || {}));
       
-      // Check if result has success property (wrapped response) or is direct data (intercepted response)
-      const isSuccessful = (result && result.success) || (result && (result as any).serviceId && (result as any).action);
-      const responseData = result.data || result; // Handle both wrapped and direct responses
+      // Check if result has success property - backend always returns this now
+      const isSuccessful = result && result.success === true;
       
       if (isSuccessful) {
         // Note: WebSocket will handle the real-time update automatically
@@ -303,7 +302,7 @@ const ValueAddedServices: React.FC = () => {
         console.log(`Local state updated:`, {
           serviceId,
           newStatus: newSubscriptionStatus ? 'SUBSCRIBED' : 'UNSUBSCRIBED',
-          action: (responseData as any).action || action
+          action: (result as any).action || action
         });
         
         console.log(`${displayAction} SUCCESSFUL for ${currentService?.name}`);
