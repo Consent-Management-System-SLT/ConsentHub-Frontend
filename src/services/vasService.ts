@@ -81,6 +81,7 @@ class VASServiceAPI {
       console.log(`VAS API: Raw response:`, response);
       console.log(`VAS API: Response type:`, typeof response);
       console.log(`VAS API: Response keys:`, Object.keys(response || {}));
+      console.log(`🚀 VAS API DEBUG: Using new logic order - FIX 805e319 deployed!`);
       
       // Check if the response is an error object from interceptor
       if (response && typeof response === 'object' && (response as any).error === true) {
