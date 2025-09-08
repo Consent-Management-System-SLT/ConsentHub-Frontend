@@ -1850,9 +1850,9 @@ class CSRDashboardService {
     
     try {
       const response = await apiClient.get('/api/csr/customer-vas', {
-        headers: {
-          'customerId': customerId,
-          'customerEmail': customerEmail
+        params: {
+          customerId: customerId,
+          customerEmail: customerEmail
         }
       });
       console.log('[CSR] Customer VAS services retrieved successfully:', response.data);
@@ -1862,7 +1862,7 @@ class CSRDashboardService {
       throw {
         message: error.response?.data?.message || 'Failed to retrieve customer VAS services',
         status: error.response?.status || 500,
-        details: error.response?.data || error.message
+        details: error.response?.data?.details || 'Network error - please check your connection'
       };
     }
   }
@@ -1882,12 +1882,10 @@ class CSRDashboardService {
     
     try {
       const response = await apiClient.post(`/api/csr/customer-vas/${serviceId}/toggle`, 
-        { action },
-        {
-          headers: {
-            'customerId': customerId,
-            'customerEmail': customerEmail
-          }
+        { 
+          action,
+          customerId: customerId,
+          customerEmail: customerEmail
         }
       );
       console.log('[CSR] Customer VAS subscription toggled successfully:', response.data);

@@ -5,36 +5,12 @@ import {
   Mail, 
   Phone, 
   Settings, 
-  Shield,
   RefreshCw,
   AlertCircle,
-  Clock,
-  Check,
-  X,
-  Globe,
-  Smartphone,
-  Monitor,
-  Play,
-  Wifi,
-  Cloud,
-  Camera,
-  Star,
-  Eye,
-  EyeOff
+  X
 } from 'lucide-react';
-import { csrDashboardService } from '../../services/csrDashboardService';
+import { csrDashboardService, CustomerData } from '../../services/csrDashboardService';
 import { websocketService, VASSubscriptionUpdate } from '../../services/websocketService';
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  mobile?: string;
-  status?: string;
-  joinDate?: string;
-  lastLogin?: string;
-}
 
 interface VASService {
   id: string;
@@ -50,19 +26,33 @@ interface VASService {
 }
 
 const CSRCustomerVASManagement: React.FC = () => {
+  // Search and customer selection state
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [searchResults, setSearchResults] = useState<CustomerData[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
+  
+  // VAS services state
   const [vasServices, setVasServices] = useState<VASService[]>([]);
+  
+  // UI state
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingVAS, setIsLoadingVAS] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
+  // Statistics
+  const [stats, setStats] = useState({
+    totalServices: 0,
+    activeSubscriptions: 0,
+    availableServices: 0
+  });
+
   // Handle customer search
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
       setSearchResults([]);
+      setSelectedCustomer(null);
+      setVasServices([]);
       return;
     }
 
@@ -70,39 +60,56 @@ const CSRCustomerVASManagement: React.FC = () => {
     setError(null);
 
     try {
-      const response = await csrDashboardService.searchCustomersForPreferences(searchTerm);
-      setSearchResults(response.customers || []);
+      console.log('🔍 [CSR VAS] Searching for customers:', searchTerm);
+      const customers = await csrDashboardService.searchCustomers(searchTerm);
+      
+      setSearchResults(customers);
+      
+      // If only one result, auto-select it
+      if (customers.length === 1) {
+        await handleSelectCustomer(customers[0]);
+      }
+      
+      console.log(`🔍 [CSR VAS] Found ${customers.length} customers`);
     } catch (error) {
-      console.error('Search failed:', error);
+      console.error('🚨 [CSR VAS] Search failed:', error);
       setError('Failed to search customers. Please try again.');
+      setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
   };
 
   // Handle customer selection and load their VAS services
-  const handleSelectCustomer = async (customer: Customer) => {
+  const handleSelectCustomer = async (customer: CustomerData) => {
+    console.log('👤 [CSR VAS] Selecting customer:', customer.name);
     setSelectedCustomer(customer);
     setVasServices([]);
     setIsLoadingVAS(true);
     setError(null);
 
     try {
-      console.log('CSR loading VAS services for customer:', customer.email);
-      
       const response = await csrDashboardService.getCustomerVASServices(
         customer.id, 
         customer.email
       );
       
-      // API returns {customer, services, totalServices, activeSubscriptions}
       const responseData = response as any;
       const services = responseData.services || responseData.data || [];
       setVasServices(services);
-      console.log(`CSR loaded ${services.length} VAS services for customer`);
+      
+      // Update statistics
+      const activeCount = services.filter((s: VASService) => s.isSubscribed).length;
+      setStats({
+        totalServices: services.length,
+        activeSubscriptions: activeCount,
+        availableServices: services.length - activeCount
+      });
+      
+      console.log(`📊 [CSR VAS] Loaded ${services.length} services (${activeCount} active) for ${customer.name}`);
       
     } catch (error) {
-      console.error('Failed to load customer VAS services:', error);
+      console.error('🚨 [CSR VAS] Failed to load customer VAS services:', error);
       setError('Failed to load customer VAS services. Please try again.');
     } finally {
       setIsLoadingVAS(false);
@@ -119,7 +126,7 @@ const CSRCustomerVASManagement: React.FC = () => {
     try {
       const action = currentStatus ? 'unsubscribe' : 'subscribe';
       
-      console.log(`CSR ${action}ing customer ${selectedCustomer.email} ${action === 'subscribe' ? 'to' : 'from'} ${serviceId}`);
+      console.log(`🔄 [CSR VAS] ${action}ing customer ${selectedCustomer.name} ${action === 'subscribe' ? 'to' : 'from'} service ${serviceId}`);
       
       await csrDashboardService.toggleCustomerVASSubscription(
         selectedCustomer.id,
@@ -135,11 +142,21 @@ const CSRCustomerVASManagement: React.FC = () => {
           : service
       ));
 
-      // Show success notification
-      console.log(`CSR successfully ${action}d ${serviceId} for customer ${selectedCustomer.email}`);
+      // Update statistics
+      const newActiveCount = vasServices.filter(s => 
+        s.id === serviceId ? !currentStatus : s.isSubscribed
+      ).length;
+      
+      setStats(prev => ({
+        ...prev,
+        activeSubscriptions: newActiveCount,
+        availableServices: prev.totalServices - newActiveCount
+      }));
+
+      console.log(`✅ [CSR VAS] Successfully ${action}d ${serviceId} for ${selectedCustomer.name}`);
       
     } catch (error) {
-      console.error('Failed to update VAS subscription:', error);
+      console.error('🚨 [CSR VAS] Failed to update VAS subscription:', error);
       setError(`Failed to ${currentStatus ? 'unsubscribe from' : 'subscribe to'} service. Please try again.`);
     } finally {
       setIsUpdating(null);
@@ -153,303 +170,260 @@ const CSRCustomerVASManagement: React.FC = () => {
     }
   };
 
-  // Get service icon
-  const getServiceIcon = (serviceId: string) => {
-    switch (serviceId) {
-      case 'slt-filmhall': return <Play className="w-5 h-5" />;
-      case 'peo-tv': return <Monitor className="w-5 h-5" />;
-      case 'kaspersky-security': return <Shield className="w-5 h-5" />;
-      case 'e-channelling-plus': return <Smartphone className="w-5 h-5" />;
-      case 'slt-cloud-pro': return <Cloud className="w-5 h-5" />;
-      case 'slt-international-roaming': return <Globe className="w-5 h-5" />;
-      case 'slt-wifi-plus': return <Wifi className="w-5 h-5" />;
-      default: return <Star className="w-5 h-5" />;
-    }
+  // Clear search and selection
+  const clearSearch = () => {
+    setSearchTerm('');
+    setSearchResults([]);
+    setSelectedCustomer(null);
+    setVasServices([]);
+    setError(null);
   };
 
-  // Get category color
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'entertainment': return 'bg-purple-500/10 text-purple-600 border-purple-200';
-      case 'security': return 'bg-red-500/10 text-red-600 border-red-200';
-      case 'communication': return 'bg-blue-500/10 text-blue-600 border-blue-200';
-      case 'cloud': return 'bg-green-500/10 text-green-600 border-green-200';
-      case 'health': return 'bg-pink-500/10 text-pink-600 border-pink-200';
-      case 'travel': return 'bg-orange-500/10 text-orange-600 border-orange-200';
-      default: return 'bg-gray-500/10 text-gray-600 border-gray-200';
-    }
-  };
-
-  // Set up real-time VAS updates for CSR dashboard
+  // WebSocket real-time updates
   useEffect(() => {
-    // Subscribe to real-time VAS updates
     const handleVASUpdate = (update: VASSubscriptionUpdate) => {
-      console.log('CSR Dashboard received VAS update:', update);
-      
-      // Update VAS services if this customer is currently selected
       if (selectedCustomer && update.customerId === selectedCustomer.id) {
+        console.log('🔄 [CSR VAS] Real-time VAS update received:', update);
+        
         setVasServices(prev => prev.map(service => 
           service.id === update.serviceId 
             ? { ...service, isSubscribed: update.isSubscribed }
             : service
         ));
+
+        // Update statistics
+        const updatedServices = vasServices.map(service => 
+          service.id === update.serviceId 
+            ? { ...service, isSubscribed: update.isSubscribed }
+            : service
+        );
+        const newActiveCount = updatedServices.filter(s => s.isSubscribed).length;
         
-        console.log(`CSR Dashboard: Updated ${update.serviceId} subscription status to ${update.isSubscribed} for customer ${selectedCustomer.email}`);
+        setStats(prev => ({
+          ...prev,
+          activeSubscriptions: newActiveCount,
+          availableServices: prev.totalServices - newActiveCount
+        }));
       }
     };
 
-    // Connect to WebSocket and listen for VAS updates
     websocketService.onCSRVASUpdate(handleVASUpdate);
 
-    // Cleanup on component unmount
     return () => {
       websocketService.offCSRVASUpdate();
     };
-  }, [selectedCustomer]);
+  }, [selectedCustomer, vasServices]);
 
   return (
-    <div className="space-y-6 p-6 bg-myslt-background min-h-full">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="bg-myslt-card rounded-xl p-6 shadow-sm border border-myslt-accent/20">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="p-3 bg-myslt-accent rounded-xl">
-            <Settings className="w-6 h-6 text-myslt-success" />
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-lg">
+              <Settings className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">VAS Management</h1>
+              <p className="text-sm text-gray-500">Search and manage customer Value Added Services</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-myslt-text-primary">VAS Management</h1>
-            <p className="text-myslt-text-secondary">
-              Search and manage customer Value Added Services subscriptions
-            </p>
-          </div>
+          {selectedCustomer && (
+            <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <span className="font-medium">Managing:</span>
+                <span className="text-blue-600">{selectedCustomer.name}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Search Section */}
-        <div className="flex space-x-3">
+        <div className="flex gap-3">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-myslt-text-muted" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search by customer name, email, or phone..."
+              placeholder="Search customer by name, email, or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="w-full pl-10 pr-4 py-3 border border-myslt-accent/30 rounded-xl bg-myslt-card text-myslt-text-primary placeholder-myslt-text-muted focus:outline-none focus:ring-2 focus:ring-myslt-success focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <button
             onClick={handleSearch}
             disabled={isSearching || !searchTerm.trim()}
-            className="px-6 py-3 bg-myslt-success text-white rounded-xl hover:bg-myslt-success/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
           >
             {isSearching ? (
-              <RefreshCw className="w-5 h-5 animate-spin" />
+              <RefreshCw className="w-4 h-4 animate-spin" />
             ) : (
-              <Search className="w-5 h-5" />
+              <Search className="w-4 h-4" />
             )}
             <span>Search</span>
           </button>
+          {searchTerm && (
+            <button
+              onClick={clearSearch}
+              className="px-3 py-2 text-gray-500 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
-      </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start space-x-3">
-          <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
-          <div>
-            <p className="text-red-700 font-medium">Error</p>
-            <p className="text-red-600">{error}</p>
+        {/* Error Display */}
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
+            <AlertCircle className="w-4 h-4 text-red-500" />
+            <span className="text-red-700 text-sm">{error}</span>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Search Results */}
       {searchResults.length > 0 && !selectedCustomer && (
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20">
-          <div className="p-6 border-b border-myslt-accent/20">
-            <h2 className="text-lg font-semibold text-myslt-text-primary">
-              Search Results ({searchResults.length} customers found)
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="space-y-3">
-              {searchResults.map((customer) => (
-                <div
-                  key={customer.id}
-                  onClick={() => handleSelectCustomer(customer)}
-                  className="flex items-center justify-between p-4 border border-myslt-accent/20 rounded-lg hover:bg-myslt-accent/10 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-myslt-success/10 rounded-lg">
-                      <User className="w-5 h-5 text-myslt-success" />
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Search Results</h2>
+          <div className="space-y-3">
+            {searchResults.map((customer) => (
+              <div
+                key={customer.id}
+                onClick={() => handleSelectCustomer(customer)}
+                className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-myslt-text-primary">{customer.name}</h3>
-                      <div className="flex items-center space-x-4 text-sm text-myslt-text-secondary">
+                      <h3 className="font-medium text-gray-900">{customer.name}</h3>
+                      <div className="flex items-center space-x-4 text-sm text-gray-500">
                         <span className="flex items-center space-x-1">
-                          <Mail className="w-4 h-4" />
+                          <Mail className="w-3 h-3" />
                           <span>{customer.email}</span>
                         </span>
                         {customer.phone && (
                           <span className="flex items-center space-x-1">
-                            <Phone className="w-4 h-4" />
+                            <Phone className="w-3 h-3" />
                             <span>{customer.phone}</span>
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
-                  <div className="text-myslt-success">
-                    <Settings className="w-5 h-5" />
-                  </div>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    customer.status === 'active' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {customer.status}
+                  </span>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Selected Customer VAS Management */}
+      {/* VAS Services Management */}
       {selectedCustomer && (
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20">
-          {/* Customer Header */}
-          <div className="p-6 border-b border-myslt-accent/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-2 bg-myslt-success/10 rounded-lg">
-                  <User className="w-5 h-5 text-myslt-success" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-myslt-text-primary">
-                    {selectedCustomer.name} - VAS Management
-                  </h2>
-                  <p className="text-myslt-text-secondary">{selectedCustomer.email}</p>
-                </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                VAS Services for {selectedCustomer.name}
+              </h2>
+              <p className="text-sm text-gray-500">{selectedCustomer.email}</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-600">
+                <span className="font-medium">Active:</span> {stats.activeSubscriptions} / {stats.totalServices}
               </div>
               <button
-                onClick={() => setSelectedCustomer(null)}
-                className="p-2 text-myslt-text-muted hover:text-myslt-text-secondary hover:bg-myslt-accent/10 rounded-lg transition-colors"
+                onClick={() => handleSelectCustomer(selectedCustomer)}
+                disabled={isLoadingVAS}
+                className="flex items-center space-x-2 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg"
               >
-                <X className="w-5 h-5" />
+                <RefreshCw className={`w-4 h-4 ${isLoadingVAS ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
               </button>
             </div>
           </div>
 
-          <div className="p-6">
-            {isLoadingVAS ? (
-              <div className="flex items-center justify-center py-8">
-                <RefreshCw className="w-8 h-8 animate-spin text-myslt-success" />
-                <span className="ml-3 text-myslt-text-secondary">Loading VAS services...</span>
-              </div>
-            ) : vasServices.length > 0 ? (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-myslt-text-primary">
-                    Value Added Services
-                  </h3>
-                  <div className="text-sm text-myslt-text-secondary">
-                    Active: {vasServices.filter(s => s.isSubscribed).length} / {vasServices.length}
+          {isLoadingVAS ? (
+            <div className="flex items-center justify-center py-12">
+              <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
+              <span className="ml-2 text-gray-600">Loading VAS services...</span>
+            </div>
+          ) : vasServices.length === 0 ? (
+            <div className="text-center py-12">
+              <Settings className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No VAS Services</h3>
+              <p className="text-gray-500">No Value Added Services available for this customer.</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {vasServices.map((service) => (
+                <div
+                  key={service.id}
+                  className={`p-4 border rounded-lg transition-colors ${
+                    service.isSubscribed 
+                      ? 'border-green-200 bg-green-50' 
+                      : 'border-gray-200 bg-white hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900 mb-1">{service.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{service.description}</p>
+                      <div className="flex items-center space-x-2 text-xs text-gray-500">
+                        <span className="bg-gray-100 px-2 py-1 rounded">{service.category}</span>
+                        <span>{service.price}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm font-medium ${
+                      service.isSubscribed ? 'text-green-600' : 'text-gray-500'
+                    }`}>
+                      {service.isSubscribed ? 'Active' : 'Available'}
+                    </span>
+                    
+                    <button
+                      onClick={() => handleVASToggle(service.id, service.isSubscribed)}
+                      disabled={isUpdating === service.id}
+                      className={`px-3 py-1 text-sm rounded-lg transition-colors disabled:opacity-50 ${
+                        service.isSubscribed
+                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                          : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                      }`}
+                    >
+                      {isUpdating === service.id ? (
+                        <RefreshCw className="w-3 h-3 animate-spin" />
+                      ) : service.isSubscribed ? (
+                        'Unsubscribe'
+                      ) : (
+                        'Subscribe'
+                      )}
+                    </button>
                   </div>
                 </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {vasServices.map((service) => (
-                    <div key={service.id} className="border border-myslt-accent/20 rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div className={`p-2 rounded-lg ${service.isSubscribed ? 'bg-myslt-success/10' : 'bg-myslt-accent/10'}`}>
-                            {getServiceIcon(service.id)}
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-myslt-text-primary">{service.name}</h4>
-                            <p className="text-sm text-myslt-text-secondary">{service.provider}</p>
-                          </div>
-                        </div>
-                        <span className={`px-2 py-1 rounded-full text-xs border ${getCategoryColor(service.category)}`}>
-                          {service.category}
-                        </span>
-                      </div>
-
-                      <p className="text-sm text-myslt-text-secondary mb-3">{service.description}</p>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm font-medium text-myslt-text-primary">
-                          {service.price}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className={`text-sm ${service.isSubscribed ? 'text-myslt-success' : 'text-myslt-text-muted'}`}>
-                            {service.isSubscribed ? 'Subscribed' : 'Not Subscribed'}
-                          </span>
-                          <button
-                            onClick={() => handleVASToggle(service.id, service.isSubscribed)}
-                            disabled={isUpdating === service.id}
-                            className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
-                              service.isSubscribed
-                                ? 'bg-red-500/10 text-red-600 hover:bg-red-500/20'
-                                : 'bg-myslt-success/10 text-myslt-success hover:bg-myslt-success/20'
-                            }`}
-                          >
-                            {isUpdating === service.id ? (
-                              <RefreshCw className="w-4 h-4 animate-spin" />
-                            ) : service.isSubscribed ? (
-                              <EyeOff className="w-4 h-4" />
-                            ) : (
-                              <Eye className="w-4 h-4" />
-                            )}
-                            <span>
-                              {isUpdating === service.id 
-                                ? 'Updating...' 
-                                : service.isSubscribed 
-                                  ? 'Unsubscribe' 
-                                  : 'Subscribe'
-                              }
-                            </span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Service Features */}
-                      {service.features && service.features.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-myslt-accent/20">
-                          <p className="text-xs text-myslt-text-muted mb-1">Key Features:</p>
-                          <div className="flex flex-wrap gap-1">
-                            {service.features.slice(0, 3).map((feature, index) => (
-                              <span key={index} className="text-xs bg-myslt-accent/10 text-myslt-text-secondary px-2 py-1 rounded">
-                                {feature}
-                              </span>
-                            ))}
-                            {service.features.length > 3 && (
-                              <span className="text-xs text-myslt-text-muted">
-                                +{service.features.length - 3} more
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <AlertCircle className="w-12 h-12 text-myslt-text-muted mx-auto mb-3" />
-                <p className="text-myslt-text-secondary">
-                  No VAS services found for this customer.
-                </p>
-                <p className="text-sm text-myslt-text-muted mt-1">
-                  The customer may not have any VAS services configured yet.
-                </p>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* Empty State */}
-      {searchTerm.trim() && searchResults.length === 0 && !isSearching && (
-        <div className="bg-myslt-card rounded-xl p-8 text-center shadow-sm border border-myslt-accent/20">
-          <Search className="w-12 h-12 text-myslt-text-muted mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-myslt-text-primary mb-2">No customers found</h3>
-          <p className="text-myslt-text-secondary">
+      {!selectedCustomer && searchResults.length === 0 && searchTerm && !isSearching && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+          <Search className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No customers found</h3>
+          <p className="text-gray-500">
             Try searching with a different name or email address.
           </p>
         </div>
