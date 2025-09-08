@@ -4390,9 +4390,18 @@ app.post('/api/admin/vas/services', verifyToken, async (req, res) => {
       });
     }
     
-    // Extract numeric price
-    const priceMatch = price.match(/(\d+(?:\.\d+)?)/);
-    const priceNumeric = priceMatch ? parseFloat(priceMatch[1]) : 0;
+    // Extract numeric price - handle various formats
+    let priceNumeric = 0;
+    
+    if (typeof price === 'number') {
+      priceNumeric = price;
+    } else if (typeof price === 'string') {
+      // Remove currency symbols and spaces, extract numbers
+      const cleanPrice = price.replace(/[^\d.]/g, '');
+      priceNumeric = parseFloat(cleanPrice) || 0;
+    }
+    
+    console.log(`🔧 Price parsing: "${price}" → ${priceNumeric}`);
     
     // Create new service
     const newService = new VASService({
