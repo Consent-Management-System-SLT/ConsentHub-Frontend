@@ -23,7 +23,7 @@ import {
   User,
   X
 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import { multiServiceApiClient } from '../../services/multiServiceApiClient';
 
 interface VASService {
   id: string;
@@ -73,7 +73,7 @@ interface CustomerVASData {
 }
 
 const VASManagement: React.FC = () => {
-  const { getAuthToken } = useAuth();
+  // No need for getAuthToken anymore since we're using multiServiceApiClient
   
   // State for tabs
   const [activeTab, setActiveTab] = useState<'services' | 'subscriptions' | 'analytics' | 'history'>('services');
@@ -178,24 +178,19 @@ const VASManagement: React.FC = () => {
       setLoadingServices(true);
       setError(null);
       
-      const token = getAuthToken();
-      const response = await fetch('/api/admin/vas/services', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const result = await multiServiceApiClient.makeRequest(
+        'GET',
+        '/api/admin/vas/services',
+        undefined,
+        'admin',
+        'gateway'
+      );
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setVasServices(result.data || []);
-          console.log('VAS Services loaded:', result.data?.length, 'services');
-        } else {
-          setError(result.message || 'Failed to fetch VAS services');
-        }
+      if (result.success) {
+        setVasServices(result.data || []);
+        console.log('VAS Services loaded:', result.data?.length, 'services');
       } else {
-        setError('Failed to fetch VAS services');
+        setError(result.message || 'Failed to fetch VAS services');
       }
     } catch (error) {
       console.error('Error fetching VAS services:', error);
@@ -210,23 +205,18 @@ const VASManagement: React.FC = () => {
       setLoadingSubscriptions(true);
       setError(null);
       
-      const token = getAuthToken();
-      const response = await fetch('/api/admin/vas/customer-subscriptions', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const result = await multiServiceApiClient.makeRequest(
+        'GET',
+        '/api/admin/vas/subscriptions',
+        undefined,
+        'admin',
+        'gateway'
+      );
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setCustomerSubscriptions(result.data || []);
-        } else {
-          setError(result.message || 'Failed to fetch customer subscriptions');
-        }
+      if (result.success) {
+        setCustomerSubscriptions(result.data || []);
       } else {
-        setError('Failed to fetch customer subscriptions');
+        setError(result.message || 'Failed to fetch customer subscriptions');
       }
     } catch (error) {
       console.error('Error fetching customer subscriptions:', error);
@@ -241,23 +231,18 @@ const VASManagement: React.FC = () => {
       setLoadingHistory(true);
       setError(null);
       
-      const token = getAuthToken();
-      const response = await fetch('/api/admin/vas/subscription-history', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const result = await multiServiceApiClient.makeRequest(
+        'GET',
+        '/api/admin/vas/analytics',
+        undefined,
+        'admin',
+        'gateway'
+      );
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setSubscriptionHistory(result.data || []);
-        } else {
-          setError(result.message || 'Failed to fetch subscription history');
-        }
+      if (result.success) {
+        setSubscriptionHistory(result.data?.subscriptionHistory || []);
       } else {
-        setError('Failed to fetch subscription history');
+        setError(result.message || 'Failed to fetch subscription history');
       }
     } catch (error) {
       console.error('Error fetching subscription history:', error);
@@ -269,28 +254,21 @@ const VASManagement: React.FC = () => {
 
   const handleCreateService = async (serviceData: Partial<VASService>) => {
     try {
-      const token = getAuthToken();
-      const response = await fetch('/api/admin/vas/services', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(serviceData),
-      });
+      const result = await multiServiceApiClient.makeRequest(
+        'POST',
+        '/api/admin/vas/services',
+        serviceData,
+        'admin',
+        'gateway'
+      );
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          // Refresh the entire services list to ensure consistency
-          await fetchVASServices();
-          setShowCreateModal(false);
-          setError(null);
-        } else {
-          setError(result.message || 'Failed to create VAS service');
-        }
+      if (result.success) {
+        // Refresh the entire services list to ensure consistency
+        await fetchVASServices();
+        setShowCreateModal(false);
+        setError(null);
       } else {
-        setError('Failed to create VAS service');
+        setError(result.message || 'Failed to create VAS service');
       }
     } catch (error) {
       console.error('Error creating VAS service:', error);
@@ -300,29 +278,22 @@ const VASManagement: React.FC = () => {
 
   const handleUpdateService = async (serviceId: string, serviceData: Partial<VASService>) => {
     try {
-      const token = getAuthToken();
-      const response = await fetch(`/api/admin/vas/services/${serviceId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(serviceData),
-      });
+      const result = await multiServiceApiClient.makeRequest(
+        'PUT',
+        `/api/admin/vas/services/${serviceId}`,
+        serviceData,
+        'admin',
+        'gateway'
+      );
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          // Refresh the entire services list to ensure consistency
-          await fetchVASServices();
-          setShowEditModal(false);
-          setSelectedService(null);
-          setError(null);
-        } else {
-          setError(result.message || 'Failed to update VAS service');
-        }
+      if (result.success) {
+        // Refresh the entire services list to ensure consistency
+        await fetchVASServices();
+        setShowEditModal(false);
+        setSelectedService(null);
+        setError(null);
       } else {
-        setError('Failed to update VAS service');
+        setError(result.message || 'Failed to update VAS service');
       }
     } catch (error) {
       console.error('Error updating VAS service:', error);
@@ -336,26 +307,20 @@ const VASManagement: React.FC = () => {
     }
 
     try {
-      const token = getAuthToken();
-      const response = await fetch(`/api/admin/vas/services/${serviceId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const result = await multiServiceApiClient.makeRequest(
+        'DELETE',
+        `/api/admin/vas/services/${serviceId}`,
+        undefined,
+        'admin',
+        'gateway'
+      );
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          // Refresh the entire services list to ensure consistency
-          await fetchVASServices();
-          setError(null);
-        } else {
-          setError(result.message || 'Failed to delete VAS service');
-        }
+      if (result.success) {
+        // Refresh the entire services list to ensure consistency
+        await fetchVASServices();
+        setError(null);
       } else {
-        setError('Failed to delete VAS service');
+        setError(result.message || 'Failed to delete VAS service');
       }
     } catch (error) {
       console.error('Error deleting VAS service:', error);
