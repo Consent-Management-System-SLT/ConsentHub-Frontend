@@ -14,7 +14,8 @@ import {
   ChevronRight,
   UserCheck,
   Zap,
-  Cog
+  Cog,
+  Smartphone
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -35,6 +36,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { id: 'consents', label: 'Consents', icon: Shield, description: 'Manage all customer consents' },
     { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Manage guardian consent for minors' },
     { id: 'preference-management', label: 'Preference Management', icon: Cog, description: 'Configure communication channels & topic preferences' },
+    { id: 'vas-management', label: 'VAS Management', icon: Smartphone, description: 'Manage Value Added Services and customer subscriptions' },
     { id: 'privacy-notices', label: 'Privacy Notices', icon: FileText, description: 'Manage privacy policies' },
     { id: 'dsar-requests', label: 'DSAR Requests', icon: Database, description: 'Data subject access requests' },
     { id: 'dsar-automation', label: 'DSAR Automation', icon: Zap, description: 'Automated DSAR processing' },

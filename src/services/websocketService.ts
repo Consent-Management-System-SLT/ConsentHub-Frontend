@@ -18,11 +18,24 @@ export interface PreferenceUpdateEvent {
   source: 'customer' | 'csr';
 }
 
+export interface VASSubscriptionUpdate {
+  type: string;
+  customerId: string;
+  customerEmail: string;
+  serviceId: string;
+  serviceName: string;
+  isSubscribed: boolean;
+  action: string;
+  timestamp: string;
+  subscriptionId: string;
+}
+
 class WebSocketService {
   private socket: Socket | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
+  private customerId: string | null = null;
 
   constructor() {
     this.connect();
@@ -30,8 +43,8 @@ class WebSocketService {
 
   private connect() {
     try {
-      // Use environment variable for WebSocket URL, fallback to production
-      const wsUrl = import.meta.env.VITE_WS_URL || 'https://consenthub-backend.onrender.com';
+      // Use environment variable for WebSocket URL, fallback to localhost
+      const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3001';
       
       this.socket = io(wsUrl, {
         transports: ['websocket', 'polling'],
@@ -163,6 +176,108 @@ class WebSocketService {
     }
   }
 
+  // VAS WEBSOCKET METHODS - Real-time subscription updates
+  
+  // Join customer room for VAS updates
+  joinCustomerRoom(customerId: string): void {
+    if (this.socket && this.socket.connected) {
+      this.customerId = customerId;
+      this.socket.emit('join-customer-room', customerId);
+      console.log('WebSocket: Joining customer room for VAS updates:', customerId);
+    } else {
+      console.warn('WebSocket: Cannot join customer room - not connected');
+    }
+  }
+
+  // Leave customer room
+  leaveCustomerRoom(): void {
+    if (this.socket && this.customerId) {
+      this.socket.emit('leave-customer-room', this.customerId);
+      console.log('WebSocket: Leaving customer room:', this.customerId);
+      this.customerId = null;
+    }
+  }
+
+  // Authenticate customer for VAS updates
+  authenticateCustomer(customerId: string, token?: string): void {
+    if (this.socket && this.socket.connected) {
+      this.customerId = customerId;
+      this.socket.emit('authenticate-customer', { customerId, token });
+      console.log('WebSocket: Authenticating customer:', customerId);
+    } else {
+      console.warn('WebSocket: Cannot authenticate - not connected');
+    }
+  }
+
+  // Listen for VAS subscription updates
+  onVASUpdate(callback: (event: VASSubscriptionUpdate) => void): void {
+    if (this.socket) {
+      console.log('WebSocket: Setting up VAS subscription update listener');
+      
+      this.socket.on('vasSubscriptionUpdate', (event: VASSubscriptionUpdate) => {
+        console.log('WebSocket: Received VAS subscription update:', event);
+        console.log('   - Service:', event.serviceName);
+        console.log('   - Action:', event.action);
+        console.log('   - Status:', event.isSubscribed ? 'SUBSCRIBED' : 'UNSUBSCRIBED');
+        callback(event);
+      });
+
+      // Also listen for room join confirmations
+      this.socket.on('room-joined', (data) => {
+        console.log('WebSocket: Room joined successfully:', data);
+      });
+
+      this.socket.on('authentication-success', (data) => {
+        console.log('WebSocket: Customer authentication successful:', data);
+      });
+
+      this.socket.on('authentication-failed', (data) => {
+        console.error('WebSocket: Customer authentication failed:', data);
+      });
+    } else {
+      console.error('WebSocket: Cannot set up VAS listener - not initialized');
+    }
+  }
+
+  // Remove VAS update listener
+  offVASUpdate(): void {
+    if (this.socket) {
+      this.socket.off('vasSubscriptionUpdate');
+      this.socket.off('room-joined');
+      this.socket.off('authentication-success');
+      this.socket.off('authentication-failed');
+      console.log('WebSocket: Removed VAS update listeners');
+    }
+  }
+
+  // CSR VAS WEBSOCKET METHODS - Real-time VAS updates for CSR dashboard
+  
+  // Listen for VAS updates on CSR dashboard (all customer VAS changes)
+  onCSRVASUpdate(callback: (event: VASSubscriptionUpdate) => void): void {
+    if (this.socket) {
+      console.log('WebSocket: Setting up CSR VAS subscription update listener');
+      
+      this.socket.on('csrVasUpdate', (event: VASSubscriptionUpdate) => {
+        console.log('WebSocket: Received CSR VAS subscription update:', event);
+        console.log('   - Customer:', event.customerEmail);
+        console.log('   - Service:', event.serviceName);
+        console.log('   - Action:', event.action);
+        console.log('   - Status:', event.isSubscribed ? 'SUBSCRIBED' : 'UNSUBSCRIBED');
+        callback(event);
+      });
+    } else {
+      console.error('WebSocket: Cannot set up CSR VAS listener - not initialized');
+    }
+  }
+
+  // Remove CSR VAS update listener
+  offCSRVASUpdate(): void {
+    if (this.socket) {
+      this.socket.off('csrVasUpdate');
+      console.log('WebSocket: Removed CSR VAS update listeners');
+    }
+  }
+
   // Check if connected
   isConnected(): boolean {
     return this.socket ? this.socket.connected : false;
@@ -180,8 +295,12 @@ class WebSocketService {
   disconnect(): void {
     if (this.socket) {
       this.leaveCSRDashboard();
+      this.leaveCustomerRoom();
+      this.offVASUpdate();
+      this.offCSRVASUpdate();
       this.socket.disconnect();
       this.socket = null;
+      this.customerId = null;
     }
   }
 

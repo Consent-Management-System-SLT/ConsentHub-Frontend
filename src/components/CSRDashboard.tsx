@@ -21,6 +21,7 @@ import CustomerSearchForm from './csr/CustomerSearchForm_Backend';
 import ConsentHistoryTable from './csr/ConsentHistoryTable_Backend';
 import ConsentManagement from './csr/ConsentManagement_Backend';
 import PreferenceEditorForm from './csr/PreferenceEditorForm_Backend';
+import CSRCustomerVASManagement from './csr/CSRCustomerVASManagement';
 import DSARRequestPanel from './csr/DSARRequestPanel_Backend';
 import GuardianConsentForm from './csr/GuardianConsentForm_Backend';
 import AuditLogTable from './csr/AuditLogTable_Backend';
@@ -228,6 +229,8 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
         return <ConsentManagement customerId={selectedCustomer?.id} />;
       case 'preference-editor':
         return <PreferenceEditorForm customerId={selectedCustomer?.id} />;
+      case 'vas-management':
+        return <CSRCustomerVASManagement />;
       case 'notification-center':
         return <NotificationCenter />;
       case 'dsar-requests':

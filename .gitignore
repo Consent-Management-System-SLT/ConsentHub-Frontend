@@ -82,5 +82,22 @@ verify-dinuka-account.js
 # Development utilities
 openapi-tmf-spec.yaml
 
+# VAS development and testing files
+check-customer-subscriptions.js
+check-vas-indexes.js
+cleanup-hardcoded-vas.js
+clear-vas-data.js
+compare-api-database-vas.js
+debug-vas-api-response.js
+debug-vas-service-lookup.js
+init-vas-services.js
+inspect-vas-services.js
+public/test-vas.html
+reseed-vas-services.js
+reset-all-vas-subscriptions.js
+seed-vas-to-backend-db.js
+vas-test.html
+vas-websocket-demo.html
+
 # Keep essential backend files
 !seedGuardians.js
