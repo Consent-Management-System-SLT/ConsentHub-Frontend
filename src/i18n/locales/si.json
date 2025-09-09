@@ -308,5 +308,200 @@
     "unauthorized": "ඔබට මෙම ක්‍රියාව සිදු කිරීමට අවසර නැත.",
     "validationError": "කරුණාකර ඔබේ ආදානය පරීක්ෂා කර නැවත උත්සාහ කරන්න.",
     "sessionExpired": "ඔබේ සැසිය කල් ඉකුත් වී ඇත. කරුණාකර නැවත ඇතුළුවන්න."
+  },
+  "consentCenter": {
+    "title": "සම්මති කේන්ද්‍රය",
+    "subtitle": "ඔබේ දත්ත සම්මතිවන් සහ පුද්ගලිකත්ව මනාප කළමනාකරණය කරන්න",
+    "searchPlaceholder": "සම්මතිවන් සොයන්න...",
+    "filters": {
+      "allStatus": "සියලුම තත්ත්වයන්",
+      "allCategories": "සියලුම වර්ග",
+      "granted": "ලබාදී ඇත",
+      "revoked": "අවලංගු කර ඇත",
+      "expired": "කල් ඉකුත් වූ",
+      "pending": "ප්‍රතික්ෂේප වෙමින්"
+    },
+    "categories": {
+      "marketing": "අලෙවිකරණය",
+      "analytics": "විශ්ලේෂණ",
+      "essential": "අත්‍යවශ්‍ය",
+      "sharing": "දත්ත බෙදාගැනීම",
+      "location": "ස්ථානය"
+    },
+    "status": {
+      "granted": "ලබාදී ඇත",
+      "revoked": "අවලංගු කර ඇත",
+      "expired": "කල් ඉකුත් වූ",
+      "pending": "ප්‍රතික්ෂේප වෙමින්"
+    },
+    "actions": {
+      "grant": "ලබාදෙන්න",
+      "revoke": "අවලංගු කරන්න",
+      "view": "විස්තර බලන්න",
+      "close": "වසන්න"
+    },
+    "details": {
+      "purpose": "අරමුණ",
+      "status": "තත්ත්වය",
+      "channel": "මාර්ගය",
+      "validFrom": "වලංගු වන දිනය",
+      "validUntil": "වලංගු වන අවසාන දිනය",
+      "description": "විස්තරය",
+      "category": "වර්ගය",
+      "jurisdiction": "අධිකරණ බල සීමාව",
+      "lastUpdated": "අවසන් වරට යාවත්කාලීන කරන ලදී",
+      "grantedBy": "ලබාදුන් අයා"
+    },
+    "loading": "සම්මතිවන් පූරණය කරමින්...",
+    "error": "සම්මතිවන් පූරණය කිරීමට අසමත් විය",
+    "noConsents": "සම්මතිවන් හමු නොවීය",
+    "grantSuccess": "සම්මතිය සාර්ථකව ලබාදී ඇත",
+    "revokeSuccess": "සම්මතිය සාර්ථකව අවලංගු කරන ලදී",
+    "updateError": "සම්මතිය යාවත්කාලීන කිරීමට අසමත් විය"
+  },
+  "preferences": {
+    "title": "සන්නිවේදන මනාප",
+    "subtitle": "ඔබේ සන්නිවේදන සහ දැනුම්දීම් මනාප කළමනාකරණය කරන්න",
+    "description": "විවිධ මාර්ග හරහා අප ඔබ සමඟ කෙසේ සහ කවදා සන්නිවේදනය කරනවාද යන්න පාලනය කරන්න",
+    "categories": {
+      "email": "විද්‍යුත් තැපෑල මනාප",
+      "sms": "SMS මනාප",
+      "push": "Push දැනුම්දීම්",
+      "marketing": "අලෙවිකරණ සන්නිවේදන",
+      "transactional": "ගනුදෙනු පණිවිඩ",
+      "frequency": "සංඛ්‍යාත සැකසුම්"
+    },
+    "channelSettings": {
+      "email": {
+        "enabled": "විද්‍යුත් තැපෑල සන්නිවේදන සක්‍රීය කරන්න",
+        "marketing": "අලෙවිකරණ විද්‍යුත් තැපෑල",
+        "newsletters": "ප්‍රවෘත්ති පත්‍ර",
+        "promotions": "ප්‍රවර්ධන දීමනා",
+        "updates": "සේවා යාවත්කාලීන"
+      },
+      "sms": {
+        "enabled": "SMS සන්නිවේදන සක්‍රීය කරන්න",
+        "marketing": "අලෙවිකරණ SMS",
+        "alerts": "සේවා අනතුරු ඇඟවීම්",
+        "reminders": "ගෙවීම් මතක්කිරීම්",
+        "updates": "ගිණුම් යාවත්කාලීන"
+      },
+      "push": {
+        "enabled": "Push දැනුම්දීම් සක්‍රීය කරන්න",
+        "marketing": "අලෙවිකරණ දැනුම්දීම්",
+        "alerts": "වැදගත් අනතුරු ඇඟවීම්",
+        "updates": "යෙදුම් යාවත්කාලීන",
+        "news": "ප්‍රවෘත්ති සහ යාවත්කාලීන"
+      }
+    },
+    "frequencySettings": {
+      "title": "සන්නිවේදන සංඛ්‍යාතය",
+      "daily": "දෛනික",
+      "weekly": "සාප්තාහික",
+      "monthly": "මාසික",
+      "maxEmails": "දිනකට උපරිම විද්‍යුත් තැපෑල",
+      "maxSms": "දිනකට උපරිම SMS",
+      "description": "ඔබට කොපමණ වාරයක් සන්නිවේදන ලැබෙනවාද යන්න සඳහා සීමාවන් සකසන්න"
+    },
+    "saveChanges": "මනාප සුරකින්න",
+    "resetDefaults": "පෙරනිමි සඳහා නැවත සකසන්න",
+    "preferencesUpdated": "මනාප සාර්ථකව යාවත්කාලීන කර ඇත",
+    "updateFailed": "මනාප යාවත්කාලීන කිරීමට අසමත් විය"
+  },
+  "valueAddedServices": {
+    "title": "අධික වටිනාකම සේවා",
+    "subtitle": "SLT ප්‍රිමියම් සේවාවන් ගවේෂණය කර දායක වන්න",
+    "description": "අපගේ ප්‍රිමියම් සේවා සහ විශේෂාංග සමඟ ඔබේ අත්දැකීම වැඩිදියුණු කරන්න",
+    "categories": {
+      "all": "සියලුම සේවා",
+      "entertainment": "විනෝදාස්වාදය",
+      "productivity": "ඵලදායිත්වය",
+      "security": "ආරක්ෂාව",
+      "communication": "සන්නිවේදනය",
+      "lifestyle": "ජීවන රටාව"
+    },
+    "filters": {
+      "subscribed": "දායක වූ",
+      "available": "ලබා ගත හැකි",
+      "popular": "ජනප්‍රිය"
+    },
+    "serviceDetails": {
+      "price": "මිල",
+      "duration": "කාලසීමාව",
+      "features": "විශේෂාංග",
+      "description": "විස්තරය",
+      "benefits": "ප්‍රතිලාභ"
+    },
+    "actions": {
+      "subscribe": "දායක වන්න",
+      "unsubscribe": "දායකත්වය අවලංගු කරන්න",
+      "viewDetails": "විස්තර බලන්න",
+      "manage": "සේවාව කළමනාකරණය කරන්න"
+    },
+    "subscription": {
+      "active": "සක්‍රීය",
+      "inactive": "අක්‍රීය",
+      "pending": "ප්‍රතික්ෂේප වෙමින්",
+      "expired": "කල් ඉකුත් වූ"
+    },
+    "messages": {
+      "subscribeSuccess": "{{serviceName}} සඳහා සාර්ථකව දායක විය",
+      "unsubscribeSuccess": "{{serviceName}} වෙතින් සාර්ථකව දායකත්වය අවලංගු කරන ලදී",
+      "subscribeError": "සේවාවට දායක වීමට අසමත් විය",
+      "unsubscribeError": "සේවාවෙන් දායකත්වය අවලංගු කිරීමට අසමත් විය",
+      "loadingServices": "සේවා පූරණය කරමින්...",
+      "noServices": "සේවා නොමැත"
+    }
+  },
+  "dsarRequests": {
+    "title": "දත්ත විෂය ප්‍රවේශ ඉල්ලීම්",
+    "subtitle": "ඔබේ පුද්ගලික දත්ත වෙත ප්‍රවේශය, අපනයනය හෝ මකාදැමීම ඉල්ලන්න",
+    "description": "පුද්ගලිකත්ව නියමයන් යටතේ ඔබේ දත්ත අයිතිවාසිකම් භාවිතා කරන්න",
+    "requestTypes": {
+      "access": "මගේ දත්ත වෙත ප්‍රවේශය",
+      "export": "මගේ දත්ත අපනයනය කරන්න",
+      "deletion": "මගේ දත්ත මකන්න",
+      "correction": "මගේ දත්ත නිවැරදි කරන්න",
+      "portability": "දත්ත හුවමාරු කිරීම"
+    },
+    "newRequest": {
+      "title": "නව DSAR ඉල්ලීමක් සාදන්න",
+      "type": "ඉල්ලීම් වර්ගය",
+      "purpose": "අරමුණ",
+      "description": "විස්තරය",
+      "submit": "ඉල්ලීම ඉදිරිපත් කරන්න",
+      "cancel": "අවලංගු කරන්න"
+    },
+    "requestStatus": {
+      "pending": "ප්‍රතික්ෂේප වෙමින්",
+      "in_progress": "ක්‍රියාත්මක වෙමින්",
+      "completed": "සම්පූර්ණ කර ඇත",
+      "rejected": "ප්‍රතික්ෂේප කර ඇත",
+      "expired": "කල් ඉකුත් වූ"
+    },
+    "requestDetails": {
+      "requestId": "ඉල්ලීම් ID",
+      "type": "වර්ගය",
+      "status": "තත්ත්වය",
+      "requestedDate": "ඉල්ලීම් දිනය",
+      "completedDate": "සම්පූර්ණ කළ දිනය",
+      "estimatedCompletion": "ඇස්තමේන්තුගත සම්පූර්ණතාව",
+      "description": "විස්තරය",
+      "downloadData": "දත්ත බාගන්න",
+      "expiryDate": "කල්ඉකුත් වන දිනය"
+    },
+    "actions": {
+      "download": "බාගන්න",
+      "view": "විස්තර බලන්න",
+      "cancel": "ඉල්ලීම අවලංගු කරන්න"
+    },
+    "messages": {
+      "requestSubmitted": "DSAR ඉල්ලීම සාර්ථකව ඉදිරිපත් කර ඇත",
+      "requestFailed": "DSAR ඉල්ලීම ඉදිරිපත් කිරීමට අසමත් විය",
+      "downloadSuccess": "දත්ත සාර්ථකව බාගන්න ලදී",
+      "downloadFailed": "දත්ත බාගැනීමට අසමත් විය",
+      "noRequests": "DSAR ඉල්ලීම් හමු නොවීය",
+      "loadingRequests": "ඉල්ලීම් පූරණය කරමින්..."
+    }
   }
 }

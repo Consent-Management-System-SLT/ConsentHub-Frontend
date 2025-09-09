@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Download, 
   Trash2, 
@@ -40,6 +41,7 @@ interface CustomerDSARRequestsProps {
 }
 
 const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'new-request' | 'my-requests'>('my-requests');
   const [requestType, setRequestType] = useState<'export' | 'delete' | 'correct' | 'portability' | 'restrict' | 'object' | 'withdraw'>('export');
   const [requestReason, setRequestReason] = useState('');
