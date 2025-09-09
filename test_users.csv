@@ -1,6 +1,0 @@
-name,email,phone,role,isActive
-John Admin,john.admin@sltmobitel.lk,+94777777777,admin,true
-Jane CSR,jane.csr@sltmobitel.lk,+94788888888,csr,true
-Bob Customer,bob.customer@gmail.com,+94799999999,customer,true
-Alice Support,alice.support@sltmobitel.lk,+94766666666,csr,true
-Mike Manager,mike.manager@sltmobitel.lk,+94755555555,admin,false
