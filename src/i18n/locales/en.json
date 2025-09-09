@@ -308,5 +308,200 @@
     "unauthorized": "You are not authorized to perform this action.",
     "validationError": "Please check your input and try again.",
     "sessionExpired": "Your session has expired. Please log in again."
+  },
+  "consentCenter": {
+    "title": "Consent Center",
+    "subtitle": "Manage your data consents and privacy preferences",
+    "searchPlaceholder": "Search consents...",
+    "filters": {
+      "allStatus": "All Status",
+      "allCategories": "All Categories",
+      "granted": "Granted",
+      "revoked": "Revoked",
+      "expired": "Expired",
+      "pending": "Pending"
+    },
+    "categories": {
+      "marketing": "Marketing",
+      "analytics": "Analytics",
+      "essential": "Essential",
+      "sharing": "Data Sharing",
+      "location": "Location"
+    },
+    "status": {
+      "granted": "Granted",
+      "revoked": "Revoked",
+      "expired": "Expired",
+      "pending": "Pending"
+    },
+    "actions": {
+      "grant": "Grant",
+      "revoke": "Revoke",
+      "view": "View Details",
+      "close": "Close"
+    },
+    "details": {
+      "purpose": "Purpose",
+      "status": "Status",
+      "channel": "Channel",
+      "validFrom": "Valid From",
+      "validUntil": "Valid Until",
+      "description": "Description",
+      "category": "Category",
+      "jurisdiction": "Jurisdiction",
+      "lastUpdated": "Last Updated",
+      "grantedBy": "Granted By"
+    },
+    "loading": "Loading consents...",
+    "error": "Failed to load consents",
+    "noConsents": "No consents found",
+    "grantSuccess": "Consent granted successfully",
+    "revokeSuccess": "Consent revoked successfully",
+    "updateError": "Failed to update consent"
+  },
+  "preferences": {
+    "title": "Communication Preferences",
+    "subtitle": "Manage your communication and notification preferences",
+    "description": "Control how and when we communicate with you across different channels",
+    "categories": {
+      "email": "Email Preferences",
+      "sms": "SMS Preferences", 
+      "push": "Push Notifications",
+      "marketing": "Marketing Communications",
+      "transactional": "Transactional Messages",
+      "frequency": "Frequency Settings"
+    },
+    "channelSettings": {
+      "email": {
+        "enabled": "Enable Email Communications",
+        "marketing": "Marketing Emails",
+        "newsletters": "Newsletters",
+        "promotions": "Promotional Offers",
+        "updates": "Service Updates"
+      },
+      "sms": {
+        "enabled": "Enable SMS Communications",
+        "marketing": "Marketing SMS",
+        "alerts": "Service Alerts",
+        "reminders": "Payment Reminders",
+        "updates": "Account Updates"
+      },
+      "push": {
+        "enabled": "Enable Push Notifications",
+        "marketing": "Marketing Notifications",
+        "alerts": "Important Alerts",
+        "updates": "App Updates",
+        "news": "News & Updates"
+      }
+    },
+    "frequencySettings": {
+      "title": "Communication Frequency",
+      "daily": "Daily",
+      "weekly": "Weekly", 
+      "monthly": "Monthly",
+      "maxEmails": "Maximum emails per day",
+      "maxSms": "Maximum SMS per day",
+      "description": "Set limits on how often you receive communications"
+    },
+    "saveChanges": "Save Preferences",
+    "resetDefaults": "Reset to Defaults",
+    "preferencesUpdated": "Preferences updated successfully",
+    "updateFailed": "Failed to update preferences"
+  },
+  "valueAddedServices": {
+    "title": "Value Added Services",
+    "subtitle": "Explore and subscribe to premium SLT services",
+    "description": "Enhance your experience with our premium services and features",
+    "categories": {
+      "all": "All Services",
+      "entertainment": "Entertainment",
+      "productivity": "Productivity", 
+      "security": "Security",
+      "communication": "Communication",
+      "lifestyle": "Lifestyle"
+    },
+    "filters": {
+      "subscribed": "Subscribed",
+      "available": "Available",
+      "popular": "Popular"
+    },
+    "serviceDetails": {
+      "price": "Price",
+      "duration": "Duration",
+      "features": "Features",
+      "description": "Description",
+      "benefits": "Benefits"
+    },
+    "actions": {
+      "subscribe": "Subscribe",
+      "unsubscribe": "Unsubscribe",
+      "viewDetails": "View Details",
+      "manage": "Manage Service"
+    },
+    "subscription": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "expired": "Expired"
+    },
+    "messages": {
+      "subscribeSuccess": "Successfully subscribed to {{serviceName}}",
+      "unsubscribeSuccess": "Successfully unsubscribed from {{serviceName}}",
+      "subscribeError": "Failed to subscribe to service",
+      "unsubscribeError": "Failed to unsubscribe from service",
+      "loadingServices": "Loading services...",
+      "noServices": "No services available"
+    }
+  },
+  "dsarRequests": {
+    "title": "Data Subject Access Requests",
+    "subtitle": "Request access, export, or deletion of your personal data",
+    "description": "Exercise your data rights under privacy regulations",
+    "requestTypes": {
+      "access": "Access My Data",
+      "export": "Export My Data", 
+      "deletion": "Delete My Data",
+      "correction": "Correct My Data",
+      "portability": "Data Portability"
+    },
+    "newRequest": {
+      "title": "Create New DSAR Request",
+      "type": "Request Type",
+      "purpose": "Purpose",
+      "description": "Description",
+      "submit": "Submit Request",
+      "cancel": "Cancel"
+    },
+    "requestStatus": {
+      "pending": "Pending",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "requestDetails": {
+      "requestId": "Request ID",
+      "type": "Type",
+      "status": "Status",
+      "requestedDate": "Requested Date",
+      "completedDate": "Completed Date",
+      "estimatedCompletion": "Estimated Completion",
+      "description": "Description",
+      "downloadData": "Download Data",
+      "expiryDate": "Expires On"
+    },
+    "actions": {
+      "download": "Download",
+      "view": "View Details",
+      "cancel": "Cancel Request"
+    },
+    "messages": {
+      "requestSubmitted": "DSAR request submitted successfully",
+      "requestFailed": "Failed to submit DSAR request",
+      "downloadSuccess": "Data downloaded successfully",
+      "downloadFailed": "Failed to download data",
+      "noRequests": "No DSAR requests found",
+      "loadingRequests": "Loading requests..."
+    }
   }
 }

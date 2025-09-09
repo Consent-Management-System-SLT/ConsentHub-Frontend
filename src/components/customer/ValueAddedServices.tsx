@@ -370,7 +370,7 @@ const ValueAddedServices: React.FC = () => {
               <Activity className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Value Added Services</h1>
+              <h1 className="text-2xl font-bold">{t('valueAddedServices.title')}</h1>
               <p className="text-white/90">Enhance your SLT experience with premium services</p>
               {/* WebSocket Status Indicator */}
               <div className="flex items-center space-x-2 mt-2">

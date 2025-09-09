@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   FileText, 
   CheckCircle, 
@@ -50,6 +51,7 @@ interface CustomerPrivacyNoticesProps {
 }
 
 const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
+  const { t } = useTranslation();
   const [notices, setNotices] = useState<PrivacyNotice[]>([]);
   const [filteredNotices, setFilteredNotices] = useState<PrivacyNotice[]>([]);
   const [selectedNotice, setSelectedNotice] = useState<PrivacyNotice | null>(null);

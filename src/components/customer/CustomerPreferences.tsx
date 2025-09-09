@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Settings, 
   Bell, 
@@ -68,6 +69,7 @@ interface CustomerPreferencesProps {
 }
 
 const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
+  const { t } = useTranslation();
   // Dynamic preference configuration from admin
   const [preferenceConfig, setPreferenceConfig] = useState<PreferenceConfig | null>(null);
   
@@ -639,21 +641,21 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-myslt-text-primary">Communication Preferences</h1>
-          <p className="text-myslt-text-muted mt-2">Customize how and when you receive communications from us</p>
+          <h1 className="text-3xl font-bold text-myslt-text-primary">{t('preferences.title')}</h1>
+          <p className="text-myslt-text-muted mt-2">{t('preferences.description')}</p>
         </div>
         
         {saveStatus === 'success' && (
           <div className="flex items-center space-x-2 px-4 py-2 bg-myslt-success/10 text-myslt-success rounded-lg border border-myslt-success/20">
             <CheckCircle className="w-4 h-4" />
-            <span className="text-sm font-medium">Preferences saved!</span>
+            <span className="text-sm font-medium">{t('preferences.preferencesUpdated')}</span>
           </div>
         )}
         
         {saveStatus === 'error' && (
           <div className="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg border border-red-200">
             <AlertCircle className="w-4 h-4" />
-            <span className="text-sm font-medium">Error saving preferences</span>
+            <span className="text-sm font-medium">{t('preferences.updateFailed')}</span>
           </div>
         )}
       </div>
@@ -667,7 +669,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
                 <Settings className="w-5 h-5 text-myslt-primary" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-myslt-text-primary">Communication Channels</h2>
+                <h2 className="text-lg font-semibold text-myslt-text-primary">{t('preferences.categories.email')}</h2>
                 <p className="text-sm text-myslt-text-muted">Choose how you'd like to receive notifications</p>
               </div>
             </div>
@@ -749,14 +751,14 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
                 <Clock className="w-5 h-5 text-orange-600" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-myslt-text-primary">Frequency Limits</h2>
-                <p className="text-sm text-myslt-text-muted">Control how often you receive notifications</p>
+                <h2 className="text-lg font-semibold text-myslt-text-primary">{t('preferences.frequencySettings.title')}</h2>
+                <p className="text-sm text-myslt-text-muted">{t('preferences.frequencySettings.description')}</p>
               </div>
             </div>
           </div>
           <div className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-myslt-text-primary mb-2">Maximum Emails per Day</label>
+              <label className="block text-sm font-medium text-myslt-text-primary mb-2">{t('preferences.frequencySettings.maxEmails')}</label>
               <select
                 value={preferences.frequency.maxEmailsPerDay}
                 onChange={(e) => updateFrequencySettings('maxEmailsPerDay', parseInt(e.target.value))}
@@ -772,7 +774,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-myslt-text-primary mb-2">Maximum SMS per Day</label>
+              <label className="block text-sm font-medium text-myslt-text-primary mb-2">{t('preferences.frequencySettings.maxSms')}</label>
               <select
                 value={preferences.frequency.maxSmsPerDay}
                 onChange={(e) => updateFrequencySettings('maxSmsPerDay', parseInt(e.target.value))}
@@ -810,7 +812,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
                 className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-myslt-text-primary bg-myslt-service-card hover:bg-myslt-service-card/80 rounded-lg transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
-                <span>Reset</span>
+                <span>{t('preferences.resetDefaults')}</span>
               </button>
               <button
                 onClick={handleSave}
@@ -818,7 +820,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
                 className="flex items-center space-x-2 px-6 py-2 text-sm font-medium text-white bg-myslt-primary hover:bg-myslt-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
               >
                 <Save className="w-4 h-4" />
-                <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
+                <span>{isSaving ? t('common.loading') : t('preferences.saveChanges')}</span>
               </button>
             </div>
           </div>

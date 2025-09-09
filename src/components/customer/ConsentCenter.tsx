@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Shield, 
   CheckCircle, 
@@ -35,6 +36,7 @@ interface ConsentCenterProps {
 }
 
 const ConsentCenter: React.FC<ConsentCenterProps> = () => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -428,8 +430,8 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
             <div className="flex items-center space-x-3">
               <Shield className="w-8 h-8" />
               <div>
-                <h1 className="text-2xl font-bold">Consent Center</h1>
-                <p className="text-blue-100">Manage your data processing consents</p>
+                <h1 className="text-2xl font-bold">{t('consentCenter.title')}</h1>
+                <p className="text-blue-100">{t('consentCenter.subtitle')}</p>
               </div>
             </div>
             <button
@@ -438,7 +440,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
               className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors flex items-center"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
+              {t('common.refresh')}
             </button>
           </div>
         </div>
@@ -451,7 +453,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                 <Search className="absolute left-3 top-3 w-5 h-5 text-myslt-text-secondary" />
                 <input
                   type="text"
-                  placeholder="Search consents..."
+                  placeholder={t('consentCenter.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-accent focus:border-transparent bg-myslt-background"
@@ -467,11 +469,11 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="pl-10 pr-8 py-3 border border-myslt-accent/30 rounded-lg bg-myslt-background appearance-none"
                 >
-                  <option value="all">All Status</option>
-                  <option value="granted">Granted</option>
-                  <option value="revoked">Revoked</option>
-                  <option value="expired">Expired</option>
-                  <option value="pending">Pending</option>
+                  <option value="all">{t('consentCenter.filters.allStatus')}</option>
+                  <option value="granted">{t('consentCenter.filters.granted')}</option>
+                  <option value="revoked">{t('consentCenter.filters.revoked')}</option>
+                  <option value="expired">{t('consentCenter.filters.expired')}</option>
+                  <option value="pending">{t('consentCenter.filters.pending')}</option>
                 </select>
               </div>
               
@@ -482,11 +484,11 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                   onChange={(e) => setCategoryFilter(e.target.value)}
                   className="pl-10 pr-8 py-3 border border-myslt-accent/30 rounded-lg bg-myslt-background appearance-none"
                 >
-                  <option value="all">All Categories</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="Analytics">Analytics</option>
+                  <option value="all">{t('consentCenter.filters.allCategories')}</option>
+                  <option value="Marketing">{t('consentCenter.categories.marketing')}</option>
+                  <option value="Analytics">{t('consentCenter.categories.analytics')}</option>
                   <option value="Personalization">Personalization</option>
-                  <option value="Location">Location</option>
+                  <option value="Location">{t('consentCenter.categories.location')}</option>
                   <option value="General">General</option>
                   <option value="Cookies">Cookies</option>
                   <option value="Communication">Communication</option>
@@ -501,31 +503,31 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
               <div className="text-2xl font-bold text-myslt-text-primary">
                 {filteredConsents.length}
               </div>
-              <div className="text-sm text-myslt-text-secondary">Total Consents</div>
+              <div className="text-sm text-myslt-text-secondary">{t('customerDashboard.overview.totalConsents')}</div>
             </div>
             <div className="bg-green-50 p-4 rounded-lg border border-green-200">
               <div className="text-2xl font-bold text-green-600">
                 {filteredConsents.filter(c => c.status === 'granted').length}
               </div>
-              <div className="text-sm text-green-700">Active</div>
+              <div className="text-sm text-green-700">{t('customerDashboard.overview.activeConsents')}</div>
             </div>
             <div className="bg-red-50 p-4 rounded-lg border border-red-200">
               <div className="text-2xl font-bold text-red-600">
                 {filteredConsents.filter(c => c.status === 'revoked').length}
               </div>
-              <div className="text-sm text-red-700">Revoked</div>
+              <div className="text-sm text-red-700">{t('customerDashboard.overview.revoked')}</div>
             </div>
             <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
               <div className="text-2xl font-bold text-yellow-600">
                 {filteredConsents.filter(c => c.status === 'pending').length}
               </div>
-              <div className="text-sm text-yellow-700">Pending</div>
+              <div className="text-sm text-yellow-700">{t('consentCenter.status.pending')}</div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
               <div className="text-2xl font-bold text-gray-600">
                 {filteredConsents.filter(c => c.status === 'expired').length}
               </div>
-              <div className="text-sm text-gray-700">Expired</div>
+              <div className="text-sm text-gray-700">{t('customerDashboard.overview.expired')}</div>
             </div>
           </div>
 
@@ -535,7 +537,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
               <div className="flex items-center">
                 <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
                 <div>
-                  <p className="text-red-800 font-medium">Error loading consents</p>
+                  <p className="text-red-800 font-medium">{t('consentCenter.error')}</p>
                   <p className="text-red-600 text-sm">{error}</p>
                   <p className="text-red-600 text-sm">Showing demo data for testing purposes.</p>
                 </div>
@@ -548,7 +550,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
             {filteredConsents.length === 0 ? (
               <div className="text-center py-12">
                 <Shield className="w-16 h-16 mx-auto text-myslt-text-muted mb-4" />
-                <h3 className="text-xl font-semibold text-myslt-text-secondary mb-2">No consents found</h3>
+                <h3 className="text-xl font-semibold text-myslt-text-secondary mb-2">{t('consentCenter.noConsents')}</h3>
                 <p className="text-myslt-text-muted">Try adjusting your search or filter criteria.</p>
               </div>
             ) : (
@@ -609,7 +611,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                         className="px-3 py-2 text-myslt-accent hover:bg-myslt-accent/10 rounded-lg transition-colors flex items-center text-sm"
                       >
                         <Eye className="w-4 h-4 mr-1" />
-                        Details
+                        {t('consentCenter.actions.view')}
                       </button>
                       
                       {/* Single Toggle Button - Changes based on current status */}
@@ -625,7 +627,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                           ) : (
                             <XCircle className="w-4 h-4 mr-1" />
                           )}
-                          Revoke
+                          {t('consentCenter.actions.revoke')}
                         </button>
                       ) : (
                         <button
@@ -639,7 +641,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                           ) : (
                             <CheckCircle className="w-4 h-4 mr-1" />
                           )}
-                          {consent.status === 'expired' ? 'Renew' : 'Grant'}
+                          {t('consentCenter.actions.grant')}
                         </button>
                       )}
                     </div>
@@ -676,23 +678,23 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Basic Information</h3>
+                  <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">{t('consentCenter.details.purpose')}</h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-sm text-myslt-text-secondary">Status</label>
+                      <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.status')}</label>
                       <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border mt-1 ${getStatusColor(selectedConsent.status)}`}>
                         {getStatusIcon(selectedConsent.status)}
-                        <span className="ml-2">{selectedConsent.status.charAt(0).toUpperCase() + selectedConsent.status.slice(1)}</span>
+                        <span className="ml-2">{t(`consentCenter.status.${selectedConsent.status}`)}</span>
                       </div>
                     </div>
                     
                     <div>
-                      <label className="text-sm text-myslt-text-secondary">Channel</label>
+                      <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.channel')}</label>
                       <p className="text-myslt-text-primary">{selectedConsent.channel}</p>
                     </div>
                     
                     <div>
-                      <label className="text-sm text-myslt-text-secondary">Jurisdiction</label>
+                      <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.jurisdiction')}</label>
                       <p className="text-myslt-text-primary">{selectedConsent.jurisdiction}</p>
                     </div>
                   </div>
@@ -702,19 +704,19 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                   <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Timeline</h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-sm text-myslt-text-secondary">Valid From</label>
+                      <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.validFrom')}</label>
                       <p className="text-myslt-text-primary">{new Date(selectedConsent.validFrom).toLocaleDateString()}</p>
                     </div>
                     
                     {selectedConsent.validUntil && (
                       <div>
-                        <label className="text-sm text-myslt-text-secondary">Valid Until</label>
+                        <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.validUntil')}</label>
                         <p className="text-myslt-text-primary">{new Date(selectedConsent.validUntil).toLocaleDateString()}</p>
                       </div>
                     )}
                     
                     <div>
-                      <label className="text-sm text-myslt-text-secondary">Last Updated</label>
+                      <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.lastUpdated')}</label>
                       <p className="text-myslt-text-primary">{new Date(selectedConsent.lastUpdated).toLocaleDateString()}</p>
                     </div>
                   </div>
@@ -722,7 +724,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
               </div>
               
               <div>
-                <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Description</h3>
+                <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">{t('consentCenter.details.description')}</h3>
                 <p className="text-myslt-text-secondary bg-myslt-background p-4 rounded-lg">
                   {selectedConsent.description}
                 </p>
@@ -730,7 +732,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
               
               <div className="flex justify-between items-center pt-4 border-t border-myslt-accent/20">
                 <span className="text-sm text-myslt-text-muted">
-                  Granted by: {selectedConsent.grantedBy}
+                  {t('consentCenter.details.grantedBy')}: {selectedConsent.grantedBy}
                 </span>
                 
                 <div className="flex space-x-3">
@@ -738,7 +740,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                     onClick={() => setSelectedConsent(null)}
                     className="px-4 py-2 border border-myslt-accent/30 text-myslt-text-secondary rounded-lg hover:bg-myslt-accent/5 transition-colors"
                   >
-                    Close
+                    {t('consentCenter.actions.close')}
                   </button>
                   
                   {/* Single Toggle Button in Modal */}
@@ -756,7 +758,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                       ) : (
                         <XCircle className="w-4 h-4 mr-2" />
                       )}
-                      Revoke Consent
+                      {t('consentCenter.actions.revoke')} Consent
                     </button>
                   ) : (
                     <button
@@ -772,7 +774,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                       ) : (
                         <CheckCircle className="w-4 h-4 mr-2" />
                       )}
-                      {selectedConsent.status === 'expired' ? 'Renew' : 'Grant'} Consent
+                      {t('consentCenter.actions.grant')} Consent
                     </button>
                   )}
                 </div>
