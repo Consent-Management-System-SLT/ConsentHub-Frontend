@@ -23,7 +23,7 @@ secureLog.log('Service URLs Configuration:', SERVICES);
 // Service-specific API clients
 export const customerApi = axios.create({
   baseURL: SERVICES.CUSTOMER,
-  timeout: 10000,
+  timeout: 30000, // Increased timeout for registration
   headers: {
     'Content-Type': 'application/json'
     // Authorization will be added dynamically in makeRequest
@@ -32,7 +32,7 @@ export const customerApi = axios.create({
 
 export const authApi = axios.create({
   baseURL: SERVICES.AUTH,
-  timeout: 10000,
+  timeout: 30000, // Increased timeout for registration
   headers: {
     'Content-Type': 'application/json'
   }
