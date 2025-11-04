@@ -1,4 +1,4 @@
-# 🎯 ConsentHub Frontend
+# ConsentHub Frontend
 
 <div align="center">
 
@@ -16,33 +16,15 @@
 
 ---
 
-## 📋 **Table of Contents**
-
-- [🎯 Overview](#-overview)
-- [🏆 Implementation Status](#-implementation-status)
-- [✨ Key Features](#-key-features)
-- [🚀 Quick Start](#-quick-start)
-- [🧱 Architecture](#-architecture)
-- [🎛️ Dashboard Features](#️-dashboard-features)
-- [📱 User Interfaces](#-user-interfaces)
-- [🔗 API Integration](#-api-integration)
-- [🌍 Compliance & Security](#-compliance--security)
-- [📊 Technology Stack](#-technology-stack)
-- [🚀 Deployment](#-deployment)
-- [📚 Documentation](#-documentation)
-- [🤝 Contributing](#-contributing)
-
----
-
-## 🎯 **Overview**
+## **Overview**
 
 ConsentHub Frontend is a comprehensive, enterprise-grade Privacy and Consent Management System designed for telecommunications companies. Built in alignment with **TM Forum Open APIs** and **Open Digital Architecture (ODA)** principles, it provides complete GDPR, CCPA, and PDPA compliance with real-time data management.
 
-### **🎯 Project Vision**
+### **Project Vision**
 Deliver a production-ready consent management platform that seamlessly integrates with existing telecom infrastructure while ensuring maximum privacy compliance and user experience.
 
-### **📊 Key Metrics**
-- **98% Project Proposal Compliance** ✅
+### **Key Metrics**
+- **98% Project Proposal Compliance** 
 - **TMF Forum API Alignment**: TMF632, TMF641, TMF669, TMF620, TMF673
 - **Regulatory Coverage**: GDPR, CCPA, PDPA, PIPEDA
 - **200+ API Endpoints** across microservices
@@ -50,68 +32,68 @@ Deliver a production-ready consent management platform that seamlessly integrate
 
 ---
 
-## 🏆 **Implementation Status**
+## **Implementation Status**
 
-### ✅ **FULLY IMPLEMENTED - Production Ready**
+### **FULLY IMPLEMENTED - Production Ready**
 
 | **Domain** | **Completion** | **Features** |
 |-----------|---------------|-------------|
-| **Consent Management** | 100% ✅ | Complete lifecycle (capture, grant, revoke, audit) |
-| **Communication Preferences** | 100% ✅ | Channel, topic, frequency management |
-| **Privacy Governance** | 100% ✅ | GDPR, CCPA, PDPA compliance |
-| **User Management** | 100% ✅ | Role-based access (Admin, CSR, Customer) |
-| **DSAR Processing** | 100% ✅ | Automated data subject access rights |
-| **Audit & Compliance** | 100% ✅ | Complete activity tracking |
-| **Multi-language Support** | 100% ✅ | English, Sinhala, Tamil |
-| **Real-time Features** | 100% ✅ | WebSocket notifications |
+| **Consent Management** | 100% | Complete lifecycle (capture, grant, revoke, audit) |
+| **Communication Preferences** | 100% | Channel, topic, frequency management |
+| **Privacy Governance** | 100% | GDPR, CCPA, PDPA compliance |
+| **User Management** | 100% | Role-based access (Admin, CSR, Customer) |
+| **DSAR Processing** | 100% | Automated data subject access rights |
+| **Audit & Compliance** | 100% | Complete activity tracking |
+| **Multi-language Support** | 100% | English, Sinhala, Tamil |
+| **Real-time Features** | 100% | WebSocket notifications |
 
 ---
 
-## ✨ **Key Features**
+## **Key Features**
 
-### 🛡️ **Privacy & Consent Management**
+### **Privacy & Consent Management**
 - **TMF632 Consent Management** - Complete consent lifecycle with audit trails
 - **Granular Control** - Purpose, channel, duration-specific permissions
 - **Legal Basis Tracking** - GDPR Article 6 compliance
 - **Guardian Consent** - Parental consent workflows for minors (GDPR Article 8)
 - **Version Management** - Privacy notice versioning and change tracking
 
-### 📊 **Advanced Dashboard Suite**
+### **Advanced Dashboard Suite**
 
-#### 👥 **Customer Dashboard**
-- 🎛️ **Dashboard Overview** - Real-time consent status and statistics
-- 🔐 **Consent Center** - Interactive consent management
-- 📧 **Communication Preferences** - Channel and topic subscriptions
-- 📄 **Privacy Notices** - Multi-language policy management
-- 📋 **DSAR Requests** - Self-service data access rights
-- 📊 **Value Added Services** - Service subscriptions with consent
+#### **Customer Dashboard**
+- **Dashboard Overview** - Real-time consent status and statistics
+- **Consent Center** - Interactive consent management
+- **Communication Preferences** - Channel and topic subscriptions
+- **Privacy Notices** - Multi-language policy management
+- **DSAR Requests** - Self-service data access rights
+- **Value Added Services** - Service subscriptions with consent
 
-#### 👩‍💼 **CSR Dashboard**
-- 🔍 **Customer Search** - Advanced customer lookup tools
-- 📈 **Consent History** - Complete customer consent timeline
-- ⚙️ **Preference Management** - Update customer preferences
-- 📋 **DSAR Processing** - Handle data subject requests
-- 👨‍👩‍👧‍👦 **Guardian Management** - Minor account approvals
-- 📞 **Notification Center** - Multi-channel customer notifications
+#### **CSR Dashboard**
+- **Customer Search** - Advanced customer lookup tools
+- **Consent History** - Complete customer consent timeline
+- **Preference Management** - Update customer preferences
+- **DSAR Processing** - Handle data subject requests
+- **Guardian Management** - Minor account approvals
+- **Notification Center** - Multi-channel customer notifications
 
-#### 👨‍💼 **Admin Dashboard**
-- 👥 **User Management** - Create and manage user accounts
-- 📊 **Consent Overview** - System-wide consent analytics
-- ⚙️ **Preference Manager** - Bulk preference operations
-- 📄 **Privacy Notice Manager** - Create and version policies
-- 📋 **DSAR Automation** - Automated request processing
-- 📁 **Bulk Import** - CSV data import functionality
-- 🔍 **Audit Logs** - Complete system activity tracking
-- 📈 **Analytics Dashboard** - Compliance reports and insights
+#### **Admin Dashboard**
+- **User Management** - Create and manage user accounts
+- **Consent Overview** - System-wide consent analytics
+- **Preference Manager** - Bulk preference operations
+- **Privacy Notice Manager** - Create and version policies
+- **DSAR Automation** - Automated request processing
+- **Bulk Import** - CSV data import functionality
+- **Audit Logs** - Complete system activity tracking
+- **Analytics Dashboard** - Compliance reports and insights
 
-### 🌍 **Compliance & Security**
+### **Compliance & Security**
 - **GDPR Compliant** - Articles 13, 14, 15-22 implementation
 - **CCPA Support** - California Consumer Privacy Act compliance
 - **PDPA Compliance** - Sri Lankan Personal Data Protection Act
 - **Guardian Consent** - GDPR Article 8 minor consent workflows
 - **Regional Compliance** - Geo-specific privacy rules engine
 
-### 🔧 **Technical Excellence**
+### **Technical Excellence**
 - **Microservices Architecture** - Domain-driven service design
 - **Event-Driven** - TMF669 compliant real-time notifications
 - **OpenAPI 3.0** - Complete API documentation
@@ -120,7 +102,7 @@ Deliver a production-ready consent management platform that seamlessly integrate
 
 ---
 
-## 🚀 **Quick Start**
+## **Quick Start**
 
 ### **Prerequisites**
 ```bash
@@ -130,7 +112,7 @@ MongoDB Atlas account
 Git
 ```
 
-### **🔧 Installation**
+### **Installation**
 
 1. **Clone the Repository**
 ```bash
@@ -170,9 +152,9 @@ npm run start:backend
 
 ---
 
-## 🧱 **Architecture**
+## **Architecture**
 
-### **🎯 Frontend Architecture**
+### **Frontend Architecture**
 
 ```
 src/
@@ -192,7 +174,7 @@ src/
 └── config/             # Configuration files
 ```
 
-### **🔗 Backend Integration**
+### **Backend Integration**
 
 The frontend communicates with a comprehensive microservices backend:
 
@@ -206,9 +188,9 @@ The frontend communicates with a comprehensive microservices backend:
 
 ---
 
-## 🎛️ **Dashboard Features**
+## **Dashboard Features**
 
-### **📊 Customer Dashboard**
+### **Customer Dashboard**
 
 #### **Dashboard Overview**
 - Real-time consent statistics
@@ -245,7 +227,7 @@ The frontend communicates with a comprehensive microservices backend:
 - Download links for completed exports
 - Request history timeline
 
-### **👩‍💼 CSR Dashboard**
+### **CSR Dashboard**
 
 #### **Customer Management**
 - Advanced customer search and filtering
@@ -268,7 +250,7 @@ The frontend communicates with a comprehensive microservices backend:
 - Customer targeting
 - Campaign tracking
 
-### **👨‍💼 Admin Dashboard**
+### **Admin Dashboard**
 
 #### **System Management**
 - User account management
@@ -286,9 +268,9 @@ The frontend communicates with a comprehensive microservices backend:
 
 ---
 
-## 📱 **User Interfaces**
+## **User Interfaces**
 
-### **🎨 Design System**
+### **Design System**
 
 #### **Visual Identity**
 - **Primary Colors**: SLT brand colors with accessibility compliance
@@ -302,13 +284,13 @@ The frontend communicates with a comprehensive microservices backend:
 - Accessibility-first approach (WCAG 2.1 AA)
 - Dark mode support preparation
 
-### **📱 Responsive Design**
+### **Responsive Design**
 - **Mobile-First**: Optimized for mobile devices
 - **Tablet Support**: Enhanced layouts for tablet users
 - **Desktop Experience**: Full-featured desktop interface
 - **Touch-Friendly**: Optimized for touch interactions
 
-### **♿ Accessibility Features**
+### **Accessibility Features**
 - **Keyboard Navigation**: Full keyboard accessibility
 - **Screen Reader Support**: ARIA labels and descriptions
 - **High Contrast**: Color schemes for visual impairments
@@ -316,7 +298,7 @@ The frontend communicates with a comprehensive microservices backend:
 
 ---
 
-## 🔗 **API Integration**
+## **API Integration**
 
 ### **TMF Forum API Compliance**
 
@@ -372,9 +354,9 @@ websocketService.on('dsar-status-changed', (event) => {
 
 ---
 
-## 🌍 **Compliance & Security**
+## **Compliance & Security**
 
-### **🛡️ Privacy Regulations**
+### **Privacy Regulations**
 
 #### **GDPR (EU) Compliance**
 - **Article 7**: Clear consent mechanisms
@@ -395,7 +377,7 @@ websocketService.on('dsar-status-changed', (event) => {
 - Cross-border data transfer controls
 - Breach notification procedures
 
-### **🔒 Security Features**
+### **Security Features**
 
 #### **Authentication & Authorization**
 - JWT-based authentication
@@ -411,7 +393,7 @@ websocketService.on('dsar-status-changed', (event) => {
 
 ---
 
-## 📊 **Technology Stack**
+## **Technology Stack**
 
 ### **Frontend Technologies**
 
@@ -441,9 +423,9 @@ websocketService.on('dsar-status-changed', (event) => {
 
 ---
 
-## 🚀 **Deployment**
+## **Deployment**
 
-### **🌐 Production Deployment**
+### **Production Deployment**
 
 #### **Environment Configuration**
 ```bash
@@ -489,7 +471,7 @@ EXPOSE 5174
 CMD ["npm", "run", "preview"]
 ```
 
-### **🔧 CI/CD Pipeline**
+### **CI/CD Pipeline**
 
 #### **GitHub Actions Workflow**
 ```yaml
@@ -511,9 +493,9 @@ jobs:
 
 ---
 
-## 📚 **Documentation**
+## **Documentation**
 
-### **📖 Available Documentation**
+### **Available Documentation**
 
 | **Document** | **Description** | **Location** |
 |-------------|----------------|-------------|
@@ -523,7 +505,7 @@ jobs:
 | **Deployment Guide** | Production deployment steps | `/docs/deployment` |
 | **User Manual** | End-user documentation | `/docs/user-guide` |
 
-### **🔗 External Resources**
+### **External Resources**
 
 - [TMF Forum APIs](https://www.tmforum.org/open-apis/)
 - [GDPR Guidelines](https://gdpr-info.eu/)
@@ -533,9 +515,9 @@ jobs:
 
 ---
 
-## 🤝 **Contributing**
+## **Contributing**
 
-### **🛠️ Development Setup**
+### **Development Setup**
 
 1. **Fork the Repository**
 2. **Create Feature Branch**
@@ -553,7 +535,7 @@ git commit -m "feat: add new consent management feature"
 ```
 5. **Submit Pull Request**
 
-### **📋 Code Standards**
+### **Code Standards**
 
 - **TypeScript**: Strict type checking enabled
 - **ESLint**: Follow configured linting rules
@@ -561,7 +543,7 @@ git commit -m "feat: add new consent management feature"
 - **Conventional Commits**: Standardized commit messages
 - **Component Documentation**: JSDoc comments required
 
-### **🧪 Testing Guidelines**
+### **Testing Guidelines**
 
 - Unit tests for utility functions
 - Component testing with React Testing Library
@@ -570,15 +552,15 @@ git commit -m "feat: add new consent management feature"
 
 ---
 
-## 📞 **Support & Contact**
+## **Support & Contact**
 
-### **🎯 Project Team**
+### **Project Team**
 
 | **Role** | **Contact** | **Responsibility** |
 |----------|------------|-------------------|
 | **Project Lead** | ojitharajapaksha@gmail.com | Overall project coordination |
 
-### **🔗 Resources**
+### **Resources**
 
 - **GitHub Repository**: [ConsentHub-Frontend](https://github.com/Consent-Management-System-SLT/ConsentHub-Frontend)
 - **Issue Tracker**: [GitHub Issues](https://github.com/Consent-Management-System-SLT/ConsentHub-Frontend/issues)
@@ -587,9 +569,9 @@ git commit -m "feat: add new consent management feature"
 
 ---
 
-## 🏆 **Achievement Summary**
+## **Achievement Summary**
 
-### **✅ Project Completion**
+### **Project Completion**
 
 ConsentHub Frontend successfully delivers **98% of project proposal requirements**, providing a comprehensive, production-ready privacy management solution that exceeds industry standards for:
 
@@ -599,20 +581,20 @@ ConsentHub Frontend successfully delivers **98% of project proposal requirements
 - **User Experience** - Intuitive, accessible interfaces
 - **Security Standards** - Enterprise-grade security implementation
 
-### **🌟 Key Achievements**
+### **Key Achievements**
 
-- ✅ **Complete TMF Forum API Implementation** (TMF632, TMF641, TMF669)
-- ✅ **Full Regulatory Compliance Suite** (GDPR, CCPA, PDPA)
-- ✅ **Production-Ready Architecture** with microservices design
-- ✅ **Real-time Features** with WebSocket integration
-- ✅ **Multi-language Support** for international deployment
-- ✅ **Comprehensive Testing** with automated quality assurance
+- **Complete TMF Forum API Implementation** (TMF632, TMF641, TMF669)
+- **Full Regulatory Compliance Suite** (GDPR, CCPA, PDPA)
+- **Production-Ready Architecture** with microservices design
+- **Real-time Features** with WebSocket integration
+- **Multi-language Support** for international deployment
+- **Comprehensive Testing** with automated quality assurance
 
 ---
 
 <div align="center">
 
-**🌟 Built with Privacy-by-Design Principles**
+**Built with Privacy-by-Design Principles**
 
 [![TMF Forum](https://img.shields.io/badge/TMF%20Forum-Compliant-blue.svg)](https://www.tmforum.org/)
 [![Privacy by Design](https://img.shields.io/badge/Privacy-By%20Design-green.svg)](https://en.wikipedia.org/wiki/Privacy_by_design)
