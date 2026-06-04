@@ -1,6 +1,7 @@
 {
   "name": "consenthub-frontend",
   "private": true,
+  "type": "module",
   "version": "1.0.0",
   "description": "TMF632-aligned Privacy and Consent Management System",
   "scripts": {
