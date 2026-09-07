@@ -1,209 +1,1 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { 
-  Home, 
-  Shield, 
-  Settings, 
-  FileText, 
-  Download, 
-  ChevronRight,
-  Menu,
-  X,
-  Zap
-} from 'lucide-react';
-
-interface CustomerSidebarProps {
-  activeSection: string;
-  onSectionChange: (section: string) => void;
-  isOpen: boolean;
-  onToggle: () => void;
-}
-
-const CustomerSidebar: React.FC<CustomerSidebarProps> = ({ 
-  activeSection, 
-  onSectionChange, 
-  isOpen, 
-  onToggle 
-}) => {
-  const { t } = useTranslation();
-  
-  const navigationItems = [
-    {
-      id: 'dashboard',
-      label: t('customerDashboard.navigation.dashboard'),
-      icon: Home,
-      description: t('customerDashboard.navigation.dashboardDesc')
-    },
-    {
-      id: 'consent-center',
-      label: t('customerDashboard.navigation.consentCenter'),
-      icon: Shield,
-      description: t('customerDashboard.navigation.consentCenterDesc')
-    },
-    {
-      id: 'preferences',
-      label: t('customerDashboard.navigation.preferences'),
-      icon: Settings,
-      description: t('customerDashboard.navigation.preferencesDesc')
-    },
-    {
-      id: 'value-added-services',
-      label: t('customerDashboard.navigation.valueAddedServices'),
-      icon: Zap,
-      description: t('customerDashboard.navigation.valueAddedServicesDesc')
-    },
-    {
-      id: 'privacy-notices',
-      label: t('customerDashboard.navigation.privacyNotices'),
-      icon: FileText,
-      description: t('customerDashboard.navigation.privacyNoticesDesc')
-    },
-    {
-      id: 'dsar-requests',
-      label: t('customerDashboard.navigation.dsarRequests'),
-      icon: Download,
-      description: t('customerDashboard.navigation.dsarRequestsDesc')
-    }
-  ];
-
-  return (
-    <>
-      {/* Mobile overlay - solid background */}
-      {isOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-slate-50 z-30 transition-opacity duration-300"
-          onClick={onToggle}
-        />
-      )}
-      
-      {/* Mobile menu button */}
-      <button
-        onClick={onToggle}
-        className="lg:hidden fixed top-16 sm:top-20 left-3 sm:left-4 z-50 p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white border-r border-slate-200 shadow-xl shadow-lg border-2 border-slate-200 hover:shadow-xl transition-all duration-200"
-        aria-label="Toggle navigation menu"
-      >
-        {isOpen ? (
-          <X className="w-4 h-4 text-slate-500 sm:w-5 h-5 text-slate-500" />
-        ) : (
-          <Menu className="w-4 h-4 text-slate-500 sm:w-5 h-5 text-slate-500" />
-        )}
-      </button>
-
-      {/* Sidebar */}
-      <aside className={`
-        fixed lg:relative left-0 top-0 h-full w-64 sm:w-72 lg:w-64 bg-white border border-slate-200 rounded-xl shadow-sm z-40 
-        transform transition-all duration-300 ease-in-out shadow-xl lg:shadow-none
-        border-r border-slate-200
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
-        <div className="flex flex-col h-full">
-          {/* Header - Match main header height exactly */}
-          <div className="px-3 sm:px-4 lg:px-6 bg-slate-50 h-14 sm:h-16 flex items-center justify-center border-b border-slate-200">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center justify-center w-full">
-                <img 
-                  src="/Logo-SLT.png" 
-                  alt="SLT Mobitel" 
-                  className="h-8 sm:h-10 w-auto"
-                />
-                {/* Navigation text removed as requested */}
-              </div>
-              {/* Close button for mobile */}
-              <button
-                onClick={onToggle}
-                className="lg:hidden p-1.5 sm:p-2 rounded-lg hover:bg-blue-50/10 transition-colors absolute right-2 sm:right-4"
-                aria-label="Close navigation menu"
-              >
-                <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
-              </button>
-            </div>
-          </div>
-
-          {/* Navigation Items */}
-          <nav className="flex-1 px-2 sm:px-3 lg:px-4 py-4 sm:py-6 space-y-1 sm:space-y-2 overflow-y-auto">
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeSection === item.id;
-              
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    onSectionChange(item.id);
-                    if (window.innerWidth < 1024) {
-                      onToggle();
-                    }
-                  }}
-                  className={`
-                    w-full flex items-start space-x-2 sm:space-x-3 lg:space-x-4 px-2 sm:px-3 lg:px-4 py-3 sm:py-4 rounded-lg sm:rounded-xl text-left 
-                    transition-all duration-200 group hover:shadow-sm
-                    ${isActive 
-                      ? 'bg-blue-50 border-2 border-blue-200 text-slate-900 shadow-sm' 
-                      : 'hover:bg-blue-50/50 text-slate-600 hover:text-slate-900 border-2 border-transparent hover:border-slate-200'
-                    }
-                  `}
-                >
-                  <div className={`
-                    flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-200
-                    ${isActive 
-                      ? 'bg-blue-600 text-white shadow-sm' 
-                      : 'bg-blue-50 text-slate-500 group-hover:bg-blue-50/80 group-hover:text-slate-900'
-                    }
-                  `}>
-                    <Icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5 sm:mb-1">
-                      <h3 className={`
-                        font-semibold text-xs sm:text-sm lg:text-base truncate
-                        ${isActive ? 'text-slate-900' : 'text-slate-900'}
-                      `}>
-                        {item.label}
-                      </h3>
-                      <ChevronRight className={`
-                        flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4 transition-all duration-200
-                        ${isActive 
-                          ? 'text-blue-600 transform rotate-90' 
-                          : 'text-slate-500 group-hover:text-slate-600 group-hover:translate-x-1'
-                        }
-                      `} />
-                    </div>
-                    <p className={`
-                      text-xs lg:text-sm leading-tight line-clamp-2
-                      ${isActive ? 'text-slate-600' : 'text-slate-500 group-hover:text-slate-600'}
-                    `}>
-                      {item.description}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Footer */}
-          <div className="px-2 sm:px-3 lg:px-6 py-3 sm:py-4 bg-slate-50/30">
-            <div className="bg-slate-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-blue-200">
-              <div className="flex items-start space-x-2 sm:space-x-3">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-blue-600" />
-                </div>
-                <div className="min-w-0">
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-900 mb-0.5 sm:mb-1">{t('customerDashboard.sidebar.privacyTitle')}</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed hidden sm:block">
-                    {t('customerDashboard.sidebar.privacyDesc')}
-                  </p>
-                  <p className="text-xs text-slate-600 leading-relaxed sm:hidden">
-                    Privacy protected
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </>
-  );
-};
-
-export default CustomerSidebar;
+import React from 'react';import { useTranslation } from 'react-i18next';import {   Home,   Shield,   Settings,   FileText,   Download,   ChevronRight,  Menu,  X,  Zap} from 'lucide-react';interface CustomerSidebarProps {  activeSection: string;  onSectionChange: (section: string) => void;  isOpen: boolean;  onToggle: () => void;}const CustomerSidebar: React.FC<CustomerSidebarProps> = ({   activeSection,   onSectionChange,   isOpen,   onToggle }) => {  const { t } = useTranslation();  const navigationItems = [    {      id: 'dashboard',      label: t('customerDashboard.navigation.dashboard'),      icon: Home,      description: t('customerDashboard.navigation.dashboardDesc')    },    {      id: 'consent-center',      label: t('customerDashboard.navigation.consentCenter'),      icon: Shield,      description: t('customerDashboard.navigation.consentCenterDesc')    },    {      id: 'preferences',      label: t('customerDashboard.navigation.preferences'),      icon: Settings,      description: t('customerDashboard.navigation.preferencesDesc')    },    {      id: 'value-added-services',      label: t('customerDashboard.navigation.valueAddedServices'),      icon: Zap,      description: t('customerDashboard.navigation.valueAddedServicesDesc')    },    {      id: 'privacy-notices',      label: t('customerDashboard.navigation.privacyNotices'),      icon: FileText,      description: t('customerDashboard.navigation.privacyNoticesDesc')    },    {      id: 'dsar-requests',      label: t('customerDashboard.navigation.dsarRequests'),      icon: Download,      description: t('customerDashboard.navigation.dsarRequestsDesc')    }  ];  return (    <>      {/* Mobile overlay - solid background */}      {isOpen && (        <div           className="lg:hidden fixed inset-0 bg-slate-50 z-30 transition-opacity duration-300"          onClick={onToggle}        />      )}      {/* Mobile menu button */}      <button        onClick={onToggle}        className="lg:hidden fixed top-16 sm:top-20 left-3 sm:left-4 z-50 p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white border-r border-slate-200 shadow-xl shadow-lg border-2 border-slate-200 hover:shadow-xl transition-all duration-200"        aria-label="Toggle navigation menu"      >        {isOpen ? (          <X className="w-4 h-4 text-slate-500 sm:w-5 h-5 text-slate-500" />        ) : (          <Menu className="w-4 h-4 text-slate-500 sm:w-5 h-5 text-slate-500" />        )}      </button>      {/* Sidebar */}      <aside className={`        fixed lg:relative left-0 top-0 h-full w-64 sm:w-72 lg:w-64 bg-white border border-slate-200 rounded-xl shadow-sm z-40         transform transition-all duration-300 ease-in-out shadow-xl lg:shadow-none        border-r border-slate-200        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}      `}>        <div className="flex flex-col h-full">          {/* Header - Match main header height exactly */}          <div className="px-3 sm:px-4 lg:px-6 bg-slate-50 h-14 sm:h-16 flex items-center justify-center border-b border-slate-200">            <div className="flex items-center justify-between w-full">              <div className="flex items-center justify-center w-full">                <img                   src="/Logo-SLT.png"                   alt="SLT Mobitel"                   className="h-8 sm:h-10 w-auto"                />                {/* Navigation text removed as requested */}              </div>              {/* Close button for mobile */}              <button                onClick={onToggle}                className="lg:hidden p-1.5 sm:p-2 rounded-lg hover:bg-blue-50/10 transition-colors absolute right-2 sm:right-4"                aria-label="Close navigation menu"              >                <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />              </button>            </div>          </div>          {/* Navigation Items */}          <nav className="flex-1 px-2 sm:px-3 lg:px-4 py-4 sm:py-6 space-y-1 sm:space-y-2 overflow-y-auto">            {navigationItems.map((item) => {              const Icon = item.icon;              const isActive = activeSection === item.id;              return (                <button                  key={item.id}                  onClick={() => {                    onSectionChange(item.id);                    if (window.innerWidth < 1024) {                      onToggle();                    }                  }}                  className={`                    w-full flex items-start space-x-2 sm:space-x-3 lg:space-x-4 px-2 sm:px-3 lg:px-4 py-3 sm:py-4 rounded-lg sm:rounded-xl text-left                     transition-all duration-200 group hover:shadow-sm                    ${isActive                       ? 'bg-blue-50 border-2 border-blue-200 text-slate-900 shadow-sm'                       : 'hover:bg-blue-50/50 text-slate-600 hover:text-slate-900 border-2 border-transparent hover:border-slate-200'                    }                  `}                >                  <div className={`                    flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-200                    ${isActive                       ? 'bg-blue-600 text-white shadow-sm'                       : 'bg-blue-50 text-slate-500 group-hover:bg-blue-50/80 group-hover:text-slate-900'                    }                  `}>                    <Icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />                  </div>                  <div className="flex-1 min-w-0">                    <div className="flex items-center justify-between mb-0.5 sm:mb-1">                      <h3 className={`                        font-semibold text-xs sm:text-sm lg:text-base truncate                        ${isActive ? 'text-slate-900' : 'text-slate-900'}                      `}>                        {item.label}                      </h3>                      <ChevronRight className={`                        flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4 transition-all duration-200                        ${isActive                           ? 'text-blue-600 transform rotate-90'                           : 'text-slate-500 group-hover:text-slate-600 group-hover:translate-x-1'                        }                      `} />                    </div>                    <p className={`                      text-xs lg:text-sm leading-tight line-clamp-2                      ${isActive ? 'text-slate-600' : 'text-slate-500 group-hover:text-slate-600'}                    `}>                      {item.description}                    </p>                  </div>                </button>              );            })}          </nav>          {/* Footer */}          <div className="px-2 sm:px-3 lg:px-6 py-3 sm:py-4 bg-slate-50/30">            <div className="bg-slate-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-blue-200">              <div className="flex items-start space-x-2 sm:space-x-3">                <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">                  <Shield className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-blue-600" />                </div>                <div className="min-w-0">                  <h4 className="text-xs sm:text-sm font-semibold text-slate-900 mb-0.5 sm:mb-1">{t('customerDashboard.sidebar.privacyTitle')}</h4>                  <p className="text-xs text-slate-600 leading-relaxed hidden sm:block">                    {t('customerDashboard.sidebar.privacyDesc')}                  </p>                  <p className="text-xs text-slate-600 leading-relaxed sm:hidden">                    Privacy protected                  </p>                </div>              </div>            </div>          </div>        </div>      </aside>    </>  );};export default CustomerSidebar;

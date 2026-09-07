@@ -88,31 +88,31 @@ The Customer Dashboard provides a complete solution for GDPR/PDPA compliance, al
 
 ## Key Features
 
-### 🔐 Privacy-First Design
+###  Privacy-First Design
 - Clear consent granularity
 - Easy opt-in/opt-out mechanisms
 - Transparent data usage information
 - Compliance with GDPR/PDPA requirements
 
-### 📱 Responsive Design
+###  Responsive Design
 - Mobile-first approach
 - Tailwind CSS utilities
 - Adaptive layouts for all screen sizes
 - Touch-friendly interactions
 
-### 🌍 Internationalization Ready
+###  Internationalization Ready
 - Multi-language support (English, Sinhala, Tamil)
 - Language selector component
 - Localized content and dates
 - RTL support preparation
 
-### ♿ Accessibility
+###  Accessibility
 - Keyboard navigation support
 - Screen reader friendly
 - High contrast color schemes
 - ARIA labels and descriptions
 
-### 🎨 Modern UI/UX
+###  Modern UI/UX
 - Clean, professional design
 - Consistent color scheme
 - Smooth animations and transitions

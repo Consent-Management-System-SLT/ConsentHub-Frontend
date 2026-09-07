@@ -1,634 +1,1 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  FileText, 
-  Shield, 
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  HelpCircle,
-  RefreshCw,
-  Activity
-} from 'lucide-react';
-import { csrDashboardService } from '../services/csrDashboardService';
-import { websocketService } from '../services/websocketService';
-
-// Import CSR components (using backend-integrated versions)
-import CSRHeader from './csr/CSRHeader';
-import SidebarNav from './csr/SidebarNav';
-import CustomerSearchForm from './csr/CustomerSearchForm_Backend';
-import ConsentHistoryTable from './csr/ConsentHistoryTable_Backend';
-import ConsentManagement from './csr/ConsentManagement_Backend';
-import PreferenceEditorForm from './csr/PreferenceEditorForm_Backend';
-import CSRCustomerVASManagement from './csr/CSRCustomerVASManagement';
-import DSARRequestPanel from './csr/DSARRequestPanel_Backend';
-import GuardianConsentForm from './csr/GuardianConsentForm_Backend';
-import AuditLogTable from './csr/AuditLogTable_Backend';
-import CSROverviewEnhanced from './csr/CSROverviewEnhanced';
-import CustomerProfile from './csr/CustomerProfile';
-import NotificationCenter from './csr/NotificationCenter';
-import HelpModal from './csr/HelpModal';
-import ServerConnectionAlert from './shared/ServerConnectionAlert';
-import NotificationContainer from './shared/NotificationContainer';
-
-interface CSRDashboardProps {
-  className?: string;
-}
-
-const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
-  const [activeSection, setActiveSection] = useState('overview');
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showHelpModal, setShowHelpModal] = useState(false);
-  const [showConnectionAlert, setShowConnectionAlert] = useState(true);
-  const [dashboardStats, setDashboardStats] = useState({
-    totalCustomers: 0,
-    pendingRequests: 0,
-    consentUpdates: 0,
-    guardiansManaged: 0,
-    todayActions: 0,
-    riskAlerts: 0
-  });
-  const [recentActivities, setRecentActivities] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [insights, setInsights] = useState({
-    consentRate: 0,
-    resolvedRequests: 0,
-    newCustomers: 0
-  });
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [autoRefresh, setAutoRefresh] = useState(true);
-
-  useEffect(() => {
-    console.log('CSR Dashboard initializing...');
-    
-    // Initialize WebSocket connection for real-time updates
-    console.log('Initializing WebSocket for CSR Dashboard');
-    if (websocketService.isConnected()) {
-      websocketService.joinCSRDashboard();
-    } else {
-      // Wait a bit and try to join when connected
-      setTimeout(() => {
-        if (websocketService.isConnected()) {
-          websocketService.joinCSRDashboard();
-        }
-      }, 2000);
-    }
-    
-    loadDashboardData();
-    
-    // Cleanup on unmount
-    return () => {
-      console.log('CSR Dashboard cleanup - leaving WebSocket room');
-      websocketService.leaveCSRDashboard();
-    };
-  }, []);
-
-  // Auto-refresh functionality
-  useEffect(() => {
-    if (autoRefresh) {
-      const interval = setInterval(() => {
-        console.log('Auto-refreshing CSR dashboard data...');
-        loadDashboardData();
-      }, 30000); // Refresh every 30 seconds
-      return () => clearInterval(interval);
-    }
-  }, [autoRefresh]);
-
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      console.log('[CSR] Loading comprehensive CSR dashboard data...');
-      
-      // Use the new CSR dashboard service with comprehensive fallbacks
-      const dashboardData = await csrDashboardService.getComprehensiveDashboardData();
-      
-      if (dashboardData.offlineMode) {
-        console.warn('📴 Operating in offline mode with fallback data');
-        setShowConnectionAlert(true);
-      }
-
-      // Set stats from service
-      setDashboardStats({
-        totalCustomers: dashboardData.stats.totalCustomers,
-        pendingRequests: dashboardData.stats.pendingRequests,
-        consentUpdates: dashboardData.stats.consentUpdates,
-        guardiansManaged: dashboardData.stats.guardiansManaged,
-        todayActions: dashboardData.stats.todayActions,
-        riskAlerts: dashboardData.stats.riskAlerts
-      });
-
-      // Set insights
-      setInsights({
-        consentRate: dashboardData.stats.consentRate,
-        resolvedRequests: dashboardData.stats.resolvedRequests,
-        newCustomers: dashboardData.stats.newCustomers
-      });
-
-      // Create recent activities from audit events
-      const recentEvents = dashboardData.auditEvents
-        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, 5)
-        .map((event: any, index: number) => ({
-          id: index + 1,
-          type: event.eventType.includes('consent') ? 'consent' : 
-                event.eventType.includes('dsar') ? 'dsar' : 'system',
-          message: event.description,
-          timestamp: getRelativeTime(event.createdAt),
-          priority: event.severity === 'critical' ? 'high' : 
-                   event.severity === 'high' ? 'high' : 'medium',
-          category: event.category || 'General'
-        }));
-
-      setRecentActivities(recentEvents);
-
-    } catch (error) {
-      console.error('Error loading CSR dashboard data:', error);
-      
-      // Emergency fallback - ensure we always have some data
-      setDashboardStats({
-        totalCustomers: 10,
-        pendingRequests: 4,
-        consentUpdates: 8,
-        guardiansManaged: 2,
-        todayActions: 15,
-        riskAlerts: 2
-      });
-
-      setInsights({
-        consentRate: 78,
-        resolvedRequests: 8,
-        newCustomers: 3
-      });
-
-      setRecentActivities([
-        {
-          id: 1,
-          type: 'system',
-          message: 'System operating in offline mode with sample data',
-          timestamp: 'Just now',
-          priority: 'medium',
-          category: 'System'
-        }
-      ]);
-
-      setShowConnectionAlert(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle manual refresh
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await loadDashboardData();
-    } catch (error) {
-      console.error('Error refreshing CSR dashboard:', error);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  const getRelativeTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;
-    return `${Math.floor(diffInMinutes / 1440)} days ago`;
-  };
-
-  const handleCustomerSelect = (customer: any) => {
-    setSelectedCustomer(customer);
-    setActiveSection('customer-profile');
-  };
-
-  const renderContent = () => {
-    switch (activeSection) {
-      case 'overview':
-        return <CSROverviewEnhanced 
-          stats={dashboardStats} 
-          activities={recentActivities} 
-          onSectionChange={setActiveSection} 
-          loading={loading}
-          onRefresh={handleRefresh}
-          insights={insights}
-          isRefreshing={isRefreshing}
-          autoRefresh={autoRefresh}
-          onAutoRefreshChange={setAutoRefresh}
-        />;
-      case 'customer-search':
-        return <CustomerSearchForm onCustomerSelect={handleCustomerSelect} />;
-      case 'consent-history':
-        return <ConsentHistoryTable />;
-      case 'consent-management':
-        return <ConsentManagement customerId={selectedCustomer?.id} />;
-      case 'preference-editor':
-        return <PreferenceEditorForm customerId={selectedCustomer?.id} />;
-      case 'vas-management':
-        return <CSRCustomerVASManagement />;
-      case 'notification-center':
-        return <NotificationCenter />;
-      case 'dsar-requests':
-        return <DSARRequestPanel customerId={selectedCustomer?.id} />;
-      case 'guardian-consent':
-        return <GuardianConsentForm customerId={selectedCustomer?.id} />;
-      case 'audit-logs':
-        return <AuditLogTable customerId={selectedCustomer?.id} />;
-      case 'customer-profile':
-        return <CustomerProfile customer={selectedCustomer} onBack={() => setActiveSection('customer-search')} onSectionChange={setActiveSection} />;
-      default:
-        return <CSROverviewEnhanced 
-          stats={dashboardStats} 
-          activities={recentActivities} 
-          onSectionChange={setActiveSection} 
-          loading={loading}
-          onRefresh={handleRefresh}
-          insights={insights}
-          isRefreshing={isRefreshing}
-          autoRefresh={autoRefresh}
-          onAutoRefreshChange={setAutoRefresh}
-        />;
-    }
-  };
-
-  return (
-    <div className={`min-h-screen bg-slate-50 flex flex-col lg:flex-row ${className}`}>
-      {/* Server Connection Alert */}
-      {showConnectionAlert && (
-        <ServerConnectionAlert 
-          onClose={() => setShowConnectionAlert(false)}
-          autoHide={true}
-          autoHideDelay={4000}
-        />
-      )}
-
-      {/* Sidebar */}
-      <SidebarNav
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
-      />
-      
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header */}
-        <CSRHeader 
-          onRefresh={handleRefresh}
-          isRefreshing={isRefreshing}
-        />
-        
-        {/* Main Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 max-w-full">
-            <div className="max-w-7xl mx-auto">
-              {renderContent()}
-            </div>
-          </div>
-        </main>
-      </div>
-
-      {/* Floating Help Button */}
-      <button
-        onClick={() => setShowHelpModal(true)}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 hover:bg-blue-700 transition-colors text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group z-40"
-        title="Help & Documentation"
-      >
-        <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />
-      </button>
-
-      {/* Help Modal */}
-      <HelpModal
-        isOpen={showHelpModal}
-        onClose={() => setShowHelpModal(false)}
-      />
-
-      {/* Real-time Notification Container */}
-      <NotificationContainer />
-    </div>
-  );
-};
-
-// Dashboard Overview Component
-const DashboardOverview: React.FC<{ 
-  stats: any; 
-  activities: any[]; 
-  onSectionChange: (section: string) => void;
-  loading?: boolean;
-  onRefresh?: () => void;
-  insights?: { consentRate: number; resolvedRequests: number; newCustomers: number };
-  isRefreshing?: boolean;
-  autoRefresh?: boolean;
-  onAutoRefreshChange?: (value: boolean) => void;
-}> = ({ 
-  stats, 
-  activities, 
-  onSectionChange, 
-  loading = false, 
-  onRefresh, 
-  insights, 
-  isRefreshing = false, 
-  autoRefresh = false, 
-  onAutoRefreshChange 
-}) => {
-  
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        {/* Loading Welcome Section */}
-        <div className="bg-gradient-to-r from-myslt-primary via-myslt-secondary to-myslt-primary-dark rounded-xl shadow-lg p-6 text-white shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Loading Dashboard...</h1>
-              <p className="text-white/90 text-sm sm:text-base">
-                Please wait while we fetch your real-time data.
-              </p>
-            </div>
-            <div className="hidden sm:block">
-              <RefreshCw className="w-16 h-16 opacity-80 animate-spin" />
-            </div>
-          </div>
-        </div>
-
-        {/* Loading Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm p-6 border border-slate-200 animate-pulse">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="h-4 bg-blue-50/30 rounded w-3/4 mb-2"></div>
-                  <div className="h-8 bg-blue-50/30 rounded w-1/2"></div>
-                </div>
-                <div className="w-12 h-12 bg-blue-50/30 rounded-lg"></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Dashboard Overview</h1>
-          <p className="text-slate-600 mt-1">Customer Support Representative Dashboard</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-slate-600">Auto-refresh:</label>
-            <input
-              type="checkbox"
-              checked={autoRefresh}
-              onChange={(e) => onAutoRefreshChange && onAutoRefreshChange(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-myslt-primary"
-            />
-          </div>
-          {onRefresh && (
-            <button
-              onClick={onRefresh}
-              disabled={isRefreshing}
-              className="flex items-center space-x-2 px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 disabled:opacity-50"
-              title="Refresh Data"
-            >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600">Total Customers</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.totalCustomers.toLocaleString()}</p>
-              <p className="text-xs text-green-600 mt-1">Active accounts</p>
-            </div>
-            <div className="p-3 bg-green-600/20 rounded-full">
-              <Users className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600">Pending Requests</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.pendingRequests}</p>
-              <p className="text-xs text-orange-400 mt-1">Awaiting response</p>
-            </div>
-            <div className="p-3 bg-orange-400/20 rounded-full">
-              <Clock className="w-6 h-6 text-orange-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600">Consent Updates</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.consentUpdates}</p>
-              <p className="text-xs text-green-600 mt-1">This period</p>
-            </div>
-            <div className="p-3 bg-green-600/20 rounded-full">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600">Guardian Managed</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.guardiansManaged}</p>
-              <p className="text-xs text-purple-400 mt-1">Under supervision</p>
-            </div>
-            <div className="p-3 bg-purple-400/20 rounded-full">
-              <Shield className="w-6 h-6 text-purple-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600">Today's Actions</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.todayActions}</p>
-              <p className="text-xs text-indigo-400 mt-1">Completed tasks</p>
-            </div>
-            <div className="p-3 bg-indigo-400/20 rounded-full">
-              <TrendingUp className="w-6 h-6 text-indigo-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600">Risk Alerts</p>
-              <p className="text-2xl font-bold text-slate-900">{stats.riskAlerts}</p>
-              <p className="text-xs text-red-400 mt-1">Requires attention</p>
-            </div>
-            <div className="p-3 bg-red-400/20 rounded-full">
-              <AlertTriangle className="w-6 h-6 text-red-400" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions and Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Quick Actions */}
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <button
-              onClick={() => onSectionChange('customer-search')}
-              className="w-full flex items-center space-x-3 p-3 bg-blue-50/30 hover:bg-blue-50/50 rounded-lg transition-colors"
-            >
-              <div className="p-2 bg-green-600/20 rounded-lg">
-                <Users className="w-5 h-5 text-green-600" />
-              </div>
-              <div className="text-left">
-                <p className="font-medium text-slate-900">Search Customers</p>
-                <p className="text-sm text-slate-600">Find and manage customer accounts</p>
-              </div>
-            </button>
-            
-            <button
-              onClick={() => onSectionChange('dsar-requests')}
-              className="w-full flex items-center space-x-3 p-3 bg-orange-400/20 hover:bg-orange-400/30 rounded-lg transition-colors"
-            >
-              <div className="p-2 bg-orange-400/30 rounded-lg">
-                <FileText className="w-5 h-5 text-orange-400" />
-              </div>
-              <div className="text-left">
-                <p className="font-medium text-slate-900">DSAR Requests</p>
-                <p className="text-sm text-slate-600">Process data subject requests</p>
-              </div>
-            </button>
-            
-            <button
-              onClick={() => onSectionChange('consent-history')}
-              className="w-full flex items-center space-x-3 p-3 bg-green-600/20 hover:bg-green-600/30 rounded-lg transition-colors"
-            >
-              <div className="p-2 bg-green-600/30 rounded-lg">
-                <Shield className="w-5 h-5 text-green-600" />
-              </div>
-              <div className="text-left">
-                <p className="font-medium text-slate-900">Consent Management</p>
-                <p className="text-sm text-slate-600">Review and update consents</p>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-slate-900">Recent Activity</h3>
-            {isRefreshing && (
-              <div className="flex items-center text-green-600 text-sm">
-                <RefreshCw className="w-4 h-4 animate-spin mr-2" />
-                Refreshing...
-              </div>
-            )}
-          </div>
-          <div className="space-y-4">
-            {activities.length > 0 ? (
-              activities.slice(0, 5).map((activity, index) => (
-                <div key={index} className="flex items-start space-x-3 p-3 bg-white border border-slate-200 rounded-lg">
-                  <div className={`p-2 rounded-lg ${
-                    activity.type === 'consent' ? 'bg-green-100' :
-                    activity.type === 'dsar' ? 'bg-orange-100' :
-                    'bg-white border border-slate-200'
-                  }`}>
-                    {activity.type === 'consent' ? (
-                      <Shield className={`w-4 h-4 ${
-                        activity.type === 'consent' ? 'text-green-600' :
-                        activity.type === 'dsar' ? 'text-orange-600' :
-                        'text-blue-600'
-                      }`} />
-                    ) : activity.type === 'dsar' ? (
-                      <FileText className={`w-4 h-4 ${
-                        activity.type === 'consent' ? 'text-green-600' :
-                        activity.type === 'dsar' ? 'text-orange-600' :
-                        'text-blue-600'
-                      }`} />
-                    ) : (
-                      <Activity className={`w-4 h-4 ${
-                        activity.type === 'consent' ? 'text-green-600' :
-                        activity.type === 'dsar' ? 'text-orange-600' :
-                        'text-blue-600'
-                      }`} />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-900">{activity.message}</p>
-                    <p className="text-xs text-slate-500 mt-1">{activity.timestamp}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-slate-500">
-                <Activity className="w-12 h-12 mx-auto mb-3 text-slate-500/50" />
-                <p>No recent activity</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Insights */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm p-6 border border-slate-200">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-900">Today's Insights</h3>
-          {isRefreshing && (
-            <div className="flex items-center text-green-600 text-sm">
-              <RefreshCw className="w-4 h-4 animate-spin mr-2" />
-              Refreshing...
-            </div>
-          )}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium text-slate-900">Consent Rate</span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900 mt-2">{insights?.consentRate || 0}%</p>
-            <p className="text-sm text-blue-600">Based on active consents</p>
-          </div>
-          <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              <span className="text-sm font-medium text-green-800">Resolved Requests</span>
-            </div>
-            <p className="text-2xl font-bold text-green-900 mt-2">{insights?.resolvedRequests || 0}</p>
-            <p className="text-sm text-green-600">Completed DSAR requests</p>
-          </div>
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
-            <div className="flex items-center space-x-2">
-              <Users className="w-5 h-5 text-orange-600" />
-              <span className="text-sm font-medium text-orange-800">New Customers</span>
-            </div>
-            <p className="text-2xl font-bold text-orange-900 mt-2">{insights?.newCustomers || 0}</p>
-            <p className="text-sm text-orange-600">Registered today</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default CSRDashboard;
+import React, { useState, useEffect } from 'react';import {   Users,   FileText,   Shield,   TrendingUp,  AlertTriangle,  CheckCircle,  Clock,  HelpCircle,  RefreshCw,  Activity} from 'lucide-react';import { csrDashboardService } from '../services/csrDashboardService';import { websocketService } from '../services/websocketService';// Import CSR components (using backend-integrated versions)import CSRHeader from './csr/CSRHeader';import SidebarNav from './csr/SidebarNav';import CustomerSearchForm from './csr/CustomerSearchForm_Backend';import ConsentHistoryTable from './csr/ConsentHistoryTable_Backend';import ConsentManagement from './csr/ConsentManagement_Backend';import PreferenceEditorForm from './csr/PreferenceEditorForm_Backend';import CSRCustomerVASManagement from './csr/CSRCustomerVASManagement';import DSARRequestPanel from './csr/DSARRequestPanel_Backend';import GuardianConsentForm from './csr/GuardianConsentForm_Backend';import AuditLogTable from './csr/AuditLogTable_Backend';import CSROverviewEnhanced from './csr/CSROverviewEnhanced';import CustomerProfile from './csr/CustomerProfile';import NotificationCenter from './csr/NotificationCenter';import HelpModal from './csr/HelpModal';import ServerConnectionAlert from './shared/ServerConnectionAlert';import NotificationContainer from './shared/NotificationContainer';interface CSRDashboardProps {  className?: string;}const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {  const [activeSection, setActiveSection] = useState('overview');  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);  const [sidebarOpen, setSidebarOpen] = useState(false);  const [showHelpModal, setShowHelpModal] = useState(false);  const [showConnectionAlert, setShowConnectionAlert] = useState(true);  const [dashboardStats, setDashboardStats] = useState({    totalCustomers: 0,    pendingRequests: 0,    consentUpdates: 0,    guardiansManaged: 0,    todayActions: 0,    riskAlerts: 0  });  const [recentActivities, setRecentActivities] = useState<any[]>([]);  const [loading, setLoading] = useState(true);  const [insights, setInsights] = useState({    consentRate: 0,    resolvedRequests: 0,    newCustomers: 0  });  const [isRefreshing, setIsRefreshing] = useState(false);  const [autoRefresh, setAutoRefresh] = useState(true);  useEffect(() => {    console.log('CSR Dashboard initializing...');    // Initialize WebSocket connection for real-time updates    console.log('Initializing WebSocket for CSR Dashboard');    if (websocketService.isConnected()) {      websocketService.joinCSRDashboard();    } else {      // Wait a bit and try to join when connected      setTimeout(() => {        if (websocketService.isConnected()) {          websocketService.joinCSRDashboard();        }      }, 2000);    }    loadDashboardData();    // Cleanup on unmount    return () => {      console.log('CSR Dashboard cleanup - leaving WebSocket room');      websocketService.leaveCSRDashboard();    };  }, []);  // Auto-refresh functionality  useEffect(() => {    if (autoRefresh) {      const interval = setInterval(() => {        console.log('Auto-refreshing CSR dashboard data...');        loadDashboardData();      }, 30000); // Refresh every 30 seconds      return () => clearInterval(interval);    }  }, [autoRefresh]);  const loadDashboardData = async () => {    try {      setLoading(true);      console.log('[CSR] Loading comprehensive CSR dashboard data...');      // Use the new CSR dashboard service with comprehensive fallbacks      const dashboardData = await csrDashboardService.getComprehensiveDashboardData();      if (dashboardData.offlineMode) {        console.warn(' Operating in offline mode with fallback data');        setShowConnectionAlert(true);      }      // Set stats from service      setDashboardStats({        totalCustomers: dashboardData.stats.totalCustomers,        pendingRequests: dashboardData.stats.pendingRequests,        consentUpdates: dashboardData.stats.consentUpdates,        guardiansManaged: dashboardData.stats.guardiansManaged,        todayActions: dashboardData.stats.todayActions,        riskAlerts: dashboardData.stats.riskAlerts      });      // Set insights      setInsights({        consentRate: dashboardData.stats.consentRate,        resolvedRequests: dashboardData.stats.resolvedRequests,        newCustomers: dashboardData.stats.newCustomers      });      // Create recent activities from audit events      const recentEvents = dashboardData.auditEvents        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())        .slice(0, 5)        .map((event: any, index: number) => ({          id: index + 1,          type: event.eventType.includes('consent') ? 'consent' :                 event.eventType.includes('dsar') ? 'dsar' : 'system',          message: event.description,          timestamp: getRelativeTime(event.createdAt),          priority: event.severity === 'critical' ? 'high' :                    event.severity === 'high' ? 'high' : 'medium',          category: event.category || 'General'        }));      setRecentActivities(recentEvents);    } catch (error) {      console.error('Error loading CSR dashboard data:', error);      // Emergency fallback - ensure we always have some data      setDashboardStats({        totalCustomers: 10,        pendingRequests: 4,        consentUpdates: 8,        guardiansManaged: 2,        todayActions: 15,        riskAlerts: 2      });      setInsights({        consentRate: 78,        resolvedRequests: 8,        newCustomers: 3      });      setRecentActivities([        {          id: 1,          type: 'system',          message: 'System operating in offline mode with sample data',          timestamp: 'Just now',          priority: 'medium',          category: 'System'        }      ]);      setShowConnectionAlert(true);    } finally {      setLoading(false);    }  };  // Handle manual refresh  const handleRefresh = async () => {    setIsRefreshing(true);    try {      await loadDashboardData();    } catch (error) {      console.error('Error refreshing CSR dashboard:', error);    } finally {      setIsRefreshing(false);    }  };  const getRelativeTime = (dateString: string) => {    const date = new Date(dateString);    const now = new Date();    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));    if (diffInMinutes < 1) return 'Just now';    if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hours ago`;    return `${Math.floor(diffInMinutes / 1440)} days ago`;  };  const handleCustomerSelect = (customer: any) => {    setSelectedCustomer(customer);    setActiveSection('customer-profile');  };  const renderContent = () => {    switch (activeSection) {      case 'overview':        return <CSROverviewEnhanced           stats={dashboardStats}           activities={recentActivities}           onSectionChange={setActiveSection}           loading={loading}          onRefresh={handleRefresh}          insights={insights}          isRefreshing={isRefreshing}          autoRefresh={autoRefresh}          onAutoRefreshChange={setAutoRefresh}        />;      case 'customer-search':        return <CustomerSearchForm onCustomerSelect={handleCustomerSelect} />;      case 'consent-history':        return <ConsentHistoryTable />;      case 'consent-management':        return <ConsentManagement customerId={selectedCustomer?.id} />;      case 'preference-editor':        return <PreferenceEditorForm customerId={selectedCustomer?.id} />;      case 'vas-management':        return <CSRCustomerVASManagement />;      case 'notification-center':        return <NotificationCenter />;      case 'dsar-requests':        return <DSARRequestPanel customerId={selectedCustomer?.id} />;      case 'guardian-consent':        return <GuardianConsentForm customerId={selectedCustomer?.id} />;      case 'audit-logs':        return <AuditLogTable customerId={selectedCustomer?.id} />;      case 'customer-profile':        return <CustomerProfile customer={selectedCustomer} onBack={() => setActiveSection('customer-search')} onSectionChange={setActiveSection} />;      default:        return <CSROverviewEnhanced           stats={dashboardStats}           activities={recentActivities}           onSectionChange={setActiveSection}           loading={loading}          onRefresh={handleRefresh}          insights={insights}          isRefreshing={isRefreshing}          autoRefresh={autoRefresh}          onAutoRefreshChange={setAutoRefresh}        />;    }  };  return (    <div className={`min-h-screen bg-slate-50 flex flex-col lg:flex-row ${className}`}>      {/* Server Connection Alert */}      {showConnectionAlert && (        <ServerConnectionAlert           onClose={() => setShowConnectionAlert(false)}          autoHide={true}          autoHideDelay={4000}        />      )}      {/* Sidebar */}      <SidebarNav        activeSection={activeSection}        onSectionChange={setActiveSection}        isOpen={sidebarOpen}        onToggle={() => setSidebarOpen(!sidebarOpen)}      />      {/* Main content area */}      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">        {/* Header */}        <CSRHeader           onRefresh={handleRefresh}          isRefreshing={isRefreshing}        />        {/* Main Content */}        <main className="flex-1 overflow-x-hidden overflow-y-auto">          <div className="p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 max-w-full">            <div className="max-w-7xl mx-auto">              {renderContent()}            </div>          </div>        </main>      </div>      {/* Floating Help Button */}      <button        onClick={() => setShowHelpModal(true)}        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 hover:bg-blue-700 transition-colors text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group z-40"        title="Help & Documentation"      >        <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform" />      </button>      {/* Help Modal */}      <HelpModal        isOpen={showHelpModal}        onClose={() => setShowHelpModal(false)}      />      {/* Real-time Notification Container */}      <NotificationContainer />    </div>  );};// Dashboard Overview Componentconst DashboardOverview: React.FC<{   stats: any;   activities: any[];   onSectionChange: (section: string) => void;  loading?: boolean;  onRefresh?: () => void;  insights?: { consentRate: number; resolvedRequests: number; newCustomers: number };  isRefreshing?: boolean;  autoRefresh?: boolean;  onAutoRefreshChange?: (value: boolean) => void;}> = ({   stats,   activities,   onSectionChange,   loading = false,   onRefresh,   insights,   isRefreshing = false,   autoRefresh = false,   onAutoRefreshChange }) => {  if (loading) {    return (      <div className="space-y-6">        {/* Loading Welcome Section */}        <div className="bg-gradient-to-r from-myslt-primary via-myslt-secondary to-myslt-primary-dark rounded-xl shadow-lg p-6 text-white shadow-sm">          <div className="flex items-center justify-between">            <div>              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Loading Dashboard...</h1>              <p className="text-white/90 text-sm sm:text-base">                Please wait while we fetch your real-time data.              </p>            </div>            <div className="hidden sm:block">              <RefreshCw className="w-16 h-16 opacity-80 animate-spin" />            </div>          </div>        </div>        {/* Loading Stats Cards */}        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">          {[...Array(6)].map((_, i) => (            <div key={i} className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm p-6 border border-slate-200 animate-pulse">              <div className="flex items-center justify-between">                <div className="flex-1">                  <div className="h-4 bg-blue-50/30 rounded w-3/4 mb-2"></div>                  <div className="h-8 bg-blue-50/30 rounded w-1/2"></div>                </div>                <div className="w-12 h-12 bg-blue-50/30 rounded-lg"></div>              </div>            </div>          ))}        </div>      </div>    );  }  return (    <div className="space-y-6">      {/* Header */}      <div className="flex justify-between items-center">        <div>          <h1 className="text-3xl font-bold text-slate-900">Dashboard Overview</h1>          <p className="text-slate-600 mt-1">Customer Support Representative Dashboard</p>        </div>        <div className="flex items-center space-x-4">          <div className="flex items-center space-x-2">            <label className="text-sm font-medium text-slate-600">Auto-refresh:</label>            <input              type="checkbox"              checked={autoRefresh}              onChange={(e) => onAutoRefreshChange && onAutoRefreshChange(e.target.checked)}              className="rounded border-gray-300 text-blue-600 focus:ring-myslt-primary"            />          </div>          {onRefresh && (            <button              onClick={onRefresh}              disabled={isRefreshing}              className="flex items-center space-x-2 px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 disabled:opacity-50"              title="Refresh Data"            >              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />              <span>Refresh</span>            </button>          )}        </div>      </div>      {/* Key Metrics */}      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">          <div className="flex items-center justify-between">            <div>              <p className="text-sm font-medium text-slate-600">Total Customers</p>              <p className="text-2xl font-bold text-slate-900">{stats.totalCustomers.toLocaleString()}</p>              <p className="text-xs text-green-600 mt-1">Active accounts</p>            </div>            <div className="p-3 bg-green-600/20 rounded-full">              <Users className="w-6 h-6 text-green-600" />            </div>          </div>        </div>        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">          <div className="flex items-center justify-between">            <div>              <p className="text-sm font-medium text-slate-600">Pending Requests</p>              <p className="text-2xl font-bold text-slate-900">{stats.pendingRequests}</p>              <p className="text-xs text-orange-400 mt-1">Awaiting response</p>            </div>            <div className="p-3 bg-orange-400/20 rounded-full">              <Clock className="w-6 h-6 text-orange-400" />            </div>          </div>        </div>        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">          <div className="flex items-center justify-between">            <div>              <p className="text-sm font-medium text-slate-600">Consent Updates</p>              <p className="text-2xl font-bold text-slate-900">{stats.consentUpdates}</p>              <p className="text-xs text-green-600 mt-1">This period</p>            </div>            <div className="p-3 bg-green-600/20 rounded-full">              <CheckCircle className="w-6 h-6 text-green-600" />            </div>          </div>        </div>        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">          <div className="flex items-center justify-between">            <div>              <p className="text-sm font-medium text-slate-600">Guardian Managed</p>              <p className="text-2xl font-bold text-slate-900">{stats.guardiansManaged}</p>              <p className="text-xs text-purple-400 mt-1">Under supervision</p>            </div>            <div className="p-3 bg-purple-400/20 rounded-full">              <Shield className="w-6 h-6 text-purple-400" />            </div>          </div>        </div>        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">          <div className="flex items-center justify-between">            <div>              <p className="text-sm font-medium text-slate-600">Today's Actions</p>              <p className="text-2xl font-bold text-slate-900">{stats.todayActions}</p>              <p className="text-xs text-indigo-400 mt-1">Completed tasks</p>            </div>            <div className="p-3 bg-indigo-400/20 rounded-full">              <TrendingUp className="w-6 h-6 text-indigo-400" />            </div>          </div>        </div>        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">          <div className="flex items-center justify-between">            <div>              <p className="text-sm font-medium text-slate-600">Risk Alerts</p>              <p className="text-2xl font-bold text-slate-900">{stats.riskAlerts}</p>              <p className="text-xs text-red-400 mt-1">Requires attention</p>            </div>            <div className="p-3 bg-red-400/20 rounded-full">              <AlertTriangle className="w-6 h-6 text-red-400" />            </div>          </div>        </div>      </div>      {/* Quick Actions and Recent Activity */}      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">        {/* Quick Actions */}        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">          <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>          <div className="space-y-3">            <button              onClick={() => onSectionChange('customer-search')}              className="w-full flex items-center space-x-3 p-3 bg-blue-50/30 hover:bg-blue-50/50 rounded-lg transition-colors"            >              <div className="p-2 bg-green-600/20 rounded-lg">                <Users className="w-5 h-5 text-green-600" />              </div>              <div className="text-left">                <p className="font-medium text-slate-900">Search Customers</p>                <p className="text-sm text-slate-600">Find and manage customer accounts</p>              </div>            </button>            <button              onClick={() => onSectionChange('dsar-requests')}              className="w-full flex items-center space-x-3 p-3 bg-orange-400/20 hover:bg-orange-400/30 rounded-lg transition-colors"            >              <div className="p-2 bg-orange-400/30 rounded-lg">                <FileText className="w-5 h-5 text-orange-400" />              </div>              <div className="text-left">                <p className="font-medium text-slate-900">DSAR Requests</p>                <p className="text-sm text-slate-600">Process data subject requests</p>              </div>            </button>            <button              onClick={() => onSectionChange('consent-history')}              className="w-full flex items-center space-x-3 p-3 bg-green-600/20 hover:bg-green-600/30 rounded-lg transition-colors"            >              <div className="p-2 bg-green-600/30 rounded-lg">                <Shield className="w-5 h-5 text-green-600" />              </div>              <div className="text-left">                <p className="font-medium text-slate-900">Consent Management</p>                <p className="text-sm text-slate-600">Review and update consents</p>              </div>            </button>          </div>        </div>        {/* Recent Activity */}        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">          <div className="flex items-center justify-between mb-4">            <h3 className="text-lg font-semibold text-slate-900">Recent Activity</h3>            {isRefreshing && (              <div className="flex items-center text-green-600 text-sm">                <RefreshCw className="w-4 h-4 animate-spin mr-2" />                Refreshing...              </div>            )}          </div>          <div className="space-y-4">            {activities.length > 0 ? (              activities.slice(0, 5).map((activity, index) => (                <div key={index} className="flex items-start space-x-3 p-3 bg-white border border-slate-200 rounded-lg">                  <div className={`p-2 rounded-lg ${                    activity.type === 'consent' ? 'bg-green-100' :                    activity.type === 'dsar' ? 'bg-orange-100' :                    'bg-white border border-slate-200'                  }`}>                    {activity.type === 'consent' ? (                      <Shield className={`w-4 h-4 ${                        activity.type === 'consent' ? 'text-green-600' :                        activity.type === 'dsar' ? 'text-orange-600' :                        'text-blue-600'                      }`} />                    ) : activity.type === 'dsar' ? (                      <FileText className={`w-4 h-4 ${                        activity.type === 'consent' ? 'text-green-600' :                        activity.type === 'dsar' ? 'text-orange-600' :                        'text-blue-600'                      }`} />                    ) : (                      <Activity className={`w-4 h-4 ${                        activity.type === 'consent' ? 'text-green-600' :                        activity.type === 'dsar' ? 'text-orange-600' :                        'text-blue-600'                      }`} />                    )}                  </div>                  <div className="flex-1 min-w-0">                    <p className="text-sm font-medium text-slate-900">{activity.message}</p>                    <p className="text-xs text-slate-500 mt-1">{activity.timestamp}</p>                  </div>                </div>              ))            ) : (              <div className="text-center py-8 text-slate-500">                <Activity className="w-12 h-12 mx-auto mb-3 text-slate-500/50" />                <p>No recent activity</p>              </div>            )}          </div>        </div>      </div>      {/* Recent Insights */}      <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm p-6 border border-slate-200">        <div className="flex items-center justify-between mb-4">          <h3 className="text-lg font-semibold text-slate-900">Today's Insights</h3>          {isRefreshing && (            <div className="flex items-center text-green-600 text-sm">              <RefreshCw className="w-4 h-4 animate-spin mr-2" />              Refreshing...            </div>          )}        </div>        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">            <div className="flex items-center space-x-2">              <TrendingUp className="w-5 h-5 text-blue-600" />              <span className="text-sm font-medium text-slate-900">Consent Rate</span>            </div>            <p className="text-2xl font-bold text-slate-900 mt-2">{insights?.consentRate || 0}%</p>            <p className="text-sm text-blue-600">Based on active consents</p>          </div>          <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">            <div className="flex items-center space-x-2">              <CheckCircle className="w-5 h-5 text-green-600" />              <span className="text-sm font-medium text-green-800">Resolved Requests</span>            </div>            <p className="text-2xl font-bold text-green-900 mt-2">{insights?.resolvedRequests || 0}</p>            <p className="text-sm text-green-600">Completed DSAR requests</p>          </div>          <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">            <div className="flex items-center space-x-2">              <Users className="w-5 h-5 text-orange-600" />              <span className="text-sm font-medium text-orange-800">New Customers</span>            </div>            <p className="text-2xl font-bold text-orange-900 mt-2">{insights?.newCustomers || 0}</p>            <p className="text-sm text-orange-600">Registered today</p>          </div>        </div>      </div>    </div>  );};export default CSRDashboard;

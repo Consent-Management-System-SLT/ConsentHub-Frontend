@@ -388,37 +388,37 @@ export const PrivacyNotices: React.FC = () => {
       const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3001';
       socket = io(wsUrl);
 
-      console.log('🔌 Admin Privacy Notices: Connected to real-time updates');
+      console.log(' Admin Privacy Notices: Connected to real-time updates');
 
       // Listen for privacy notice updates
       socket.on('privacy-notice-updated', (data) => {
-        console.log('📡 Admin received real-time update:', data);
+        console.log(' Admin received real-time update:', data);
 
         if (data.action === 'deleted' || data.action === 'updated' || data.action === 'created') {
           // Reload notices to get the latest data
-          console.log('🔄 Refreshing admin privacy notices due to real-time update');
+          console.log(' Refreshing admin privacy notices due to real-time update');
           loadNotices();
         }
       });
 
       // Handle connection events
       socket.on('connect', () => {
-        console.log('✅ Admin dashboard connected to real-time updates');
+        console.log(' Admin dashboard connected to real-time updates');
       });
 
       socket.on('disconnect', () => {
-        console.log('❌ Admin dashboard disconnected from real-time updates');
+        console.log(' Admin dashboard disconnected from real-time updates');
       });
 
     } catch (error) {
-      console.error('❌ Admin failed to connect to real-time updates:', error);
+      console.error(' Admin failed to connect to real-time updates:', error);
     }
 
     // Cleanup on component unmount
     return () => {
       if (socket) {
         socket.disconnect();
-        console.log('🔌 Admin Privacy Notices: Disconnected from real-time updates');
+        console.log(' Admin Privacy Notices: Disconnected from real-time updates');
       }
     };
   }, []);
@@ -462,7 +462,7 @@ export const PrivacyNotices: React.FC = () => {
       if (response.data) {
         setShowForm(false);
         // Don't manually update state - let Socket.IO real-time updates handle it
-        console.log('✅ Privacy notice created successfully:', response.data.notice.title);
+        console.log(' Privacy notice created successfully:', response.data.notice.title);
       }
     } catch (err) {
       console.error('Error creating notice:', err);
@@ -483,7 +483,7 @@ export const PrivacyNotices: React.FC = () => {
         setShowForm(false);
         setEditingNotice(null);
         // Don't manually update state - let Socket.IO real-time updates handle it
-        console.log('✅ Privacy notice updated successfully:', response.data.notice.title);
+        console.log(' Privacy notice updated successfully:', response.data.notice.title);
       }
     } catch (err) {
       console.error('Error updating notice:', err);
@@ -497,12 +497,12 @@ export const PrivacyNotices: React.FC = () => {
     if (!confirm('Are you sure you want to delete this privacy notice?')) return;
 
     try {
-      console.log('🗑️ Attempting to delete privacy notice with ID:', id);
+      console.log('️ Attempting to delete privacy notice with ID:', id);
       const response = await privacyNoticeService.deletePrivacyNotice(id);
-      console.log('✅ Delete response:', response);
+      console.log(' Delete response:', response);
       
       if (response.data) {
-        console.log('🔄 Delete successful - letting real-time update handle the refresh');
+        console.log(' Delete successful - letting real-time update handle the refresh');
         
         // Don't manually update state here - let the real-time update handle it
         // The real-time Socket.IO event will trigger loadNotices() automatically
@@ -511,25 +511,25 @@ export const PrivacyNotices: React.FC = () => {
         alert('Privacy notice archived successfully!');
       }
     } catch (err) {
-      console.error('❌ Error deleting notice:', err);
-      console.error('❌ Full error details:', err);
+      console.error(' Error deleting notice:', err);
+      console.error(' Full error details:', err);
       alert('Failed to delete notice: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };
 
   const handleExport = async (format: 'json' | 'csv') => {
     try {
-      console.log('🚀 Starting export for format:', format);
+      console.log(' Starting export for format:', format);
       
       // Test the URL construction
       const baseURL = import.meta.env.VITE_PRIVACY_NOTICE_API_URL || 'http://localhost:3001';
       const testUrl = `${baseURL}/api/v1/privacy-notices/export/${format}`;
-      console.log('🌐 Test URL:', testUrl);
+      console.log(' Test URL:', testUrl);
       
       // Get token from correct localStorage key
       const token = localStorage.getItem('authToken'); // Changed from 'token' to 'authToken'
-      console.log('🔑 Token present:', !!token);
-      console.log('🔑 Token preview:', token ? token.substring(0, 20) + '...' : 'null');
+      console.log(' Token present:', !!token);
+      console.log(' Token preview:', token ? token.substring(0, 20) + '...' : 'null');
       
       if (!token) {
         throw new Error('No authentication token found. Please login again.');
@@ -546,7 +546,7 @@ export const PrivacyNotices: React.FC = () => {
       });
       
       console.log('Response status:', response.status);
-      console.log('📄 Response ok:', response.ok);
+      console.log(' Response ok:', response.ok);
       
       if (!response.ok) {
         const errorText = await response.text();
@@ -556,7 +556,7 @@ export const PrivacyNotices: React.FC = () => {
       
       // Create and download the file
       const blob = await response.blob();
-      console.log('📦 Blob size:', blob.size);
+      console.log(' Blob size:', blob.size);
       
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -569,7 +569,7 @@ export const PrivacyNotices: React.FC = () => {
       document.body.removeChild(a);
       
     } catch (err) {
-      console.error('❌ Export error:', err);
+      console.error(' Export error:', err);
       alert('Failed to export notices: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };

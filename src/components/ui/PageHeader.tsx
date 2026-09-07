@@ -1,12 +1,10 @@
 import React from 'react';
-
 interface PageHeaderProps {
   title: string;
   description?: string;
   action?: React.ReactNode;
   className?: string;
 }
-
 export const PageHeader: React.FC<PageHeaderProps> = ({ 
   title, 
   description, 
@@ -31,5 +29,4 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     </div>
   );
 };
-
 export default PageHeader;

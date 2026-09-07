@@ -25,73 +25,20 @@
 
 @layer components {
   /* Temporary Legacy SLT Classes - stripped of dark theme styles */
-  .myslt-card { @apply bg-white rounded-xl shadow-sm border border-slate-200; }
-  .myslt-card-hover { @apply myslt-card hover:shadow-md transition-shadow duration-200; }
   
-  .myslt-btn-primary { @apply bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2; }
-  .myslt-btn-secondary { @apply bg-white text-slate-700 px-4 py-2 rounded-lg font-medium border border-slate-300 hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2; }
 
-  .myslt-table { @apply min-w-full divide-y divide-slate-200 bg-white rounded-lg overflow-hidden border border-slate-200; }
-  .myslt-table-header { @apply bg-slate-50 border-b border-slate-200; }
-  .myslt-table-header-cell { @apply px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider; }
-  .myslt-table-body { @apply bg-white divide-y divide-slate-200; }
-  .myslt-table-row { @apply hover:bg-slate-50 transition-colors duration-150; }
-  .myslt-table-cell { @apply px-6 py-4 whitespace-nowrap text-sm text-slate-600; }
-  .myslt-table-cell-primary { @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900; }
-  .myslt-table-cell-muted { @apply px-6 py-4 whitespace-nowrap text-xs text-slate-500; }
 
-  .myslt-heading { @apply text-slate-900 font-bold; }
-  .myslt-subheading { @apply text-slate-700 font-medium; }
-  .myslt-text { @apply text-slate-500; }
 
-  .myslt-status-active { @apply bg-green-50 text-green-700 px-2.5 py-1 rounded-full text-xs font-medium border border-green-200; }
-  .myslt-status-pending { @apply bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full text-xs font-medium border border-amber-200; }
-  .myslt-status-inactive { @apply bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full text-xs font-medium border border-slate-200; }
 
-  .myslt-gradient-bg { @apply bg-slate-50; }
-  .myslt-success-bg { @apply bg-green-600; }
 
-  .myslt-input { @apply bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors; }
 
-  .myslt-container { @apply bg-slate-50 min-h-screen; }
-  .myslt-sidebar { @apply bg-white border-r border-slate-200; }
-  .myslt-sidebar-mobile { @apply bg-white border-r border-slate-200; }
-  .myslt-header { @apply bg-white shadow-sm border-b border-slate-200; }
-  .myslt-notification-dropdown { @apply bg-white border border-slate-200 shadow-lg; }
   
-  .myslt-icon-sm { @apply w-4 h-4 text-slate-500; }
-  .myslt-icon-md { @apply w-5 h-5 text-slate-500; }
-  .myslt-icon-lg { @apply w-6 h-6 text-slate-700; }
-  .myslt-icon-xl { @apply w-8 h-8 text-slate-700; }
-  .myslt-icon { @apply w-4 h-4 text-slate-500; }
 }
 
 @layer utilities {
-  .bg-myslt-background { @apply bg-slate-50; }
-  .bg-myslt-card { @apply bg-white; }
-  .bg-myslt-card-solid { @apply bg-white; }
-  .bg-myslt-primary { @apply bg-white; }
-  .bg-myslt-primary-dark { @apply bg-slate-900; }
-  .bg-myslt-accent { @apply bg-blue-50; }
-  .bg-myslt-success { @apply bg-green-500; }
-  .bg-myslt-warning { @apply bg-amber-500; }
-  .bg-myslt-danger { @apply bg-red-500; }
-  .bg-myslt-info { @apply bg-blue-500; }
   
-  .text-myslt-text-primary { @apply text-slate-900; }
-  .text-myslt-text-secondary { @apply text-slate-600; }
-  .text-myslt-text-muted { @apply text-slate-500; }
-  .text-myslt-text-accent { @apply text-blue-600; }
-  .text-myslt-primary { @apply text-blue-600; }
   
-  .border-myslt-accent { @apply border-slate-200; }
-  .border-myslt-primary { @apply border-blue-600; }
-  .border-myslt-border { @apply border-slate-200; }
   
-  .myslt-card-glow { @apply shadow-sm; }
-  .myslt-card-hover-effect:hover { @apply shadow-md transform -translate-y-0.5 transition-all; }
-  .bg-myslt-card-gradient { @apply bg-white; }
-  .bg-myslt-service-card { @apply bg-white border border-slate-200; }
 
   /* Responsive text utilities */
   .text-responsive-sm { @apply text-xs sm:text-sm; }
@@ -171,9 +118,6 @@
   .mobile-p-safe { @apply p-3 sm:p-4; }
   .mobile-m-safe { @apply m-3 sm:m-4; }
   
-  .myslt-checkbox {
-    @apply w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2;
-  }
 
   .animate-fadeIn { animation: fadeIn 0.2s ease-out; }
   .animate-slideUp { animation: slideUp 0.2s ease-out; }
