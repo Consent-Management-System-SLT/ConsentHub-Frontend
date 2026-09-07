@@ -341,9 +341,9 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'expired':
-        return 'bg-myslt-service-card text-myslt-text-secondary';
+        return 'bg-white border border-slate-200 text-slate-600';
       default:
-        return 'bg-myslt-service-card text-myslt-text-secondary';
+        return 'bg-white border border-slate-200 text-slate-600';
     }
   };
 
@@ -364,19 +364,19 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
 
   if (loading) {
     return (
-      <div className={`bg-myslt-card-solid rounded-lg shadow-lg ${className}`}>
+      <div className={`bg-white rounded-lg shadow-lg ${className}`}>
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <FileText className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-xl font-semibold text-myslt-text-primary">Consent History</h2>
-              <p className="text-sm text-myslt-text-secondary">View and manage customer consent records</p>
+              <h2 className="text-xl font-semibold text-slate-900">Consent History</h2>
+              <p className="text-sm text-slate-600">View and manage customer consent records</p>
             </div>
           </div>
         </div>
         <div className="flex items-center justify-center py-12">
           <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
-          <span className="ml-2 text-myslt-text-secondary">Loading consent history...</span>
+          <span className="ml-2 text-slate-600">Loading consent history...</span>
         </div>
       </div>
     );
@@ -384,13 +384,13 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
 
   if (error) {
     return (
-      <div className={`bg-myslt-card-solid rounded-lg shadow-lg ${className}`}>
+      <div className={`bg-white rounded-lg shadow-lg ${className}`}>
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <FileText className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-xl font-semibold text-myslt-text-primary">Consent History</h2>
-              <p className="text-sm text-myslt-text-secondary">View and manage customer consent records</p>
+              <h2 className="text-xl font-semibold text-slate-900">Consent History</h2>
+              <p className="text-sm text-slate-600">View and manage customer consent records</p>
             </div>
           </div>
         </div>
@@ -411,17 +411,17 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
   }
 
   return (
-    <div className={`bg-myslt-card-solid rounded-lg shadow-lg ${className}`}>
+    <div className={`bg-white rounded-lg shadow-lg ${className}`}>
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <History className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-xl font-semibold text-myslt-text-primary">Consent History & Audit Trail</h2>
-              <p className="text-sm text-myslt-text-secondary">
+              <h2 className="text-xl font-semibold text-slate-900">Consent History & Audit Trail</h2>
+              <p className="text-sm text-slate-600">
                 {customerId ? `Showing consent history for customer: ${getCustomerName(customerId)}` : 'Real-time tracking of all customer consent changes'}
               </p>
-              <div className="flex items-center space-x-4 text-xs text-myslt-text-muted mt-1">
+              <div className="flex items-center space-x-4 text-xs text-slate-500 mt-1">
                 <span className="flex items-center space-x-1">
                   <Clock className="w-3 h-3" />
                   <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
@@ -460,7 +460,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       {consents && consents.length === 0 ? (
         <div className="text-center py-12">
           <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-myslt-text-secondary">No consent records found.</p>
+          <p className="text-slate-600">No consent records found.</p>
           <p className="text-sm text-gray-500 mt-1">
             {customerId ? 'This customer has no consent records.' : 'No consent records exist in the system.'}
           </p>
@@ -468,7 +468,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-myslt-service-card">
+            <thead className="bg-white border border-slate-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Customer Name
@@ -490,16 +490,16 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-myslt-card-solid divide-y divide-myslt-accent/20">
+            <tbody className="bg-white divide-y divide-myslt-accent/20">
               {Array.isArray(consents) && consents.map((consent) => (
-                <tr key={consent.id} className="hover:bg-myslt-service-card">
+                <tr key={consent.id} className="hover:bg-white border border-slate-200">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-myslt-text-primary">
+                    <div className="text-sm font-medium text-slate-900">
                       {getCustomerName(consent.partyId)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-myslt-text-primary">{formatPurposeName(consent.purpose)}</div>
+                    <div className="text-sm text-slate-900">{formatPurposeName(consent.purpose)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(consent.status)}`}>
@@ -507,16 +507,16 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-myslt-text-primary">
+                    <div className="text-sm text-slate-900">
                       {formatDate(consent.lastModified || consent.updatedAt || consent.createdAt)}
                     </div>
-                    <div className="text-xs text-myslt-text-muted">
+                    <div className="text-xs text-slate-500">
                       {new Date(consent.lastModified || consent.updatedAt || consent.createdAt).toLocaleTimeString()}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-myslt-text-primary">{consent.channel || 'All Channels'}</div>
-                    <div className="text-xs text-myslt-text-muted">{consent.consentType || 'Standard'}</div>
+                    <div className="text-sm text-slate-900">{consent.channel || 'All Channels'}</div>
+                    <div className="text-xs text-slate-500">{consent.consentType || 'Standard'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
@@ -538,16 +538,16 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       {/* Modal for viewing consent details */}
       {showModal && selectedConsent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-myslt-card-solid rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-myslt-text-primary flex items-center">
+                <h3 className="text-xl font-semibold text-slate-900 flex items-center">
                   <FileText className="w-6 h-6 mr-2" />
                   Consent Details
                 </h3>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-myslt-text-secondary transition-colors"
+                  className="text-gray-400 hover:text-slate-600 transition-colors"
                 >
                   <span className="text-2xl">×</span>
                 </button>
@@ -557,11 +557,11 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
               <div className="space-y-6">
                 {/* Customer & Status - Full Width */}
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="bg-myslt-service-card p-4 rounded-lg">
+                  <div className="bg-white border border-slate-200 p-4 rounded-lg">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <label className="block text-sm font-medium text-gray-700">Customer</label>
-                        <p className="mt-1 text-lg text-myslt-text-primary font-semibold">
+                        <p className="mt-1 text-lg text-slate-900 font-semibold">
                           {getCustomerName(selectedConsent.partyId)}
                         </p>
                       </div>
@@ -578,9 +578,9 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                 {/* Purpose - Full Width */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Purpose</label>
-                  <div className="mt-1 bg-myslt-service-card p-3 rounded-lg">
-                    <p className="text-lg text-myslt-text-primary font-medium">{formatPurposeName(selectedConsent.purpose)}</p>
-                    <p className="text-sm text-myslt-text-muted mt-1">{generateDescription(selectedConsent.purpose)}</p>
+                  <div className="mt-1 bg-white border border-slate-200 p-3 rounded-lg">
+                    <p className="text-lg text-slate-900 font-medium">{formatPurposeName(selectedConsent.purpose)}</p>
+                    <p className="text-sm text-slate-500 mt-1">{generateDescription(selectedConsent.purpose)}</p>
                   </div>
                 </div>
 
@@ -607,26 +607,26 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
 
                 {/* Timeline Information */}
                 <div className="border-t pt-6">
-                  <h4 className="text-md font-medium text-myslt-text-primary mb-4 flex items-center">
+                  <h4 className="text-md font-medium text-slate-900 mb-4 flex items-center">
                     <Calendar className="w-4 h-4 mr-2" />
                     Timeline & History
                   </h4>
                   <div className="grid grid-cols-1 gap-4">
-                    <div className="bg-myslt-service-card p-4 rounded-lg">
+                    <div className="bg-white border border-slate-200 p-4 rounded-lg">
                       <div className="flex justify-between items-start">
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Created Date</label>
-                          <p className="mt-1 text-sm text-myslt-text-primary">{formatDate(selectedConsent.createdAt)}</p>
-                          <p className="text-xs text-myslt-text-muted">
+                          <p className="mt-1 text-sm text-slate-900">{formatDate(selectedConsent.createdAt)}</p>
+                          <p className="text-xs text-slate-500">
                             {new Date(selectedConsent.createdAt).toLocaleString()}
                           </p>
                         </div>
                         <div className="text-right">
                           <label className="block text-sm font-medium text-gray-700">Last Modified</label>
-                          <p className="mt-1 text-sm text-myslt-text-primary">
+                          <p className="mt-1 text-sm text-slate-900">
                             {formatDate(selectedConsent.lastModified || selectedConsent.updatedAt || selectedConsent.createdAt)}
                           </p>
-                          <p className="text-xs text-myslt-text-muted">
+                          <p className="text-xs text-slate-500">
                             {new Date(selectedConsent.lastModified || selectedConsent.updatedAt || selectedConsent.createdAt).toLocaleString()}
                           </p>
                         </div>
@@ -637,23 +637,23 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
 
                 {/* Technical Details */}
                 <div className="border-t pt-6">
-                  <h4 className="text-md font-medium text-myslt-text-primary mb-4">Technical Details</h4>
+                  <h4 className="text-md font-medium text-slate-900 mb-4">Technical Details</h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Channel</label>
-                      <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.channel || 'All Channels'}</p>
+                      <p className="mt-1 text-sm text-slate-900">{selectedConsent.channel || 'All Channels'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Consent Type</label>
-                      <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.consentType || 'Standard'}</p>
+                      <p className="mt-1 text-sm text-slate-900">{selectedConsent.consentType || 'Standard'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Legal Basis</label>
-                      <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.lawfulBasis || 'Consent'}</p>
+                      <p className="mt-1 text-sm text-slate-900">{selectedConsent.lawfulBasis || 'Consent'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Source</label>
-                      <p className="mt-1 text-sm text-myslt-text-primary">{selectedConsent.source || 'Customer Portal'}</p>
+                      <p className="mt-1 text-sm text-slate-900">{selectedConsent.source || 'Customer Portal'}</p>
                     </div>
                   </div>
                 </div>
@@ -661,8 +661,8 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                 {selectedConsent.description && (
                   <div className="border-t pt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                    <div className="bg-myslt-service-card p-4 rounded-lg">
-                      <p className="text-sm text-myslt-text-primary">{selectedConsent.description}</p>
+                    <div className="bg-white border border-slate-200 p-4 rounded-lg">
+                      <p className="text-sm text-slate-900">{selectedConsent.description}</p>
                     </div>
                   </div>
                 )}
@@ -671,16 +671,16 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                 {selectedConsent.validFor && (
                   <div className="border-t pt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Validity Period</label>
-                    <div className="bg-myslt-service-card p-4 rounded-lg">
+                    <div className="bg-white border border-slate-200 p-4 rounded-lg">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <span className="text-sm font-medium">Valid From:</span>
-                          <p className="text-sm text-myslt-text-primary">{formatDate(selectedConsent.validFor.startDateTime)}</p>
+                          <p className="text-sm text-slate-900">{formatDate(selectedConsent.validFor.startDateTime)}</p>
                         </div>
                         {selectedConsent.validFor.endDateTime && (
                           <div>
                             <span className="text-sm font-medium">Valid Until:</span>
-                            <p className="text-sm text-myslt-text-primary">{formatDate(selectedConsent.validFor.endDateTime)}</p>
+                            <p className="text-sm text-slate-900">{formatDate(selectedConsent.validFor.endDateTime)}</p>
                           </div>
                         )}
                       </div>

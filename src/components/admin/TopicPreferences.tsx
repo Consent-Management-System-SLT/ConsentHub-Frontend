@@ -162,8 +162,8 @@ const TopicPreferences: React.FC = () => {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-myslt-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-myslt-text-secondary">Loading topic preferences...</p>
+          <div className="w-8 h-8 border-4 border-slate-200 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading topic preferences...</p>
         </div>
       </div>
     );
@@ -204,21 +204,21 @@ const TopicPreferences: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-myslt-text-primary">Topic Preferences</h2>
-        <p className="text-myslt-text-secondary mt-2">
+        <h2 className="text-2xl font-semibold text-slate-900">Topic Preferences</h2>
+        <p className="text-slate-600 mt-2">
           Customize your communication preferences by topic and channel. Set Do Not Disturb periods to control when you receive notifications.
         </p>
       </div>
 
-      <div className="myslt-card p-4 sm:p-6">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-6">
         <div className="space-y-8">
           {/* Topic Preferences */}
           <div>
-            <h3 className="text-lg font-medium text-myslt-text-primary mb-4">Communication Topics</h3>
+            <h3 className="text-lg font-medium text-slate-900 mb-4">Communication Topics</h3>
             
             {Object.entries(groupedTopics).map(([category, categoryTopics]) => (
               <div key={category} className="mb-8">
-                <h4 className="text-md font-medium text-myslt-text-primary mb-4 px-3 py-2 myslt-service-card rounded-lg">
+                <h4 className="text-md font-medium text-slate-900 mb-4 px-3 py-2 myslt-service-card rounded-lg">
                   {category}
                 </h4>
                 
@@ -228,7 +228,7 @@ const TopicPreferences: React.FC = () => {
                     if (!preference) return null;
 
                     return (
-                      <div key={topic.id} className="border border-myslt-border rounded-lg p-4 myslt-service-card">
+                      <div key={topic.id} className="border border-slate-200 rounded-lg p-4 myslt-service-card">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center">
                             <label className="flex items-center">
@@ -236,9 +236,9 @@ const TopicPreferences: React.FC = () => {
                                 type="checkbox"
                                 checked={preference.enabled}
                                 onChange={(e) => updatePreference(topic.id, 'enabled', e.target.checked)}
-                                className="mr-3 h-4 w-4 text-myslt-accent focus:ring-myslt-accent border-myslt-border rounded myslt-checkbox"
+                                className="mr-3 h-4 w-4 text-blue-600 focus:ring-myslt-accent border-slate-200 rounded w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
                               />
-                              <span className="font-medium text-myslt-text-primary">{topic.name}</span>
+                              <span className="font-medium text-slate-900">{topic.name}</span>
                             </label>
                           </div>
                           
@@ -246,7 +246,7 @@ const TopicPreferences: React.FC = () => {
                             value={preference.frequency}
                             onChange={(e) => updatePreference(topic.id, 'frequency', e.target.value)}
                             disabled={!preference.enabled}
-                            className="myslt-input px-3 py-1 text-sm disabled:bg-myslt-muted/20 disabled:text-myslt-text-muted"
+                            className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors px-3 py-1 text-sm disabled:bg-slate-50/20 disabled:text-slate-500"
                           >
                             {frequencies.map(freq => (
                               <option key={freq.value} value={freq.value}>
@@ -258,7 +258,7 @@ const TopicPreferences: React.FC = () => {
 
                         {preference.enabled && (
                           <div className="ml-7">
-                            <p className="text-sm text-myslt-text-secondary mb-3">Communication Channels:</p>
+                            <p className="text-sm text-slate-600 mb-3">Communication Channels:</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                               {channels.map(channel => (
                                 <label key={channel.id} className="flex items-center">
@@ -266,10 +266,10 @@ const TopicPreferences: React.FC = () => {
                                     type="checkbox"
                                     checked={preference.channels.includes(channel.id)}
                                     onChange={(e) => updateChannel(topic.id, channel.id, e.target.checked)}
-                                    className="mr-2 h-4 w-4 text-myslt-accent focus:ring-myslt-accent border-myslt-border rounded myslt-checkbox"
+                                    className="mr-2 h-4 w-4 text-blue-600 focus:ring-myslt-accent border-slate-200 rounded w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
                                   />
-                                  <span className="text-sm text-myslt-text-primary flex items-center">
-                                    <channel.icon className="myslt-icon mr-1" />
+                                  <span className="text-sm text-slate-900 flex items-center">
+                                    <channel.icon className="w-4 h-4 text-slate-500 mr-1" />
                                     {channel.name}
                                   </span>
                                 </label>
@@ -288,10 +288,10 @@ const TopicPreferences: React.FC = () => {
           {/* Do Not Disturb Periods */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-myslt-text-primary">Do Not Disturb Periods</h3>
+              <h3 className="text-lg font-medium text-slate-900">Do Not Disturb Periods</h3>
               <button
                 onClick={addDoNotDisturbPeriod}
-                className="myslt-btn-primary px-4 py-2 text-sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-4 py-2 text-sm"
               >
                 Add Period
               </button>
@@ -299,26 +299,26 @@ const TopicPreferences: React.FC = () => {
 
             <div className="space-y-4">
               {doNotDisturbPeriods.map((period, index) => (
-                <div key={index} className="border border-myslt-border rounded-lg p-4 myslt-service-card">
+                <div key={index} className="border border-slate-200 rounded-lg p-4 myslt-service-card">
                   <div className="flex items-center justify-between mb-4">
                     <label className="flex items-center">
                       <input
                         type="checkbox"
                         checked={period.enabled}
                         onChange={(e) => updateDoNotDisturb(index, 'enabled', e.target.checked)}
-                        className="mr-3 h-4 w-4 text-myslt-accent focus:ring-myslt-accent border-myslt-border rounded myslt-checkbox"
+                        className="mr-3 h-4 w-4 text-blue-600 focus:ring-myslt-accent border-slate-200 rounded w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
                       />
                       <input
                         type="text"
                         value={period.name}
                         onChange={(e) => updateDoNotDisturb(index, 'name', e.target.value)}
-                        className="font-medium text-myslt-text-primary bg-transparent border-none focus:outline-none focus:bg-myslt-muted/10 px-2 py-1 rounded"
+                        className="font-medium text-slate-900 bg-transparent border-none focus:outline-none focus:bg-slate-100 px-2 py-1 rounded"
                       />
                     </label>
                     
                     <button
                       onClick={() => removeDoNotDisturbPeriod(index)}
-                      className="text-myslt-danger hover:text-myslt-danger/80"
+                      className="text-red-600 hover:text-red-600/80"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -330,27 +330,27 @@ const TopicPreferences: React.FC = () => {
                     <div className="ml-7 space-y-4">
                       <div className="flex items-center space-x-4">
                         <div>
-                          <label className="block text-sm font-medium text-myslt-text-secondary">Start Time</label>
+                          <label className="block text-sm font-medium text-slate-600">Start Time</label>
                           <input
                             type="time"
                             value={period.startTime}
                             onChange={(e) => updateDoNotDisturb(index, 'startTime', e.target.value)}
-                            className="myslt-input mt-1 p-2 text-sm"
+                            className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors mt-1 p-2 text-sm"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-myslt-text-secondary">End Time</label>
+                          <label className="block text-sm font-medium text-slate-600">End Time</label>
                           <input
                             type="time"
                             value={period.endTime}
                             onChange={(e) => updateDoNotDisturb(index, 'endTime', e.target.value)}
-                            className="myslt-input mt-1 p-2 text-sm"
+                            className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors mt-1 p-2 text-sm"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-myslt-text-secondary mb-2">Days</label>
+                        <label className="block text-sm font-medium text-slate-600 mb-2">Days</label>
                         <div className="flex space-x-2">
                           {weekDays.map(day => (
                             <label key={day.id} className="flex items-center">
@@ -358,9 +358,9 @@ const TopicPreferences: React.FC = () => {
                                 type="checkbox"
                                 checked={period.days.includes(day.id)}
                                 onChange={(e) => updateDoNotDisturbDay(index, day.id, e.target.checked)}
-                                className="mr-1 h-4 w-4 text-myslt-accent focus:ring-myslt-accent border-myslt-border rounded myslt-checkbox"
+                                className="mr-1 h-4 w-4 text-blue-600 focus:ring-myslt-accent border-slate-200 rounded w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
                               />
-                              <span className="text-sm text-myslt-text-primary">{day.label}</span>
+                              <span className="text-sm text-slate-900">{day.label}</span>
                             </label>
                           ))}
                         </div>
@@ -373,11 +373,11 @@ const TopicPreferences: React.FC = () => {
           </div>
 
           {/* Save Button */}
-          <div className="flex justify-end pt-6 border-t border-myslt-border">
+          <div className="flex justify-end pt-6 border-t border-slate-200">
             <button
               onClick={handleSave}
               disabled={saving}
-              className="myslt-btn-primary px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Saving...' : 'Save Preferences'}
             </button>

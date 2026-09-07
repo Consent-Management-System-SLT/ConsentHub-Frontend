@@ -41,7 +41,7 @@ const CustomerMainDashboard: React.FC<CustomerMainDashboardProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-myslt-background flex flex-col lg:flex-row">
+    <div className="min-h-screen bg-slate-50 flex flex-col lg:flex-row">
       {/* Sidebar */}
       <CustomerSidebar
         activeSection={activeSection}

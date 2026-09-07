@@ -170,11 +170,11 @@ const CustomerManagement: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-myslt-text-primary flex items-center gap-2">
-            <Users className="w-8 h-8 text-myslt-primary" />
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <Users className="w-8 h-8 text-blue-600" />
             Customer Management
           </h1>
-          <p className="text-myslt-text-secondary mt-1">
+          <p className="text-slate-600 mt-1">
             Manage all customer accounts and view their consent & preference data
           </p>
         </div>
@@ -182,7 +182,7 @@ const CustomerManagement: React.FC = () => {
         <div className="flex gap-3">
           <button
             onClick={fetchCustomers}
-            className="flex items-center gap-2 px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary-dark transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-white text-white rounded-lg hover:bg-slate-900 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -192,54 +192,54 @@ const CustomerManagement: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="myslt-card p-4">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-myslt-accent/20 rounded-lg">
-              <Users className="w-5 h-5 text-myslt-accent" />
+            <div className="p-2 bg-blue-50/20 rounded-lg">
+              <Users className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-myslt-text-secondary">Total Customers</p>
-              <p className="text-xl font-bold text-myslt-text-primary">{customers.length}</p>
+              <p className="text-sm text-slate-600">Total Customers</p>
+              <p className="text-xl font-bold text-slate-900">{customers.length}</p>
             </div>
           </div>
         </div>
 
-        <div className="myslt-card p-4">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-myslt-success/20 rounded-lg">
-              <UserPlus className="w-5 h-5 text-myslt-success" />
+            <div className="p-2 bg-green-600/20 rounded-lg">
+              <UserPlus className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-myslt-text-secondary">Active Customers</p>
-              <p className="text-xl font-bold text-myslt-text-primary">
+              <p className="text-sm text-slate-600">Active Customers</p>
+              <p className="text-xl font-bold text-slate-900">
                 {customers.filter(c => c.status === 'active').length}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="myslt-card p-4">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-myslt-info/20 rounded-lg">
-              <Shield className="w-5 h-5 text-myslt-info" />
+            <div className="p-2 bg-blue-600/20 rounded-lg">
+              <Shield className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-myslt-text-secondary">Avg Consents</p>
-              <p className="text-xl font-bold text-myslt-text-primary">
+              <p className="text-sm text-slate-600">Avg Consents</p>
+              <p className="text-xl font-bold text-slate-900">
                 {customers.length > 0 ? Math.round(customers.reduce((sum, c) => sum + c.totalConsents, 0) / customers.length) : 0}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="myslt-card p-4">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-myslt-warning/20 rounded-lg">
-              <Calendar className="w-5 h-5 text-myslt-warning" />
+            <div className="p-2 bg-amber-600/20 rounded-lg">
+              <Calendar className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-sm text-myslt-text-secondary">New This Month</p>
-              <p className="text-xl font-bold text-myslt-text-primary">
+              <p className="text-sm text-slate-600">New This Month</p>
+              <p className="text-xl font-bold text-slate-900">
                 {customers.filter(c => new Date(c.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length}
               </p>
             </div>
@@ -250,22 +250,22 @@ const CustomerManagement: React.FC = () => {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-myslt-text-secondary" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-600" />
           <input
             type="text"
             placeholder="Search customers..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
           />
         </div>
         
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-myslt-text-secondary" />
+          <Filter className="w-4 h-4 text-slate-600" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
+            className="px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -282,27 +282,27 @@ const CustomerManagement: React.FC = () => {
       )}
 
       {/* Customer Table */}
-      <div className="myslt-card overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-myslt-accent/5">
+            <thead className="bg-blue-50/5">
               <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium text-myslt-text-secondary">Customer</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-myslt-text-secondary">Contact</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-myslt-text-secondary">Status</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-myslt-text-secondary">Consents</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-myslt-text-secondary">Preferences</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-myslt-text-secondary">Last Activity</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-myslt-text-secondary">Actions</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Customer</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Contact</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Status</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Consents</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Preferences</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Last Activity</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-myslt-accent/10">
               {filteredCustomers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-myslt-accent/5">
+                <tr key={customer.id} className="hover:bg-blue-50/5">
                   <td className="px-6 py-4">
                     <div>
-                      <div className="font-medium text-myslt-text-primary">{customer.name}</div>
-                      <div className="text-sm text-myslt-text-secondary">{customer.company}</div>
+                      <div className="font-medium text-slate-900">{customer.name}</div>
+                      <div className="text-sm text-slate-600">{customer.company}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -312,7 +312,7 @@ const CustomerManagement: React.FC = () => {
                         {customer.email}
                       </div>
                       {customer.phone && (
-                        <div className="flex items-center gap-2 text-sm text-myslt-text-secondary">
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
                           <Phone className="w-3 h-3" />
                           {customer.phone}
                         </div>
@@ -325,22 +325,22 @@ const CustomerManagement: React.FC = () => {
                   <td className="px-6 py-4">
                     <div className="text-sm">
                       <div className="font-medium">{customer.activeConsents}/{customer.totalConsents}</div>
-                      <div className="text-myslt-text-secondary">active/total</div>
+                      <div className="text-slate-600">active/total</div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm">
                       <div className="font-medium">{customer.activePreferences}/{customer.totalPreferences}</div>
-                      <div className="text-myslt-text-secondary">active/total</div>
+                      <div className="text-slate-600">active/total</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-myslt-text-secondary">
+                  <td className="px-6 py-4 text-sm text-slate-600">
                     {formatDate(customer.lastActivity)}
                   </td>
                   <td className="px-6 py-4">
                     <button
                       onClick={() => viewCustomerDetails(customer)}
-                      className="flex items-center gap-1 px-3 py-1 text-sm bg-myslt-primary text-white rounded hover:bg-myslt-primary-dark transition-colors"
+                      className="flex items-center gap-1 px-3 py-1 text-sm bg-white text-white rounded hover:bg-slate-900 transition-colors"
                     >
                       <Eye className="w-3 h-3" />
                       View
@@ -353,8 +353,8 @@ const CustomerManagement: React.FC = () => {
           
           {filteredCustomers.length === 0 && (
             <div className="text-center py-12">
-              <Users className="w-12 h-12 text-myslt-text-secondary mx-auto mb-4" />
-              <p className="text-myslt-text-secondary">
+              <Users className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+              <p className="text-slate-600">
                 {searchTerm || statusFilter !== 'all' ? 'No customers match your filters' : 'No customers found'}
               </p>
             </div>
@@ -365,12 +365,12 @@ const CustomerManagement: React.FC = () => {
       {/* Customer Details Modal */}
       {showCustomerDetails && selectedCustomer && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="myslt-card p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-myslt-text-primary">Customer Details</h2>
+              <h2 className="text-xl font-bold text-slate-900">Customer Details</h2>
               <button
                 onClick={() => setShowCustomerDetails(false)}
-                className="p-2 hover:bg-myslt-muted/10 rounded-lg transition-colors text-myslt-text-muted hover:text-myslt-text-secondary"
+                className="p-2 hover:bg-slate-50 rounded-lg transition-colors text-slate-500 hover:text-slate-600"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -380,34 +380,34 @@ const CustomerManagement: React.FC = () => {
               {/* Customer Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-myslt-text-secondary mb-1">Name</label>
-                  <p className="text-myslt-text-primary">{selectedCustomer.name}</p>
+                  <label className="block text-sm font-medium text-slate-600 mb-1">Name</label>
+                  <p className="text-slate-900">{selectedCustomer.name}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-myslt-text-secondary mb-1">Email</label>
-                  <p className="text-myslt-text-primary">{selectedCustomer.email}</p>
+                  <label className="block text-sm font-medium text-slate-600 mb-1">Email</label>
+                  <p className="text-slate-900">{selectedCustomer.email}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-myslt-text-secondary mb-1">Phone</label>
-                  <p className="text-myslt-text-primary">{selectedCustomer.phone || 'Not provided'}</p>
+                  <label className="block text-sm font-medium text-slate-600 mb-1">Phone</label>
+                  <p className="text-slate-900">{selectedCustomer.phone || 'Not provided'}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-myslt-text-secondary mb-1">Company</label>
-                  <p className="text-myslt-text-primary">{selectedCustomer.company}</p>
+                  <label className="block text-sm font-medium text-slate-600 mb-1">Company</label>
+                  <p className="text-slate-900">{selectedCustomer.company}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-myslt-text-secondary mb-1">Status</label>
+                  <label className="block text-sm font-medium text-slate-600 mb-1">Status</label>
                   {getStatusBadge(selectedCustomer.status)}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-myslt-text-secondary mb-1">Member Since</label>
-                  <p className="text-myslt-text-primary">{formatDate(selectedCustomer.createdAt)}</p>
+                  <label className="block text-sm font-medium text-slate-600 mb-1">Member Since</label>
+                  <p className="text-slate-900">{formatDate(selectedCustomer.createdAt)}</p>
                 </div>
               </div>
 
               {/* Activity Summary */}
               <div className="border-t pt-6">
-                <h3 className="font-medium text-myslt-text-primary mb-4">Activity Summary</h3>
+                <h3 className="font-medium text-slate-900 mb-4">Activity Summary</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600">{selectedCustomer.totalConsents}</div>

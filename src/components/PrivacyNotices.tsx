@@ -209,7 +209,7 @@ const PrivacyNoticeForm: React.FC<{
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 bg-myslt-primary text-white rounded-md hover:bg-myslt-primary-dark disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 bg-white text-white rounded-md hover:bg-slate-900 disabled:opacity-50 flex items-center gap-2"
             >
               {isLoading ? (
                 <>
@@ -606,9 +606,9 @@ export const PrivacyNotices: React.FC = () => {
 
   if (loading && notices.length === 0) {
     return (
-      <div className="min-h-screen bg-myslt-background flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-myslt-primary" />
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
           <p className="text-gray-600">Loading privacy notices...</p>
         </div>
       </div>
@@ -617,13 +617,13 @@ export const PrivacyNotices: React.FC = () => {
 
   if (error && notices.length === 0) {
     return (
-      <div className="min-h-screen bg-myslt-background flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="h-8 w-8 mx-auto mb-4 text-red-600" />
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={loadNotices}
-            className="bg-myslt-primary text-white px-4 py-2 rounded-md hover:bg-myslt-primary-dark transition-colors"
+            className="bg-white text-white px-4 py-2 rounded-md hover:bg-slate-900 transition-colors"
           >
             Retry
           </button>
@@ -638,19 +638,19 @@ export const PrivacyNotices: React.FC = () => {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold text-myslt-text-primary flex items-center">
-              <FileText className="h-5 w-5 mr-2 text-myslt-primary" />
+            <h2 className="text-lg font-semibold text-slate-900 flex items-center">
+              <FileText className="h-5 w-5 mr-2 text-blue-600" />
               Privacy Notices Management
             </h2>
-            <p className="text-sm text-myslt-text-secondary mt-1">
+            <p className="text-sm text-slate-600 mt-1">
               Showing <span className="font-medium">{filters.status === 'active' ? 'Active' : filters.status === 'archived' ? 'Archived (Deleted)' : filters.status || 'All'}</span> notices. 
-              {filters.status === 'active' && <span className="text-myslt-text-muted"> Deleted notices are archived and hidden.</span>}
+              {filters.status === 'active' && <span className="text-slate-500"> Deleted notices are archived and hidden.</span>}
             </p>
           </div>
           <div className="flex space-x-2">
             <button
               onClick={() => setShowForm(true)}
-              className="bg-myslt-primary text-white px-4 py-2 rounded-md hover:bg-myslt-primary-dark transition-colors flex items-center gap-2"
+              className="bg-white text-white px-4 py-2 rounded-md hover:bg-slate-900 transition-colors flex items-center gap-2"
             >
               <Plus className="h-4 w-4" />
               Create Notice
@@ -757,7 +757,7 @@ export const PrivacyNotices: React.FC = () => {
       {/* Notices Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {notices.map((notice) => (
-          <div key={notice.id} className="bg-myslt-card border border-myslt-accent/20 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={notice.id} className="bg-white border border-slate-200 rounded-xl shadow-sm border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 {getStatusIcon(notice.status)}
@@ -786,24 +786,24 @@ export const PrivacyNotices: React.FC = () => {
               </div>
             </div>
 
-            <h3 className="text-lg font-medium text-myslt-text-primary mb-2 line-clamp-2">
+            <h3 className="text-lg font-medium text-slate-900 mb-2 line-clamp-2">
               {notice.title}
             </h3>
 
-            <div className="space-y-2 mb-4 text-sm text-myslt-text-secondary">
+            <div className="space-y-2 mb-4 text-sm text-slate-600">
               <div className="flex items-center space-x-2">
-                <FileText className="h-4 w-4 text-myslt-text-muted" />
+                <FileText className="h-4 w-4 text-slate-500" />
                 <span>{notice.category}</span>
-                <span className="text-xs bg-myslt-accent/20 text-myslt-text-primary px-2 py-1 rounded">{notice.language}</span>
+                <span className="text-xs bg-blue-50/20 text-slate-900 px-2 py-1 rounded">{notice.language}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4 text-myslt-text-muted" />
+                <Calendar className="h-4 w-4 text-slate-500" />
                 <span>
                   Effective: {new Date(notice.effectiveDate).toLocaleDateString()}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4 text-myslt-text-muted" />
+                <Users className="h-4 w-4 text-slate-500" />
                 <span>{notice.acknowledgments.length} acknowledgments</span>
               </div>
             </div>
@@ -817,7 +817,7 @@ export const PrivacyNotices: React.FC = () => {
             <div className="flex space-x-2">
               <button
                 onClick={() => setViewingNotice(notice)}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-myslt-card hover:bg-myslt-service-card transition-colors"
+                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-white border border-slate-200 transition-colors"
               >
                 <Eye className="h-4 w-4 mr-2" />
                 View
@@ -828,12 +828,12 @@ export const PrivacyNotices: React.FC = () => {
       </div>
 
       {notices.length === 0 && !loading && (
-        <div className="text-center py-12 bg-myslt-card rounded-lg">
+        <div className="text-center py-12 bg-white border border-slate-200 rounded-xl shadow-sm rounded-lg">
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500 mb-4">No privacy notices found.</p>
           <button
             onClick={() => setShowForm(true)}
-            className="bg-myslt-primary text-white px-4 py-2 rounded-md hover:bg-myslt-primary-dark transition-colors"
+            className="bg-white text-white px-4 py-2 rounded-md hover:bg-slate-900 transition-colors"
           >
             Create your first notice
           </button>

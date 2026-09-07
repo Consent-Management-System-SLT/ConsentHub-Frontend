@@ -160,7 +160,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       label: t('customerDashboard.overview.communicationChannels'),
       value: String(dashboardData?.data?.communicationChannels?.total || dashboardData?.communicationChannels?.total || 0),
       icon: <Settings className="w-6 h-6" />,
-      color: 'text-myslt-primary bg-myslt-service-card border-myslt-primary/30',
+      color: 'text-blue-600 bg-white border border-slate-200 border-blue-600/30',
       trend: (dashboardData?.data?.communicationChannels?.channels || dashboardData?.communicationChannels?.channels || []).join(', ') || 'None configured'
     },
     {
@@ -186,8 +186,8 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
     timestamp: activity.date || new Date(activity.timestamp).toLocaleDateString(),
     type: activity.type,
     icon: activity.type === 'consent_granted' ? <CheckCircle className="w-4 h-4 text-green-600" /> :
-          activity.type === 'profile_updated' ? <User className="w-4 h-4 text-myslt-primary" /> :
-          activity.type === 'preferences_updated' ? <Settings className="w-4 h-4 text-myslt-primary" /> :
+          activity.type === 'profile_updated' ? <User className="w-4 h-4 text-blue-600" /> :
+          activity.type === 'preferences_updated' ? <Settings className="w-4 h-4 text-blue-600" /> :
           activity.type === 'privacy_notice_acknowledged' ? <FileText className="w-4 h-4 text-purple-600" /> :
           <Download className="w-4 h-4 text-orange-600" />
   })) || [
@@ -203,7 +203,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       action: t('customerDashboard.overview.activities.updatedPreferences'),
       timestamp: t('customerDashboard.overview.timestamps.daysAgo', { count: 1 }),
       type: 'preference',
-      icon: <Settings className="w-4 h-4 text-myslt-primary" />
+      icon: <Settings className="w-4 h-4 text-blue-600" />
     },
     {
       id: 3,
@@ -225,30 +225,30 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
     {
       title: t('customerDashboard.overview.actions.manageConsents'),
       description: t('customerDashboard.overview.actions.manageConsentsDesc'),
-      icon: <Shield className="w-8 h-8 text-myslt-primary" />,
+      icon: <Shield className="w-8 h-8 text-blue-600" />,
       action: 'consent-center',
-      color: 'bg-myslt-service-card hover:bg-myslt-card-gradient border-myslt-primary/30'
+      color: 'bg-white border border-slate-200 hover:bg-white border-blue-600/30'
     },
     {
       title: t('customerDashboard.overview.actions.communicationPrefs'),
       description: t('customerDashboard.overview.actions.communicationPrefsDesc'),
-      icon: <Settings className="w-8 h-8 text-myslt-success" />,
+      icon: <Settings className="w-8 h-8 text-green-600" />,
       action: 'preferences',
-      color: 'bg-myslt-service-card hover:bg-myslt-card-gradient border-myslt-success/30'
+      color: 'bg-white border border-slate-200 hover:bg-white border-green-200/30'
     },
     {
       title: t('customerDashboard.overview.actions.privacyNotices'),
       description: t('customerDashboard.overview.actions.privacyNoticesDesc'),
-      icon: <FileText className="w-8 h-8 text-myslt-accent" />,
+      icon: <FileText className="w-8 h-8 text-blue-600" />,
       action: 'privacy-notices',
-      color: 'bg-myslt-service-card hover:bg-myslt-card-gradient border-myslt-accent/30'
+      color: 'bg-white border border-slate-200 hover:bg-white border-slate-200'
     },
     {
       title: t('customerDashboard.overview.actions.requestData'),
       description: t('customerDashboard.overview.actions.requestDataDesc'),
-      icon: <Download className="w-8 h-8 text-myslt-text-accent" />,
+      icon: <Download className="w-8 h-8 text-blue-600" />,
       action: 'dsar-requests',
-      color: 'bg-myslt-service-card hover:bg-myslt-card-gradient border-myslt-text-accent/30'
+      color: 'bg-white border border-slate-200 hover:bg-white border-text-slate-500-accent/30'
     }
   ];
 
@@ -260,19 +260,19 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       description: `Version ${privacyStatus?.version || '2.1'} - Current`,
       status: privacyStatus?.privacyPolicyAccepted ? 'Active' : 'Pending',
       icon: privacyStatus?.privacyPolicyAccepted 
-        ? <CheckCircle className="w-5 h-5 text-myslt-success mt-0.5 flex-shrink-0" />
+        ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
         : <Clock className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />,
-      bgColor: 'bg-myslt-service-card',
+      bgColor: 'bg-white border border-slate-200',
       borderColor: privacyStatus?.privacyPolicyAccepted 
-        ? 'border-myslt-success/30' 
+        ? 'border-green-200/30' 
         : 'border-yellow-300/30',
-      textColor: 'text-myslt-text-primary',
-      descColor: 'text-myslt-text-secondary',
+      textColor: 'text-slate-900',
+      descColor: 'text-slate-600',
       statusBg: privacyStatus?.privacyPolicyAccepted 
-        ? 'bg-myslt-success/10' 
+        ? 'bg-green-50' 
         : 'bg-yellow-100/50',
       statusText: privacyStatus?.privacyPolicyAccepted 
-        ? 'text-myslt-success' 
+        ? 'text-green-600' 
         : 'text-yellow-600'
     },
     {
@@ -281,19 +281,19 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       description: `Last updated ${privacyStatus?.communicationLastUpdated || '1 day ago'}`,
       status: privacyStatus?.communicationPrefsConfigured ? 'Configured' : 'Not Configured',
       icon: privacyStatus?.communicationPrefsConfigured 
-        ? <Settings className="w-5 h-5 text-myslt-primary mt-0.5 flex-shrink-0" />
+        ? <Settings className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
         : <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />,
-      bgColor: 'bg-myslt-service-card',
+      bgColor: 'bg-white border border-slate-200',
       borderColor: privacyStatus?.communicationPrefsConfigured 
-        ? 'border-myslt-primary/30'
+        ? 'border-blue-600/30'
         : 'border-yellow-300/30',
-      textColor: 'text-myslt-text-primary',
-      descColor: 'text-myslt-text-secondary',
+      textColor: 'text-slate-900',
+      descColor: 'text-slate-600',
       statusBg: privacyStatus?.communicationPrefsConfigured 
-        ? 'bg-myslt-primary/10'
+        ? 'bg-white/10'
         : 'bg-yellow-100/50',
       statusText: privacyStatus?.communicationPrefsConfigured 
-        ? 'text-myslt-primary'
+        ? 'text-blue-600'
         : 'text-yellow-600'
     },
     {
@@ -304,12 +304,12 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       icon: privacyStatus?.dsarProcessingStatus === 'Processing' 
         ? <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
         : privacyStatus?.dsarProcessingStatus === 'Completed'
-        ? <CheckCircle className="w-5 h-5 text-myslt-success mt-0.5 flex-shrink-0" />
+        ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
         : <XCircle className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />,
-      bgColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'bg-yellow-50' : 'bg-myslt-service-card',
+      bgColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'bg-yellow-50' : 'bg-white border border-slate-200',
       borderColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'border-yellow-200' : 'border-gray-200',
-      textColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-900' : 'text-myslt-text-primary',
-      descColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-700' : 'text-myslt-text-secondary',
+      textColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-900' : 'text-slate-900',
+      descColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-700' : 'text-slate-600',
       statusBg: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'bg-yellow-100' : 'bg-gray-100',
       statusText: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-600' : 'text-gray-600'
     }
@@ -323,17 +323,17 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       )}
       
       {/* Welcome Section - SLT Mobitel Style */}
-      <div className="bg-gradient-to-r from-myslt-primary via-myslt-secondary to-myslt-primary-dark rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 text-white myslt-card-glow">
+      <div className="bg-gradient-to-r from-myslt-primary via-myslt-secondary to-myslt-primary-dark rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 text-white shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-white truncate">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-slate-900 truncate">
               {t('customerDashboard.overview.welcomeBack', { name: currentCustomerName })}!
             </h1>
-            <p className="text-blue-100 text-sm sm:text-base lg:text-lg">
+            <p className="text-slate-600 text-sm sm:text-base lg:text-lg">
               {t('customerDashboard.overview.welcomeDesc')}
             </p>
             {dashboardData?.customer?.lastLogin && (
-              <p className="text-blue-200 text-xs sm:text-sm mt-2">
+              <p className="text-slate-500 text-xs sm:text-sm mt-2">
                 Last login: {new Date(dashboardData.customer.lastLogin).toLocaleString()}
               </p>
             )}
@@ -342,13 +342,13 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
             <button
               onClick={loadDashboardData}
               disabled={isLoading}
-              className="bg-myslt-success hover:bg-myslt-success/90 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-xl text-sm sm:text-base"
+              className="bg-green-600 hover:bg-green-600/90 text-whitepx-3 sm:px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-xl text-sm sm:text-base"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
             <div className="flex-shrink-0 sm:hidden lg:block">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-myslt-accent bg-opacity-30 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-blue-50 rounded-full flex items-center justify-center">
                 <Shield className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
               </div>
             </div>
@@ -356,40 +356,40 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
         </div>
         
         <div className="mt-4 sm:mt-6 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-          <div className="bg-myslt-accent bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
+          <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-green-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.granted}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">{t('customerDashboard.overview.activeConsents')}</p>
+            <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.activeConsents')}</p>
           </div>
-          <div className="bg-myslt-accent bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
+          <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <XCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-red-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.revoked}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">{t('customerDashboard.overview.revoked')}</p>
+            <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.revoked')}</p>
           </div>
-          <div className="bg-myslt-accent bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
+          <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <Clock className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-yellow-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.expired}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">{t('customerDashboard.overview.expired')}</p>
+            <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.expired')}</p>
           </div>
-          <div className="bg-myslt-accent bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
+          <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-orange-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.pending}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-100 font-medium leading-tight">{t('customerDashboard.overview.pendingReview')}</p>
+            <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.pendingReview')}</p>
           </div>
         </div>
       </div>
 
       {/* Latest Consent Update */}
       {isLoading ? (
-        <div className="bg-myslt-card rounded-lg sm:rounded-xl border border-myslt-accent/20 p-4 sm:p-6 shadow-sm animate-pulse">
+        <div className="bg-white border border-slate-200 rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6 shadow-sm animate-pulse">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0 p-2 rounded-lg bg-gray-200 w-9 h-9"></div>
@@ -407,15 +407,15 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
           </div>
         </div>
       ) : latestConsent ? (
-        <div className="bg-myslt-card rounded-lg sm:rounded-xl border border-myslt-accent/20 p-4 sm:p-6 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-xl border border-slate-200 shadow-sm p-4 sm:p-6 shadow-sm">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0 p-2 rounded-lg bg-myslt-accent/10">
-                <Bell className="w-5 h-5 text-myslt-accent" />
+              <div className="flex-shrink-0 p-2 rounded-lg bg-blue-50/10">
+                <Bell className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-myslt-text-primary">Latest Consent Update</h3>
-                <p className="text-sm text-myslt-text-secondary">
+                <h3 className="text-lg font-semibold text-slate-900">Latest Consent Update</h3>
+                <p className="text-sm text-slate-600">
                   {(() => {
                     const latestAction = getLatestConsentAction(latestConsent);
                     if (latestAction) {
@@ -438,7 +438,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-2 text-xs text-myslt-text-muted">
+            <div className="flex items-center space-x-2 text-xs text-slate-500">
               <Calendar className="w-4 h-4" />
               <span>
                 {(() => {
@@ -452,7 +452,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
             </div>
           </div>
           
-          <div className="bg-myslt-accent/5 rounded-lg p-4 border border-myslt-accent/10">
+          <div className="bg-blue-50/5 rounded-lg p-4 border border-slate-200/10">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-2">
@@ -482,10 +482,10 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                   </span>
                 </div>
                 
-                <h4 className="font-medium text-myslt-text-primary mb-1">{latestConsent.purpose}</h4>
-                <p className="text-sm text-myslt-text-secondary mb-2">{latestConsent.description}</p>
+                <h4 className="font-medium text-slate-900 mb-1">{latestConsent.purpose}</h4>
+                <p className="text-sm text-slate-600 mb-2">{latestConsent.description}</p>
                 
-                <div className="flex items-center space-x-4 text-xs text-myslt-text-muted">
+                <div className="flex items-center space-x-4 text-xs text-slate-500">
                   <span>Category: {latestConsent.dataCategory}</span>
                   {latestConsent.grantedAt && (
                     <span className={latestConsent.status === 'granted' ? 'font-medium text-green-600' : ''}>
@@ -505,7 +505,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
               
               <button
                 onClick={() => onNavigate && onNavigate('consent-center')}
-                className="ml-4 px-3 py-1.5 text-xs font-medium text-myslt-accent bg-myslt-accent/10 hover:bg-myslt-accent/20 rounded-lg transition-colors"
+                className="ml-4 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50/10 hover:bg-blue-50/20 rounded-lg transition-colors"
               >
                 Manage
               </button>
@@ -517,11 +517,11 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {quickStats.map((stat) => (
-          <div key={stat.label} className="bg-myslt-card rounded-lg sm:rounded-xl border border-myslt-accent/20 p-3 sm:p-4 lg:p-6 hover:shadow-md transition-shadow">
+          <div key={stat.label} className="bg-white border border-slate-200 rounded-xl border border-slate-200 shadow-sm p-3 sm:p-4 lg:p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0 pr-2">
                 <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2 line-clamp-2">{stat.label}</p>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-myslt-text-primary mb-1">{stat.value}</p>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mb-1">{stat.value}</p>
                 {stat.trend && (
                   <p className="text-xs text-gray-500 line-clamp-2">{stat.trend}</p>
                 )}
@@ -536,12 +536,12 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-myslt-text-primary mb-3 sm:mb-4 lg:mb-6">Quick Actions</h2>
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 mb-3 sm:mb-4 lg:mb-6">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {quickActions.map((action) => (
             <button
               key={action.action}
-              className={`p-3 sm:p-4 lg:p-6 rounded-lg sm:rounded-xl border-2 transition-all duration-200 text-left hover:shadow-lg hover:transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-myslt-primary/50 myslt-card-hover-effect ${action.color}`}
+              className={`p-3 sm:p-4 lg:p-6 rounded-lg sm:rounded-xl border-2 transition-all duration-200 text-left hover:shadow-lg hover:transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-myslt-primary/50 hover:shadow-md hover:-translate-y-0.5 transition-all ${action.color}`}
               onClick={() => {
                 if (onNavigate) {
                   onNavigate(action.action);
@@ -554,9 +554,9 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                 <div className="flex-shrink-0 mt-1">
                   {action.icon}
                 </div>
-                <h3 className="font-semibold text-myslt-text-primary text-sm sm:text-base line-clamp-2">{action.title}</h3>
+                <h3 className="font-semibold text-slate-900 text-sm sm:text-base line-clamp-2">{action.title}</h3>
               </div>
-              <p className="text-xs sm:text-sm text-myslt-text-secondary leading-relaxed line-clamp-3">{action.description}</p>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3">{action.description}</p>
             </button>
           ))}
         </div>
@@ -565,24 +565,24 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       {/* Recent Activity & Current Status */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         {/* Recent Activity */}
-        <div className="bg-myslt-card rounded-lg sm:rounded-xl border border-myslt-accent/20 p-3 sm:p-4 lg:p-6">
+        <div className="bg-white border border-slate-200 rounded-xl border border-slate-200 shadow-sm p-3 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4 lg:mb-6">
-            <h3 className="text-base sm:text-lg font-semibold text-myslt-text-primary">Recent Activity</h3>
-            <button className="text-xs sm:text-sm text-myslt-success hover:text-myslt-success/80 font-medium">
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900">Recent Activity</h3>
+            <button className="text-xs sm:text-sm text-green-600 hover:text-green-600/80 font-medium">
               View All
             </button>
           </div>
           <div className="space-y-2 sm:space-y-3 lg:space-y-4">
             {recentActivity.map((activity, index) => (
-              <div key={activity.id || `activity-${index}`} className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg hover:bg-myslt-accent/10 transition-colors">
+              <div key={activity.id || `activity-${index}`} className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg hover:bg-blue-50/10 transition-colors">
                 <div className="flex-shrink-0 mt-1">
                   {'icon' in activity && activity.icon ? 
                     activity.icon : 
-                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-myslt-primary"></div>
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-white"></div>
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-myslt-text-primary leading-relaxed line-clamp-2">{activity.action}</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-900 leading-relaxed line-clamp-2">{activity.action}</p>
                   <p className="text-xs text-gray-500 mt-1">{activity.timestamp}</p>
                 </div>
               </div>
@@ -591,8 +591,8 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
         </div>
 
         {/* Current Status */}
-        <div className="bg-myslt-card rounded-lg sm:rounded-xl border border-myslt-accent/20 p-3 sm:p-4 lg:p-6">
-          <h3 className="text-base sm:text-lg font-semibold text-myslt-text-primary mb-3 sm:mb-4 lg:mb-6">Privacy Status</h3>
+        <div className="bg-white border border-slate-200 rounded-xl border border-slate-200 shadow-sm p-3 sm:p-4 lg:p-6">
+          <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-3 sm:mb-4 lg:mb-6">Privacy Status</h3>
           <div className="space-y-2 sm:space-y-3 lg:space-y-4">
             {privacyStatusItems.map((item) => (
               <div key={item.id} className={`flex items-center justify-between p-2 sm:p-3 lg:p-4 ${item.bgColor} rounded-lg border ${item.borderColor}`}>

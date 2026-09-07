@@ -331,15 +331,15 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
   };
 
   return (
-    <div className={`bg-myslt-card rounded-xl shadow-lg border border-myslt-accent/20 ${className}`}>
+    <div className={`bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-lg border border-slate-200 ${className}`}>
       {/* Header */}
-      <div className="border-b border-myslt-accent/20 p-6">
+      <div className="border-b border-slate-200 p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Shield className="w-6 h-6 text-myslt-accent mr-3" />
+            <Shield className="w-6 h-6 text-blue-600 mr-3" />
             <div>
-              <h2 className="text-2xl font-bold text-myslt-text-primary">Consent Management</h2>
-              <p className="text-sm text-myslt-text-secondary mt-1">
+              <h2 className="text-2xl font-bold text-slate-900">Consent Management</h2>
+              <p className="text-sm text-slate-600 mt-1">
                 Search customers and manage their consent records
               </p>
             </div>
@@ -347,7 +347,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
           <div className="flex items-center space-x-2">
             <button
               onClick={() => { loadCustomers(); loadAllConsents(); }}
-              className="px-4 py-2 bg-myslt-accent/10 text-myslt-accent rounded-lg hover:bg-myslt-accent/20 transition-colors flex items-center"
+              className="px-4 py-2 bg-blue-50/10 text-blue-600 rounded-lg hover:bg-blue-50/20 transition-colors flex items-center"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
@@ -359,28 +359,28 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
       <div className="p-6">
         {/* Customer Search Section */}
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Search Customer</h3>
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Search Customer</h3>
           
           <div className="grid md:grid-cols-2 gap-4 mb-4">
             {/* Search Input */}
             <div className="relative">
-              <Search className="absolute left-3 top-3 w-5 h-5 text-myslt-text-secondary" />
+              <Search className="absolute left-3 top-3 w-5 h-5 text-slate-600" />
               <input
                 type="text"
                 placeholder="Search by name, email, or phone..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-accent focus:border-transparent bg-myslt-background"
+                className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-accent focus:border-transparent bg-slate-50"
               />
             </div>
 
             {/* Customer Selection */}
             <div className="relative">
-              <User className="absolute left-3 top-3 w-5 h-5 text-myslt-text-secondary" />
+              <User className="absolute left-3 top-3 w-5 h-5 text-slate-600" />
               <select
                 value={selectedCustomer}
                 onChange={(e) => setSelectedCustomer(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-accent focus:border-transparent bg-myslt-background appearance-none"
+                className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-accent focus:border-transparent bg-slate-50 appearance-none"
               >
                 <option value="">Select a customer...</option>
                 {filteredCustomers.map(customer => (
@@ -389,22 +389,22 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-myslt-text-secondary pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-slate-600 pointer-events-none" />
             </div>
           </div>
 
           {/* Selected Customer Info */}
           {selectedCustomerInfo && (
-            <div className="bg-myslt-background rounded-lg p-4 border border-myslt-accent/20">
+            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <User className="w-5 h-5 text-myslt-accent mr-3" />
+                  <User className="w-5 h-5 text-blue-600 mr-3" />
                   <div>
-                    <h4 className="font-semibold text-myslt-text-primary">{selectedCustomerInfo.name}</h4>
-                    <p className="text-sm text-myslt-text-secondary">{selectedCustomerInfo.email}</p>
+                    <h4 className="font-semibold text-slate-900">{selectedCustomerInfo.name}</h4>
+                    <p className="text-sm text-slate-600">{selectedCustomerInfo.email}</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4 text-sm text-myslt-text-secondary">
+                <div className="flex items-center space-x-4 text-sm text-slate-600">
                   <span>Phone: {selectedCustomerInfo.phone}</span>
                   <span>Customer Since: {new Date(selectedCustomerInfo.createdAt).toLocaleDateString()}</span>
                   <span className="flex items-center">
@@ -422,15 +422,15 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
           <>
             {/* Filters */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Customer Consents</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Customer Consents</h3>
               
               <div className="flex flex-wrap gap-4">
                 <div className="flex items-center">
-                  <Filter className="w-4 h-4 text-myslt-text-secondary mr-2" />
+                  <Filter className="w-4 h-4 text-slate-600 mr-2" />
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="px-3 py-2 border border-myslt-accent/30 rounded-lg bg-myslt-background text-sm"
+                    className="px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"
                   >
                     <option value="all">All Status</option>
                     <option value="granted">Granted</option>
@@ -439,11 +439,11 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                 </div>
 
                 <div className="flex items-center">
-                  <FileText className="w-4 h-4 text-myslt-text-secondary mr-2" />
+                  <FileText className="w-4 h-4 text-slate-600 mr-2" />
                   <select
                     value={purposeFilter}
                     onChange={(e) => setPurposeFilter(e.target.value)}
-                    className="px-3 py-2 border border-myslt-accent/30 rounded-lg bg-myslt-background text-sm"
+                    className="px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"
                   >
                     <option value="all">All Purposes</option>
                     <option value="marketing">Marketing Communications</option>
@@ -458,7 +458,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
 
                 <button
                   onClick={() => setShowHistory(!showHistory)}
-                  className="px-4 py-2 bg-myslt-accent/10 text-myslt-accent rounded-lg hover:bg-myslt-accent/20 transition-colors flex items-center text-sm"
+                  className="px-4 py-2 bg-blue-50/10 text-blue-600 rounded-lg hover:bg-blue-50/20 transition-colors flex items-center text-sm"
                 >
                   <History className="w-4 h-4 mr-2" />
                   {showHistory ? 'Hide History' : 'Show History'}
@@ -469,14 +469,14 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
             {/* Consents List */}
             {loading ? (
               <div className="text-center py-8">
-                <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-myslt-accent" />
-                <p className="text-myslt-text-secondary">Loading consents...</p>
+                <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-blue-600" />
+                <p className="text-slate-600">Loading consents...</p>
               </div>
             ) : filteredConsents.length === 0 ? (
               <div className="text-center py-8">
-                <Shield className="w-12 h-12 mx-auto mb-4 text-myslt-text-muted" />
-                <h3 className="text-lg font-semibold text-myslt-text-secondary mb-2">No Consents Found</h3>
-                <p className="text-myslt-text-muted">
+                <Shield className="w-12 h-12 mx-auto mb-4 text-slate-500" />
+                <h3 className="text-lg font-semibold text-slate-600 mb-2">No Consents Found</h3>
+                <p className="text-slate-500">
                   {selectedCustomer ? 'This customer has no consent records matching your filters.' : 'Select a customer to view their consents.'}
                 </p>
               </div>
@@ -485,7 +485,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                 {filteredConsents.map(consent => (
                   <div 
                     key={consent.id}
-                    className="border border-myslt-accent/20 rounded-lg bg-myslt-background hover:shadow-md transition-shadow"
+                    className="border border-slate-200 rounded-lg bg-slate-50 hover:shadow-md transition-shadow"
                   >
                     {/* Consent Header */}
                     <div className="p-4">
@@ -493,8 +493,8 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                         <div className="flex items-center space-x-3">
                           {getConsentTypeIcon(consent.purpose)}
                           <div>
-                            <h4 className="font-semibold text-myslt-text-primary">{formatPurposeName(consent.purpose)}</h4>
-                            <p className="text-sm text-myslt-text-secondary">{consent.description || generateDescription(consent.purpose)}</p>
+                            <h4 className="font-semibold text-slate-900">{formatPurposeName(consent.purpose)}</h4>
+                            <p className="text-sm text-slate-600">{consent.description || generateDescription(consent.purpose)}</p>
                           </div>
                         </div>
                         
@@ -503,7 +503,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                           
                           <button
                             onClick={() => setExpandedConsent(expandedConsent === consent.id ? null : consent.id)}
-                            className="p-2 rounded-lg hover:bg-myslt-accent/10 text-myslt-text-secondary hover:text-myslt-accent transition-colors"
+                            className="p-2 rounded-lg hover:bg-blue-50/10 text-slate-600 hover:text-blue-600 transition-colors"
                           >
                             {expandedConsent === consent.id ? 
                               <ChevronUp className="w-4 h-4" /> : 
@@ -514,7 +514,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                       </div>
 
                       {/* Quick Info */}
-                      <div className="mt-3 flex items-center space-x-6 text-sm text-myslt-text-secondary">
+                      <div className="mt-3 flex items-center space-x-6 text-sm text-slate-600">
                         <span className="flex items-center">
                           <Calendar className="w-4 h-4 mr-1" />
                           {consent.grantedAt ? `Granted: ${new Date(consent.grantedAt).toLocaleDateString()}` : 
@@ -528,32 +528,32 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
 
                     {/* Expanded Details */}
                     {expandedConsent === consent.id && (
-                      <div className="border-t border-myslt-accent/20 p-4 bg-myslt-card/50">
+                      <div className="border-t border-slate-200 p-4 bg-white border border-slate-200 rounded-xl shadow-sm/50">
                         <div className="grid md:grid-cols-2 gap-6">
                           {/* Consent Details */}
                           <div>
-                            <h5 className="font-semibold text-myslt-text-primary mb-3">Consent Details</h5>
+                            <h5 className="font-semibold text-slate-900 mb-3">Consent Details</h5>
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between">
-                                <span className="text-myslt-text-secondary">Type:</span>
-                                <span className="text-myslt-text-primary">{consent.type}</span>
+                                <span className="text-slate-600">Type:</span>
+                                <span className="text-slate-900">{consent.type}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-myslt-text-secondary">Category:</span>
-                                <span className="text-myslt-text-primary">{consent.category || 'General'}</span>
+                                <span className="text-slate-600">Category:</span>
+                                <span className="text-slate-900">{consent.category || 'General'}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-myslt-text-secondary">Lawful Basis:</span>
-                                <span className="text-myslt-text-primary">{consent.lawfulBasis}</span>
+                                <span className="text-slate-600">Lawful Basis:</span>
+                                <span className="text-slate-900">{consent.lawfulBasis}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-myslt-text-secondary">Source:</span>
-                                <span className="text-myslt-text-primary">{consent.source}</span>
+                                <span className="text-slate-600">Source:</span>
+                                <span className="text-slate-900">{consent.source}</span>
                               </div>
                               {consent.expiresAt && (
                                 <div className="flex justify-between">
-                                  <span className="text-myslt-text-secondary">Expires:</span>
-                                  <span className="text-myslt-text-primary">{new Date(consent.expiresAt).toLocaleDateString()}</span>
+                                  <span className="text-slate-600">Expires:</span>
+                                  <span className="text-slate-900">{new Date(consent.expiresAt).toLocaleDateString()}</span>
                                 </div>
                               )}
                             </div>
@@ -561,7 +561,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
 
                           {/* Update Actions */}
                           <div>
-                            <h5 className="font-semibold text-myslt-text-primary mb-3">Update Consent</h5>
+                            <h5 className="font-semibold text-slate-900 mb-3">Update Consent</h5>
                             
                             {editingConsent === consent.id ? (
                               <div className="space-y-3">
@@ -569,7 +569,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                                   placeholder="Add notes for this update..."
                                   value={updateNotes[consent.id] || ''}
                                   onChange={(e) => setUpdateNotes(prev => ({ ...prev, [consent.id]: e.target.value }))}
-                                  className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg bg-myslt-background text-sm"
+                                  className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"
                                   rows={3}
                                 />
                                 
@@ -593,7 +593,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                                 
                                 <button
                                   onClick={() => setEditingConsent(null)}
-                                  className="w-full px-3 py-2 bg-myslt-accent/10 text-myslt-accent rounded-lg hover:bg-myslt-accent/20 transition-colors text-sm"
+                                  className="w-full px-3 py-2 bg-blue-50/10 text-blue-600 rounded-lg hover:bg-blue-50/20 transition-colors text-sm"
                                 >
                                   Cancel
                                 </button>
@@ -601,7 +601,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                             ) : (
                               <button
                                 onClick={() => setEditingConsent(consent.id)}
-                                className="w-full px-4 py-2 bg-myslt-accent text-white rounded-lg hover:bg-myslt-accent/90 transition-colors flex items-center justify-center"
+                                className="w-full px-4 py-2 bg-blue-50 text-white rounded-lg hover:bg-blue-50/90 transition-colors flex items-center justify-center"
                               >
                                 <Edit className="w-4 h-4 mr-2" />
                                 Update Consent

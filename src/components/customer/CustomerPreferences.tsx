@@ -331,7 +331,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
 
   // Helper functions for dynamic rendering
   const getChannelIcon = (iconName: string) => {
-    const iconProps = { className: "w-5 h-5 text-myslt-primary" };
+    const iconProps = { className: "w-5 h-5 text-blue-600" };
     switch (iconName) {
       case 'Mail':
         return <Mail {...iconProps} />;
@@ -603,15 +603,15 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
     label: string; 
     description?: string; 
   }) => (
-    <div className="flex items-center justify-between py-4 border-b border-myslt-accent/10 last:border-b-0">
+    <div className="flex items-center justify-between py-4 border-b border-slate-200/10 last:border-b-0">
       <div className="flex-1">
-        <label className="text-sm font-medium text-myslt-text-primary">{label}</label>
-        {description && <p className="text-xs text-myslt-text-muted mt-1">{description}</p>}
+        <label className="text-sm font-medium text-slate-900">{label}</label>
+        {description && <p className="text-xs text-slate-500 mt-1">{description}</p>}
       </div>
       <button
         onClick={() => onChange(!enabled)}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-myslt-primary focus:ring-offset-2 ${
-          enabled ? 'bg-myslt-primary' : 'bg-gray-200'
+          enabled ? 'bg-white' : 'bg-gray-200'
         }`}
       >
         <span
@@ -629,8 +629,8 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-myslt-primary border-t-transparent mx-auto mb-4"></div>
-            <p className="text-myslt-text-muted">Loading your preferences...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto mb-4"></div>
+            <p className="text-slate-500">Loading your preferences...</p>
           </div>
         </div>
       </div>
@@ -641,12 +641,12 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-myslt-text-primary">{t('preferences.title')}</h1>
-          <p className="text-myslt-text-muted mt-2">{t('preferences.description')}</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t('preferences.title')}</h1>
+          <p className="text-slate-500 mt-2">{t('preferences.description')}</p>
         </div>
         
         {saveStatus === 'success' && (
-          <div className="flex items-center space-x-2 px-4 py-2 bg-myslt-success/10 text-myslt-success rounded-lg border border-myslt-success/20">
+          <div className="flex items-center space-x-2 px-4 py-2 bg-green-50 text-green-600 rounded-lg border border-green-200">
             <CheckCircle className="w-4 h-4" />
             <span className="text-sm font-medium">{t('preferences.preferencesUpdated')}</span>
           </div>
@@ -662,15 +662,15 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Communication Channels */}
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20">
-          <div className="p-6 border-b border-myslt-accent/20">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200">
+          <div className="p-6 border-b border-slate-200">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-myslt-primary/10 rounded-lg flex items-center justify-center">
-                <Settings className="w-5 h-5 text-myslt-primary" />
+              <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                <Settings className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-myslt-text-primary">{t('preferences.categories.email')}</h2>
-                <p className="text-sm text-myslt-text-muted">Choose how you'd like to receive notifications</p>
+                <h2 className="text-lg font-semibold text-slate-900">{t('preferences.categories.email')}</h2>
+                <p className="text-sm text-slate-500">Choose how you'd like to receive notifications</p>
               </div>
             </div>
           </div>
@@ -680,15 +680,15 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
         </div>
 
         {/* Topic Subscriptions */}
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20">
-          <div className="p-6 border-b border-myslt-accent/20">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200">
+          <div className="p-6 border-b border-slate-200">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-myslt-success/10 rounded-lg flex items-center justify-center">
-                <Bell className="w-5 h-5 text-myslt-success" />
+              <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                <Bell className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-myslt-text-primary">Topic Subscriptions</h2>
-                <p className="text-sm text-myslt-text-muted">Select the types of communications you want to receive</p>
+                <h2 className="text-lg font-semibold text-slate-900">Topic Subscriptions</h2>
+                <p className="text-sm text-slate-500">Select the types of communications you want to receive</p>
               </div>
             </div>
           </div>
@@ -698,15 +698,15 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
         </div>
 
         {/* Do Not Disturb Settings */}
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20">
-          <div className="p-6 border-b border-myslt-accent/20">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200">
+          <div className="p-6 border-b border-slate-200">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                 {preferences.dndSettings.enabled ? <VolumeX className="w-5 h-5 text-purple-600" /> : <Volume2 className="w-5 h-5 text-purple-600" />}
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-myslt-text-primary">Do Not Disturb</h2>
-                <p className="text-sm text-myslt-text-muted">Set quiet hours for notifications</p>
+                <h2 className="text-lg font-semibold text-slate-900">Do Not Disturb</h2>
+                <p className="text-sm text-slate-500">Set quiet hours for notifications</p>
               </div>
             </div>
           </div>
@@ -719,23 +719,23 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
             />
             
             {preferences.dndSettings.enabled && (
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-myslt-accent/10">
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200/10">
                 <div>
-                  <label className="block text-sm font-medium text-myslt-text-primary mb-2">Start Time</label>
+                  <label className="block text-sm font-medium text-slate-900 mb-2">Start Time</label>
                   <input
                     type="time"
                     value={preferences.dndSettings.startTime}
                     onChange={(e) => updateDndSettings('startTime', e.target.value)}
-                    className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-myslt-service-card text-myslt-text-primary"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-white border border-slate-200 text-slate-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-myslt-text-primary mb-2">End Time</label>
+                  <label className="block text-sm font-medium text-slate-900 mb-2">End Time</label>
                   <input
                     type="time"
                     value={preferences.dndSettings.endTime}
                     onChange={(e) => updateDndSettings('endTime', e.target.value)}
-                    className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-myslt-service-card text-myslt-text-primary"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-white border border-slate-200 text-slate-900"
                   />
                 </div>
               </div>
@@ -744,25 +744,25 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
         </div>
 
         {/* Frequency Limits */}
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20">
-          <div className="p-6 border-b border-myslt-accent/20">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200">
+          <div className="p-6 border-b border-slate-200">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                 <Clock className="w-5 h-5 text-orange-600" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-myslt-text-primary">{t('preferences.frequencySettings.title')}</h2>
-                <p className="text-sm text-myslt-text-muted">{t('preferences.frequencySettings.description')}</p>
+                <h2 className="text-lg font-semibold text-slate-900">{t('preferences.frequencySettings.title')}</h2>
+                <p className="text-sm text-slate-500">{t('preferences.frequencySettings.description')}</p>
               </div>
             </div>
           </div>
           <div className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-myslt-text-primary mb-2">{t('preferences.frequencySettings.maxEmails')}</label>
+              <label className="block text-sm font-medium text-slate-900 mb-2">{t('preferences.frequencySettings.maxEmails')}</label>
               <select
                 value={preferences.frequency.maxEmailsPerDay}
                 onChange={(e) => updateFrequencySettings('maxEmailsPerDay', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-myslt-service-card text-myslt-text-primary"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-white border border-slate-200 text-slate-900"
               >
                 <option value={1}>1 email per day</option>
                 <option value={2}>2 emails per day</option>
@@ -774,11 +774,11 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-myslt-text-primary mb-2">{t('preferences.frequencySettings.maxSms')}</label>
+              <label className="block text-sm font-medium text-slate-900 mb-2">{t('preferences.frequencySettings.maxSms')}</label>
               <select
                 value={preferences.frequency.maxSmsPerDay}
                 onChange={(e) => updateFrequencySettings('maxSmsPerDay', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-myslt-service-card text-myslt-text-primary"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent bg-white border border-slate-200 text-slate-900"
               >
                 <option value={1}>1 SMS per day</option>
                 <option value={2}>2 SMS per day</option>
@@ -800,16 +800,16 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
 
       {/* Action Buttons */}
       {hasChanges && (
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
             <div>
-              <p className="text-sm font-medium text-myslt-text-primary">You have unsaved changes</p>
-              <p className="text-xs text-myslt-text-muted">Your preferences will be lost if you leave without saving</p>
+              <p className="text-sm font-medium text-slate-900">You have unsaved changes</p>
+              <p className="text-xs text-slate-500">Your preferences will be lost if you leave without saving</p>
             </div>
             <div className="flex space-x-3">
               <button
                 onClick={handleReset}
-                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-myslt-text-primary bg-myslt-service-card hover:bg-myslt-service-card/80 rounded-lg transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-900 bg-white border border-slate-200 hover:bg-white border border-slate-200/80 rounded-lg transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>{t('preferences.resetDefaults')}</span>
@@ -817,7 +817,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center space-x-2 px-6 py-2 text-sm font-medium text-white bg-myslt-primary hover:bg-myslt-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                className="flex items-center space-x-2 px-6 py-2 text-sm font-medium text-white bg-white hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
               >
                 <Save className="w-4 h-4" />
                 <span>{isSaving ? t('common.loading') : t('preferences.saveChanges')}</span>

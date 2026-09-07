@@ -855,7 +855,7 @@ const UserManagement: React.FC = () => {
       case 'guardian':
         return <UserCheck className="w-4 h-4 text-purple-600" />;
       default:
-        return <Users className="w-4 h-4 text-myslt-text-secondary" />;
+        return <Users className="w-4 h-4 text-slate-600" />;
     }
   };
 
@@ -864,26 +864,26 @@ const UserManagement: React.FC = () => {
       case 'admin':
         return 'bg-red-100 text-red-800';
       case 'csr':
-        return 'bg-myslt-success/10 text-myslt-success';
+        return 'bg-green-50 text-green-600';
       case 'customer':
         return 'bg-blue-100 text-blue-800';
       case 'guardian':
         return 'bg-purple-100 text-purple-800';
       default:
-        return 'bg-myslt-service-card text-myslt-text-primary';
+        return 'bg-white border border-slate-200 text-slate-900';
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-myslt-success/10 text-myslt-success';
+        return 'bg-green-50 text-green-600';
       case 'inactive':
-        return 'bg-myslt-service-card text-myslt-text-muted';
+        return 'bg-white border border-slate-200 text-slate-500';
       case 'suspended':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-myslt-service-card text-myslt-text-primary';
+        return 'bg-white border border-slate-200 text-slate-900';
     }
   };
 
@@ -911,8 +911,8 @@ const UserManagement: React.FC = () => {
     <div className="max-w-full mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-8">
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-myslt-text-primary truncate">User Management</h1>
-          <p className="text-myslt-text-secondary mt-1 sm:mt-2 text-sm sm:text-base">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 truncate">User Management</h1>
+          <p className="text-slate-600 mt-1 sm:mt-2 text-sm sm:text-base">
             Manage user accounts and permissions {totalCount > 0 && `(${totalCount} total users)`}
           </p>
         </div>
@@ -931,7 +931,7 @@ const UserManagement: React.FC = () => {
           <button 
             onClick={fetchUsers}
             disabled={loading}
-            className="px-3 sm:px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
+            className="px-3 sm:px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
             title={lastRefresh ? `Last updated: ${lastRefresh.toLocaleTimeString()}` : 'Click to refresh'}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -979,69 +979,69 @@ const UserManagement: React.FC = () => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
-        <div className="bg-myslt-card rounded-lg sm:rounded-xl shadow-sm border border-myslt-accent/20 p-3 sm:p-4 lg:p-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm shadow-sm border border-slate-200 p-3 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-myslt-text-secondary">Total Users</p>
-              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-myslt-success">{users.length}</p>
+              <p className="text-xs sm:text-sm font-medium text-slate-600">Total Users</p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600">{users.length}</p>
             </div>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-myslt-accent/20 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
-              <Users className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-myslt-success" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-blue-50/20 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-600" />
             </div>
           </div>
         </div>
         
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-myslt-text-secondary">Active Users</p>
-              <p className="text-2xl font-bold text-myslt-success">
+              <p className="text-sm font-medium text-slate-600">Active Users</p>
+              <p className="text-2xl font-bold text-green-600">
                 {users.filter(u => u.status === 'active').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
-              <UserCheck className="w-6 h-6 text-myslt-success" />
+            <div className="w-12 h-12 bg-blue-50/20 rounded-xl flex items-center justify-center">
+              <UserCheck className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
         
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-myslt-text-secondary">Admins</p>
-              <p className="text-2xl font-bold text-myslt-danger">
+              <p className="text-sm font-medium text-slate-600">Admins</p>
+              <p className="text-2xl font-bold text-red-600">
                 {users.filter(u => u.role === 'admin').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-myslt-danger" />
+            <div className="w-12 h-12 bg-blue-50/20 rounded-xl flex items-center justify-center">
+              <Shield className="w-6 h-6 text-red-600" />
             </div>
           </div>
         </div>
         
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-myslt-text-secondary">CSR Staff</p>
-              <p className="text-2xl font-bold text-myslt-primary">
+              <p className="text-sm font-medium text-slate-600">CSR Staff</p>
+              <p className="text-2xl font-bold text-blue-600">
                 {users.filter(u => u.role === 'csr').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-myslt-primary" />
+            <div className="w-12 h-12 bg-blue-50/20 rounded-xl flex items-center justify-center">
+              <Users className="w-6 h-6 text-blue-600" />
             </div>
           </div>
         </div>
         
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-myslt-text-secondary">Guardians</p>
+              <p className="text-sm font-medium text-slate-600">Guardians</p>
               <p className="text-2xl font-bold text-purple-600">
                 {users.filter(u => u.role === 'guardian').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-myslt-accent/20 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-blue-50/20 rounded-xl flex items-center justify-center">
               <UserCheck className="w-6 h-6 text-purple-600" />
             </div>
           </div>
@@ -1049,10 +1049,10 @@ const UserManagement: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6 mb-8">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-myslt-text-muted w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
             <input
               type="text"
               placeholder="Search users..."
@@ -1087,48 +1087,48 @@ const UserManagement: React.FC = () => {
 
       {/* Users Table */}
       {loading && users.length === 0 ? (
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-8">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-8">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-myslt-primary mx-auto mb-4"></div>
-            <p className="text-myslt-text-secondary">Loading users...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-slate-600">Loading users...</p>
           </div>
         </div>
       ) : error && users.length === 0 ? (
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-8">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-8">
           <div className="text-center">
             <div className="text-red-500 text-4xl mb-4">⚠️</div>
-            <h3 className="text-lg font-medium text-myslt-text-primary mb-2">Error Loading Users</h3>
-            <p className="text-myslt-text-secondary mb-4">{error}</p>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">Error Loading Users</h3>
+            <p className="text-slate-600 mb-4">{error}</p>
             <button
               onClick={fetchUsers}
-              className="px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors"
+              className="px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors"
             >
               Try Again
             </button>
           </div>
         </div>
       ) : (
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-myslt-background">
+              <thead className="bg-slate-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">User</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">User</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
                     Last Login
                     <span className="ml-1 text-xs text-green-600" title="Sorted by most recent login first">↓</span>
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Department</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-secondary uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Department</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-myslt-card divide-y divide-myslt-accent/20">
+              <tbody className="bg-white border border-slate-200 rounded-xl shadow-sm divide-y divide-myslt-accent/20">
                 {sortedUsers.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-8 text-center">
-                      <div className="text-myslt-text-secondary">
+                      <div className="text-slate-600">
                         {searchTerm || roleFilter !== 'all' || statusFilter !== 'all' 
                           ? 'No users found matching your search criteria.'
                           : 'No users found. Create your first user to get started.'
@@ -1138,17 +1138,17 @@ const UserManagement: React.FC = () => {
                   </tr>
                 ) : (
                   sortedUsers.map((user, index) => (
-                <tr key={`${user.id}-${user.email || 'no-email'}-${index}`} className="hover:bg-myslt-background">
+                <tr key={`${user.id}-${user.email || 'no-email'}-${index}`} className="hover:bg-slate-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-myslt-accent/20 rounded-full flex items-center justify-center">
-                        <Users className="w-5 h-5 text-myslt-text-primary" />
+                      <div className="w-10 h-10 bg-blue-50/20 rounded-full flex items-center justify-center">
+                        <Users className="w-5 h-5 text-slate-900" />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-myslt-text-primary">
+                        <div className="text-sm font-medium text-slate-900">
                           {(user.name && user.name !== 'undefined undefined') ? user.name : (user.email || 'Unknown User')}
                         </div>
-                        <div className="text-sm text-myslt-text-secondary">{user.email || 'No email'}</div>
+                        <div className="text-sm text-slate-600">{user.email || 'No email'}</div>
                         {user.phone && <div className="text-xs text-gray-400">{user.phone}</div>}
                       </div>
                     </div>
@@ -1172,7 +1172,7 @@ const UserManagement: React.FC = () => {
                       <option value="suspended">Suspended</option>
                     </select>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                     <div className="flex flex-col">
                       {user.hasNeverLoggedIn ? (
                         <>
@@ -1205,12 +1205,12 @@ const UserManagement: React.FC = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">{user.department || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{user.department || 'N/A'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-1">
                       <button 
                         onClick={() => handleEditUser(user)}
-                        className="text-myslt-primary hover:text-myslt-primary-dark p-2 hover:bg-myslt-service-card rounded transition-colors"
+                        className="text-blue-600 hover:text-blue-600-dark p-2 hover:bg-white border border-slate-200 rounded transition-colors"
                         title="Edit User"
                       >
                         <Edit className="w-4 h-4" />
@@ -1634,9 +1634,9 @@ const UserManagement: React.FC = () => {
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-25 z-50 flex items-center justify-center p-4">
-          <div className="bg-myslt-card rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-myslt-accent/20">
-              <h3 className="text-lg font-semibold text-myslt-text-primary">Edit User</h3>
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6 border-b border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900">Edit User</h3>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -1689,7 +1689,7 @@ const UserManagement: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="p-6 border-t border-myslt-border flex justify-end space-x-3">
+            <div className="p-6 border-t border-slate-200 flex justify-end space-x-3">
               <button
                 onClick={() => setShowEditModal(false)}
                 className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
@@ -1774,7 +1774,7 @@ const UserManagement: React.FC = () => {
           <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-myslt-text-primary">Edit Guardian</h2>
+                <h2 className="text-2xl font-bold text-slate-900">Edit Guardian</h2>
                 <button 
                   onClick={() => setIsEditModalOpen(false)}
                   className="text-gray-400 hover:text-gray-600 p-2"
@@ -1793,7 +1793,7 @@ const UserManagement: React.FC = () => {
 
               {/* Guardian Basic Information */}
               <div>
-                <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Guardian Information</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Guardian Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
@@ -1864,10 +1864,10 @@ const UserManagement: React.FC = () => {
               {/* Dependents Section */}
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-myslt-text-primary">Minor Dependents</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">Minor Dependents</h3>
                   <button
                     onClick={addDependentToEdit}
-                    className="flex items-center gap-2 bg-myslt-primary text-white px-4 py-2 rounded-lg hover:bg-myslt-primary-dark transition-colors"
+                    className="flex items-center gap-2 bg-white text-white px-4 py-2 rounded-lg hover:bg-slate-900 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Add Child
@@ -1943,7 +1943,7 @@ const UserManagement: React.FC = () => {
               <button
                 onClick={handleUpdateGuardian}
                 disabled={loading}
-                className="px-6 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                className="px-6 py-2 bg-white text-white rounded-lg hover:bg-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
               >
                 {loading ? (
                   <>

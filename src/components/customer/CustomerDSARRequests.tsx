@@ -257,9 +257,9 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="w-5 h-5 text-myslt-success" />;
+        return <CheckCircle className="w-5 h-5 text-green-600" />;
       case 'processing':
-        return <RefreshCw className="w-5 h-5 text-myslt-primary animate-spin" />;
+        return <RefreshCw className="w-5 h-5 text-blue-600 animate-spin" />;
       case 'pending':
         return <Clock className="w-5 h-5 text-yellow-600" />;
       case 'rejected':
@@ -274,24 +274,24 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'bg-myslt-success/10 text-myslt-success border-myslt-success/20';
+        return 'bg-green-50 text-green-600 border-green-200';
       case 'processing':
-        return 'bg-myslt-primary/10 text-myslt-primary border-myslt-primary/20';
+        return 'bg-white/10 text-blue-600 border-blue-600/20';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'rejected':
         return 'bg-red-100 text-red-800 border-red-200';
       case 'expired':
-        return 'bg-myslt-service-card text-myslt-text-muted border-myslt-accent/30';
+        return 'bg-white border border-slate-200 text-slate-500 border-slate-200';
       default:
-        return 'bg-myslt-service-card text-myslt-text-muted border-myslt-accent/30';
+        return 'bg-white border border-slate-200 text-slate-500 border-slate-200';
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'export':
-        return <Download className="w-5 h-5 text-myslt-primary" />;
+        return <Download className="w-5 h-5 text-blue-600" />;
       case 'delete':
         return <Trash2 className="w-5 h-5 text-red-600" />;
       case 'rectify':
@@ -425,8 +425,8 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-myslt-text-primary">DSAR Requests</h1>
-          <p className="text-myslt-text-muted mt-2">Submit and manage your data subject access rights requests</p>
+          <h1 className="text-3xl font-bold text-slate-900">DSAR Requests</h1>
+          <p className="text-slate-500 mt-2">Submit and manage your data subject access rights requests</p>
         </div>
         
         {/* Fast Real-time Connection Status */}
@@ -450,14 +450,14 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200">
         <div className="flex">
           <button
             onClick={() => setActiveTab('my-requests')}
             className={`flex-1 px-6 py-4 text-sm font-medium rounded-l-xl transition-colors ${
               activeTab === 'my-requests'
-                ? 'bg-myslt-primary/10 text-myslt-primary border-b-2 border-myslt-primary'
-                : 'text-myslt-text-muted hover:text-myslt-text-primary'
+                ? 'bg-white/10 text-blue-600 border-b-2 border-blue-600'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             My Requests ({dsarRequests.length})
@@ -466,8 +466,8 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
             onClick={() => setActiveTab('new-request')}
             className={`flex-1 px-6 py-4 text-sm font-medium rounded-r-xl transition-colors ${
               activeTab === 'new-request'
-                ? 'bg-myslt-primary/10 text-myslt-primary border-b-2 border-myslt-primary'
-                : 'text-myslt-text-muted hover:text-myslt-text-primary'
+                ? 'bg-white/10 text-blue-600 border-b-2 border-blue-600'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             New Request
@@ -479,45 +479,45 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
         <>
           {/* Status Summary */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-myslt-card rounded-lg border border-myslt-accent/20 p-4">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-lg border border-slate-200 p-4">
               <div className="flex items-center space-x-3">
                 <Clock className="w-8 h-8 text-yellow-600" />
                 <div>
-                  <p className="text-2xl font-bold text-myslt-text-primary">
+                  <p className="text-2xl font-bold text-slate-900">
                     {dsarRequests.filter(r => r.status === 'pending').length}
                   </p>
-                  <p className="text-sm text-myslt-text-muted">Pending</p>
+                  <p className="text-sm text-slate-500">Pending</p>
                 </div>
               </div>
             </div>
-            <div className="bg-myslt-card rounded-lg border border-myslt-accent/20 p-4">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-lg border border-slate-200 p-4">
               <div className="flex items-center space-x-3">
-                <RefreshCw className="w-8 h-8 text-myslt-primary" />
+                <RefreshCw className="w-8 h-8 text-blue-600" />
                 <div>
-                  <p className="text-2xl font-bold text-myslt-text-primary">
+                  <p className="text-2xl font-bold text-slate-900">
                     {dsarRequests.filter(r => r.status === 'processing').length}
                   </p>
-                  <p className="text-sm text-myslt-text-muted">Processing</p>
+                  <p className="text-sm text-slate-500">Processing</p>
                 </div>
               </div>
             </div>
-            <div className="bg-myslt-card rounded-lg border border-myslt-accent/20 p-4">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-lg border border-slate-200 p-4">
               <div className="flex items-center space-x-3">
-                <CheckCircle className="w-8 h-8 text-myslt-success" />
+                <CheckCircle className="w-8 h-8 text-green-600" />
                 <div>
-                  <p className="text-2xl font-bold text-myslt-text-primary">
+                  <p className="text-2xl font-bold text-slate-900">
                     {dsarRequests.filter(r => r.status === 'completed').length}
                   </p>
-                  <p className="text-sm text-myslt-text-muted">Completed</p>
+                  <p className="text-sm text-slate-500">Completed</p>
                 </div>
               </div>
             </div>
-            <div className="bg-myslt-card rounded-lg border border-myslt-accent/20 p-4">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-lg border border-slate-200 p-4">
               <div className="flex items-center space-x-3">
-                <Database className="w-8 h-8 text-myslt-primary" />
+                <Database className="w-8 h-8 text-blue-600" />
                 <div>
-                  <p className="text-2xl font-bold text-myslt-text-primary">{dsarRequests.length}</p>
-                  <p className="text-sm text-myslt-text-muted">Total Requests</p>
+                  <p className="text-2xl font-bold text-slate-900">{dsarRequests.length}</p>
+                  <p className="text-sm text-slate-500">Total Requests</p>
                 </div>
               </div>
             </div>
@@ -525,11 +525,11 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
 
           {/* Requests Header with Refresh */}
           <div className="flex items-center justify-between mt-6 mb-4">
-            <h3 className="text-lg font-semibold text-myslt-text-primary">My DSAR Requests</h3>
+            <h3 className="text-lg font-semibold text-slate-900">My DSAR Requests</h3>
             <button
               onClick={loadDSARRequests}
               disabled={loading}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-myslt-accent hover:text-myslt-accent-hover hover:bg-myslt-accent/10 rounded-lg transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:text-blue-600-hover hover:bg-blue-50/10 rounded-lg transition-colors disabled:opacity-50"
               title="Refresh to see latest status updates"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -541,22 +541,22 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="flex items-center space-x-3">
-                <RefreshCw className="w-6 h-6 text-myslt-primary animate-spin" />
-                <span className="text-myslt-text-muted">Loading your DSAR requests...</span>
+                <RefreshCw className="w-6 h-6 text-blue-600 animate-spin" />
+                <span className="text-slate-500">Loading your DSAR requests...</span>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
               {dsarRequests.map((request) => (
-              <div key={request.id} className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6 hover:shadow-md transition-shadow">
+              <div key={request.id} className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-4">
                     <div className="flex-shrink-0">
                       {getTypeIcon(request.type)}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-myslt-text-primary">{request.description}</h3>
-                      <p className="text-sm text-myslt-text-muted">Request ID: {request.id}</p>
+                      <h3 className="font-semibold text-slate-900">{request.description}</h3>
+                      <p className="text-sm text-slate-500">Request ID: {request.id}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
@@ -568,18 +568,18 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="flex items-center text-sm text-myslt-text-muted">
+                  <div className="flex items-center text-sm text-slate-500">
                     <Calendar className="w-4 h-4 mr-2" />
                     Requested: {new Date(request.requestedDate).toLocaleDateString()}
                   </div>
                   {request.completedDate && (
-                    <div className="flex items-center text-sm text-myslt-text-muted">
+                    <div className="flex items-center text-sm text-slate-500">
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Completed: {new Date(request.completedDate).toLocaleDateString()}
                     </div>
                   )}
                   {request.estimatedCompletion && !request.completedDate && (
-                    <div className="flex items-center text-sm text-myslt-text-muted">
+                    <div className="flex items-center text-sm text-slate-500">
                       <Clock className="w-4 h-4 mr-2" />
                       Est. Completion: {new Date(request.estimatedCompletion).toLocaleDateString()}
                     </div>
@@ -592,8 +592,8 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
 
                 {request.reason && (
                   <div className="mb-4">
-                    <p className="text-sm font-medium text-myslt-text-primary mb-1">Reason:</p>
-                    <p className="text-sm text-myslt-text-muted">{request.reason}</p>
+                    <p className="text-sm font-medium text-slate-900 mb-1">Reason:</p>
+                    <p className="text-sm text-slate-500">{request.reason}</p>
                   </div>
                 )}
 
@@ -644,18 +644,18 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
         </>
       ) : (
         /* New Request Form */
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
           <form onSubmit={handleSubmitRequest} className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold text-myslt-text-primary mb-4">Submit New DSAR Request</h2>
-              <p className="text-myslt-text-muted mb-6">
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">Submit New DSAR Request</h2>
+              <p className="text-slate-500 mb-6">
                 Choose the type of request you'd like to submit. We'll process your request within 30 days as required by data protection regulations.
               </p>
             </div>
 
             {/* Request Type Selection */}
             <div>
-              <label className="block text-sm font-medium text-myslt-text-primary mb-3">Request Type</label>
+              <label className="block text-sm font-medium text-slate-900 mb-3">Request Type</label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {requestTypeOptions.map((option) => (
                   <label
@@ -688,7 +688,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
 
             {/* Reason */}
             <div>
-              <label htmlFor="reason" className="block text-sm font-medium text-myslt-text-primary mb-2">
+              <label htmlFor="reason" className="block text-sm font-medium text-slate-900 mb-2">
                 Reason for Request (Optional)
               </label>
               <textarea
@@ -703,7 +703,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
 
             {/* Additional Details */}
             <div>
-              <label htmlFor="details" className="block text-sm font-medium text-myslt-text-primary mb-2">
+              <label htmlFor="details" className="block text-sm font-medium text-slate-900 mb-2">
                 Additional Details (Optional)
               </label>
               <textarea

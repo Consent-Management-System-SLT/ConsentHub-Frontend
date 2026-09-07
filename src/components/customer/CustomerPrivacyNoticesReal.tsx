@@ -246,10 +246,10 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-myslt-background">
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-myslt-success mx-auto mb-4" />
-          <p className="text-myslt-text-secondary">Loading privacy notices...</p>
+          <RefreshCw className="w-8 h-8 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-slate-600">Loading privacy notices...</p>
         </div>
       </div>
     );
@@ -257,24 +257,24 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
 
   if (selectedNotice) {
     return (
-      <div className="min-h-screen bg-myslt-background p-6">
+      <div className="min-h-screen bg-slate-50 p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6 mb-6">
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setSelectedNotice(null)}
-                  className="p-2 rounded-lg bg-myslt-accent/10 hover:bg-myslt-accent/20 transition-colors"
+                  className="p-2 rounded-lg bg-blue-50/10 hover:bg-blue-50/20 transition-colors"
                 >
-                  <X className="w-5 h-5 text-myslt-text-secondary" />
+                  <X className="w-5 h-5 text-slate-600" />
                 </button>
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <FileText className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-myslt-text-primary">{selectedNotice.title}</h1>
-                  <p className="text-myslt-text-secondary">Version {selectedNotice.version}</p>
+                  <h1 className="text-2xl font-bold text-slate-900">{selectedNotice.title}</h1>
+                  <p className="text-slate-600">Version {selectedNotice.version}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
@@ -287,29 +287,29 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
           </div>
 
           {/* Notice Details */}
-          <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6 mb-6">
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div className="flex items-center space-x-3">
-                <Calendar className="w-5 h-5 text-myslt-text-muted" />
+                <Calendar className="w-5 h-5 text-slate-500" />
                 <div>
-                  <p className="text-sm text-myslt-text-secondary">Effective Date</p>
-                  <p className="font-medium text-myslt-text-primary">
+                  <p className="text-sm text-slate-600">Effective Date</p>
+                  <p className="font-medium text-slate-900">
                     {new Date(selectedNotice.effectiveDate).toLocaleDateString()}
                   </p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Globe className="w-5 h-5 text-myslt-text-muted" />
+                <Globe className="w-5 h-5 text-slate-500" />
                 <div>
-                  <p className="text-sm text-myslt-text-secondary">Category</p>
-                  <p className="font-medium text-myslt-text-primary capitalize">{selectedNotice.category}</p>
+                  <p className="text-sm text-slate-600">Category</p>
+                  <p className="font-medium text-slate-900 capitalize">{selectedNotice.category}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <User className="w-5 h-5 text-myslt-text-muted" />
+                <User className="w-5 h-5 text-slate-500" />
                 <div>
-                  <p className="text-sm text-myslt-text-secondary">Language</p>
-                  <p className="font-medium text-myslt-text-primary uppercase">{selectedNotice.language}</p>
+                  <p className="text-sm text-slate-600">Language</p>
+                  <p className="font-medium text-slate-900 uppercase">{selectedNotice.language}</p>
                 </div>
               </div>
             </div>
@@ -321,8 +321,8 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
             )}
 
             <div className="prose max-w-none">
-              <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Notice Content</h3>
-              <div className="text-myslt-text-secondary">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Notice Content</h3>
+              <div className="text-slate-600">
                 {renderContent(selectedNotice.content)}
               </div>
             </div>
@@ -330,9 +330,9 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
 
           {/* Action Buttons */}
           {!selectedNotice.acknowledged && (
-            <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
-              <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Your Response Required</h3>
-              <p className="text-myslt-text-secondary mb-6">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Response Required</h3>
+              <p className="text-slate-600 mb-6">
                 Please review this privacy notice and indicate your acceptance or decline.
               </p>
               
@@ -376,7 +376,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
 
           {/* Already responded */}
           {selectedNotice.acknowledged && (
-            <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
               <div className="flex items-center space-x-3">
                 {selectedNotice.customerDecision === 'accept' ? (
                   <CheckCircle className="w-6 h-6 text-green-500" />
@@ -384,10 +384,10 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                   <XCircle className="w-6 h-6 text-red-500" />
                 )}
                 <div>
-                  <h3 className="text-lg font-semibold text-myslt-text-primary">
+                  <h3 className="text-lg font-semibold text-slate-900">
                     You {selectedNotice.customerDecision === 'accept' ? 'Accepted' : 'Declined'} this Notice
                   </h3>
-                  <p className="text-myslt-text-secondary">
+                  <p className="text-slate-600">
                     Responded on {new Date(selectedNotice.acknowledgedAt || '').toLocaleDateString()}
                   </p>
                 </div>
@@ -400,24 +400,24 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
   }
 
   return (
-    <div className="min-h-screen bg-myslt-background p-6">
+    <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6 mb-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-blue-100 rounded-lg">
                 <FileText className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-myslt-text-primary">Privacy Notices</h1>
-                <p className="text-myslt-text-secondary">Review and respond to privacy notices</p>
+                <h1 className="text-3xl font-bold text-slate-900">Privacy Notices</h1>
+                <p className="text-slate-600">Review and respond to privacy notices</p>
               </div>
             </div>
             <button
               onClick={loadPrivacyNotices}
               disabled={isLoading}
-              className="flex items-center space-x-2 px-4 py-2 bg-myslt-success hover:bg-myslt-success/90 text-white rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-600/90 text-white rounded-lg transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
@@ -426,24 +426,24 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6 mb-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-myslt-text-muted w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search privacy notices..."
-                className="w-full pl-10 pr-4 py-2 border border-myslt-accent/30 rounded-lg bg-myslt-background focus:ring-2 focus:ring-myslt-success focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div className="flex items-center space-x-2">
-              <Filter className="w-4 h-4 text-myslt-text-muted" />
+              <Filter className="w-4 h-4 text-slate-500" />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 border border-myslt-accent/30 rounded-lg bg-myslt-background focus:ring-2 focus:ring-myslt-success focus:border-transparent"
+                className="px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
@@ -468,7 +468,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
         {filteredNotices.length > 0 ? (
           <div className="space-y-4">
             {filteredNotices.map((notice) => (
-              <div key={notice.id || notice._id} className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
+              <div key={notice.id || notice._id} className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-start space-x-4">
@@ -477,7 +477,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold text-myslt-text-primary">{notice.title}</h3>
+                          <h3 className="text-lg font-semibold text-slate-900">{notice.title}</h3>
                           <span className={`px-2 py-1 rounded-full border text-xs font-medium ${getStatusBadgeClass(notice)}`}>
                             {getStatusText(notice)}
                           </span>
@@ -489,10 +489,10 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                         </div>
                         
                         {notice.description && (
-                          <p className="text-myslt-text-secondary mb-3">{notice.description}</p>
+                          <p className="text-slate-600 mb-3">{notice.description}</p>
                         )}
                         
-                        <div className="flex items-center space-x-6 text-sm text-myslt-text-muted">
+                        <div className="flex items-center space-x-6 text-sm text-slate-500">
                           <span className="flex items-center space-x-1">
                             <Calendar className="w-4 h-4" />
                             <span>Version {notice.version}</span>
@@ -508,7 +508,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                         </div>
 
                         {notice.acknowledged && notice.acknowledgedAt && (
-                          <div className="mt-2 text-sm text-myslt-text-muted">
+                          <div className="mt-2 text-sm text-slate-500">
                             {notice.customerDecision === 'accept' ? 'Accepted' : 'Declined'} on{' '}
                             {new Date(notice.acknowledgedAt).toLocaleDateString()}
                           </div>
@@ -522,7 +522,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                     
                     <button
                       onClick={() => setSelectedNotice(notice)}
-                      className="flex items-center space-x-2 px-4 py-2 text-myslt-success hover:bg-myslt-success/10 border border-myslt-success/30 rounded-lg transition-colors"
+                      className="flex items-center space-x-2 px-4 py-2 text-green-600 hover:bg-green-50 border border-green-200/30 rounded-lg transition-colors"
                     >
                       <Eye className="w-4 h-4" />
                       <span>Review</span>
@@ -562,12 +562,12 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
             ))}
           </div>
         ) : (
-          <div className="bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-8 text-center">
-            <FileText className="w-12 h-12 text-myslt-text-muted mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-myslt-text-primary mb-2">
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-8 text-center">
+            <FileText className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">
               {searchTerm || statusFilter !== 'all' ? 'No Matching Notices' : 'No Privacy Notices Available'}
             </h3>
-            <p className="text-myslt-text-secondary">
+            <p className="text-slate-600">
               {searchTerm || statusFilter !== 'all' 
                 ? 'Try adjusting your search or filter criteria.'
                 : 'There are currently no privacy notices that require your attention.'
@@ -577,8 +577,8 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
         )}
 
         {/* Summary Stats */}
-        <div className="mt-6 bg-myslt-card rounded-xl shadow-sm border border-myslt-accent/20 p-6">
-          <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Summary</h3>
+        <div className="mt-6 bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-sm border border-slate-200 p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Summary</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-blue-50 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">{notices.length}</div>

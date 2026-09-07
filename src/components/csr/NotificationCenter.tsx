@@ -406,19 +406,19 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
   }, [error]);
 
   return (
-    <div className={`notification-center bg-myslt-background min-h-screen ${className}`}>
+    <div className={`notification-center bg-slate-50 min-h-screen ${className}`}>
       {/* Header */}
-      <div className="bg-myslt-card border-b border-myslt-accent/20 px-6 py-4">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm border-b border-slate-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-myslt-text">Notification Center</h1>
-            <p className="text-myslt-text-secondary mt-1">Send notifications and manage campaigns</p>
+            <h1 className="text-2xl font-bold text-text-slate-500">Notification Center</h1>
+            <p className="text-slate-600 mt-1">Send notifications and manage campaigns</p>
           </div>
           <div className="flex items-center space-x-3">
             <button
               onClick={loadAnalytics}
               disabled={loading}
-              className="flex items-center space-x-2 px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors disabled:opacity-50"
+              className="flex items-center space-x-2 px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
@@ -439,8 +439,8 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
               onClick={() => setActiveTab(key as any)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                 activeTab === key
-                  ? 'bg-myslt-primary text-white shadow-md'
-                  : 'text-myslt-text-secondary hover:bg-myslt-accent/10'
+                  ? 'bg-white text-white shadow-md'
+                  : 'text-slate-600 hover:bg-blue-50/10'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -453,16 +453,16 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
       {/* Success Popup Modal */}
       {success && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
-          <div className="bg-myslt-card rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl transform animate-slideUp border border-myslt-success">
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl transform animate-slideUp border border-green-200">
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-myslt-success mb-4">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-600 mb-4">
                 <CheckCircle className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-myslt-text-primary mb-2">Success!</h3>
-              <p className="text-myslt-text-secondary mb-6">{success}</p>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">Success!</h3>
+              <p className="text-slate-600 mb-6">{success}</p>
               <button
                 onClick={() => setSuccess(null)}
-                className="px-6 py-2 bg-myslt-success text-white rounded-lg hover:bg-myslt-success hover:opacity-90 transition-colors focus:outline-none focus:ring-2 focus:ring-myslt-success focus:ring-offset-2"
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-600 hover:opacity-90 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 OK
               </button>
@@ -519,11 +519,11 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
             
             {/* Customer Selection */}
             <div className="lg:col-span-1 space-y-4">
-              <div className="bg-myslt-card rounded-xl border border-myslt-accent/20 p-6">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-myslt-text">Select Customers</h3>
+                  <h3 className="text-lg font-semibold text-text-slate-500">Select Customers</h3>
                   {selectedCustomers.length > 0 && (
-                    <span className="bg-myslt-primary text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="bg-white text-white px-3 py-1 rounded-full text-sm font-medium">
                       {selectedCustomers.length} selected
                     </span>
                   )}
@@ -531,20 +531,20 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                 
                 {/* Search */}
                 <div className="relative mb-4">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-myslt-text-secondary w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-600 w-4 h-4" />
                   <input
                     type="text"
                     placeholder="Search customers..."
                     value={customerSearch}
                     onChange={(e) => setCustomerSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
                   />
                 </div>
 
                 {/* Customer List */}
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {(filteredCustomers || []).map(customer => (
-                    <label key={customer.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-myslt-accent/5 cursor-pointer">
+                    <label key={customer.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-blue-50/5 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={selectedCustomers.includes(customer.id)}
@@ -558,15 +558,15 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                         className="mt-1"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-myslt-text truncate">{customer.name}</p>
-                        <p className="text-sm text-myslt-text-secondary truncate">{customer.email}</p>
-                        <p className="text-xs text-myslt-text-secondary">{customer.phone}</p>
+                        <p className="font-medium text-text-slate-500 truncate">{customer.name}</p>
+                        <p className="text-sm text-slate-600 truncate">{customer.email}</p>
+                        <p className="text-xs text-slate-600">{customer.phone}</p>
                       </div>
                     </label>
                   ))}
                 </div>
 
-                <div className="mt-4 text-sm text-myslt-text-secondary">
+                <div className="mt-4 text-sm text-slate-600">
                   {selectedCustomers.length} customer(s) selected
                 </div>
               </div>
@@ -575,17 +575,17 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
             {/* Notification Form */}
             <div className="lg:col-span-2 space-y-6">
               {/* Notification Content */}
-              <div className="bg-myslt-card rounded-xl border border-myslt-accent/20 p-6">
-                <h3 className="text-lg font-semibold text-myslt-text mb-4">Notification Content</h3>
+              <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-text-slate-500 mb-4">Notification Content</h3>
                 
                 <div className="space-y-4">
                   {/* Message Type */}
                   <div>
-                    <label className="block text-sm font-medium text-myslt-text mb-2">Message Type</label>
+                    <label className="block text-sm font-medium text-text-slate-500 mb-2">Message Type</label>
                     <select
                       value={messageType}
                       onChange={(e) => setMessageType(e.target.value as any)}
-                      className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
                     >
                       <option value="informational">Informational</option>
                       <option value="promotional">Promotional</option>
@@ -596,7 +596,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
 
                   {/* Channels */}
                   <div>
-                    <label className="block text-sm font-medium text-myslt-text mb-2">Channels</label>
+                    <label className="block text-sm font-medium text-text-slate-500 mb-2">Channels</label>
                     <div className="flex flex-wrap gap-3">
                       {[
                         { key: 'email', label: 'Email', icon: Mail },
@@ -616,8 +616,8 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                               }
                             }}
                           />
-                          <Icon className="w-4 h-4 text-myslt-text-secondary" />
-                          <span className="text-myslt-text">{label}</span>
+                          <Icon className="w-4 h-4 text-slate-600" />
+                          <span className="text-text-slate-500">{label}</span>
                         </label>
                       ))}
                     </div>
@@ -625,25 +625,25 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
 
                   {/* Subject */}
                   <div>
-                    <label className="block text-sm font-medium text-myslt-text mb-2">Subject</label>
+                    <label className="block text-sm font-medium text-text-slate-500 mb-2">Subject</label>
                     <input
                       type="text"
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
                       placeholder="Enter notification subject..."
-                      className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
                     />
                   </div>
 
                   {/* Message */}
                   <div>
-                    <label className="block text-sm font-medium text-myslt-text mb-2">Message</label>
+                    <label className="block text-sm font-medium text-text-slate-500 mb-2">Message</label>
                     <textarea
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Enter your message..."
                       rows={6}
-                      className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent resize-none"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent resize-none"
                     />
                   </div>
 
@@ -652,7 +652,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                     <button
                       onClick={handleSendNotification}
                       disabled={isSending || !selectedCustomers.length || !subject.trim() || !message.trim()}
-                      className="flex items-center space-x-2 px-6 py-3 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="flex items-center space-x-2 px-6 py-3 bg-white text-white rounded-lg hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Send className={`w-4 h-4 ${isSending ? 'animate-pulse' : ''}`} />
                       <span>{isSending ? 'Sending...' : `Send to ${selectedCustomers.length} Selected`}</span>
@@ -682,41 +682,41 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
           <div className="space-y-6">
             {/* Overview Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-myslt-card rounded-xl border border-myslt-accent/20 p-6">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-2xl font-bold text-myslt-text">{analytics?.overview?.totalSent || 0}</p>
-                    <p className="text-myslt-text-secondary">Total Sent</p>
+                    <p className="text-2xl font-bold text-text-slate-500">{analytics?.overview?.totalSent || 0}</p>
+                    <p className="text-slate-600">Total Sent</p>
                   </div>
                   <Send className="w-8 h-8 text-blue-500" />
                 </div>
               </div>
 
-              <div className="bg-myslt-card rounded-xl border border-myslt-accent/20 p-6">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-2xl font-bold text-myslt-text">{analytics?.overview?.totalDelivered || 0}</p>
-                    <p className="text-myslt-text-secondary">Delivered</p>
+                    <p className="text-2xl font-bold text-text-slate-500">{analytics?.overview?.totalDelivered || 0}</p>
+                    <p className="text-slate-600">Delivered</p>
                   </div>
                   <CheckCircle className="w-8 h-8 text-green-500" />
                 </div>
               </div>
 
-              <div className="bg-myslt-card rounded-xl border border-myslt-accent/20 p-6">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-2xl font-bold text-myslt-text">{analytics?.overview?.totalOpened || 0}</p>
-                    <p className="text-myslt-text-secondary">Opened</p>
+                    <p className="text-2xl font-bold text-text-slate-500">{analytics?.overview?.totalOpened || 0}</p>
+                    <p className="text-slate-600">Opened</p>
                   </div>
                   <Eye className="w-8 h-8 text-purple-500" />
                 </div>
               </div>
 
-              <div className="bg-myslt-card rounded-xl border border-myslt-accent/20 p-6">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl border border-slate-200 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-2xl font-bold text-myslt-text">{analytics?.overview?.deliveryRate || 0}%</p>
-                    <p className="text-myslt-text-secondary">Delivery Rate</p>
+                    <p className="text-2xl font-bold text-text-slate-500">{analytics?.overview?.deliveryRate || 0}%</p>
+                    <p className="text-slate-600">Delivery Rate</p>
                   </div>
                   <BarChart3 className="w-8 h-8 text-orange-500" />
                 </div>
@@ -724,27 +724,27 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
             </div>
 
             {/* Channel Performance */}
-            <div className="bg-myslt-card rounded-xl border border-myslt-accent/20 p-6">
-              <h3 className="text-lg font-semibold text-myslt-text mb-4">Channel Performance</h3>
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl border border-slate-200 p-6">
+              <h3 className="text-lg font-semibold text-text-slate-500 mb-4">Channel Performance</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {Object.entries(analytics?.channels || {}).map(([channel, data]) => (
-                  <div key={channel} className="border border-myslt-accent/20 rounded-lg p-4">
+                  <div key={channel} className="border border-slate-200 rounded-lg p-4">
                     <div className="flex items-center space-x-2 mb-2">
                       {getChannelIcon(channel)}
-                      <span className="font-medium text-myslt-text capitalize">{channel}</span>
+                      <span className="font-medium text-text-slate-500 capitalize">{channel}</span>
                     </div>
                     <div className="space-y-1 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-myslt-text-secondary">Sent:</span>
-                        <span className="text-myslt-text">{data.sent}</span>
+                        <span className="text-slate-600">Sent:</span>
+                        <span className="text-text-slate-500">{data.sent}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-myslt-text-secondary">Delivered:</span>
-                        <span className="text-myslt-text">{data.delivered}</span>
+                        <span className="text-slate-600">Delivered:</span>
+                        <span className="text-text-slate-500">{data.delivered}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-myslt-text-secondary">Rate:</span>
-                        <span className="text-myslt-text">{data.deliveryRate}%</span>
+                        <span className="text-slate-600">Rate:</span>
+                        <span className="text-text-slate-500">{data.deliveryRate}%</span>
                       </div>
                     </div>
                   </div>
@@ -756,12 +756,12 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
 
         {activeTab === 'campaigns' && (
           <div className="space-y-6">
-            <div className="bg-myslt-card rounded-xl border border-myslt-accent/20 p-6">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-myslt-text">Campaigns</h3>
+                <h3 className="text-lg font-semibold text-text-slate-500">Campaigns</h3>
                 <button
                   onClick={() => setShowCampaignForm(!showCampaignForm)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Create Campaign</span>
@@ -769,7 +769,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
               </div>
               
               {campaigns.length === 0 ? (
-                <div className="text-center py-8 text-myslt-text-secondary">
+                <div className="text-center py-8 text-slate-600">
                   <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>No campaigns created yet</p>
                   <p className="text-sm">Create your first campaign to get started</p>
@@ -777,9 +777,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
               ) : (
                 <div className="space-y-4">
                   {(campaigns || []).map(campaign => (
-                    <div key={campaign.id} className="border border-myslt-accent/20 rounded-lg p-4">
+                    <div key={campaign.id} className="border border-slate-200 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-myslt-text">{campaign.name}</h4>
+                        <h4 className="font-medium text-text-slate-500">{campaign.name}</h4>
                         <span className={`px-2 py-1 rounded text-xs ${
                           campaign.status === 'active' ? 'bg-green-100 text-green-800' :
                           campaign.status === 'paused' ? 'bg-yellow-100 text-yellow-800' :
@@ -788,21 +788,21 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                           {campaign.status}
                         </span>
                       </div>
-                      <p className="text-myslt-text-secondary mb-3">{campaign.description}</p>
+                      <p className="text-slate-600 mb-3">{campaign.description}</p>
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center space-x-4">
-                          <span className="text-myslt-text-secondary">Audience: {campaign.audienceSize}</span>
-                          <span className="text-myslt-text-secondary">Sent: {campaign.performance.sent}</span>
-                          <span className="text-myslt-text-secondary">Delivered: {campaign.performance.delivered}</span>
+                          <span className="text-slate-600">Audience: {campaign.audienceSize}</span>
+                          <span className="text-slate-600">Sent: {campaign.performance.sent}</span>
+                          <span className="text-slate-600">Delivered: {campaign.performance.delivered}</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <button className="p-1 text-myslt-text-secondary hover:text-myslt-primary">
+                          <button className="p-1 text-slate-600 hover:text-blue-600">
                             <Play className="w-4 h-4" />
                           </button>
-                          <button className="p-1 text-myslt-text-secondary hover:text-myslt-primary">
+                          <button className="p-1 text-slate-600 hover:text-blue-600">
                             <Edit3 className="w-4 h-4" />
                           </button>
-                          <button className="p-1 text-myslt-text-secondary hover:text-red-500">
+                          <button className="p-1 text-slate-600 hover:text-red-500">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -818,56 +818,56 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
         {activeTab === 'templates' && (
           <div className="space-y-6">
             {/* Pre-Built Templates Section */}
-            <div className="bg-myslt-card rounded-xl border border-myslt-accent/20 p-6">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-myslt-text">Pre-Built Professional Templates</h3>
-                  <p className="text-sm text-myslt-text-secondary">Ready-to-use templates with beautiful designs</p>
+                  <h3 className="text-lg font-semibold text-text-slate-500">Pre-Built Professional Templates</h3>
+                  <p className="text-sm text-slate-600">Ready-to-use templates with beautiful designs</p>
                 </div>
-                <div className="flex items-center space-x-2 text-sm text-myslt-text-secondary">
+                <div className="flex items-center space-x-2 text-sm text-slate-600">
                   <span>{preBuiltTemplates.length} templates available</span>
                 </div>
               </div>
               
               {preBuiltTemplates.length === 0 ? (
-                <div className="text-center py-8 text-myslt-text-secondary">
+                <div className="text-center py-8 text-slate-600">
                   <RefreshCw className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>Loading pre-built templates...</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {preBuiltTemplates.map(template => (
-                    <div key={template.id} className="bg-myslt-card rounded-lg border border-myslt-primary/30 p-5 hover:shadow-xl hover:border-myslt-primary/50 transition-all duration-300">
+                    <div key={template.id} className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-lg border border-blue-600/30 p-5 hover:shadow-xl hover:border-blue-600/50 transition-all duration-300">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <h4 className="font-semibold text-myslt-text-primary text-lg mb-1">{template.name}</h4>
-                          <p className="text-sm text-myslt-text-secondary mb-2">{template.description}</p>
+                          <h4 className="font-semibold text-slate-900 text-lg mb-1">{template.name}</h4>
+                          <p className="text-sm text-slate-600 mb-2">{template.description}</p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ml-2 ${
-                          template.type === 'promotional' ? 'bg-myslt-primary/20 text-myslt-primary border border-myslt-primary/30' :
-                          template.type === 'informational' ? 'bg-myslt-success/20 text-myslt-success border border-myslt-success/30' :
-                          template.type === 'alert' ? 'bg-myslt-warning/20 text-myslt-warning border border-myslt-warning/30' :
-                          template.type === 'urgent' ? 'bg-myslt-danger/20 text-myslt-danger border border-myslt-danger/30' :
-                          template.type === 'reminder' ? 'bg-myslt-accent/20 text-myslt-accent border border-myslt-accent/30' :
-                          'bg-myslt-info/20 text-myslt-info border border-myslt-info/30'
+                          template.type === 'promotional' ? 'bg-white/20 text-blue-600 border border-blue-600/30' :
+                          template.type === 'informational' ? 'bg-green-600/20 text-green-600 border border-green-200/30' :
+                          template.type === 'alert' ? 'bg-amber-600/20 text-amber-600 border border-slate-200/30' :
+                          template.type === 'urgent' ? 'bg-red-50 text-red-600 border border-red-200' :
+                          template.type === 'reminder' ? 'bg-blue-50/20 text-blue-600 border border-slate-200' :
+                          'bg-blue-600/20 text-blue-600 border border-slate-200/30'
                         }`}>
                           {template.type || 'informational'}
                         </span>
                       </div>
                       
                       {/* Template Preview */}
-                      <div className="bg-myslt-primary/5 rounded-lg p-3 mb-3 border border-myslt-primary/10">
-                        <p className="text-sm font-medium text-myslt-text-primary mb-1">{template.subject}</p>
-                        <p className="text-xs text-myslt-text-secondary line-clamp-3">
+                      <div className="bg-white/5 rounded-lg p-3 mb-3 border border-blue-600/10">
+                        <p className="text-sm font-medium text-slate-900 mb-1">{template.subject}</p>
+                        <p className="text-xs text-slate-600 line-clamp-3">
                           {template.message?.substring(0, 120)}...
                         </p>
                       </div>
                       
                       {/* Channels */}
                       <div className="flex items-center space-x-3 mb-4">
-                        <span className="text-xs text-myslt-text-secondary font-medium">Channels:</span>
+                        <span className="text-xs text-slate-600 font-medium">Channels:</span>
                         {(template.channels || ['email']).map(channel => (
-                          <div key={channel} className="flex items-center space-x-1 text-xs text-myslt-primary bg-myslt-primary/10 px-2 py-1 rounded border border-myslt-primary/20">
+                          <div key={channel} className="flex items-center space-x-1 text-xs text-blue-600 bg-white/10 px-2 py-1 rounded border border-blue-600/20">
                             {getChannelIcon(channel)}
                             <span>{channel}</span>
                           </div>
@@ -875,24 +875,24 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                       </div>
                       
                       {/* Action Buttons */}
-                      <div className="flex items-center justify-between pt-3 border-t border-myslt-primary/20">
+                      <div className="flex items-center justify-between pt-3 border-t border-blue-600/20">
                         <button 
                           onClick={() => handleTemplatePreview(template)}
-                          className="flex items-center space-x-1 text-myslt-primary hover:text-myslt-primary/80 text-sm font-medium transition-colors"
+                          className="flex items-center space-x-1 text-blue-600 hover:text-blue-600/80 text-sm font-medium transition-colors"
                         >
                           <Eye className="w-4 h-4" />
                           <span>Preview</span>
                         </button>
                         <button 
                           onClick={() => handleTemplateEdit(template)}
-                          className="flex items-center space-x-1 text-myslt-warning hover:text-myslt-warning/80 text-sm font-medium transition-colors"
+                          className="flex items-center space-x-1 text-amber-600 hover:text-amber-600/80 text-sm font-medium transition-colors"
                         >
                           <Edit3 className="w-4 h-4" />
                           <span>Edit</span>
                         </button>
                         <button 
                           onClick={() => handlePreBuiltTemplateSelect(template)}
-                          className="flex items-center space-x-1 px-3 py-1.5 bg-myslt-primary text-myslt-text-primary rounded-lg hover:bg-myslt-primary/90 text-sm font-medium transition-colors"
+                          className="flex items-center space-x-1 px-3 py-1.5 bg-white text-slate-900 rounded-lg hover:bg-white/90 text-sm font-medium transition-colors"
                         >
                           <Play className="w-4 h-4" />
                           <span>Use</span>
@@ -905,15 +905,15 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
             </div>
 
             {/* Custom Templates Section */}
-            <div className="bg-myslt-card rounded-xl border border-myslt-accent/20 p-6">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-myslt-text">Custom Templates</h3>
-                  <p className="text-sm text-myslt-text-secondary">Your saved notification templates</p>
+                  <h3 className="text-lg font-semibold text-text-slate-500">Custom Templates</h3>
+                  <p className="text-sm text-slate-600">Your saved notification templates</p>
                 </div>
                 <button
                   onClick={() => setShowTemplateForm(!showTemplateForm)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Create Template</span>
@@ -922,28 +922,28 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
 
               {/* Template Creation Form */}
               {showTemplateForm && (
-                <div className="bg-gray-50 rounded-lg p-6 mb-6 border-2 border-dashed border-myslt-primary/20">
-                  <h4 className="font-semibold text-myslt-text mb-4">Create New Template</h4>
+                <div className="bg-gray-50 rounded-lg p-6 mb-6 border-2 border-dashed border-blue-600/20">
+                  <h4 className="font-semibold text-text-slate-500 mb-4">Create New Template</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Template Name */}
                     <div>
-                      <label className="block text-sm font-medium text-myslt-text mb-2">Template Name</label>
+                      <label className="block text-sm font-medium text-text-slate-500 mb-2">Template Name</label>
                       <input
                         type="text"
                         value={templateName}
                         onChange={(e) => setTemplateName(e.target.value)}
                         placeholder="e.g., Welcome Message"
-                        className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
                       />
                     </div>
 
                     {/* Template Type */}
                     <div>
-                      <label className="block text-sm font-medium text-myslt-text mb-2">Template Type</label>
+                      <label className="block text-sm font-medium text-text-slate-500 mb-2">Template Type</label>
                       <select
                         value={templateType}
                         onChange={(e) => setTemplateType(e.target.value as any)}
-                        className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
                       >
                         <option value="informational">Informational</option>
                         <option value="promotional">Promotional</option>
@@ -954,43 +954,43 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
 
                     {/* Template Description */}
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-myslt-text mb-2">Description (Optional)</label>
+                      <label className="block text-sm font-medium text-text-slate-500 mb-2">Description (Optional)</label>
                       <input
                         type="text"
                         value={templateDescription}
                         onChange={(e) => setTemplateDescription(e.target.value)}
                         placeholder="Brief description of the template"
-                        className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
                       />
                     </div>
 
                     {/* Template Subject */}
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-myslt-text mb-2">Subject</label>
+                      <label className="block text-sm font-medium text-text-slate-500 mb-2">Subject</label>
                       <input
                         type="text"
                         value={templateSubject}
                         onChange={(e) => setTemplateSubject(e.target.value)}
                         placeholder="Email subject line"
-                        className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
                       />
                     </div>
 
                     {/* Template Message */}
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-myslt-text mb-2">Message</label>
+                      <label className="block text-sm font-medium text-text-slate-500 mb-2">Message</label>
                       <textarea
                         value={templateMessage}
                         onChange={(e) => setTemplateMessage(e.target.value)}
                         placeholder="Template message content..."
                         rows={6}
-                        className="w-full px-3 py-2 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-transparent"
                       />
                     </div>
 
                     {/* Template Channels */}
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-myslt-text mb-2">Default Channels</label>
+                      <label className="block text-sm font-medium text-text-slate-500 mb-2">Default Channels</label>
                       <div className="flex flex-wrap gap-3">
                         {[
                           { key: 'email', label: 'Email', icon: Mail },
@@ -1010,8 +1010,8 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                                 }
                               }}
                             />
-                            <Icon className="w-4 h-4 text-myslt-text-secondary" />
-                            <span className="text-myslt-text">{label}</span>
+                            <Icon className="w-4 h-4 text-slate-600" />
+                            <span className="text-text-slate-500">{label}</span>
                           </label>
                         ))}
                       </div>
@@ -1019,7 +1019,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                   </div>
 
                   {/* Form Actions */}
-                  <div className="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-myslt-primary/20">
+                  <div className="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-blue-600/20">
                     <button
                       onClick={() => {
                         setShowTemplateForm(false);
@@ -1028,13 +1028,13 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                         setTemplateSubject('');
                         setTemplateMessage('');
                       }}
-                      className="px-4 py-2 text-myslt-text-secondary hover:text-myslt-text transition-colors"
+                      className="px-4 py-2 text-slate-600 hover:text-text-slate-500 transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={saveCustomTemplate}
-                      className="px-6 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90 transition-colors"
+                      className="px-6 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors"
                     >
                       Save Template
                     </button>
@@ -1043,7 +1043,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
               )}
               
               {templates.length === 0 ? (
-                <div className="text-center py-8 text-myslt-text-secondary">
+                <div className="text-center py-8 text-slate-600">
                   <Edit3 className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>No custom templates created yet</p>
                   <p className="text-sm">Create templates to save your frequently used messages</p>
@@ -1051,9 +1051,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {(templates || []).map(template => (
-                    <div key={template.id} className="border border-myslt-accent/20 rounded-lg p-4">
+                    <div key={template.id} className="border border-slate-200 rounded-lg p-4">
                       <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-medium text-myslt-text">{template.name}</h4>
+                        <h4 className="font-medium text-text-slate-500">{template.name}</h4>
                         <span className={`px-2 py-1 rounded text-xs ${
                           template.type === 'promotional' ? 'bg-blue-100 text-blue-800' :
                           template.type === 'informational' ? 'bg-green-100 text-green-800' :
@@ -1063,27 +1063,27 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                           {template.type}
                         </span>
                       </div>
-                      <p className="text-myslt-text-secondary text-sm mb-3">{template.description}</p>
+                      <p className="text-slate-600 text-sm mb-3">{template.description}</p>
                       <div className="flex items-center space-x-2 mb-3">
                         {(template.channels || []).map((channel: string) => (
-                          <div key={channel} className="flex items-center space-x-1 text-xs text-myslt-text-secondary">
+                          <div key={channel} className="flex items-center space-x-1 text-xs text-slate-600">
                             {getChannelIcon(channel)}
                             <span>{channel}</span>
                           </div>
                         ))}
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-myslt-text-secondary">Used: {template.usage?.timesUsed || 0} times</span>
+                        <span className="text-slate-600">Used: {template.usage?.timesUsed || 0} times</span>
                         <div className="flex items-center space-x-2">
                           <button 
                             onClick={() => handleTemplateSelect(template)}
-                            className="text-myslt-primary hover:text-myslt-primary/80"
+                            className="text-blue-600 hover:text-blue-600/80"
                           >
                             Use
                           </button>
                           <button 
                             onClick={() => deleteTemplate(template.id)}
-                            className="text-myslt-text-secondary hover:text-red-500"
+                            className="text-slate-600 hover:text-red-500"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -1098,12 +1098,12 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
             {/* Template Preview Modal */}
             {showTemplatePreview && selectedPreBuiltTemplate && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-myslt-card rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto border border-myslt-primary/30">
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto border border-blue-600/30">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold text-myslt-text-primary">Template Preview</h3>
+                    <h3 className="text-xl font-semibold text-slate-900">Template Preview</h3>
                     <button 
                       onClick={() => setShowTemplatePreview(false)}
-                      className="text-myslt-text-secondary hover:text-myslt-text-primary transition-colors"
+                      className="text-slate-600 hover:text-slate-900 transition-colors"
                     >
                       ✕
                     </button>
@@ -1111,29 +1111,29 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                   
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-medium text-myslt-text-primary mb-2">{selectedPreBuiltTemplate.name}</h4>
-                      <p className="text-myslt-text-secondary text-sm">{selectedPreBuiltTemplate.description}</p>
+                      <h4 className="font-medium text-slate-900 mb-2">{selectedPreBuiltTemplate.name}</h4>
+                      <p className="text-slate-600 text-sm">{selectedPreBuiltTemplate.description}</p>
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-myslt-text-primary mb-1">Subject</label>
-                      <div className="bg-myslt-primary/10 p-3 rounded-lg border border-myslt-primary/20">
-                        <p className="text-myslt-text-primary">{selectedPreBuiltTemplate.subject}</p>
+                      <label className="block text-sm font-medium text-slate-900 mb-1">Subject</label>
+                      <div className="bg-white/10 p-3 rounded-lg border border-blue-600/20">
+                        <p className="text-slate-900">{selectedPreBuiltTemplate.subject}</p>
                       </div>
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-myslt-text-primary mb-1">Message</label>
-                      <div className="bg-myslt-primary/10 p-3 rounded-lg max-h-60 overflow-y-auto border border-myslt-primary/20">
-                        <p className="text-myslt-text-primary whitespace-pre-line">{selectedPreBuiltTemplate.message}</p>
+                      <label className="block text-sm font-medium text-slate-900 mb-1">Message</label>
+                      <div className="bg-white/10 p-3 rounded-lg max-h-60 overflow-y-auto border border-blue-600/20">
+                        <p className="text-slate-900 whitespace-pre-line">{selectedPreBuiltTemplate.message}</p>
                       </div>
                     </div>
                     
-                    <div className="flex items-center justify-between pt-4 border-t border-myslt-primary/20">
+                    <div className="flex items-center justify-between pt-4 border-t border-blue-600/20">
                       <div className="flex items-center space-x-4">
-                        <span className="text-sm text-myslt-text-secondary">Type: {selectedPreBuiltTemplate.type || 'informational'}</span>
+                        <span className="text-sm text-slate-600">Type: {selectedPreBuiltTemplate.type || 'informational'}</span>
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm text-myslt-text-secondary">Channels:</span>
+                          <span className="text-sm text-slate-600">Channels:</span>
                           {(selectedPreBuiltTemplate.channels || ['email']).map(channel => (
                             <span key={channel} className="bg-gray-100 px-2 py-1 rounded text-xs">{channel}</span>
                           ))}
@@ -1145,7 +1145,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                             handleTemplateEdit(selectedPreBuiltTemplate);
                             setShowTemplatePreview(false);
                           }}
-                          className="px-4 py-2 text-myslt-primary border border-myslt-primary rounded-lg hover:bg-myslt-primary/10"
+                          className="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-white/10"
                         >
                           Edit
                         </button>
@@ -1154,7 +1154,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                             handlePreBuiltTemplateSelect(selectedPreBuiltTemplate);
                             setShowTemplatePreview(false);
                           }}
-                          className="px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-myslt-primary/90"
+                          className="px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90"
                         >
                           Use Template
                         </button>

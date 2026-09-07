@@ -459,56 +459,56 @@ export const ConsentManagement: React.FC<ConsentManagementProps> = ({ selectedCu
 
         {/* Consent Table */}
         <div className="overflow-x-auto">
-          <table className="myslt-table">
-            <thead className="myslt-table-header">
+          <table className="min-w-full divide-y divide-slate-200 bg-white rounded-lg overflow-hidden border border-slate-200">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Customer
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Consent Type
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Channel
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Granted Date
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="myslt-table-body">
+            <tbody className="bg-white divide-y divide-slate-200">
               {filteredConsents.map((consent: any) => (
-                <tr key={consent.id} className="myslt-table-row">
-                  <td className="myslt-table-cell-primary">
-                    <div className="text-myslt-text-primary font-medium">
+                <tr key={consent.id} className="hover:bg-slate-50 transition-colors duration-150">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                    <div className="text-slate-900 font-medium">
                       {getCustomerName(consent.partyId)}
                     </div>
-                    <div className="text-myslt-text-muted text-xs">{consent.partyId}</div>
+                    <div className="text-slate-500 text-xs">{consent.partyId}</div>
                   </td>
-                  <td className="myslt-table-cell">{consent.purpose}</td>
-                  <td className="myslt-table-cell">{consent.channel}</td>
-                  <td className="myslt-table-cell">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{consent.purpose}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{consent.channel}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(consent.status)}`}>
                       {getStatusIcon(consent.status)}
                       <span className="ml-1">{consent.status}</span>
                     </span>
                   </td>
-                  <td className="myslt-table-cell">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     {new Date(consent.timestampGranted).toLocaleDateString()}
                   </td>
-                  <td className="myslt-table-cell font-medium space-x-2">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium space-x-2">
                     <button
                       onClick={() => {
                         setSelectedConsent(consent);
                         setShowModal(true);
                       }}
-                      className="text-myslt-accent hover:text-myslt-primary inline-flex items-center transition-colors"
+                      className="text-blue-600 hover:text-blue-600 inline-flex items-center transition-colors"
                     >
                       <Eye className="h-4 w-4 mr-1" />
                       View
@@ -516,7 +516,7 @@ export const ConsentManagement: React.FC<ConsentManagementProps> = ({ selectedCu
                     {consent.status === 'granted' && (
                       <button
                         onClick={() => handleUpdateConsent(consent.id, 'revoked')}
-                        className="text-myslt-danger hover:text-red-400 inline-flex items-center transition-colors"
+                        className="text-red-600 hover:text-red-400 inline-flex items-center transition-colors"
                       >
                         <X className="h-4 w-4 mr-1" />
                         Revoke

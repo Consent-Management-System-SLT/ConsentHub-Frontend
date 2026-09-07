@@ -346,8 +346,8 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-myslt-text-primary">Communication Preferences</h1>
-          <p className="text-myslt-text-secondary mt-2">Manage customer communication preferences and settings</p>
+          <h1 className="text-3xl font-bold text-slate-900">Communication Preferences</h1>
+          <p className="text-slate-600 mt-2">Manage customer communication preferences and settings</p>
           {selectedCustomer && (
             <div className="flex items-center space-x-2 mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -360,14 +360,14 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       </div>
 
       {/* Customer Selection */}
-      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20">
-        <div className="p-6 border-b border-myslt-accent/20">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+        <div className="p-6 border-b border-slate-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <User className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-myslt-text-primary">Customer Selection</h2>
+              <h2 className="text-lg font-semibold text-slate-900">Customer Selection</h2>
               <p className="text-sm text-gray-500">Search and select a customer to manage their communication preferences</p>
               <div className="mt-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block">
                 💡 Tip: Search by name, email, phone number, or customer ID
@@ -396,7 +396,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 </button>
               </div>
               {searchTerm && (
-                <div className="mt-2 max-h-60 overflow-y-auto border border-myslt-accent/20 rounded-lg">
+                <div className="mt-2 max-h-60 overflow-y-auto border border-slate-200 rounded-lg">
                   {filteredCustomers.map(customer => (
                     <div
                       key={customer.id}
@@ -404,13 +404,13 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                         setSelectedCustomer(customer.id);
                         setSearchTerm('');
                       }}
-                      className="p-3 hover:bg-myslt-service-card cursor-pointer border-b border-myslt-border last:border-b-0 transition-colors"
+                      className="p-3 hover:bg-white border border-slate-200 cursor-pointer border-b border-slate-200 last:border-b-0 transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <User className="w-5 h-5 text-gray-500" />
                           <div>
-                            <div className="font-medium text-myslt-text-primary">{customer.name}</div>
+                            <div className="font-medium text-slate-900">{customer.name}</div>
                             <div className="text-sm text-gray-500">{customer.email}</div>
                             <div className="text-xs text-gray-400">ID: {customer.id} • {customer.phone}</div>
                           </div>
@@ -506,7 +506,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-white">Communication Channels</h2>
-                    <p className="text-blue-200 text-sm">Choose how you'd like to receive notifications</p>
+                    <p className="text-slate-500 text-sm">Choose how you'd like to receive notifications</p>
                   </div>
                 </div>
               </div>
@@ -515,7 +515,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   <div key={channel.key} className="flex items-center justify-between py-3 border-b border-blue-700/20 last:border-0">
                     <div className="flex-1">
                       <h3 className="font-semibold text-white text-base">{channel.name}</h3>
-                      <p className="text-blue-200 text-sm">{channel.description}</p>
+                      <p className="text-slate-500 text-sm">{channel.description}</p>
                     </div>
                     <div className="ml-4">
                       <button
@@ -534,7 +534,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     </div>
                   </div>
                 )) || (
-                  <div className="text-center py-8 text-blue-200">
+                  <div className="text-center py-8 text-slate-500">
                     <p>Loading communication channels...</p>
                   </div>
                 )}
@@ -550,7 +550,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-white">Topic Subscriptions</h2>
-                    <p className="text-blue-200 text-sm">Select the types of communications you want to receive</p>
+                    <p className="text-slate-500 text-sm">Select the types of communications you want to receive</p>
                   </div>
                 </div>
               </div>
@@ -559,7 +559,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   <div key={topic.key} className="flex items-center justify-between py-3 border-b border-blue-700/20 last:border-0">
                     <div className="flex-1">
                       <h3 className="font-semibold text-white text-base">{topic.name}</h3>
-                      <p className="text-blue-200 text-sm">{topic.description}</p>
+                      <p className="text-slate-500 text-sm">{topic.description}</p>
                     </div>
                     <div className="ml-4">
                       <button
@@ -578,7 +578,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     </div>
                   </div>
                 )) || (
-                  <div className="text-center py-8 text-blue-200">
+                  <div className="text-center py-8 text-slate-500">
                     <p>Loading topic subscriptions...</p>
                   </div>
                 )}
@@ -598,7 +598,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-white">Do Not Disturb</h2>
-                    <p className="text-blue-200 text-sm">Set quiet hours for notifications</p>
+                    <p className="text-slate-500 text-sm">Set quiet hours for notifications</p>
                   </div>
                 </div>
               </div>
@@ -606,7 +606,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 <div className="flex items-center justify-between py-3">
                   <div className="flex-1">
                     <h3 className="font-semibold text-white text-base">Enable Do Not Disturb</h3>
-                    <p className="text-blue-200 text-sm">Suppress non-urgent notifications during specified hours</p>
+                    <p className="text-slate-500 text-sm">Suppress non-urgent notifications during specified hours</p>
                   </div>
                   <div className="ml-4">
                     <button
@@ -629,7 +629,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   <div className="space-y-4 mt-4 pt-4 border-t border-blue-700/20">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-blue-200 mb-2">Start Time</label>
+                        <label className="block text-sm font-medium text-slate-500 mb-2">Start Time</label>
                         <input
                           type="time"
                           value={preferences.dndSettings.startTime}
@@ -639,7 +639,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-blue-200 mb-2">End Time</label>
+                        <label className="block text-sm font-medium text-slate-500 mb-2">End Time</label>
                         <input
                           type="time"
                           value={preferences.dndSettings.endTime}
@@ -663,13 +663,13 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-white">Frequency Limits</h2>
-                    <p className="text-blue-200 text-sm">Control how often you receive notifications</p>
+                    <p className="text-slate-500 text-sm">Control how often you receive notifications</p>
                   </div>
                 </div>
               </div>
               <div className="p-6 space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-blue-200 mb-3">Maximum Emails per Day</label>
+                  <label className="block text-sm font-medium text-slate-500 mb-3">Maximum Emails per Day</label>
                   <select
                     value={preferences.frequency.maxEmailsPerDay || 3}
                     onChange={(e) => isEditing && updateFrequencySettings('maxEmailsPerDay', parseInt(e.target.value))}
@@ -685,7 +685,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-blue-200 mb-3">Maximum SMS per Day</label>
+                  <label className="block text-sm font-medium text-slate-500 mb-3">Maximum SMS per Day</label>
                   <select
                     value={preferences.frequency.maxSmsPerDay || 2}
                     onChange={(e) => isEditing && updateFrequencySettings('maxSmsPerDay', parseInt(e.target.value))}
@@ -702,7 +702,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 <div className="flex items-center justify-between py-3 border-t border-blue-700/20">
                   <div className="flex-1">
                     <h3 className="font-semibold text-white text-base">Daily Digest Mode</h3>
-                    <p className="text-blue-200 text-sm">Receive a single daily summary instead of individual notifications</p>
+                    <p className="text-slate-500 text-sm">Receive a single daily summary instead of individual notifications</p>
                   </div>
                   <div className="ml-4">
                     <button
@@ -753,19 +753,19 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
           )}
         </div>
       ) : selectedCustomer && loading ? (
-        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-12">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-myslt-text-secondary">Loading preferences...</p>
+            <p className="text-slate-600">Loading preferences...</p>
           </div>
         </div>
       ) : (
-        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-accent/20 p-12">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12">
           <div className="text-center">
-            <div className="w-16 h-16 bg-myslt-service-card rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-white border border-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
               <Settings className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-myslt-text-primary mb-2">No Customer Selected</h3>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No Customer Selected</h3>
             <p className="text-gray-500">Select a customer to view and edit their communication preferences</p>
           </div>
         </div>

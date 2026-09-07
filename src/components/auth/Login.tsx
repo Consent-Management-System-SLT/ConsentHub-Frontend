@@ -83,9 +83,9 @@ const Login: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-myslt-background py-4 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-4 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8">
       <div className="max-w-sm sm:max-w-md md:max-w-lg w-full space-y-4 sm:space-y-6 md:space-y-8">
-        <div className="myslt-card p-4 sm:p-6 md:p-8">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-6 md:p-8">
           {/* Logo and header */}
           <div className="text-center">
             <img 
@@ -93,32 +93,32 @@ const Login: React.FC = () => {
               alt="SLT-Mobitel" 
               className="mx-auto h-12 sm:h-14 md:h-16 w-auto mb-3 sm:mb-4"
             />
-            <h2 className="text-2xl sm:text-3xl font-bold text-myslt-text-primary mb-1 sm:mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1 sm:mb-2">
               {t('auth.signIn')}
             </h2>
-            <p className="text-myslt-text-secondary text-sm sm:text-base">Consent Management System</p>
+            <p className="text-slate-600 text-sm sm:text-base">Consent Management System</p>
           </div>
 
           {/* Success message */}
           {success && (
-            <div className="mt-3 sm:mt-4 p-3 bg-myslt-success/20 border border-myslt-success/30 rounded-md flex items-start sm:items-center space-x-2">
-              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-myslt-success flex-shrink-0 mt-0.5 sm:mt-0" />
-              <span className="text-myslt-text-primary text-sm">{success}</span>
+            <div className="mt-3 sm:mt-4 p-3 bg-green-600/20 border border-green-200/30 rounded-md flex items-start sm:items-center space-x-2">
+              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 flex-shrink-0 mt-0.5 sm:mt-0" />
+              <span className="text-slate-900 text-sm">{success}</span>
             </div>
           )}
 
           {/* Error message */}
           {error && (
-            <div className="mt-3 sm:mt-4 p-3 bg-myslt-danger/20 border border-myslt-danger/30 rounded-md flex items-start sm:items-center space-x-2">
-              <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-myslt-danger flex-shrink-0 mt-0.5 sm:mt-0" />
-              <span className="text-myslt-text-primary text-sm">{error}</span>
+            <div className="mt-3 sm:mt-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-start sm:items-center space-x-2">
+              <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 flex-shrink-0 mt-0.5 sm:mt-0" />
+              <span className="text-slate-900 text-sm">{error}</span>
             </div>
           )}
 
           {/* Login form */}
           <form className="mt-4 sm:mt-6 space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-myslt-text-primary mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-900 mb-1">
                 {t('auth.email')}
               </label>
               <input
@@ -129,13 +129,13 @@ const Login: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="myslt-input mt-1 block w-full py-2.5 sm:py-3 text-sm sm:text-base"
+                className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors mt-1 block w-full py-2.5 sm:py-3 text-sm sm:text-base"
                 placeholder="Enter your email"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-myslt-text-primary mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-900 mb-1">
                 {t('auth.password')}
               </label>
               <div className="mt-1 relative">
@@ -147,7 +147,7 @@ const Login: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="myslt-input block w-full py-2.5 sm:py-3 pr-10 text-sm sm:text-base"
+                  className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors block w-full py-2.5 sm:py-3 pr-10 text-sm sm:text-base"
                   placeholder="Enter your password"
                 />
                 <button
@@ -156,9 +156,9 @@ const Login: React.FC = () => {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4 sm:h-5 sm:w-5 text-myslt-text-muted" />
+                    <EyeOff className="h-4 w-4 sm:h-5 sm:w-5 text-slate-500" />
                   ) : (
-                    <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-myslt-text-muted" />
+                    <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-slate-500" />
                   )}
                 </button>
               </div>
@@ -170,9 +170,9 @@ const Login: React.FC = () => {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-myslt-accent focus:ring-myslt-accent border-myslt-accent/50 rounded bg-myslt-card"
+                  className="h-4 w-4 text-blue-600 focus:ring-myslt-accent border-slate-200 rounded bg-white border border-slate-200 rounded-xl shadow-sm"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-myslt-text-primary">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-900">
                   {t('auth.rememberMe')}
                 </label>
               </div>
@@ -180,7 +180,7 @@ const Login: React.FC = () => {
               <div className="text-sm order-1 sm:order-2">
                 <Link
                   to="/forgot-password"
-                  className="font-medium text-myslt-text-accent hover:text-myslt-accent transition-colors"
+                  className="font-medium text-blue-600 hover:text-blue-600 transition-colors"
                 >
                   {t('auth.forgotPassword')}
                 </Link>
@@ -191,7 +191,7 @@ const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="myslt-btn-primary group relative w-full flex justify-center py-2.5 sm:py-3 px-4 text-sm sm:text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 group relative w-full flex justify-center py-2.5 sm:py-3 px-4 text-sm sm:text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
@@ -202,10 +202,10 @@ const Login: React.FC = () => {
             </div>
 
             <div className="text-center">
-              <span className="text-sm text-myslt-text-secondary">{t('auth.noAccount')} </span>
+              <span className="text-sm text-slate-600">{t('auth.noAccount')} </span>
               <Link
                 to="/signup"
-                className="font-medium text-myslt-text-accent hover:text-myslt-accent transition-colors"
+                className="font-medium text-blue-600 hover:text-blue-600 transition-colors"
               >
                 {t('auth.signUp')}
               </Link>

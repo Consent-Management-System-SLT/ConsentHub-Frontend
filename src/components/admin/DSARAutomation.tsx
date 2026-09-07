@@ -117,7 +117,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
       rectification: Edit
     };
     const IconComponent = icons[type as keyof typeof icons] || FileText;
-    return <IconComponent className="myslt-icon" />;
+    return <IconComponent className="w-4 h-4 text-slate-500" />;
   };
 
   const getAutomationRecommendation = (request: DSARRequest) => {
@@ -158,8 +158,8 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
     <div className="space-y-4 sm:space-y-6 max-w-full overflow-x-hidden">
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-myslt-text-primary mb-2">DSAR Automation Dashboard</h1>
-        <p className="text-myslt-text-secondary">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">DSAR Automation Dashboard</h1>
+        <p className="text-slate-600">
           Intelligent automation for Data Subject Access Requests with compliance tracking
         </p>
       </div>
@@ -191,17 +191,17 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
       </div>
 
       {/* Pending Requests with Auto-Processing */}
-      <div className="myslt-card overflow-hidden">
-        <div className="px-4 sm:px-6 py-4 border-b border-myslt-border">
-          <h4 className="text-lg font-semibold text-myslt-text-primary">Pending DSAR Requests</h4>
-          <p className="text-myslt-text-secondary text-sm mt-1">Requests eligible for automated processing</p>
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 border-b border-slate-200">
+          <h4 className="text-lg font-semibold text-slate-900">Pending DSAR Requests</h4>
+          <p className="text-slate-600 text-sm mt-1">Requests eligible for automated processing</p>
         </div>
         
         <div className="divide-y divide-myslt-border">
           {pendingRequests.length === 0 ? (
-            <div className="p-6 sm:p-8 text-center text-myslt-text-muted">
-              <div className="w-12 sm:w-16 h-12 sm:h-16 bg-myslt-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 sm:w-8 h-6 sm:h-8 text-myslt-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="p-6 sm:p-8 text-center text-slate-500">
+              <div className="w-12 sm:w-16 h-12 sm:h-16 bg-slate-50/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 sm:w-8 h-6 sm:h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
@@ -219,46 +219,46 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                       <div className="text-xl sm:text-2xl">{renderRequestTypeIcon(request.requestType)}</div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <h5 className="font-medium text-myslt-text-primary">
+                          <h5 className="font-medium text-slate-900">
                             {request.requestType.charAt(0).toUpperCase() + request.requestType.slice(1)} Request
                           </h5>
                           {getStatusBadge(request.status)}
                         </div>
-                        <p className="text-sm text-myslt-text-secondary mb-2">
+                        <p className="text-sm text-slate-600 mb-2">
                           Requester: {request.requesterName} ({request.requesterEmail})
                         </p>
-                        <p className="text-sm text-myslt-text-muted">
+                        <p className="text-sm text-slate-500">
                           Created: {new Date(request.createdAt).toLocaleDateString()}
                         </p>
                         
                         {recommendation && (
                           <div className={`mt-3 p-3 rounded-lg border ${
-                            recommendation.level === 'high' ? 'bg-myslt-danger/20 border-myslt-danger/30' :
-                            recommendation.level === 'medium' ? 'bg-myslt-warning/20 border-myslt-warning/30' :
-                            'bg-myslt-info/20 border-myslt-info/30'
+                            recommendation.level === 'high' ? 'bg-red-50 border-red-200' :
+                            recommendation.level === 'medium' ? 'bg-amber-600/20 border-slate-200/30' :
+                            'bg-blue-600/20 border-slate-200/30'
                           }`}>
                             <div className="flex items-start">
                               <div className={`w-5 h-5 rounded-full flex items-center justify-center mr-3 mt-0.5 ${
-                                recommendation.level === 'high' ? 'bg-myslt-danger/30' :
-                                recommendation.level === 'medium' ? 'bg-myslt-warning/30' :
-                                'bg-myslt-info/30'
+                                recommendation.level === 'high' ? 'bg-red-600/30' :
+                                recommendation.level === 'medium' ? 'bg-amber-600/30' :
+                                'bg-blue-600/30'
                               }`}>
-                                {recommendation.level === 'high' ? <AlertTriangle className="w-3 h-3 text-myslt-danger" /> :
-                                 recommendation.level === 'medium' ? <Clock className="w-3 h-3 text-myslt-warning" /> : 
-                                 <Info className="w-3 h-3 text-myslt-info" />}
+                                {recommendation.level === 'high' ? <AlertTriangle className="w-3 h-3 text-red-600" /> :
+                                 recommendation.level === 'medium' ? <Clock className="w-3 h-3 text-amber-600" /> : 
+                                 <Info className="w-3 h-3 text-blue-600" />}
                               </div>
                               <div>
                                 <p className={`text-sm font-medium ${
-                                  recommendation.level === 'high' ? 'text-myslt-danger' :
-                                  recommendation.level === 'medium' ? 'text-myslt-warning' :
-                                  'text-myslt-info'
+                                  recommendation.level === 'high' ? 'text-red-600' :
+                                  recommendation.level === 'medium' ? 'text-amber-600' :
+                                  'text-blue-600'
                                 }`}>
                                   Automation Recommendation
                                 </p>
                                 <p className={`text-sm ${
-                                  recommendation.level === 'high' ? 'text-myslt-danger' :
-                                  recommendation.level === 'medium' ? 'text-myslt-warning' :
-                                  'text-myslt-info'
+                                  recommendation.level === 'high' ? 'text-red-600' :
+                                  recommendation.level === 'medium' ? 'text-amber-600' :
+                                  'text-blue-600'
                                 }`}>
                                   {recommendation.message}
                                 </p>
@@ -280,9 +280,9 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                           }
                         }}
                         disabled={isProcessing}
-                        className={`myslt-btn-primary px-4 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
+                        className={`bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-4 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
                           recommendation?.level === 'high' 
-                            ? 'bg-myslt-danger hover:bg-myslt-danger/90 text-white border-myslt-danger' 
+                            ? 'bg-red-600 hover:bg-red-600/90 text-white border-slate-200' 
                             : ''
                         }`}
                       >
@@ -300,19 +300,19 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                   
                   {/* Processing Result */}
                   {processingResults[request.id] && (
-                    <div className="mt-4 p-4 bg-myslt-success/20 border border-myslt-success/30 rounded-lg">
-                      <h6 className="font-medium text-myslt-success mb-2">Processing Completed</h6>
-                      <div className="text-sm text-myslt-success space-y-1">
+                    <div className="mt-4 p-4 bg-green-600/20 border border-green-200/30 rounded-lg">
+                      <h6 className="font-medium text-green-600 mb-2">Processing Completed</h6>
+                      <div className="text-sm text-green-600 space-y-1">
                         {processingResults[request.id].dataExported && (
-                          <p className="flex items-center"><CheckCircle className="myslt-icon mr-1 text-green-500" /> Data exported successfully</p>
+                          <p className="flex items-center"><CheckCircle className="w-4 h-4 text-slate-500 mr-1 text-green-500" /> Data exported successfully</p>
                         )}
                         {processingResults[request.id].dataDeleted && (
-                          <p className="flex items-center"><CheckCircle className="myslt-icon mr-1 text-green-500" /> Data deleted and anonymized</p>
+                          <p className="flex items-center"><CheckCircle className="w-4 h-4 text-slate-500 mr-1 text-green-500" /> Data deleted and anonymized</p>
                         )}
                         {processingResults[request.id].exportSize && (
-                          <p className="flex items-center"><BarChart className="myslt-icon mr-1" /> Export size: {Math.round(processingResults[request.id].exportSize / 1024)} KB</p>
+                          <p className="flex items-center"><BarChart className="w-4 h-4 text-slate-500 mr-1" /> Export size: {Math.round(processingResults[request.id].exportSize / 1024)} KB</p>
                         )}
-                        <p className="flex items-center"><Clock className="myslt-icon mr-1" /> Processed at: {new Date(processingResults[request.id].processingTime).toLocaleString()}</p>
+                        <p className="flex items-center"><Clock className="w-4 h-4 text-slate-500 mr-1" /> Processed at: {new Date(processingResults[request.id].processingTime).toLocaleString()}</p>
                       </div>
                     </div>
                   )}
@@ -325,10 +325,10 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
 
       {/* Recently Completed Requests */}
       {completedRequests.length > 0 && (
-        <div className="myslt-card overflow-hidden">
-          <div className="px-4 sm:px-6 py-4 border-b border-myslt-border">
-            <h4 className="text-lg font-semibold text-myslt-text-primary">Recently Auto-Processed Requests</h4>
-            <p className="text-myslt-text-secondary text-sm mt-1">Successfully automated DSAR completions</p>
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="px-4 sm:px-6 py-4 border-b border-slate-200">
+            <h4 className="text-lg font-semibold text-slate-900">Recently Auto-Processed Requests</h4>
+            <p className="text-slate-600 text-sm mt-1">Successfully automated DSAR completions</p>
           </div>
           
           <div className="divide-y divide-myslt-border max-h-64 overflow-y-auto">
@@ -337,16 +337,16 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                 <div className="flex items-center space-x-4">
                   <div className="text-lg sm:text-xl">{renderRequestTypeIcon(request.requestType)}</div>
                   <div>
-                    <p className="font-medium text-myslt-text-primary">
+                    <p className="font-medium text-slate-900">
                       {request.requestType.charAt(0).toUpperCase() + request.requestType.slice(1)} Request
                     </p>
-                    <p className="text-sm text-myslt-text-secondary">{request.requesterName}</p>
+                    <p className="text-sm text-slate-600">{request.requesterName}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   {getStatusBadge(request.status)}
                   {request.completedAt && (
-                    <p className="text-xs text-myslt-text-muted mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       {new Date(request.completedAt).toLocaleDateString()}
                     </p>
                   )}

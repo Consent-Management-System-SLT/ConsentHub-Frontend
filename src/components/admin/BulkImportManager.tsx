@@ -322,21 +322,21 @@ CSR User,csr@example.com,+1987654321,csr,true`
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-myslt-text-primary">Bulk Import</h1>
-          <p className="text-myslt-text-secondary mt-2">Import customer data and consents in bulk</p>
+          <h1 className="text-3xl font-bold text-slate-900">Bulk Import</h1>
+          <p className="text-slate-600 mt-2">Import customer data and consents in bulk</p>
         </div>
         <div className="flex items-center space-x-3">
           <button 
             onClick={handleDownloadTemplate}
-            className="px-4 py-2 bg-myslt-card-solid border border-myslt-border rounded-lg hover:bg-myslt-service-card transition-colors flex items-center space-x-2"
+            className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-white border border-slate-200 transition-colors flex items-center space-x-2"
           >
-            <Download className="w-4 h-4 text-myslt-text-muted" />
-            <span className="text-sm font-medium text-myslt-text-secondary">Download Template</span>
+            <Download className="w-4 h-4 text-slate-500" />
+            <span className="text-sm font-medium text-slate-600">Download Template</span>
           </button>
           <button 
             onClick={handleRefresh}
             disabled={refreshing}
-            className="px-4 py-2 bg-myslt-danger text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
             <span className="text-sm font-medium">Refresh</span>
@@ -346,8 +346,8 @@ CSR User,csr@example.com,+1987654321,csr,true`
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Upload Section */}
-        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
-          <h3 className="text-lg font-semibold text-myslt-text-primary mb-4">Upload Data</h3>
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Upload Data</h3>
           
           {/* Import Type Selection */}
           <div className="mb-4">
@@ -378,7 +378,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
             <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             {selectedFile ? (
               <div className="space-y-4">
-                <div className="bg-myslt-service-card rounded-lg p-4">
+                <div className="bg-white border border-slate-200 rounded-lg p-4">
                   <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
                   <p className="text-xs text-gray-500">{formatFileSize(selectedFile.size)}</p>
                 </div>
@@ -446,9 +446,9 @@ CSR User,csr@example.com,+1987654321,csr,true`
         </div>
 
         {/* Import History Section */}
-        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-myslt-text-primary">Import History</h3>
+            <h3 className="text-lg font-semibold text-slate-900">Import History</h3>
           </div>
 
           {/* Filters */}
@@ -499,16 +499,16 @@ CSR User,csr@example.com,+1987654321,csr,true`
             <>
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {importHistory.length > 0 ? importHistory.map((item) => (
-                  <div key={item._id} className="border border-myslt-accent/20 rounded-lg p-4 bg-myslt-card">
+                  <div key={item._id} className="border border-slate-200 rounded-lg p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center space-x-3">
                         {getStatusIcon(item.status)}
                         <div>
-                          <p className="text-sm font-medium text-myslt-text-primary">{item.fileName}</p>
-                          <p className="text-xs text-myslt-text-muted">
+                          <p className="text-sm font-medium text-slate-900">{item.fileName}</p>
+                          <p className="text-xs text-slate-500">
                             {new Date(item.createdAt).toLocaleDateString()} at {new Date(item.createdAt).toLocaleTimeString()}
                           </p>
-                          <p className="text-xs text-myslt-text-muted">
+                          <p className="text-xs text-slate-500">
                             Type: {item.importType} • Size: {formatFileSize(item.fileSize)}
                           </p>
                         </div>
@@ -520,20 +520,20 @@ CSR User,csr@example.com,+1987654321,csr,true`
                     
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-myslt-text-muted">Total Records</p>
-                        <p className="font-medium text-myslt-text-primary">{(item.totalCount || 0).toLocaleString()}</p>
+                        <p className="text-slate-500">Total Records</p>
+                        <p className="font-medium text-slate-900">{(item.totalCount || 0).toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-myslt-text-muted">Processed</p>
-                        <p className="font-medium text-myslt-text-primary">{(item.processedCount || 0).toLocaleString()}</p>
+                        <p className="text-slate-500">Processed</p>
+                        <p className="font-medium text-slate-900">{(item.processedCount || 0).toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-myslt-text-muted">Successful</p>
-                        <p className="font-medium text-myslt-success">{(item.successfulCount || 0).toLocaleString()}</p>
+                        <p className="text-slate-500">Successful</p>
+                        <p className="font-medium text-green-600">{(item.successfulCount || 0).toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-myslt-text-muted">Errors</p>
-                        <p className="font-medium text-myslt-danger">{(item.failedCount || 0).toLocaleString()}</p>
+                        <p className="text-slate-500">Errors</p>
+                        <p className="font-medium text-red-600">{(item.failedCount || 0).toLocaleString()}</p>
                       </div>
                     </div>
                     
@@ -614,7 +614,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
       {/* Error Details Modal */}
       {showErrorModal && selectedImport && selectedImport.errors && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-myslt-card-solid rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">
@@ -622,7 +622,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
                 </h3>
                 <button 
                   onClick={() => setShowErrorModal(false)}
-                  className="p-2 hover:bg-myslt-service-card rounded-lg transition-colors"
+                  className="p-2 hover:bg-white border border-slate-200 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>

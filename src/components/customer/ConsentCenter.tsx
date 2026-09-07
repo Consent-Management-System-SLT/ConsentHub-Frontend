@@ -284,8 +284,8 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 animate-spin text-myslt-accent mr-3" />
-        <span className="text-myslt-text-secondary">Loading consents...</span>
+        <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mr-3" />
+        <span className="text-slate-600">Loading consents...</span>
       </div>
     );
   }
@@ -316,15 +316,15 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'granted':
-        return 'bg-myslt-success/10 text-myslt-success border-myslt-success/20';
+        return 'bg-green-50 text-green-600 border-green-200';
       case 'revoked':
         return 'bg-red-100 text-red-800 border-red-200';
       case 'expired':
-        return 'bg-myslt-service-card text-myslt-text-muted border-myslt-accent/30';
+        return 'bg-white border border-slate-200 text-slate-500 border-slate-200';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       default:
-        return 'bg-myslt-service-card text-myslt-text-muted border-myslt-accent/30';
+        return 'bg-white border border-slate-200 text-slate-500 border-slate-200';
     }
   };
 
@@ -424,14 +424,14 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
-      <div className="bg-myslt-card rounded-xl shadow-lg border border-myslt-accent/20 mb-6">
-        <div className="p-6 border-b border-myslt-accent/20 bg-myslt-gradient text-white rounded-t-xl">
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-lg border border-slate-200 mb-6">
+        <div className="p-6 border-b border-slate-200 bg-slate-50 text-white rounded-t-xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Shield className="w-8 h-8" />
               <div>
                 <h1 className="text-2xl font-bold">{t('consentCenter.title')}</h1>
-                <p className="text-blue-100">{t('consentCenter.subtitle')}</p>
+                <p className="text-slate-600">{t('consentCenter.subtitle')}</p>
               </div>
             </div>
             <button
@@ -450,24 +450,24 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
           <div className="flex flex-col lg:flex-row gap-4 mb-6">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-3 w-5 h-5 text-myslt-text-secondary" />
+                <Search className="absolute left-3 top-3 w-5 h-5 text-slate-600" />
                 <input
                   type="text"
                   placeholder={t('consentCenter.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-myslt-accent/30 rounded-lg focus:ring-2 focus:ring-myslt-accent focus:border-transparent bg-myslt-background"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-accent focus:border-transparent bg-slate-50"
                 />
               </div>
             </div>
             
             <div className="flex gap-3">
               <div className="relative">
-                <Filter className="absolute left-3 top-3 w-5 h-5 text-myslt-text-secondary" />
+                <Filter className="absolute left-3 top-3 w-5 h-5 text-slate-600" />
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="pl-10 pr-8 py-3 border border-myslt-accent/30 rounded-lg bg-myslt-background appearance-none"
+                  className="pl-10 pr-8 py-3 border border-slate-200 rounded-lg bg-slate-50 appearance-none"
                 >
                   <option value="all">{t('consentCenter.filters.allStatus')}</option>
                   <option value="granted">{t('consentCenter.filters.granted')}</option>
@@ -478,11 +478,11 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
               </div>
               
               <div className="relative">
-                <Tag className="absolute left-3 top-3 w-5 h-5 text-myslt-text-secondary" />
+                <Tag className="absolute left-3 top-3 w-5 h-5 text-slate-600" />
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="pl-10 pr-8 py-3 border border-myslt-accent/30 rounded-lg bg-myslt-background appearance-none"
+                  className="pl-10 pr-8 py-3 border border-slate-200 rounded-lg bg-slate-50 appearance-none"
                 >
                   <option value="all">{t('consentCenter.filters.allCategories')}</option>
                   <option value="Marketing">{t('consentCenter.categories.marketing')}</option>
@@ -499,11 +499,11 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
 
           {/* Consent Statistics */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-            <div className="bg-myslt-background p-4 rounded-lg border border-myslt-accent/20">
-              <div className="text-2xl font-bold text-myslt-text-primary">
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div className="text-2xl font-bold text-slate-900">
                 {filteredConsents.length}
               </div>
-              <div className="text-sm text-myslt-text-secondary">{t('customerDashboard.overview.totalConsents')}</div>
+              <div className="text-sm text-slate-600">{t('customerDashboard.overview.totalConsents')}</div>
             </div>
             <div className="bg-green-50 p-4 rounded-lg border border-green-200">
               <div className="text-2xl font-bold text-green-600">
@@ -549,13 +549,13 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
           <div className="grid gap-4">
             {filteredConsents.length === 0 ? (
               <div className="text-center py-12">
-                <Shield className="w-16 h-16 mx-auto text-myslt-text-muted mb-4" />
-                <h3 className="text-xl font-semibold text-myslt-text-secondary mb-2">{t('consentCenter.noConsents')}</h3>
-                <p className="text-myslt-text-muted">Try adjusting your search or filter criteria.</p>
+                <Shield className="w-16 h-16 mx-auto text-slate-500 mb-4" />
+                <h3 className="text-xl font-semibold text-slate-600 mb-2">{t('consentCenter.noConsents')}</h3>
+                <p className="text-slate-500">Try adjusting your search or filter criteria.</p>
               </div>
             ) : (
               filteredConsents.map(consent => (
-                <div key={consent.id} className="bg-myslt-background border border-myslt-accent/20 rounded-lg p-6 hover:shadow-md transition-shadow">
+                <div key={consent.id} className="bg-slate-50 border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-start space-x-4">
@@ -564,14 +564,14 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                         </div>
                         
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-semibold text-myslt-text-primary mb-1">
+                          <h3 className="text-lg font-semibold text-slate-900 mb-1">
                             {consent.purpose}
                           </h3>
-                          <p className="text-myslt-text-secondary mb-3">
+                          <p className="text-slate-600 mb-3">
                             {consent.description}
                           </p>
                           
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-myslt-text-muted mb-4">
+                          <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 mb-4">
                             <span className="flex items-center">
                               <Tag className="w-4 h-4 mr-1" />
                               {consent.category}
@@ -597,7 +597,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                               {consent.status.charAt(0).toUpperCase() + consent.status.slice(1)}
                             </span>
                             
-                            <span className="text-xs text-myslt-text-muted">
+                            <span className="text-xs text-slate-500">
                               Last updated: {new Date(consent.lastUpdated).toLocaleDateString()}
                             </span>
                           </div>
@@ -608,7 +608,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                     <div className="flex flex-col space-y-2 ml-4">
                       <button
                         onClick={() => setSelectedConsent(consent)}
-                        className="px-3 py-2 text-myslt-accent hover:bg-myslt-accent/10 rounded-lg transition-colors flex items-center text-sm"
+                        className="px-3 py-2 text-blue-600 hover:bg-blue-50/10 rounded-lg transition-colors flex items-center text-sm"
                       >
                         <Eye className="w-4 h-4 mr-1" />
                         {t('consentCenter.actions.view')}
@@ -656,14 +656,14 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
       {/* Detail Modal */}
       {selectedConsent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-myslt-card rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-myslt-accent/20 shadow-xl">
-            <div className="p-6 border-b border-myslt-accent/20 bg-myslt-gradient text-white rounded-t-2xl">
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 shadow-xl">
+            <div className="p-6 border-b border-slate-200 bg-slate-50 text-white rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <Shield className="w-8 h-8" />
                   <div>
                     <h2 className="text-2xl font-bold">{selectedConsent.purpose}</h2>
-                    <p className="text-blue-100">{selectedConsent.category}</p>
+                    <p className="text-slate-600">{selectedConsent.category}</p>
                   </div>
                 </div>
                 <button
@@ -678,10 +678,10 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">{t('consentCenter.details.purpose')}</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-3">{t('consentCenter.details.purpose')}</h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.status')}</label>
+                      <label className="text-sm text-slate-600">{t('consentCenter.details.status')}</label>
                       <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border mt-1 ${getStatusColor(selectedConsent.status)}`}>
                         {getStatusIcon(selectedConsent.status)}
                         <span className="ml-2">{t(`consentCenter.status.${selectedConsent.status}`)}</span>
@@ -689,56 +689,56 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                     </div>
                     
                     <div>
-                      <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.channel')}</label>
-                      <p className="text-myslt-text-primary">{selectedConsent.channel}</p>
+                      <label className="text-sm text-slate-600">{t('consentCenter.details.channel')}</label>
+                      <p className="text-slate-900">{selectedConsent.channel}</p>
                     </div>
                     
                     <div>
-                      <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.jurisdiction')}</label>
-                      <p className="text-myslt-text-primary">{selectedConsent.jurisdiction}</p>
+                      <label className="text-sm text-slate-600">{t('consentCenter.details.jurisdiction')}</label>
+                      <p className="text-slate-900">{selectedConsent.jurisdiction}</p>
                     </div>
                   </div>
                 </div>
                 
                 <div>
-                  <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">Timeline</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-3">Timeline</h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.validFrom')}</label>
-                      <p className="text-myslt-text-primary">{new Date(selectedConsent.validFrom).toLocaleDateString()}</p>
+                      <label className="text-sm text-slate-600">{t('consentCenter.details.validFrom')}</label>
+                      <p className="text-slate-900">{new Date(selectedConsent.validFrom).toLocaleDateString()}</p>
                     </div>
                     
                     {selectedConsent.validUntil && (
                       <div>
-                        <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.validUntil')}</label>
-                        <p className="text-myslt-text-primary">{new Date(selectedConsent.validUntil).toLocaleDateString()}</p>
+                        <label className="text-sm text-slate-600">{t('consentCenter.details.validUntil')}</label>
+                        <p className="text-slate-900">{new Date(selectedConsent.validUntil).toLocaleDateString()}</p>
                       </div>
                     )}
                     
                     <div>
-                      <label className="text-sm text-myslt-text-secondary">{t('consentCenter.details.lastUpdated')}</label>
-                      <p className="text-myslt-text-primary">{new Date(selectedConsent.lastUpdated).toLocaleDateString()}</p>
+                      <label className="text-sm text-slate-600">{t('consentCenter.details.lastUpdated')}</label>
+                      <p className="text-slate-900">{new Date(selectedConsent.lastUpdated).toLocaleDateString()}</p>
                     </div>
                   </div>
                 </div>
               </div>
               
               <div>
-                <h3 className="text-lg font-semibold text-myslt-text-primary mb-3">{t('consentCenter.details.description')}</h3>
-                <p className="text-myslt-text-secondary bg-myslt-background p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">{t('consentCenter.details.description')}</h3>
+                <p className="text-slate-600 bg-slate-50 p-4 rounded-lg">
                   {selectedConsent.description}
                 </p>
               </div>
               
-              <div className="flex justify-between items-center pt-4 border-t border-myslt-accent/20">
-                <span className="text-sm text-myslt-text-muted">
+              <div className="flex justify-between items-center pt-4 border-t border-slate-200">
+                <span className="text-sm text-slate-500">
                   {t('consentCenter.details.grantedBy')}: {selectedConsent.grantedBy}
                 </span>
                 
                 <div className="flex space-x-3">
                   <button
                     onClick={() => setSelectedConsent(null)}
-                    className="px-4 py-2 border border-myslt-accent/30 text-myslt-text-secondary rounded-lg hover:bg-myslt-accent/5 transition-colors"
+                    className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-blue-50/5 transition-colors"
                   >
                     {t('consentCenter.actions.close')}
                   </button>

@@ -292,12 +292,12 @@ const PreferenceManager: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-myslt-background">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-slate-50">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-myslt-text-primary">Preference Management</h1>
-          <p className="text-myslt-text-secondary mt-2">Configure and manage customer preferences</p>
+          <h1 className="text-3xl font-bold text-slate-900">Preference Management</h1>
+          <p className="text-slate-600 mt-2">Configure and manage customer preferences</p>
         </div>
         <div className="flex items-center space-x-3">
           <button
@@ -309,7 +309,7 @@ const PreferenceManager: React.FC = () => {
           </button>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            className="px-4 py-2 bg-white text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
             <span className="text-sm font-medium">Add Preference</span>
@@ -338,22 +338,22 @@ const PreferenceManager: React.FC = () => {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-myslt-surface rounded-xl shadow-sm border border-myslt-border p-6">
+          <div className="bg-slate-50 rounded-xl shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-myslt-text-secondary">Total Preferences</p>
-                <p className="text-2xl font-bold text-myslt-primary">{stats.totalPreferences}</p>
+                <p className="text-sm font-medium text-slate-600">Total Preferences</p>
+                <p className="text-2xl font-bold text-blue-600">{stats.totalPreferences}</p>
               </div>
-              <div className="w-12 h-12 bg-myslt-accent rounded-xl flex items-center justify-center">
-                <Settings className="w-6 h-6 text-myslt-primary" />
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                <Settings className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </div>
           
-          <div className="bg-myslt-surface rounded-xl shadow-sm border border-myslt-border p-6">
+          <div className="bg-slate-50 rounded-xl shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-myslt-text-secondary">Active Preferences</p>
+                <p className="text-sm font-medium text-slate-600">Active Preferences</p>
                 <p className="text-2xl font-bold text-green-600">{stats.activePreferences}</p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
@@ -362,10 +362,10 @@ const PreferenceManager: React.FC = () => {
             </div>
           </div>
           
-          <div className="bg-myslt-surface rounded-xl shadow-sm border border-myslt-border p-6">
+          <div className="bg-slate-50 rounded-xl shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-myslt-text-secondary">Total Users</p>
+                <p className="text-sm font-medium text-slate-600">Total Users</p>
                 <p className="text-2xl font-bold text-purple-600">{stats.totalUsers}</p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
@@ -374,10 +374,10 @@ const PreferenceManager: React.FC = () => {
             </div>
           </div>
           
-          <div className="bg-myslt-surface rounded-xl shadow-sm border border-myslt-border p-6">
+          <div className="bg-slate-50 rounded-xl shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-myslt-text-secondary">Categories</p>
+                <p className="text-sm font-medium text-slate-600">Categories</p>
                 <p className="text-2xl font-bold text-orange-600">{stats.categoriesCount}</p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
@@ -389,28 +389,28 @@ const PreferenceManager: React.FC = () => {
       )}
 
       {/* Filters */}
-      <div className="bg-myslt-surface rounded-xl shadow-sm border border-myslt-border p-6 mb-8">
+      <div className="bg-slate-50 rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-myslt-text-primary mb-2">Search</label>
+            <label className="block text-sm font-medium text-slate-900 mb-2">Search</label>
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-myslt-text-muted" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search preferences..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-myslt-border rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-myslt-primary bg-myslt-background text-myslt-text-primary"
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-blue-600 bg-slate-50 text-slate-900"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-myslt-text-primary mb-2">Category</label>
+            <label className="block text-sm font-medium text-slate-900 mb-2">Category</label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-myslt-border rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-myslt-primary bg-myslt-background text-myslt-text-primary"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-blue-600 bg-slate-50 text-slate-900"
             >
               <option value="">All Categories</option>
               {categories.map(cat => (
@@ -420,11 +420,11 @@ const PreferenceManager: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-myslt-text-primary mb-2">Status</label>
+            <label className="block text-sm font-medium text-slate-900 mb-2">Status</label>
             <select
               value={enabledFilter === null ? '' : enabledFilter.toString()}
               onChange={(e) => setEnabledFilter(e.target.value === '' ? null : e.target.value === 'true')}
-              className="w-full px-3 py-2 border border-myslt-border rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-myslt-primary bg-myslt-background text-myslt-text-primary"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-blue-600 bg-slate-50 text-slate-900"
             >
               <option value="">All Status</option>
               <option value="true">Active</option>
@@ -433,11 +433,11 @@ const PreferenceManager: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-myslt-text-primary mb-2">Type</label>
+            <label className="block text-sm font-medium text-slate-900 mb-2">Type</label>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-myslt-border rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-myslt-primary bg-myslt-background text-myslt-text-primary"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-myslt-primary focus:border-blue-600 bg-slate-50 text-slate-900"
             >
               <option value="">All Types</option>
               <option value="boolean">Boolean</option>
@@ -453,7 +453,7 @@ const PreferenceManager: React.FC = () => {
         <div className="mt-4 flex justify-end space-x-2">
           <button
             onClick={loadData}
-            className="px-4 py-2 bg-myslt-primary text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-white text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Apply Filters
           </button>
@@ -473,64 +473,64 @@ const PreferenceManager: React.FC = () => {
       </div>
 
       {/* Preferences Table */}
-      <div className="bg-myslt-surface rounded-xl shadow-sm border border-myslt-border overflow-hidden">
-        <div className="p-6 border-b border-myslt-border">
-          <h3 className="text-lg font-semibold text-myslt-text-primary">Preference Items</h3>
+      <div className="bg-slate-50 rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="p-6 border-b border-slate-200">
+          <h3 className="text-lg font-semibold text-slate-900">Preference Items</h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full myslt-table">
-            <thead className="myslt-table-header">
+          <table className="w-full min-w-full divide-y divide-slate-200 bg-white rounded-lg overflow-hidden border border-slate-200">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Preference
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Category
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Type
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Users
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Priority
                 </th>
-                <th className="myslt-table-header-cell">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-myslt-surface divide-y divide-myslt-border">
+            <tbody className="bg-slate-50 divide-y divide-myslt-border">
               {preferences.map((preference) => {
                 const category = categories.find(c => c.id === preference.categoryId);
                 return (
-                  <tr key={preference.id} className="hover:bg-myslt-accent">
-                    <td className="myslt-table-cell">
+                  <tr key={preference.id} className="hover:bg-blue-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-myslt-accent rounded-xl flex items-center justify-center mr-4">
+                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mr-4">
                           {category && getCategoryIcon(category.icon)}
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-myslt-text-primary">{preference.name}</div>
-                          <div className="text-sm text-myslt-text-secondary">{preference.description}</div>
+                          <div className="text-sm font-medium text-slate-900">{preference.name}</div>
+                          <div className="text-sm text-slate-600">{preference.description}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="myslt-table-cell">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-myslt-accent text-myslt-text-primary">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-slate-900">
                         {category?.name || 'Unknown'}
                       </span>
                     </td>
-                    <td className="myslt-table-cell">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(preference.type)}`}>
                         {preference.type}
                       </span>
                     </td>
-                    <td className="myslt-table-cell">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                       <button
                         onClick={() => handleTogglePreference(preference.id, !preference.enabled)}
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -550,17 +550,17 @@ const PreferenceManager: React.FC = () => {
                         )}
                       </button>
                     </td>
-                    <td className="myslt-table-cell">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                       {preference.users.toLocaleString()}
                     </td>
-                    <td className="myslt-table-cell">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                       {preference.priority}
                     </td>
-                    <td className="myslt-table-cell">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => openEditModal(preference)}
-                          className="text-myslt-primary hover:text-blue-900 p-1 hover:bg-myslt-accent rounded"
+                          className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
@@ -583,8 +583,8 @@ const PreferenceManager: React.FC = () => {
       {/* Create Preference Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-myslt-surface rounded-xl p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold text-myslt-text-primary mb-4">Create Preference</h2>
+          <div className="bg-slate-50 rounded-xl p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Create Preference</h2>
             <form onSubmit={handleCreatePreference}>
               <div className="space-y-4">
                 <div>
@@ -880,28 +880,28 @@ const PreferenceManager: React.FC = () => {
       )}
 
       {/* Categories Section */}
-      <div className="mt-12 bg-myslt-surface rounded-xl shadow-sm border border-myslt-border">
-        <div className="p-6 border-b border-myslt-border">
-          <h3 className="text-lg font-semibold text-myslt-text-primary">Categories</h3>
+      <div className="mt-12 bg-slate-50 rounded-xl shadow-sm border border-slate-200">
+        <div className="p-6 border-b border-slate-200">
+          <h3 className="text-lg font-semibold text-slate-900">Categories</h3>
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.map((category) => (
-              <div key={category.id} className="border border-myslt-border rounded-lg p-4 bg-myslt-background">
+              <div key={category.id} className="border border-slate-200 rounded-lg p-4 bg-slate-50">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-myslt-accent rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
                       {getCategoryIcon(category.icon)}
                     </div>
                     <div>
-                      <h4 className="font-medium text-myslt-text-primary">{category.name}</h4>
-                      <p className="text-sm text-myslt-text-secondary">Priority: {category.priority}</p>
+                      <h4 className="font-medium text-slate-900">{category.name}</h4>
+                      <p className="text-sm text-slate-600">Priority: {category.priority}</p>
                     </div>
                   </div>
                   <div className="flex space-x-1">
                     <button
                       onClick={() => openCategoryEditModal(category)}
-                      className="p-1 text-myslt-primary hover:bg-myslt-accent rounded"
+                      className="p-1 text-blue-600 hover:bg-blue-50 rounded"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
@@ -913,7 +913,7 @@ const PreferenceManager: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                <p className="text-sm text-myslt-text-secondary">{category.description}</p>
+                <p className="text-sm text-slate-600">{category.description}</p>
                 <div className="mt-3">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     category.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'

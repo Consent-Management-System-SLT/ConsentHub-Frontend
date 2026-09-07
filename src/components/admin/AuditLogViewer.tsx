@@ -303,8 +303,8 @@ const AuditLogViewer: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-myslt-text-primary">Audit Logs</h1>
-          <p className="text-myslt-text-secondary mt-2">
+          <h1 className="text-3xl font-bold text-slate-900">Audit Logs</h1>
+          <p className="text-slate-600 mt-2">
             View system activity and compliance logs ({totalLogs} total entries)
           </p>
         </div>
@@ -326,7 +326,7 @@ const AuditLogViewer: React.FC = () => {
         </div>
       )}
 
-      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6 mb-8">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="relative">
@@ -356,9 +356,9 @@ const AuditLogViewer: React.FC = () => {
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-2 bg-myslt-service-card hover:bg-gray-200 rounded-lg transition-colors flex items-center space-x-2"
+              className="px-4 py-2 bg-white border border-slate-200 hover:bg-gray-200 rounded-lg transition-colors flex items-center space-x-2"
             >
-              <Filter className="w-4 h-4 text-myslt-text-secondary" />
+              <Filter className="w-4 h-4 text-slate-600" />
               <span className="text-sm font-medium text-gray-700">Filters</span>
             </button>
           </div>
@@ -425,81 +425,81 @@ const AuditLogViewer: React.FC = () => {
         )}
       </div>
 
-      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="myslt-table">
-            <thead className="myslt-table-header">
+          <table className="min-w-full divide-y divide-slate-200 bg-white rounded-lg overflow-hidden border border-slate-200">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="myslt-table-header-cell">Timestamp</th>
-                <th className="myslt-table-header-cell">User</th>
-                <th className="myslt-table-header-cell">Action</th>
-                <th className="myslt-table-header-cell">Category</th>
-                <th className="myslt-table-header-cell">Severity</th>
-                <th className="myslt-table-header-cell">Outcome</th>
-                <th className="myslt-table-header-cell">Compliance</th>
-                <th className="myslt-table-header-cell">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Timestamp</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">User</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Severity</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Outcome</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Compliance</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="myslt-table-body">
+            <tbody className="bg-white divide-y divide-slate-200">
               {auditLogs.map((log) => (
-                <tr key={log._id} className="myslt-table-row">
-                  <td className="myslt-table-cell">
+                <tr key={log._id} className="hover:bg-slate-50 transition-colors duration-150">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     <div className="flex items-center">
-                      <Calendar className="w-4 h-4 text-myslt-text-muted mr-2" />
+                      <Calendar className="w-4 h-4 text-slate-500 mr-2" />
                       {formatDate(log.createdAt)}
                     </div>
                   </td>
-                  <td className="myslt-table-cell">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     <div className="flex items-center">
-                      <User className="w-4 h-4 text-myslt-text-muted mr-2" />
+                      <User className="w-4 h-4 text-slate-500 mr-2" />
                       <div>
-                        <div className="text-sm text-myslt-text-primary font-medium">{log.userName}</div>
-                        <div className="text-xs text-myslt-text-muted">{log.userEmail}</div>
+                        <div className="text-sm text-slate-900 font-medium">{log.userName}</div>
+                        <div className="text-xs text-slate-500">{log.userEmail}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="myslt-table-cell">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-myslt-accent/20 text-myslt-text-primary">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50/20 text-slate-900">
                       {log.action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </span>
                   </td>
-                  <td className="myslt-table-cell">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     <div className="flex items-center">
                       {getCategoryIcon(log.category)}
                       <span className="ml-2">{log.category}</span>
                     </div>
                   </td>
-                  <td className="myslt-table-cell">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getSeverityColor(log.severity)}`}>
                       {log.severity.toUpperCase()}
                     </span>
                   </td>
-                  <td className="myslt-table-cell">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     <div className="flex items-center">
                       {getOutcomeIcon(log.outcome)}
-                      <span className="ml-2 text-sm text-myslt-text-secondary capitalize">{log.outcome}</span>
+                      <span className="ml-2 text-sm text-slate-600 capitalize">{log.outcome}</span>
                     </div>
                   </td>
-                  <td className="myslt-table-cell">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     {log.complianceRelevant ? (
                       <div className="flex flex-col">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-myslt-success/20 text-myslt-success mb-1">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600/20 text-green-600 mb-1">
                           GDPR Relevant
                         </span>
                         {log.regulatoryFramework.length > 0 && (
-                          <div className="text-xs text-myslt-text-muted">
+                          <div className="text-xs text-slate-500">
                             {log.regulatoryFramework.join(', ')}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <span className="text-xs text-myslt-text-muted">N/A</span>
+                      <span className="text-xs text-slate-500">N/A</span>
                     )}
                   </td>
-                  <td className="myslt-table-cell font-medium">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
                     <button
                       onClick={() => setSelectedLog(log)}
-                      className="text-myslt-accent hover:text-myslt-primary p-1 hover:bg-myslt-accent/10 rounded transition-colors"
+                      className="text-blue-600 hover:text-blue-600 p-1 hover:bg-blue-50/10 rounded transition-colors"
                     >
                       <Eye className="w-4 h-4" />
                     </button>

@@ -106,7 +106,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       case 'privacy_notice_viewed':
         return 'bg-indigo-100 text-indigo-800';
       default:
-        return 'bg-myslt-service-card text-myslt-text-secondary';
+        return 'bg-white border border-slate-200 text-slate-600';
     }
   };
 
@@ -127,19 +127,19 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
 
   if (loading) {
     return (
-      <div className={`bg-myslt-card-solid rounded-lg shadow-lg ${className}`}>
-        <div className="p-6 border-b border-myslt-accent/20">
+      <div className={`bg-white rounded-lg shadow-lg ${className}`}>
+        <div className="p-6 border-b border-slate-200">
           <div className="flex items-center space-x-3">
             <Activity className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-xl font-semibold text-myslt-text-primary">Audit Trail</h2>
-              <p className="text-sm text-myslt-text-secondary">System activity and event logs</p>
+              <h2 className="text-xl font-semibold text-slate-900">Audit Trail</h2>
+              <p className="text-sm text-slate-600">System activity and event logs</p>
             </div>
           </div>
         </div>
         <div className="flex items-center justify-center py-12">
           <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
-          <span className="ml-2 text-myslt-text-secondary">Loading audit logs...</span>
+          <span className="ml-2 text-slate-600">Loading audit logs...</span>
         </div>
       </div>
     );
@@ -147,13 +147,13 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
 
   if (error) {
     return (
-      <div className={`bg-myslt-card-solid rounded-lg shadow-lg ${className}`}>
-        <div className="p-6 border-b border-myslt-accent/20">
+      <div className={`bg-white rounded-lg shadow-lg ${className}`}>
+        <div className="p-6 border-b border-slate-200">
           <div className="flex items-center space-x-3">
             <Activity className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-xl font-semibold text-myslt-text-primary">Audit Trail</h2>
-              <p className="text-sm text-myslt-text-secondary">System activity and event logs</p>
+              <h2 className="text-xl font-semibold text-slate-900">Audit Trail</h2>
+              <p className="text-sm text-slate-600">System activity and event logs</p>
             </div>
           </div>
         </div>
@@ -174,14 +174,14 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
   }
 
   return (
-    <div className={`bg-myslt-card-solid rounded-lg shadow-lg ${className}`}>
-      <div className="p-6 border-b border-myslt-accent/20">
+    <div className={`bg-white rounded-lg shadow-lg ${className}`}>
+      <div className="p-6 border-b border-slate-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Activity className="w-6 h-6 text-indigo-600" />
             <div>
-              <h2 className="text-xl font-semibold text-myslt-text-primary">Audit Trail</h2>
-              <p className="text-sm text-myslt-text-secondary">
+              <h2 className="text-xl font-semibold text-slate-900">Audit Trail</h2>
+              <p className="text-sm text-slate-600">
                 {customerId ? `Activity logs for customer: ${getCustomerName(customerId)}` : 'System activity and event logs'}
               </p>
             </div>
@@ -197,7 +197,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       </div>
 
       {/* Filters */}
-      <div className="p-4 border-b border-myslt-accent/20 bg-myslt-service-card">
+      <div className="p-4 border-b border-slate-200 bg-white border border-slate-200">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex items-center space-x-2">
             <Search className="w-4 h-4 text-gray-400" />
@@ -241,14 +241,14 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
                 setFilterType('all');
                 setFilterDate('');
               }}
-              className="px-3 py-2 text-sm text-myslt-text-secondary hover:text-gray-800"
+              className="px-3 py-2 text-sm text-slate-600 hover:text-gray-800"
             >
               Clear Filters
             </button>
           )}
         </div>
         
-        <div className="mt-2 text-sm text-myslt-text-secondary">
+        <div className="mt-2 text-sm text-slate-600">
           Showing {filteredLogs.length} of {auditLogs.length} logs
         </div>
       </div>
@@ -256,7 +256,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       {filteredLogs.length === 0 ? (
         <div className="text-center py-12">
           <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-myslt-text-secondary">
+          <p className="text-slate-600">
             {auditLogs.length === 0 ? 'No audit logs found.' : 'No logs match your current filters.'}
           </p>
           <p className="text-sm text-gray-500 mt-1">
@@ -269,7 +269,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-myslt-service-card">
+            <thead className="bg-white border border-slate-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Timestamp
@@ -288,11 +288,11 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-myslt-card-solid divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-gray-200">
               {filteredLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-myslt-service-card">
+                <tr key={log.id} className="hover:bg-white border border-slate-200">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-myslt-text-primary">{formatDate(log.createdAt)}</div>
+                    <div className="text-sm text-slate-900">{formatDate(log.createdAt)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEventTypeColor(log.eventType)}`}>
@@ -300,10 +300,10 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-myslt-text-primary">{log.partyId || 'N/A'}</div>
+                    <div className="text-sm font-medium text-slate-900">{log.partyId || 'N/A'}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-myslt-text-primary max-w-xs truncate">
+                    <div className="text-sm text-slate-900 max-w-xs truncate">
                       {log.description || 'No description available'}
                     </div>
                   </td>

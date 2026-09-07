@@ -9,10 +9,10 @@ const CustomerDashboard: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-myslt-background flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-myslt-text-primary mb-2">Access Denied</h2>
-          <p className="text-myslt-text-secondary">Please log in to access the customer dashboard.</p>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Access Denied</h2>
+          <p className="text-slate-600">Please log in to access the customer dashboard.</p>
         </div>
       </div>
     );

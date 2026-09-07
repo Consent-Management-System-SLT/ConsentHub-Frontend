@@ -14,7 +14,7 @@ function App() {
     <AuthProvider>
       <NotificationProvider>
         <Router>
-        <div className="min-h-screen bg-myslt-background">
+        <div className="min-h-screen bg-slate-50">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />

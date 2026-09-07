@@ -540,45 +540,45 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <CheckCircle className="w-4 h-4 text-myslt-success" />;
+        return <CheckCircle className="w-4 h-4 text-green-600" />;
       case 'withdrawn':
-        return <XCircle className="w-4 h-4 text-myslt-danger" />;
+        return <XCircle className="w-4 h-4 text-red-600" />;
       case 'expired':
-        return <AlertCircle className="w-4 h-4 text-myslt-warning" />;
+        return <AlertCircle className="w-4 h-4 text-amber-600" />;
       case 'pending':
-        return <AlertCircle className="w-4 h-4 text-myslt-accent" />;
+        return <AlertCircle className="w-4 h-4 text-blue-600" />;
       default:
-        return <AlertCircle className="w-4 h-4 text-myslt-text-secondary" />;
+        return <AlertCircle className="w-4 h-4 text-slate-600" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-myslt-success/20 text-myslt-success';
+        return 'bg-green-600/20 text-green-600';
       case 'withdrawn':
-        return 'bg-myslt-danger/20 text-myslt-danger';
+        return 'bg-red-50 text-red-600';
       case 'expired':
-        return 'bg-myslt-warning/20 text-myslt-warning';
+        return 'bg-amber-600/20 text-amber-600';
       case 'pending':
-        return 'bg-myslt-accent/20 text-myslt-accent';
+        return 'bg-blue-50/20 text-blue-600';
       default:
-        return 'bg-myslt-card text-myslt-text-secondary';
+        return 'bg-white border border-slate-200 rounded-xl shadow-sm text-slate-600';
     }
   };
 
   const getConsentTypeColor = (type: string) => {
     switch (type) {
       case 'marketing':
-        return 'bg-myslt-info/20 text-myslt-info';
+        return 'bg-blue-600/20 text-blue-600';
       case 'analytics':
-        return 'bg-myslt-accent/20 text-myslt-accent';
+        return 'bg-blue-50/20 text-blue-600';
       case 'functional':
-        return 'bg-myslt-success/20 text-myslt-success';
+        return 'bg-green-600/20 text-green-600';
       case 'necessary':
-        return 'bg-myslt-card text-myslt-text-secondary';
+        return 'bg-white border border-slate-200 rounded-xl shadow-sm text-slate-600';
       default:
-        return 'bg-myslt-card text-myslt-text-secondary';
+        return 'bg-white border border-slate-200 rounded-xl shadow-sm text-slate-600';
     }
   };
 
@@ -636,13 +636,13 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       {consentsLoading && (
         <div className="flex items-center justify-center py-12">
           <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
-          <span className="ml-2 text-myslt-text-secondary">Loading consents...</span>
+          <span className="ml-2 text-slate-600">Loading consents...</span>
         </div>
       )}
 
       {/* Error State */}
       {consentsError && (
-        <div className="bg-myslt-danger/20 border border-myslt-danger/30 text-myslt-text-primary px-4 py-3 rounded mb-4">
+        <div className="bg-red-50 border border-red-200 text-slate-900 px-4 py-3 rounded mb-4">
           <p>Error loading consents: {consentsError}</p>
         </div>
       )}
@@ -653,10 +653,10 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-myslt-text-primary">Consent Management</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Consent Management</h1>
           <div className="flex items-center space-x-4 mt-2">
-            <p className="text-myslt-text-secondary">Manage and monitor all customer consents</p>
-            <span className="text-xs text-myslt-text-muted flex items-center">
+            <p className="text-slate-600">Manage and monitor all customer consents</p>
+            <span className="text-xs text-slate-500 flex items-center">
               <RefreshCw className="w-3 h-3 mr-1" />
               Last updated: {lastUpdated.toLocaleTimeString()}
             </span>
@@ -665,36 +665,36 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
         <div className="flex items-center space-x-3">
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="myslt-btn-primary px-4 py-2 flex items-center space-x-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-4 py-2 flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
             <span className="text-sm font-medium">Create New Consent</span>
           </button>
           <button 
             onClick={handleExportData}
-            className="myslt-btn-secondary px-4 py-2 flex items-center space-x-2"
+            className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-4 py-2 flex items-center space-x-2"
           >
             <Download className="w-4 h-4" />
             <span className="text-sm font-medium">Export</span>
           </button>
           {selectedConsents.size > 0 && (
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-myslt-text-secondary">{selectedConsents.size} selected</span>
+              <span className="text-sm text-slate-600">{selectedConsents.size} selected</span>
               <button 
                 onClick={() => handleBulkAction('export')}
-                className="myslt-btn-primary px-3 py-2 text-sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-3 py-2 text-sm"
               >
                 Export Selected
               </button>
               <button 
                 onClick={() => handleBulkAction('delete')}
-                className="px-3 py-2 bg-myslt-danger text-white rounded-lg hover:bg-myslt-danger/80 transition-colors text-sm"
+                className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600/80 transition-colors text-sm"
               >
                 Delete Selected
               </button>
             </div>
           )}
-          <button className="px-4 py-2 bg-myslt-danger text-white rounded-lg hover:bg-myslt-danger/80 transition-colors flex items-center space-x-2">
+          <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600/80 transition-colors flex items-center space-x-2">
             <RefreshCw className="w-4 h-4" />
             <span className="text-sm font-medium">Refresh</span>
           </button>
@@ -703,52 +703,52 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="myslt-card p-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-myslt-text-secondary">Active Consents</p>
-              <p className="text-2xl font-bold text-myslt-success">
+              <p className="text-sm font-medium text-slate-600">Active Consents</p>
+              <p className="text-2xl font-bold text-green-600">
                 {consents.filter(c => c.status === 'active').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-myslt-success/20 rounded-xl flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-myslt-success" />
+            <div className="w-12 h-12 bg-green-600/20 rounded-xl flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
         
-        <div className="myslt-card p-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-myslt-text-secondary">Withdrawn</p>
-              <p className="text-2xl font-bold text-myslt-danger">
+              <p className="text-sm font-medium text-slate-600">Withdrawn</p>
+              <p className="text-2xl font-bold text-red-600">
                 {consents.filter(c => c.status === 'withdrawn').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-myslt-danger/20 rounded-xl flex items-center justify-center">
-              <XCircle className="w-6 h-6 text-myslt-danger" />
+            <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+              <XCircle className="w-6 h-6 text-red-600" />
             </div>
           </div>
         </div>
         
-        <div className="myslt-card p-6">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-myslt-text-secondary">Expired</p>
-              <p className="text-2xl font-bold text-myslt-warning">
+              <p className="text-sm font-medium text-slate-600">Expired</p>
+              <p className="text-2xl font-bold text-amber-600">
                 {consents.filter(c => c.status === 'expired').length}
               </p>
             </div>
-            <div className="w-12 h-12 bg-myslt-warning/20 rounded-xl flex items-center justify-center">
-              <AlertCircle className="w-6 h-6 text-myslt-warning" />
+            <div className="w-12 h-12 bg-amber-600/20 rounded-xl flex items-center justify-center">
+              <AlertCircle className="w-6 h-6 text-amber-600" />
             </div>
           </div>
         </div>
         
-        <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-myslt-text-secondary">Total Consents</p>
+              <p className="text-sm font-medium text-slate-600">Total Consents</p>
               <p className="text-2xl font-bold text-blue-600">{consents.length}</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -759,7 +759,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border p-6 mb-8">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="relative">
@@ -778,7 +778,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="appearance-none bg-myslt-card-solid border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 >
                   <option value="all">All Status</option>
                   <option value="active">Active/Granted</option>
@@ -795,7 +795,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                 <select
                   value={consentTypeFilter}
                   onChange={(e) => setConsentTypeFilter(e.target.value)}
-                  className="appearance-none bg-myslt-card-solid border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 >
                   <option value="all">All Types</option>
                   <option value="marketing">Marketing</option>
@@ -809,8 +809,8 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           </div>
           
           <div className="flex items-center space-x-3">
-            <button className="px-4 py-2 bg-myslt-service-card hover:bg-gray-200 rounded-lg transition-colors flex items-center space-x-2">
-              <Filter className="w-4 h-4 text-myslt-text-secondary" />
+            <button className="px-4 py-2 bg-white border border-slate-200 hover:bg-gray-200 rounded-lg transition-colors flex items-center space-x-2">
+              <Filter className="w-4 h-4 text-slate-600" />
               <span className="text-sm font-medium text-gray-700">More Filters</span>
             </button>
           </div>
@@ -818,12 +818,12 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       </div>
 
       {/* Consents Table */}
-      <div className="bg-myslt-card-solid rounded-xl shadow-sm border border-myslt-border overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         {/* Mobile Card View */}
         <div className="block lg:hidden">
           <div className="p-4 space-y-4">
             {paginatedConsents.map((consent) => (
-              <div key={consent.id} className="bg-myslt-service-card rounded-lg p-4 space-y-3">
+              <div key={consent.id} className="bg-white border border-slate-200 rounded-lg p-4 space-y-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-3">
                     <input
@@ -832,12 +832,12 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                       onChange={() => handleSelectConsent(consent.id)}
                       className="rounded border-gray-300 text-red-600 focus:ring-red-500"
                     />
-                    <div className="w-10 h-10 bg-myslt-card-solid rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-myslt-text-secondary" />
+                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-slate-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-myslt-text-primary">{consent.customerName}</div>
-                      <div className="text-xs text-myslt-text-secondary">{consent.email}</div>
+                      <div className="text-sm font-medium text-slate-900">{consent.customerName}</div>
+                      <div className="text-xs text-slate-600">{consent.email}</div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-1">
@@ -860,13 +860,13 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                 
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
-                    <span className="text-myslt-text-secondary">Type:</span>
+                    <span className="text-slate-600">Type:</span>
                     <span className={`ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium capitalize ${getConsentTypeColor(consent.consentType)}`}>
                       {consent.consentType}
                     </span>
                   </div>
                   <div>
-                    <span className="text-myslt-text-secondary">Status:</span>
+                    <span className="text-slate-600">Status:</span>
                     <div className="flex items-center ml-1">
                       {getStatusIcon(consent.status)}
                       <span className={`ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(consent.status)}`}>
@@ -875,12 +875,12 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     </div>
                   </div>
                   <div>
-                    <span className="text-myslt-text-secondary">Granted:</span>
-                    <span className="ml-1 text-myslt-text-primary">{new Date(consent.grantedDate).toLocaleDateString()}</span>
+                    <span className="text-slate-600">Granted:</span>
+                    <span className="ml-1 text-slate-900">{new Date(consent.grantedDate).toLocaleDateString()}</span>
                   </div>
                   <div>
-                    <span className="text-myslt-text-secondary">Source:</span>
-                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-myslt-card-solid text-gray-800 capitalize">
+                    <span className="text-slate-600">Source:</span>
+                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white text-gray-800 capitalize">
                       {consent.source}
                     </span>
                   </div>
@@ -893,7 +893,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
         {/* Desktop Table View */}
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-myslt-service-card">
+            <thead className="bg-white border border-slate-200">
               <tr>
                 <th className="px-6 py-4 text-left">
                   <input
@@ -904,7 +904,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   />
                 </th>
                 <th 
-                  className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider cursor-pointer hover:bg-myslt-service-card"
+                  className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-white border border-slate-200"
                   onClick={() => {
                     setSortBy('name');
                     setSortOrder(sortBy === 'name' && sortOrder === 'asc' ? 'desc' : 'asc');
@@ -915,11 +915,11 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'name' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider">
                   Consent Type
                 </th>
                 <th 
-                  className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider cursor-pointer hover:bg-myslt-service-card"
+                  className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-white border border-slate-200"
                   onClick={() => {
                     setSortBy('status');
                     setSortOrder(sortBy === 'status' && sortOrder === 'asc' ? 'desc' : 'asc');
@@ -931,7 +931,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   </div>
                 </th>
                 <th 
-                  className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider cursor-pointer hover:bg-myslt-service-card"
+                  className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-white border border-slate-200"
                   onClick={() => {
                     setSortBy('date');
                     setSortOrder(sortBy === 'date' && sortOrder === 'asc' ? 'desc' : 'asc');
@@ -942,20 +942,20 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'date' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider">
                   Expiry Date
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider">
                   Source
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-myslt-text-primary uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-myslt-card-solid divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-gray-200">
               {paginatedConsents.map((consent) => (
-                <tr key={consent.id} className="hover:bg-myslt-service-card">
+                <tr key={consent.id} className="hover:bg-white border border-slate-200">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="checkbox"
@@ -966,12 +966,12 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-myslt-service-card rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-myslt-text-secondary" />
+                      <div className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center">
+                        <User className="w-5 h-5 text-slate-600" />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-myslt-text-primary">{consent.customerName}</div>
-                        <div className="text-sm text-myslt-text-secondary">{consent.email}</div>
+                        <div className="text-sm font-medium text-slate-900">{consent.customerName}</div>
+                        <div className="text-sm text-slate-600">{consent.email}</div>
                         <div className="text-xs text-gray-400">{consent.customerId}</div>
                       </div>
                     </div>
@@ -989,7 +989,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 text-gray-400 mr-2" />
                       <div>
@@ -1030,7 +1030,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-myslt-text-primary">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                     {consent.expiryDate ? (
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 text-gray-400 mr-2" />
@@ -1041,7 +1041,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-myslt-service-card text-gray-800 capitalize">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white border border-slate-200 text-gray-800 capitalize">
                       {consent.source}
                     </span>
                   </td>
@@ -1056,7 +1056,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                       </button>
                       <button 
                         onClick={() => handleEditConsent(consent)}
-                        className="text-myslt-text-secondary hover:text-myslt-text-primary p-1 hover:bg-myslt-service-card rounded transition-colors"
+                        className="text-slate-600 hover:text-slate-900 p-1 hover:bg-white border border-slate-200 rounded transition-colors"
                         title="Edit Consent"
                       >
                         <Edit className="w-4 h-4" />
@@ -1072,14 +1072,14 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-between mt-6">
-        <div className="text-sm text-myslt-text-secondary">
+        <div className="text-sm text-slate-600">
           Showing {sortedConsents.length === 0 ? 0 : Math.min(startIndex + 1, sortedConsents.length)} to {Math.min(endIndex, sortedConsents.length)} of {sortedConsents.length} consents
         </div>
         <div className="flex items-center space-x-2">
           <button 
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-myslt-service-card transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-white border border-slate-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
@@ -1090,7 +1090,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
               className={`px-3 py-2 rounded-lg transition-colors text-sm ${
                 currentPage === page
                   ? 'bg-red-600 text-white'
-                  : 'border border-gray-300 hover:bg-myslt-service-card'
+                  : 'border border-gray-300 hover:bg-white border border-slate-200'
               }`}
             >
               {page}
@@ -1099,7 +1099,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           <button 
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-myslt-service-card transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-white border border-slate-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
@@ -1109,15 +1109,15 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       {/* Consent Details Modal */}
       {showModal && modalData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-myslt-card-solid rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-myslt-border">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-slate-200">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-myslt-text-primary">Consent Details</h3>
+                <h3 className="text-lg font-semibold text-slate-900">Consent Details</h3>
                 <button 
                   onClick={() => setShowModal(false)}
-                  className="p-2 hover:bg-myslt-service-card rounded-lg transition-colors"
+                  className="p-2 hover:bg-white border border-slate-200 rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-myslt-text-secondary" />
+                  <X className="w-5 h-5 text-slate-600" />
                 </button>
               </div>
             </div>
@@ -1126,7 +1126,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Customer Information</h4>
-                  <div className="bg-myslt-service-card rounded-lg p-4 space-y-2">
+                  <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
                     <p><span className="font-medium">Name:</span> {modalData.customerName}</p>
                     <p><span className="font-medium">Email:</span> {modalData.email}</p>
                     <p><span className="font-medium">ID:</span> {modalData.customerId}</p>
@@ -1135,7 +1135,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                 
                 <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Consent Details</h4>
-                  <div className="bg-myslt-service-card rounded-lg p-4 space-y-2">
+                  <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
                     <p><span className="font-medium">Type:</span> {modalData.consentType}</p>
                     <p><span className="font-medium">Status:</span> {modalData.status}</p>
                     <p><span className="font-medium">Source:</span> {modalData.source}</p>
@@ -1146,7 +1146,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
               
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Timeline</h4>
-                <div className="bg-myslt-service-card rounded-lg p-4 space-y-2">
+                <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
                   {(() => {
                     // Find the raw consent for full audit info
                     const rawConsent = rawConsents.find((c: any) => (c.id || c._id) === modalData.id);

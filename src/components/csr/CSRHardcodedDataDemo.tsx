@@ -105,7 +105,7 @@ const CSRHardcodedDataDemo: React.FC = () => {
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-xl">
         <h1 className="text-3xl font-bold mb-2">CSR Dashboard - Comprehensive Hardcoded Data Demo</h1>
-        <p className="text-blue-100">Demonstrating all CSR dashboard sections with rich sample data</p>
+        <p className="text-slate-600">Demonstrating all CSR dashboard sections with rich sample data</p>
       </div>
 
       {/* Stats Overview */}
