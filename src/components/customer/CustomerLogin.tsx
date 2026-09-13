@@ -76,6 +76,12 @@ export default function CustomerLogin() {
                 {loading ? 'Requesting...' : 'Request OTP'}
               </button>
             </div>
+            
+            <div className="mt-4 text-center">
+              <a href="/login" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+                Staff / Admin Sign In
+              </a>
+            </div>
           </form>
         </div>
       </div>
