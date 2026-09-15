@@ -16,7 +16,6 @@ import EventListenerManager from './admin/EventListenerManager';
 import UserManagement from './admin/UserManagement';
 import CustomerManagement from './admin/CustomerManagement';
 import EnterpriseManagement from './admin/EnterpriseManagement';
-import EnterpriseCampaignReview from './admin/EnterpriseCampaignReview';
 import ComplianceRulesManager from './admin/ComplianceRulesManager';
 import ServerConnectionAlert from './shared/ServerConnectionAlert';
 
@@ -35,8 +34,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
         return <DashboardHome />;
       case 'enterprise-management':
         return <EnterpriseManagement />;
-      case 'enterprise-campaigns':
-        return <EnterpriseCampaignReview />;
       case 'consents':
         return <ConsentOverviewTable />;
       case 'guardian-consent':
@@ -101,5 +98,4 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
     </div>
   );
 };
-
 export default AdminDashboard;
