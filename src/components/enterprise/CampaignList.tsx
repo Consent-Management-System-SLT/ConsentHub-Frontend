@@ -81,11 +81,11 @@ const CampaignList: React.FC<CampaignListProps> = ({ onCreateNew, onViewDetail }
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-sm text-slate-600">
-                <th className="p-4 font-medium">Campaign Name</th>
-                <th className="p-4 font-medium">Channel</th>
-                <th className="p-4 font-medium">Dates</th>
-                <th className="p-4 font-medium">Status</th>
-                <th className="p-4 font-medium text-right">Actions</th>
+                <th scope="col" className="p-4 font-medium">Campaign Name</th>
+                <th scope="col" className="p-4 font-medium">Channel</th>
+                <th scope="col" className="p-4 font-medium">Dates</th>
+                <th scope="col" className="p-4 font-medium">Status</th>
+                <th scope="col" className="p-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="text-sm">

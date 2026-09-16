@@ -118,10 +118,10 @@ const EnterpriseCampaignReview: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b text-sm text-slate-600">
-                <th className="p-4 font-medium">Enterprise</th>
-                <th className="p-4 font-medium">Campaign Name</th>
-                <th className="p-4 font-medium">Status</th>
-                <th className="p-4 font-medium text-right">Actions</th>
+                <th scope="col" className="p-4 font-medium">Enterprise</th>
+                <th scope="col" className="p-4 font-medium">Campaign Name</th>
+                <th scope="col" className="p-4 font-medium">Status</th>
+                <th scope="col" className="p-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody>

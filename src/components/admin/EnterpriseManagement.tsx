@@ -362,12 +362,12 @@ export default function EnterpriseManagement() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="text-sm text-slate-500 border-b">
-                    <th className="pb-3 font-medium">Company</th>
-                    <th className="pb-3 font-medium">Registration</th>
-                    <th className="pb-3 font-medium">Industry</th>
-                    <th className="pb-3 font-medium">Representative</th>
-                    <th className="pb-3 font-medium">Status</th>
-                    <th className="pb-3 font-medium text-right">Actions</th>
+                    <th scope="col" className="pb-3 font-medium">Company</th>
+                    <th scope="col" className="pb-3 font-medium">Registration</th>
+                    <th scope="col" className="pb-3 font-medium">Industry</th>
+                    <th scope="col" className="pb-3 font-medium">Representative</th>
+                    <th scope="col" className="pb-3 font-medium">Status</th>
+                    <th scope="col" className="pb-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">

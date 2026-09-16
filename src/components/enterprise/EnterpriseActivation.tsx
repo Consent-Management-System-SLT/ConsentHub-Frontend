@@ -86,21 +86,21 @@ const EnterpriseActivation: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Login Email</label>
                 <div className="mt-1">
-                  <input type="text" disabled value={email} className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500" />
+                  <input type="text" disabled value={email} className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500"  aria-label="Login Email"/>
                 </div>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700">New Password</label>
                 <div className="mt-1">
-                  <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                  <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"  aria-label="New Password"/>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
                 <div className="mt-1">
-                  <input type="password" required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                  <input type="password" required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"  aria-label="Confirm Password"/>
                 </div>
               </div>
 

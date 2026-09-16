@@ -85,7 +85,7 @@ const PrivacyNoticeForm: React.FC<{
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
-              />
+               aria-label="Title"/>
             </div>
 
             <div>
@@ -96,7 +96,7 @@ const PrivacyNoticeForm: React.FC<{
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+               aria-label="Category">
                 <option value="general">General</option>
                 <option value="marketing">Marketing</option>
                 <option value="analytics">Analytics</option>
@@ -116,7 +116,7 @@ const PrivacyNoticeForm: React.FC<{
                 value={formData.legalBasis}
                 onChange={(e) => setFormData({ ...formData, legalBasis: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+               aria-label="Legal Basis">
                 <option value="consent">Consent</option>
                 <option value="contract">Contract</option>
                 <option value="legal_obligation">Legal Obligation</option>
@@ -134,7 +134,7 @@ const PrivacyNoticeForm: React.FC<{
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+               aria-label="Status">
                 <option value="draft">Draft</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -150,7 +150,7 @@ const PrivacyNoticeForm: React.FC<{
                 value={formData.language}
                 onChange={(e) => setFormData({ ...formData, language: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+               aria-label="Language">
                 <option value="en">English</option>
                 <option value="si">Sinhala</option>
                 <option value="ta">Tamil</option>
@@ -166,7 +166,7 @@ const PrivacyNoticeForm: React.FC<{
                 value={formData.effectiveDate}
                 onChange={(e) => setFormData({ ...formData, effectiveDate: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+               aria-label="Effective Date"/>
             </div>
           </div>
 
@@ -180,7 +180,7 @@ const PrivacyNoticeForm: React.FC<{
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Brief description of the privacy notice"
-            />
+             aria-label="Description"/>
           </div>
 
           <div>
@@ -194,7 +194,7 @@ const PrivacyNoticeForm: React.FC<{
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Privacy notice content..."
               required
-            />
+             aria-label="Content"/>
           </div>
 
           <div className="flex justify-end space-x-4">
