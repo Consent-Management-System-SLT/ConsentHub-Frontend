@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Building, Upload, CheckCircle } from 'lucide-react';
-import { useNotifications } from '../../contexts/NotificationContext';
+import { useNotifications } from '../../contexts/NotificationContext';import { API_ORIGIN } from '../../config/api';
 import { Link } from 'react-router-dom';
 
 const EnterpriseRegistration: React.FC = () => {
@@ -45,7 +45,7 @@ const EnterpriseRegistration: React.FC = () => {
       });
       data.append('document', file);
 
-      const res = await fetch('http://localhost:3001/api/v2/enterprise/register', {
+      const res = await fetch(`${API_ORIGIN}/api/v2/enterprise/register`, {
         method: 'POST',
         body: data
       });

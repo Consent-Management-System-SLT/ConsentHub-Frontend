@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Building, Filter, Search, ArrowRight, ArrowLeft, CheckCircle, XCircle, FileText, Send } from 'lucide-react';
-import { useNotifications } from '../../contexts/NotificationContext';
+import { useNotifications } from '../../contexts/NotificationContext';import { API_ORIGIN } from '../../config/api';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface Organization {
@@ -42,7 +42,7 @@ export default function EnterpriseManagement() {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:3001/api/v2/admin/enterprise/applications', {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/applications`, {
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
       const json = await res.json();
@@ -64,7 +64,7 @@ export default function EnterpriseManagement() {
   const handleApprove = async (id: string) => {
     if (!window.confirm('Are you sure you want to approve this enterprise?')) return;
     try {
-      const res = await fetch(`http://localhost:3001/api/v2/admin/enterprise/applications/${id}/approve`, {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/applications/${id}/approve`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
@@ -84,7 +84,7 @@ export default function EnterpriseManagement() {
   const handleReject = async () => {
     if (!reviewReason.trim()) return alert('Reason is required');
     try {
-      const res = await fetch(`http://localhost:3001/api/v2/admin/enterprise/applications/${selectedOrg!._id}/reject`, {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/applications/${selectedOrg!._id}/reject`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: reviewReason })
@@ -105,7 +105,7 @@ export default function EnterpriseManagement() {
   const handleRequestInfo = async () => {
     if (!reviewReason.trim()) return alert('Reason is required');
     try {
-      const res = await fetch(`http://localhost:3001/api/v2/admin/enterprise/applications/${selectedOrg!._id}/request-information`, {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/applications/${selectedOrg!._id}/request-information`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: reviewReason })
@@ -125,7 +125,7 @@ export default function EnterpriseManagement() {
 
   const handleResendActivation = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/v2/admin/enterprise/applications/${id}/resend-activation`, {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/applications/${id}/resend-activation`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
@@ -147,7 +147,7 @@ export default function EnterpriseManagement() {
   const handleViewDocument = async (docId: string, originalFilename: string) => {
     try {
       addNotification({ type: 'system', category: 'info', title: 'Loading...', message: 'Fetching secure document' });
-      const res = await fetch(`http://localhost:3001/api/v2/admin/enterprise/documents/${docId}`, {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/documents/${docId}`, {
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
       if (!res.ok) throw new Error('Failed to load document');

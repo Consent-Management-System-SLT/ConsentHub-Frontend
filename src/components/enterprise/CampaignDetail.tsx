@@ -66,7 +66,7 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId, onBack, onE
     <div className="bg-white rounded-lg shadow-sm border border-slate-200">
       <div className="p-6 border-b border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <button onClick={onBack} className="text-slate-500 hover:text-slate-800">
+          <button aria-label="Go back" onClick={onBack} className="text-slate-500 hover:text-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h2 className="text-xl font-semibold text-slate-800">{campaign.campaignName}</h2>

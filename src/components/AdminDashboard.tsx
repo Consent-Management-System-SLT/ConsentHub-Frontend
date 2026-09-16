@@ -78,6 +78,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
           autoHideDelay={4000}
         />
       )}
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       {/* Sidebar */}
       <AdminSidebar
         activeSection={activeSection}
@@ -88,9 +89,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <AdminHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <AdminHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
         {/* Main Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto">
+        <main id="main-content" tabIndex={-1} className="flex-1 overflow-x-hidden overflow-y-auto">
           <div className="p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 max-w-full">
             <div className="max-w-7xl mx-auto">
               {renderContent()}

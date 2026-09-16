@@ -265,7 +265,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 max-w-3xl mx-auto">
       <div className="p-6 border-b border-slate-200 flex items-center gap-4">
-        <button onClick={onCancel} className="text-slate-500 hover:text-slate-800">
+        <button aria-label="Go back" onClick={onCancel} className="text-slate-500 hover:text-slate-800">
             <ArrowLeft className="w-5 h-5" />
         </button>
         <h2 className="text-xl font-semibold text-slate-800">{editCampaignId ? 'Edit Campaign' : 'Create Campaign'}</h2>

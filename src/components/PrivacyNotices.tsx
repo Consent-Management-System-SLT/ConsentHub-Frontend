@@ -68,7 +68,7 @@ const PrivacyNoticeForm: React.FC<{
           <h3 className="text-lg font-semibold">
             {notice ? 'Edit Privacy Notice' : 'Create New Privacy Notice'}
           </h3>
-          <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
+          <button aria-label="Close" onClick={onCancel} className="text-gray-500 hover:text-gray-700">
             <X className="h-5 w-5" />
           </button>
         </div>

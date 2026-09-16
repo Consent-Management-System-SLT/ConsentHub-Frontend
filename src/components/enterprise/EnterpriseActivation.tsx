@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { useNotifications } from '../../contexts/NotificationContext';
+import { useNotifications } from '../../contexts/NotificationContext';import { API_ORIGIN } from '../../config/api';
 
 const EnterpriseActivation: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -32,7 +32,7 @@ const EnterpriseActivation: React.FC = () => {
 
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:3001/api/v2/enterprise/activate', {
+      const res = await fetch(`${API_ORIGIN}/api/v2/enterprise/activate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, email, password })

@@ -21,6 +21,34 @@
   h6 { @apply text-xs md:text-sm font-medium text-slate-500 leading-tight m-0; }
   p { @apply text-sm md:text-base text-slate-600 leading-relaxed m-0; }
   small { @apply text-xs text-slate-500; }
+
+  /* One visible focus ring for every interactive element. Keyboard and
+     screen-reader users previously had no indication of focus anywhere. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-blue-600 ring-offset-2 ring-offset-white rounded-sm;
+  }
+
+  /* Honour the OS "reduce motion" setting. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Comfortable touch targets on phones and tablets. */
+  @media (pointer: coarse) {
+    button,
+    [role='button'],
+    a.btn,
+    summary {
+      min-height: 44px;
+    }
+  }
 }
 
 @layer components {
@@ -39,6 +67,14 @@
   
   
   
+
+  /* Skip link - first tab stop, visible only once focused. */
+  .skip-link {
+    @apply sr-only;
+  }
+  .skip-link:focus {
+    @apply not-sr-only fixed top-3 left-3 z-[100] px-4 py-2 rounded-lg bg-blue-700 text-white font-medium shadow-lg;
+  }
 
   /* Responsive text utilities */
   .text-responsive-sm { @apply text-xs sm:text-sm; }

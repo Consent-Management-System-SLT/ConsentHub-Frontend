@@ -48,16 +48,16 @@ export const csrApi = axios.create({
   baseURL: SERVICES.CSR,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer csr-demo-token-123'
+    'Content-Type': 'application/json'
+    // Authorization is attached per-request in makeRequest()
   }
 });
 export const adminApi = axios.create({
   baseURL: SERVICES.GATEWAY,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer admin-demo-token-123'
+    'Content-Type': 'application/json'
+    // Authorization is attached per-request in makeRequest()
   }
 });
 // Specific service APIs for Admin/CSR dashboards - Route through API Gateway
@@ -65,56 +65,56 @@ export const consentApi = axios.create({
   baseURL: SERVICES.CONSENT,
   timeout: 30000, // Increased timeout to prevent ECONNABORTED errors
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer admin-demo-token-123'
+    'Content-Type': 'application/json'
+    // Authorization is attached per-request in makeRequest()
   }
 });
 export const preferenceApi = axios.create({
   baseURL: SERVICES.PREFERENCE,
   timeout: 30000, // Increased timeout
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer admin-demo-token-123'
+    'Content-Type': 'application/json'
+    // Authorization is attached per-request in makeRequest()
   }
 });
 export const privacyNoticeApi = axios.create({
   baseURL: SERVICES.PRIVACY_NOTICE,
   timeout: 30000, // Increased timeout
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer admin-demo-token-123'
+    'Content-Type': 'application/json'
+    // Authorization is attached per-request in makeRequest()
   }
 });
 export const partyApi = axios.create({
   baseURL: SERVICES.PARTY,
   timeout: 30000, // Increased timeout
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer admin-demo-token-123'
+    'Content-Type': 'application/json'
+    // Authorization is attached per-request in makeRequest()
   }
 });
 export const dsarApi = axios.create({
   baseURL: SERVICES.DSAR,
   timeout: 30000, // Increased timeout
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer admin-demo-token-123'
+    'Content-Type': 'application/json'
+    // Authorization is attached per-request in makeRequest()
   }
 });
 export const eventApi = axios.create({
   baseURL: SERVICES.GATEWAY,
   timeout: 30000, // Increased timeout
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer admin-demo-token-123'
+    'Content-Type': 'application/json'
+    // Authorization is attached per-request in makeRequest()
   }
 });
 export const catalogApi = axios.create({
   baseURL: SERVICES.CATALOG,
   timeout: 30000, // Increased timeout
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer admin-demo-token-123'
+    'Content-Type': 'application/json'
+    // Authorization is attached per-request in makeRequest()
   }
 });
 // Enhanced API response handler
