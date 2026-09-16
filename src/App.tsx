@@ -11,7 +11,14 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route              path="/users"              element={                <ProtectedRoute roles={['admin']}>                  <UserManagement />                </ProtectedRoute>              }            />
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute roles={['admin']}>
+                  <UserManagement />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/enterprise/register" element={<EnterpriseRegistration />} />
             <Route path="/enterprise/activate" element={<EnterpriseActivation />} />
             <Route              path="/dashboard"              element={                <ProtectedRoute>                  <RoleBasedDashboard />                </ProtectedRoute>              }            />            <Route path="/" element={<Navigate to="/dashboard" replace />} />          </Routes>          <ToastContainer />        </div>      </Router>      </NotificationProvider>    </AuthProvider>  );}export default App;

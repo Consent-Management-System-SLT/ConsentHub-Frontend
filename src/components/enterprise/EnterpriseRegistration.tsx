@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Building, Upload, CheckCircle } from 'lucide-react';
-import { useNotifications } from '../../contexts/NotificationContext';import { API_ORIGIN } from '../../config/api';
+import { useNotifications } from '../../contexts/NotificationContext';
+import { API_ORIGIN } from '../../config/api';
 import { Link } from 'react-router-dom';
 
 const EnterpriseRegistration: React.FC = () => {

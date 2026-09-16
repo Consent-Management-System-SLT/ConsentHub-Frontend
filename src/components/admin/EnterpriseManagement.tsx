@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building, Filter, Search, ArrowRight, ArrowLeft, CheckCircle, XCircle, FileText, Send } from 'lucide-react';
-import { useNotifications } from '../../contexts/NotificationContext';import { API_ORIGIN } from '../../config/api';
+import { useNotifications } from '../../contexts/NotificationContext';
+import { API_ORIGIN } from '../../config/api';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface Organization {

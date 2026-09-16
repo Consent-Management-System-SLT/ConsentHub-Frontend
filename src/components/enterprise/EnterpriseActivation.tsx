@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { useNotifications } from '../../contexts/NotificationContext';import { API_ORIGIN } from '../../config/api';
+import { useNotifications } from '../../contexts/NotificationContext';
+import { API_ORIGIN } from '../../config/api';
 
 const EnterpriseActivation: React.FC = () => {
   const [searchParams] = useSearchParams();
