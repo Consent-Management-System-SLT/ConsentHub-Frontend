@@ -242,7 +242,7 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
 
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="privacynotices-dialog-1-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <div>
@@ -757,7 +757,7 @@ export const PrivacyNotices: React.FC = () => {
       {/* Notices Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {notices.map((notice) => (
-          <div key={notice.id} className="bg-white border border-slate-200 rounded-xl shadow-sm border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={notice.id} className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 {getStatusIcon(notice.status)}
@@ -817,7 +817,7 @@ export const PrivacyNotices: React.FC = () => {
             <div className="flex space-x-2">
               <button
                 onClick={() => setViewingNotice(notice)}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-white border border-slate-200 transition-colors"
+                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white border-slate-200 rounded-xl shadow-sm hover:bg-white transition-colors"
               >
                 <Eye className="h-4 w-4 mr-2" />
                 View
@@ -828,7 +828,7 @@ export const PrivacyNotices: React.FC = () => {
       </div>
 
       {notices.length === 0 && !loading && (
-        <div className="text-center py-12 bg-white border border-slate-200 rounded-xl shadow-sm rounded-lg">
+        <div className="text-center py-12 bg-white border border-slate-200 rounded-xl shadow-sm">
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500 mb-4">No privacy notices found.</p>
           <button

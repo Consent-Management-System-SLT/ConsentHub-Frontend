@@ -134,8 +134,8 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
                     <Icon className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
                   </span>
                   <span className="flex-1 min-w-0">
-                    <span className="flex items-center justify-between mb-1">
-                      <span className="font-semibold text-sm sm:text-base text-slate-900 truncate">
+                    <span className="flex items-start justify-between gap-2 mb-1">
+                      <span className="font-semibold text-sm sm:text-base text-slate-900">
                         {item.label}
                       </span>
                       <ChevronRight
@@ -143,7 +143,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({
                           flex-shrink-0 w-4 h-4 transition-all duration-200
                           ${isActive
                             ? 'text-blue-600 rotate-90'
-                            : 'text-slate-400 group-hover:text-slate-600 group-hover:translate-x-1'
+                            : 'text-slate-400 group-hover:text-slate-600'
                           }
                         `}
                         aria-hidden="true"
