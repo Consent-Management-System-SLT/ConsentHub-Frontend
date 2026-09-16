@@ -286,7 +286,7 @@ export default function EnterpriseManagement() {
         )}
 
         {showRejectModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div role="dialog" aria-modal="true" aria-label="Reject Application" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl w-full max-w-md">
               <h3 className="text-lg font-bold mb-4">Reject Application</h3>
               <textarea
@@ -304,7 +304,7 @@ export default function EnterpriseManagement() {
         )}
 
         {showRequestInfoModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div role="dialog" aria-modal="true" aria-label="Request More Information" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl w-full max-w-md">
               <h3 className="text-lg font-bold mb-4">Request More Information</h3>
               <textarea

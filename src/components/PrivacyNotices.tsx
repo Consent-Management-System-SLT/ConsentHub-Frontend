@@ -62,10 +62,10 @@ const PrivacyNoticeForm: React.FC<{
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div role="dialog" aria-modal="true" aria-labelledby="privacynotices-dialog-0-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold">
+          <h3 id="privacynotices-dialog-0-title" className="text-lg font-semibold">
             {notice ? 'Edit Privacy Notice' : 'Create New Privacy Notice'}
           </h3>
           <button aria-label="Close" onClick={onCancel} className="text-gray-500 hover:text-gray-700">
@@ -241,12 +241,12 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
   if (!isOpen || !notice) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="privacynotices-dialog-1-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{notice.title}</h2>
+            <h2 id="privacynotices-dialog-1-title" className="text-2xl font-bold text-gray-900">{notice.title}</h2>
             <div className="flex items-center space-x-4 mt-2">
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                 notice.status === 'active' ? 'bg-green-100 text-green-800' : 
