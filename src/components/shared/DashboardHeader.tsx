@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Menu, User, LogOut, Settings, ChevronDown, RefreshCw } from 'lucide-react';
+import { Menu, User, LogOut, Settings, Bell, ChevronDown, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNotifications } from '../../contexts/NotificationContext';
 import LanguageSelector from '../LanguageSelector';
-import NotificationBell from './NotificationBell';
+import NotificationsModal from './NotificationsModal';
 import UserProfile from '../UserProfile';
 
 const ROLE_LABELS: Record<string, string> = {
@@ -45,8 +46,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const { user, logout } = useAuth();
   const userName = user?.name || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Signed in';
   const userRole = ROLE_LABELS[user?.role || ''] || user?.role || '';
+  const { unreadCount } = useNotifications();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // close on outside click or Escape, as a menu should
@@ -109,11 +112,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </button>
           )}
 
-          <NotificationBell />
-
-          <div className="hidden sm:block">
-            <LanguageSelector />
-          </div>
+          <LanguageSelector />
 
           <div className="relative" ref={menuRef}>
             <button
@@ -124,8 +123,13 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               aria-label="Account menu"
               className="flex items-center gap-2 pl-1.5 pr-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
             >
-              <span className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+              <span className="relative w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
                 <User className="w-4 h-4 text-blue-800" aria-hidden="true" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-red-600 text-white text-[10px] font-semibold leading-4 text-center ring-2 ring-white">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </span>
               <span className="hidden md:block text-left leading-tight">
                 <span className="block text-[13px] font-medium text-slate-900">{userName}</span>
@@ -144,6 +148,24 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   <p className="text-[13px] font-medium text-slate-900">{userName}</p>
                   <p className="text-[11px] text-slate-500">{userRole}</p>
                 </div>
+
+                <button
+                  role="menuitem"
+                  type="button"
+                  className={itemClass}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setNotificationsOpen(true);
+                  }}
+                >
+                  <Bell className="w-4 h-4 text-slate-500" aria-hidden="true" />
+                  <span className="flex-1 text-left">Notifications</span>
+                  {unreadCount > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-semibold">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
 
                 <button
                   role="menuitem"
@@ -173,10 +195,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   </button>
                 )}
 
-                <div className="sm:hidden border-t border-slate-100 mt-1 pt-1 px-3 py-2">
-                  <LanguageSelector />
-                </div>
-
                 <div className="border-t border-slate-100 mt-1 pt-1">
                   <button
                     role="menuitem"
@@ -197,6 +215,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         </div>
       </div>
 
+      <NotificationsModal isOpen={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
       <UserProfile isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
     </header>
   );

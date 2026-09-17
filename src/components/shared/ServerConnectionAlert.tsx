@@ -165,7 +165,7 @@ const ServerConnectionAlert: React.FC<ServerConnectionAlertProps> = ({
   const config = getStatusConfig();
   return (
     <div className={`fixed top-4 right-4 left-4 sm:left-auto sm:w-96 z-50 ${config.bgColor} ${config.borderColor} border rounded-lg shadow-lg p-4 transition-all duration-300 ease-in-out`}>
-      <div className="flex flex-wrap items-start space-x-3">
+      <div className="flex items-start space-x-3">
         <div className="flex-shrink-0">
           {config.icon}
         </div>

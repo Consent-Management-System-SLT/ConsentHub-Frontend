@@ -115,7 +115,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-slate-200">
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <h3 className="text-lg font-semibold text-slate-900">Notifications</h3>
               {unreadCount > 0 && (
                 <span className="px-2 py-1 text-xs font-medium text-white bg-red-600 rounded-full">
@@ -123,7 +123,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
                 </span>
               )}
             </div>
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
@@ -158,7 +158,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
                     }`}
                     onClick={() => handleNotificationClick(notification.id)}
                   >
-                    <div className="flex flex-wrap items-start space-x-3">
+                    <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 mt-1">
                         {getNotificationIcon(notification.type, notification.category)}
                       </div>
@@ -184,7 +184,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
                           <p className="text-xs text-slate-500">
                             {formatTimestamp(notification.timestamp)}
                           </p>
-                          <div className="flex flex-wrap items-center space-x-2">
+                          <div className="flex items-center space-x-2">
                             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                               notification.category === 'urgent' ? 'bg-red-100 text-red-800' :
                               notification.category === 'warning' ? 'bg-yellow-100 text-yellow-800' :

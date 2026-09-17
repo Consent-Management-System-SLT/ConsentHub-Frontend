@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { X } from 'lucide-react';
+import { X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 export interface NavItem {
   id: string;
@@ -21,15 +21,19 @@ interface DashboardSidebarProps {
   onToggle: () => void;
 }
 
+const COLLAPSE_KEY = 'consenthub.sidebarCollapsed';
+
 /**
- * The navigation rail shared by the admin, CSR and customer dashboards.
+ * The navigation rail shared by every dashboard.
  *
  * It scrolls on its own: the page itself does not scroll, so the rail stays put
  * while the content area moves, and a long menu scrolls within the rail rather
  * than dragging the whole page.
  *
- * Below `lg` it becomes a drawer over the content, with a scrim, Escape to
- * close, and focus moved inside on open.
+ * On desktop it collapses to an icon rail and the choice is remembered. Below
+ * `lg` it is a drawer over the content, with a scrim, Escape to close, and
+ * focus moved inside on open; collapsing does not apply there, since a drawer
+ * of bare icons would be harder to use than the full list.
  */
 const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   navId,
@@ -41,6 +45,24 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   onToggle,
 }) => {
   const navRef = useRef<HTMLElement>(null);
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem(COLLAPSE_KEY) === '1';
+    } catch {
+      return false; // blocked storage: just start expanded
+    }
+  });
+
+  const toggleCollapsed = () => {
+    setCollapsed((c) => {
+      try {
+        localStorage.setItem(COLLAPSE_KEY, c ? '0' : '1');
+      } catch {
+        /* the preference simply does not persist */
+      }
+      return !c;
+    });
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -59,7 +81,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
   const handleSelect = (id: string) => {
     onSectionChange(id);
-    // only closes the drawer; onToggle would otherwise open it on a wide-to-narrow resize
+    // only closes the drawer; onToggle would otherwise open it on a wide screen
     if (isOpen && window.innerWidth < 1024) onToggle();
   };
 
@@ -73,11 +95,14 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         />
       )}
 
+      {/* lg:z-auto matters: the rail is a flex item, so a z-index here would
+          outrank dialogs opened from the header, which sits in its own context. */}
       <aside
         className={`
-          fixed lg:static inset-y-0 left-0 w-64 shrink-0 bg-white border-r border-slate-200 z-50
+          fixed lg:static z-50 lg:z-auto inset-y-0 left-0 shrink-0 bg-white border-r border-slate-200
           flex flex-col transform transition-transform duration-300 ease-in-out lg:transform-none
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${collapsed ? 'w-64 lg:w-[76px]' : 'w-64'}
         `}
       >
         {/* Brand — only rendered in the drawer; on desktop the header carries it */}
@@ -92,12 +117,16 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           </button>
         </div>
 
-        {/* The rail's own scroll region */}
+        {/* The rail's own scroll region. Every item is one box of the same
+            height, separated by a hairline rule, so the list reads evenly
+            whether a label wraps or not. */}
         <nav
           ref={navRef}
           id={navId}
           aria-label={navLabel}
-          className="flex-1 overflow-y-auto overscroll-contain px-3 py-4 space-y-1"
+          className={`flex-1 overflow-y-auto overscroll-contain py-2 divide-y divide-slate-100 ${
+            collapsed ? 'px-2 lg:px-1.5' : 'px-2'
+          }`}
         >
           {items.map((item) => {
             const Icon = item.icon;
@@ -109,27 +138,39 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                 type="button"
                 onClick={() => handleSelect(item.id)}
                 aria-current={isActive ? 'page' : undefined}
-                aria-describedby={descId}
+                aria-describedby={collapsed ? undefined : descId}
+                title={collapsed ? `${item.label} — ${item.description}` : undefined}
                 className={`
-                  w-full text-left rounded-lg px-3 py-2.5 transition-colors
+                  w-full text-left rounded-lg transition-colors my-0.5
+                  flex flex-col justify-center min-h-[56px]
+                  ${collapsed ? 'px-3 lg:px-2' : 'px-3'}
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1
-                  ${isActive ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-50'}
+                  ${isActive
+                    ? 'bg-blue-50 text-blue-800 border-l-[3px] border-l-blue-700'
+                    : 'text-slate-700 hover:bg-slate-50 border-l-[3px] border-l-transparent'}
                 `}
               >
-                {/* icon beside the heading */}
-                <span className="flex items-center gap-2.5">
+                {/* icon beside the heading — and the only thing left when collapsed,
+                    so the active state is carried by the icon and the fill */}
+                <span className={`flex items-center gap-2.5 ${collapsed ? 'lg:gap-0 lg:justify-center' : ''}`}>
                   <Icon
                     className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-blue-700' : 'text-slate-500'}`}
                     aria-hidden="true"
                   />
-                  <span className={`text-[13px] leading-tight ${isActive ? 'font-semibold' : 'font-medium'}`}>
+                  <span
+                    className={`text-[13px] leading-tight ${isActive ? 'font-semibold' : 'font-medium'} ${
+                      collapsed ? 'lg:sr-only' : ''
+                    }`}
+                  >
                     {item.label}
                   </span>
                 </span>
                 {/* description sits under it, aligned to the label */}
                 <span
                   id={descId}
-                  className="block pl-[26px] mt-0.5 text-[11px] leading-snug text-slate-600 line-clamp-2"
+                  className={`block pl-[26px] mt-0.5 text-[11px] leading-snug text-slate-600 line-clamp-2 ${
+                    collapsed ? 'lg:hidden' : ''
+                  }`}
                 >
                   {item.description}
                 </span>
@@ -137,6 +178,30 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
             );
           })}
         </nav>
+
+        {/* Collapse control, ruled off from the menu above it */}
+        <div className="hidden lg:block border-t border-slate-200 p-2">
+          <button
+            type="button"
+            onClick={toggleCollapsed}
+            aria-pressed={collapsed}
+            aria-controls={navId}
+            aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+            className={`w-full min-h-[40px] flex items-center gap-2.5 rounded-lg text-[13px] font-medium
+              text-slate-600 hover:bg-slate-50 transition-colors
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600
+              ${collapsed ? 'justify-center px-0' : 'px-3'}`}
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />
+            ) : (
+              <>
+                <PanelLeftClose className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />
+                Collapse
+              </>
+            )}
+          </button>
+        </div>
       </aside>
     </>
   );
