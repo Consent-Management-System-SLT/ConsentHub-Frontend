@@ -182,7 +182,7 @@ const CustomerManagement: React.FC = () => {
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
           <div className="flex flex-wrap items-center gap-3">
             <div className="p-2 bg-green-600/20 rounded-lg">
-              <UserPlus className="w-5 h-5 text-green-600" />
+              <UserPlus className="w-5 h-5 text-green-700" />
             </div>
             <div>
               <p className="text-sm text-slate-600">Active Customers</p>
@@ -208,7 +208,7 @@ const CustomerManagement: React.FC = () => {
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
           <div className="flex flex-wrap items-center gap-3">
             <div className="p-2 bg-amber-600/20 rounded-lg">
-              <Calendar className="w-5 h-5 text-amber-600" />
+              <Calendar className="w-5 h-5 text-amber-700" />
             </div>
             <div>
               <p className="text-sm text-slate-600">New This Month</p>
@@ -380,9 +380,9 @@ const CustomerManagement: React.FC = () => {
                     <div className="text-xs text-blue-600">{selectedCustomer.activeConsents} active</div>
                   </div>
                   <div className="bg-green-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">{selectedCustomer.totalPreferences}</div>
+                    <div className="text-2xl font-bold text-green-700">{selectedCustomer.totalPreferences}</div>
                     <div className="text-sm text-green-800">Total Preferences</div>
-                    <div className="text-xs text-green-600">{selectedCustomer.activePreferences} active</div>
+                    <div className="text-xs text-green-700">{selectedCustomer.activePreferences} active</div>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <div className="text-2xl font-bold text-purple-600">{selectedCustomer.dsarRequests}</div>

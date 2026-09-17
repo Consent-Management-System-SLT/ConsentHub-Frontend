@@ -346,7 +346,7 @@ const EventListenerManager: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-green-700" />;
       case 'inactive':
         return <XCircle className="w-5 h-5 text-slate-500" />;
       case 'error':
@@ -358,11 +358,11 @@ const EventListenerManager: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-600/20 text-green-600 border border-green-200/30';
+        return 'bg-green-600/20 text-green-700 border border-green-200/30';
       case 'inactive':
         return 'bg-slate-50/20 text-slate-500 border border-slate-200';
       case 'error':
-        return 'bg-red-50 text-red-600 border border-red-200';
+        return 'bg-red-50 text-red-800 border border-red-200';
       default:
         return 'bg-slate-50/20 text-slate-500 border border-slate-200';
     }
@@ -415,7 +415,7 @@ const EventListenerManager: React.FC = () => {
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-green-600/20 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+                <CheckCircle className="w-6 h-6 text-green-700" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-slate-600">Active</p>
@@ -426,7 +426,7 @@ const EventListenerManager: React.FC = () => {
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-amber-600/20 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-amber-600" />
+                <TrendingUp className="w-6 h-6 text-amber-700" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-slate-600">Success Rate</p>
@@ -516,7 +516,7 @@ const EventListenerManager: React.FC = () => {
                     <p className="text-xs text-slate-500">Total</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-lg font-bold text-green-600">{webhook.successfulTriggers}</p>
+                    <p className="text-lg font-bold text-green-700">{webhook.successfulTriggers}</p>
                     <p className="text-xs text-slate-500">Success</p>
                   </div>
                   <div className="text-center">
@@ -571,21 +571,21 @@ const EventListenerManager: React.FC = () => {
                     onClick={() => handleViewLogs(webhook)}
                     className="p-2 text-slate-600 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-colors"
                     title="View Logs"
-                  >
+                   aria-label="View Logs">
                     <Eye className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={() => openEditModal(webhook)}
                     className="p-2 text-slate-600 hover:text-blue-600 hover:bg-slate-50 rounded-lg transition-colors"
                     title="Edit"
-                  >
+                   aria-label="Edit">
                     <Edit className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={() => handleDeleteWebhook(webhook._id)}
                     className="p-2 text-red-600 hover:text-red-600/80 hover:bg-red-50 rounded-lg transition-colors"
                     title="Delete"
-                  >
+                   aria-label="Delete">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -793,7 +793,7 @@ const WebhookModal: React.FC<WebhookModalProps> = ({ title, formData, setFormDat
             {/* Events Selection */}
             <div className="space-y-4">
               <h4 className="font-medium text-slate-900">Events</h4>
-              <div className="max-h-64 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-slate-100">
+              <div className="max-h-96 sm:max-h-64 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-slate-100">
                 {availableEvents.map((event) => (
                   <div key={event.value} className="flex flex-wrap items-start space-x-3 py-2">
                     <input

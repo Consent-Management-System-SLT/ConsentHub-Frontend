@@ -215,7 +215,7 @@ const DashboardHome: React.FC = () => {
             <Shield className="w-6 sm:w-8 h-6 sm:h-8 text-blue-600 shrink-0" />
           </div>
           <div className="mt-3 sm:mt-4 text-xs sm:text-sm">
-            <span className="text-green-600 font-medium">
+            <span className="text-green-700 font-medium">
               {dashboardData.systemOverview.grantedConsents} granted
             </span>
             <span className="text-slate-500 mx-2">|</span>
@@ -230,7 +230,7 @@ const DashboardHome: React.FC = () => {
               <p className="text-xs sm:text-sm font-medium text-slate-600">Total Users</p>
               <p className="text-xl sm:text-2xl font-bold text-slate-900">{dashboardData.systemOverview.totalUsers}</p>
             </div>
-            <Users className="w-6 sm:w-8 h-6 sm:h-8 text-green-600 shrink-0" />
+            <Users className="w-6 sm:w-8 h-6 sm:h-8 text-green-700 shrink-0" />
           </div>
           <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-slate-600">
             Active system users
@@ -245,7 +245,7 @@ const DashboardHome: React.FC = () => {
             <FileText className="w-6 sm:w-8 h-6 sm:h-8 text-blue-600 shrink-0" />
           </div>
           <div className="mt-3 sm:mt-4 text-xs sm:text-sm">
-            <span className="text-amber-600 font-medium">
+            <span className="text-amber-700 font-medium">
               {dashboardData.systemOverview.pendingDSAR} pending
             </span>
           </div>
@@ -271,7 +271,7 @@ const DashboardHome: React.FC = () => {
         </h2>
         <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-green-600">
+            <div className="text-2xl sm:text-3xl font-bold text-green-700">
               {dashboardData.complianceMetrics.complianceScore}%
             </div>
             <div className="text-xs sm:text-sm text-slate-600 mt-1">Compliance Score</div>
@@ -289,7 +289,7 @@ const DashboardHome: React.FC = () => {
             <div className="text-xs sm:text-sm text-slate-600 mt-1">Avg Response Time</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl sm:text-3xl font-bold text-amber-600">
+            <div className="text-2xl sm:text-3xl font-bold text-amber-700">
               {dashboardData.complianceMetrics.overdueItems}
             </div>
             <div className="text-xs sm:text-sm text-slate-600 mt-1">Overdue Items</div>
@@ -316,8 +316,8 @@ const DashboardHome: React.FC = () => {
               <div className="flex flex-wrap items-center space-x-2">
                 {dashboardData.systemHealth.databaseConnected ? (
                   <>
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-green-600 text-xs sm:text-sm font-medium">Connected</span>
+                    <CheckCircle className="w-4 h-4 text-green-700" />
+                    <span className="text-green-700 text-xs sm:text-sm font-medium">Connected</span>
                   </>
                 ) : (
                   <>
@@ -335,7 +335,7 @@ const DashboardHome: React.FC = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-600 text-sm sm:text-base">Services Online</span>
-              <span className="text-green-600 font-medium text-sm sm:text-base">
+              <span className="text-green-700 font-medium text-sm sm:text-base">
                 {dashboardData.systemHealth.servicesOnline.length}/4
               </span>
             </div>
@@ -353,12 +353,12 @@ const DashboardHome: React.FC = () => {
             <Activity className="w-4 sm:w-5 h-4 sm:h-5" />
             <span>Recent Activity</span>
           </h2>
-          <div className="space-y-2 sm:space-y-3 max-h-64 overflow-y-auto">
+          <div className="space-y-2 sm:space-y-3 max-h-96 sm:max-h-64 overflow-y-auto">
             {dashboardData.recentActivity.map((activity) => (
               <div key={activity.id} className="flex flex-wrap items-center space-x-2 sm:space-x-3 p-2 hover:bg-slate-50 rounded">
                 <div className="flex-shrink-0">
                   {activity.action === 'granted' ? (
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <CheckCircle className="w-4 h-4 text-green-700" />
                   ) : activity.action === 'revoked' ? (
                     <AlertTriangle className="w-4 h-4 text-red-600" />
                   ) : (

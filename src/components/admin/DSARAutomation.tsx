@@ -220,20 +220,20 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                                 'bg-blue-600/30'
                               }`}>
                                 {recommendation.level === 'high' ? <AlertTriangle className="w-3 h-3 text-red-600" /> :
-                                 recommendation.level === 'medium' ? <Clock className="w-3 h-3 text-amber-600" /> : 
+                                 recommendation.level === 'medium' ? <Clock className="w-3 h-3 text-amber-700" /> : 
                                  <Info className="w-3 h-3 text-blue-600" />}
                               </div>
                               <div>
                                 <p className={`text-sm font-medium ${
                                   recommendation.level === 'high' ? 'text-red-600' :
-                                  recommendation.level === 'medium' ? 'text-amber-600' :
+                                  recommendation.level === 'medium' ? 'text-amber-700' :
                                   'text-blue-600'
                                 }`}>
                                   Automation Recommendation
                                 </p>
                                 <p className={`text-sm ${
                                   recommendation.level === 'high' ? 'text-red-600' :
-                                  recommendation.level === 'medium' ? 'text-amber-600' :
+                                  recommendation.level === 'medium' ? 'text-amber-700' :
                                   'text-blue-600'
                                 }`}>
                                   {recommendation.message}
@@ -275,8 +275,8 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                   {/* Processing Result */}
                   {processingResults[request.id] && (
                     <div className="mt-4 p-4 bg-green-600/20 border border-green-200/30 rounded-lg">
-                      <h6 className="font-medium text-green-600 mb-2">Processing Completed</h6>
-                      <div className="text-sm text-green-600 space-y-1">
+                      <h6 className="font-medium text-green-700 mb-2">Processing Completed</h6>
+                      <div className="text-sm text-green-700 space-y-1">
                         {processingResults[request.id].dataExported && (
                           <p className="flex items-center"><CheckCircle className="w-4 h-4 text-slate-500 mr-1 text-green-500" /> Data exported successfully</p>
                         )}
@@ -303,7 +303,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
             <h4 className="text-lg font-semibold text-slate-900">Recently Auto-Processed Requests</h4>
             <p className="text-slate-600 text-sm mt-1">Successfully automated DSAR completions</p>
           </div>
-          <div className="divide-y divide-slate-200 max-h-64 overflow-y-auto">
+          <div className="divide-y divide-slate-200 max-h-96 sm:max-h-64 overflow-y-auto">
             {completedRequests.slice(0, 5).map(request => (
               <div key={request.id} className="p-4 flex items-center justify-between">
                 <div className="flex flex-wrap items-center space-x-4">

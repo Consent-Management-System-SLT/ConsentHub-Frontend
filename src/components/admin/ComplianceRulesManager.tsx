@@ -142,18 +142,18 @@ const ComplianceRulesManager = () => {
   const getPriorityColor = (priority: any) => {
     switch (priority) {
       case 'critical': return 'text-red-600 bg-red-50 border border-red-200';
-      case 'high': return 'text-amber-600 bg-amber-600/20 border border-slate-200/30';
+      case 'high': return 'text-amber-700 bg-amber-600/20 border border-slate-200/30';
       case 'medium': return 'text-blue-600 bg-blue-600/20 border border-slate-200/30';
-      case 'low': return 'text-green-600 bg-green-600/20 border border-green-200/30';
+      case 'low': return 'text-green-700 bg-green-600/20 border border-green-200/30';
       default: return 'text-slate-500 bg-slate-50/20 border border-slate-200/30';
     }
   };
   const getStatusColor = (status: any) => {
     switch (status) {
-      case 'active': return 'text-green-600 bg-green-600/20 border border-green-200/30';
+      case 'active': return 'text-green-700 bg-green-600/20 border border-green-200/30';
       case 'inactive': return 'text-red-600 bg-red-50 border border-red-200';
       case 'draft': return 'text-slate-500 bg-slate-50/20 border border-slate-200/30';
-      case 'pending_review': return 'text-amber-600 bg-amber-600/20 border border-slate-200/30';
+      case 'pending_review': return 'text-amber-700 bg-amber-600/20 border border-slate-200/30';
       default: return 'text-slate-500 bg-slate-50/20 border border-slate-200/30';
     }
   };
@@ -182,7 +182,7 @@ const ComplianceRulesManager = () => {
         </div>
       </div>
       {success && (
-        <div className="mb-6 bg-green-600/20 border border-green-200/30 text-green-600 px-4 py-3 rounded-lg">
+        <div className="mb-6 bg-green-600/20 border border-green-200/30 text-green-700 px-4 py-3 rounded-lg">
           <div className="flex items-center">
             <CheckCircle className="w-5 h-5 mr-2" />
             {success}
@@ -238,7 +238,7 @@ const ComplianceRulesManager = () => {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-500">Success Rate:</span>
-                  <span className="font-medium text-green-600">{rule.metrics?.success_rate || 0}%</span>
+                  <span className="font-medium text-green-700">{rule.metrics?.success_rate || 0}%</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-500">Executions:</span>
@@ -276,7 +276,7 @@ const ComplianceRulesManager = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Add New Compliance Rule</h2>
-              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setShowAddModal(false)} className="text-slate-500 hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -340,7 +340,7 @@ const ComplianceRulesManager = () => {
               <button
                 onClick={handleAddRule}
                 disabled={!newRule.name || !newRule.description}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex flex-wrap items-center space-x-2"
+                className="px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex flex-wrap items-center space-x-2"
               >
                 <Save className="w-4 h-4" />
                 <span>Create Rule</span>
@@ -355,7 +355,7 @@ const ComplianceRulesManager = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Compliance Rule Details</h2>
-              <button onClick={() => setShowDetailsModal(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setShowDetailsModal(false)} className="text-slate-500 hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -395,7 +395,7 @@ const ComplianceRulesManager = () => {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-500">Success Rate:</span>
-                      <span className="font-medium text-green-600">{selectedRule.metrics?.success_rate || 0}%</span>
+                      <span className="font-medium text-green-700">{selectedRule.metrics?.success_rate || 0}%</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">Total Executions:</span>
@@ -435,7 +435,7 @@ const ComplianceRulesManager = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Edit Compliance Rule</h2>
-              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setShowEditModal(false)} className="text-slate-500 hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
             </div>

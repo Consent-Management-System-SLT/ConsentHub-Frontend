@@ -182,21 +182,21 @@ const AuditLogViewer: React.FC = () => {
   };
   const getOutcomeIcon = (outcome: string) => {
     switch (outcome) {
-      case 'success': return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 'success': return <CheckCircle className="w-4 h-4 text-green-700" />;
       case 'failure': return <XCircle className="w-4 h-4 text-red-600" />;
-      case 'partial': return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
+      case 'partial': return <AlertTriangle className="w-4 h-4 text-yellow-700" />;
       default: return <AlertCircle className="w-4 h-4 text-gray-600" />;
     }
   };
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'Consent Management': return <Shield className="w-4 h-4 text-green-600" />;
+      case 'Consent Management': return <Shield className="w-4 h-4 text-green-700" />;
       case 'DSAR Processing': return <Database className="w-4 h-4 text-blue-600" />;
       case 'User Management': return <Users className="w-4 h-4 text-purple-600" />;
       case 'Privacy Notices': return <FileText className="w-4 h-4 text-indigo-600" />;
       case 'Security': return <Lock className="w-4 h-4 text-red-600" />;
       case 'System Administration': return <Server className="w-4 h-4 text-gray-600" />;
-      case 'Compliance & Audit': return <Settings className="w-4 h-4 text-yellow-600" />;
+      case 'Compliance & Audit': return <Settings className="w-4 h-4 text-yellow-700" />;
       case 'Data Processing': return <Activity className="w-4 h-4 text-orange-600" />;
       default: return <Globe className="w-4 h-4 text-gray-600" />;
     }
@@ -238,9 +238,9 @@ const AuditLogViewer: React.FC = () => {
             <button
               key={number}
               onClick={() => setCurrentPage(number)}
-              className={`px-3 py-1 rounded-md text-sm font-medium ${
+              className={`min-w-[44px] px-3 py-1 rounded-md text-sm font-medium ${
                 currentPage === number
-                  ? 'bg-red-500 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -280,7 +280,7 @@ const AuditLogViewer: React.FC = () => {
         </div>
         <button
           onClick={exportLogs}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex flex-wrap items-center space-x-2"
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600 transition-colors flex flex-wrap items-center space-x-2"
         >
           <Download className="w-4 h-4" />
           <span>Export CSV</span>
@@ -298,7 +298,7 @@ const AuditLogViewer: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               <input
                 type="text"
                 value={searchTerm}
@@ -310,7 +310,7 @@ const AuditLogViewer: React.FC = () => {
               {searchTerm && (
                 <button aria-label="Close"
                   onClick={clearSearch}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-gray-600"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -318,7 +318,7 @@ const AuditLogViewer: React.FC = () => {
             </div>
             <button
               onClick={handleSearch}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600 transition-colors"
             >
               Search
             </button>
@@ -449,7 +449,7 @@ const AuditLogViewer: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     {log.complianceRelevant ? (
                       <div className="flex flex-col">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600/20 text-green-600 mb-1">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600/20 text-green-700 mb-1">
                           GDPR Relevant
                         </span>
                         {log.regulatoryFramework.length > 0 && (
@@ -466,7 +466,7 @@ const AuditLogViewer: React.FC = () => {
                     <button
                       onClick={() => setSelectedLog(log)}
                       aria-label={`View audit entry: ${log.action} by ${log.userEmail}`}
-                      className="text-blue-600 hover:text-blue-600 p-1 hover:bg-blue-50/10 rounded transition-colors"
+                      className="text-blue-600 hover:text-blue-600 p-2 hover:bg-blue-50/10 rounded transition-colors"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -486,7 +486,7 @@ const AuditLogViewer: React.FC = () => {
                 <h2 className="text-xl font-semibold text-gray-900">Audit Log Details</h2>
                 <button
                   onClick={() => setSelectedLog(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-slate-500 hover:text-gray-600"
                 >
                   <X className="w-6 h-6" />
                 </button>

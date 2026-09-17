@@ -499,7 +499,7 @@ const PreferenceManagement: React.FC = () => {
                           onClick={() => handleDeleteChannel(channel._id, channel.name)}
                           className="text-red-600 hover:text-red-900 p-2"
                           title="Delete channel"
-                        >
+                         aria-label="Delete channel">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </td>
@@ -509,7 +509,7 @@ const PreferenceManagement: React.FC = () => {
               </table>
               {channels.length === 0 && (
                 <div className="text-center py-12">
-                  <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
+                  <MessageSquare className="mx-auto h-12 w-12 text-slate-500" />
                   <h3 className="mt-2 text-sm font-medium text-gray-900">No channels configured</h3>
                   <p className="mt-1 text-sm text-gray-500">Get started by adding a communication channel.</p>
                 </div>
@@ -549,7 +549,7 @@ const PreferenceManagement: React.FC = () => {
                       <td className="px-6 py-4">
                         <div className="text-sm font-medium text-gray-900">{topic.name}</div>
                         <div className="text-sm text-gray-500">{topic.description}</div>
-                        <div className="text-xs text-gray-400">Key: {topic.key}</div>
+                        <div className="text-xs text-slate-500">Key: {topic.key}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full capitalize">
@@ -589,7 +589,7 @@ const PreferenceManagement: React.FC = () => {
                           onClick={() => handleDeleteTopic(topic._id, topic.name)}
                           className="text-red-600 hover:text-red-900 p-2"
                           title="Delete topic"
-                        >
+                         aria-label="Delete topic">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </td>
@@ -599,7 +599,7 @@ const PreferenceManagement: React.FC = () => {
               </table>
               {topics.length === 0 && (
                 <div className="text-center py-12">
-                  <Users className="mx-auto h-12 w-12 text-gray-400" />
+                  <Users className="mx-auto h-12 w-12 text-slate-500" />
                   <h3 className="mt-2 text-sm font-medium text-gray-900">No topics configured</h3>
                   <p className="mt-1 text-sm text-gray-500">Get started by adding a topic subscription.</p>
                 </div>
@@ -616,7 +616,7 @@ const PreferenceManagement: React.FC = () => {
                   <h3 className="text-lg font-medium text-gray-900">Add Communication Channel</h3>
                   <button
                     onClick={() => setShowAddChannel(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-slate-500 hover:text-gray-600"
                   >
                     <X className="h-6 w-6" />
                   </button>
@@ -717,7 +717,7 @@ const PreferenceManagement: React.FC = () => {
                   <h3 className="text-lg font-medium text-gray-900">Add Topic Subscription</h3>
                   <button
                     onClick={() => setShowAddTopic(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-slate-500 hover:text-gray-600"
                   >
                     <X className="h-6 w-6" />
                   </button>

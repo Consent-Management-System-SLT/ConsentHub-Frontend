@@ -180,9 +180,9 @@ export default function EnterpriseManagement() {
           </button>
           <h2 className="text-2xl font-bold text-slate-800">Application Review: {selectedOrg.legalName}</h2>
           <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-            selectedOrg.status === 'ACTIVE' ? 'bg-green-100 text-green-700' :
+            selectedOrg.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
             selectedOrg.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
-            'bg-yellow-100 text-yellow-700'
+            'bg-yellow-100 text-yellow-800'
           }`}>
             {selectedOrg.status}
           </span>
@@ -274,7 +274,7 @@ export default function EnterpriseManagement() {
 
         {['SUBMITTED', 'UNDER_REVIEW', 'MORE_INFORMATION_REQUIRED'].includes(selectedOrg.status) && (
           <div className="flex flex-wrap space-x-4 bg-white p-6 rounded-xl border shadow-sm">
-            <button onClick={() => handleApprove(selectedOrg._id)} className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <button onClick={() => handleApprove(selectedOrg._id)} className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700">
               <CheckCircle className="w-5 h-5" /> <span>Approve</span>
             </button>
             <button onClick={() => setShowRejectModal(true)} className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">

@@ -485,11 +485,11 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
+        return <CheckCircle className="w-4 h-4 text-green-700" />;
       case 'withdrawn':
         return <XCircle className="w-4 h-4 text-red-600" />;
       case 'expired':
-        return <AlertCircle className="w-4 h-4 text-amber-600" />;
+        return <AlertCircle className="w-4 h-4 text-amber-700" />;
       case 'pending':
         return <AlertCircle className="w-4 h-4 text-blue-600" />;
       default:
@@ -499,11 +499,11 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-600/20 text-green-600';
+        return 'bg-green-600/20 text-green-700';
       case 'withdrawn':
-        return 'bg-red-50 text-red-600';
+        return 'bg-red-50 text-red-800';
       case 'expired':
-        return 'bg-amber-600/20 text-amber-600';
+        return 'bg-amber-600/20 text-amber-700';
       case 'pending':
         return 'bg-blue-50/20 text-blue-600';
       default:
@@ -517,7 +517,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       case 'analytics':
         return 'bg-blue-50/20 text-blue-600';
       case 'functional':
-        return 'bg-green-600/20 text-green-600';
+        return 'bg-green-600/20 text-green-700';
       case 'necessary':
         return 'bg-white border border-slate-200 rounded-xl shadow-sm text-slate-600';
       default:
@@ -639,12 +639,12 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Active Consents</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-2xl font-bold text-green-700">
                 {consents.filter(c => c.status === 'active').length}
               </p>
             </div>
             <div className="w-12 h-12 bg-green-600/20 rounded-xl flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+              <CheckCircle className="w-6 h-6 text-green-700" />
             </div>
           </div>
         </div>
@@ -665,12 +665,12 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Expired</p>
-              <p className="text-2xl font-bold text-amber-600">
+              <p className="text-2xl font-bold text-amber-700">
                 {consents.filter(c => c.status === 'expired').length}
               </p>
             </div>
             <div className="w-12 h-12 bg-amber-600/20 rounded-xl flex items-center justify-center">
-              <AlertCircle className="w-6 h-6 text-amber-600" />
+              <AlertCircle className="w-6 h-6 text-amber-700" />
             </div>
           </div>
         </div>
@@ -691,7 +691,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search customers..."
@@ -715,7 +715,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   <option value="expired">Expired</option>
                   <option value="pending">Pending</option>
                 </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               </div>
               <div className="relative">
                 <select
@@ -729,7 +729,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   <option value="functional">Functional</option>
                   <option value="necessary">Necessary</option>
                 </select>
-                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               </div>
             </div>
           </div>
@@ -768,16 +768,16 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   <div className="flex flex-wrap items-center space-x-1">
                     <button 
                       onClick={() => handleViewConsent(consent)}
-                      className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded transition-colors"
+                      className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded transition-colors"
                       title="View Details"
-                    >
+                     aria-label="View Details">
                       <Eye className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => handleEditConsent(consent)}
-                      className="text-green-600 hover:text-green-900 p-1 hover:bg-green-50 rounded transition-colors"
+                      className="text-green-700 hover:text-green-900 p-2 hover:bg-green-50 rounded transition-colors"
                       title="Edit Consent"
-                    >
+                     aria-label="Edit Consent">
                       <Edit className="w-4 h-4" />
                     </button>
                   </div>
@@ -897,7 +897,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                       <div className="ml-4">
                         <div className="text-sm font-medium text-slate-900">{consent.customerName}</div>
                         <div className="text-sm text-slate-600">{consent.email}</div>
-                        <div className="text-xs text-gray-400">{consent.customerId}</div>
+                        <div className="text-xs text-slate-500">{consent.customerId}</div>
                       </div>
                     </div>
                   </td>
@@ -916,7 +916,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                     <div className="flex items-center">
-                      <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+                      <Calendar className="w-4 h-4 text-slate-500 mr-2" />
                       <div>
                         <div className="font-medium">
                           {(() => {
@@ -942,7 +942,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                             return `${dateInfo.date} at ${dateInfo.time}`;
                           })()}
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-slate-500">
                           by {(() => {
                             const rawConsent = rawConsents.find((c: any) => (c.id || c._id) === consent.id);
                             if (!rawConsent) return 'Customer';
@@ -958,11 +958,11 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                     {consent.expiryDate ? (
                       <div className="flex items-center">
-                        <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+                        <Calendar className="w-4 h-4 text-slate-500 mr-2" />
                         {new Date(consent.expiryDate).toLocaleDateString()}
                       </div>
                     ) : (
-                      <span className="text-gray-400">No expiry</span>
+                      <span className="text-slate-500">No expiry</span>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -974,16 +974,16 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     <div className="flex flex-wrap items-center space-x-2">
                       <button 
                         onClick={() => handleViewConsent(consent)}
-                        className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded transition-colors"
+                        className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded transition-colors"
                         title="View Details"
-                      >
+                       aria-label="View Details">
                         <Eye className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => handleEditConsent(consent)}
                         className="text-slate-600 hover:text-slate-900 p-1 hover:bg-white border border-slate-200 rounded transition-colors"
                         title="Edit Consent"
-                      >
+                       aria-label="Edit Consent">
                         <Edit className="w-4 h-4" />
                       </button>
                     </div>
@@ -1011,9 +1011,9 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
             <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className={`px-3 py-2 rounded-lg transition-colors text-sm ${
+              className={`min-w-[44px] px-3 py-2 rounded-lg transition-colors text-sm ${
                 currentPage === page
-                  ? 'bg-red-600 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'border border-gray-300 hover:bg-white border border-slate-200'
               }`}
             >
@@ -1075,7 +1075,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                       <>
                         {dateInfo && (
                           <p>
-                            <span className="font-medium">{dateInfo.action}:</span> {dateInfo.date} at {dateInfo.time} <span className="text-xs text-gray-400">by {dateInfo.source === 'csr-dashboard' ? 'CSR Staff' : dateInfo.source === 'customer-portal' ? 'Customer' : dateInfo.source === 'admin-dashboard' ? 'Admin' : 'System'}</span>
+                            <span className="font-medium">{dateInfo.action}:</span> {dateInfo.date} at {dateInfo.time} <span className="text-xs text-slate-500">by {dateInfo.source === 'csr-dashboard' ? 'CSR Staff' : dateInfo.source === 'customer-portal' ? 'Customer' : dateInfo.source === 'admin-dashboard' ? 'Admin' : 'System'}</span>
                           </p>
                         )}
                         {modalData.expiryDate && (
@@ -1112,7 +1112,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Create New Consent</h3>
-              <button onClick={() => setShowCreateModal(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setShowCreateModal(false)} className="text-slate-500 hover:text-gray-600">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -1242,7 +1242,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 id="consentoverviewtable-dialog-3-title" className="text-lg font-semibold text-gray-900">Edit Consent - {editingConsent.customerName}</h3>
-              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setShowEditModal(false)} className="text-slate-500 hover:text-gray-600">
                 <X className="h-5 w-5" />
               </button>
             </div>

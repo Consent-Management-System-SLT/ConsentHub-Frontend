@@ -381,13 +381,13 @@ const DSARManager: React.FC = () => {
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
                           request.status === 'pending'
-                            ? 'bg-amber-600/20 text-amber-600 border border-slate-200/30'
+                            ? 'bg-amber-600/20 text-amber-700 border border-slate-200/30'
                             : request.status === 'in_progress'
                             ? 'bg-blue-600/20 text-blue-600 border border-slate-200/30'
                             : request.status === 'completed'
-                            ? 'bg-green-600/20 text-green-600 border border-green-200/30'
+                            ? 'bg-green-600/20 text-green-700 border border-green-200/30'
                             : request.status === 'rejected'
-                            ? 'bg-red-50 text-red-600 border border-red-200'
+                            ? 'bg-red-50 text-red-800 border border-red-200'
                             : 'bg-slate-50/20 text-slate-500 border border-slate-200/30'
                         }`}
                       >
@@ -396,9 +396,9 @@ const DSARManager: React.FC = () => {
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
                           request.priority === 'high'
-                            ? 'bg-red-50 text-red-600 border border-red-200'
+                            ? 'bg-red-50 text-red-800 border border-red-200'
                             : request.priority === 'medium'
-                            ? 'bg-amber-600/20 text-amber-600 border border-slate-200/30'
+                            ? 'bg-amber-600/20 text-amber-700 border border-slate-200/30'
                             : 'bg-slate-50/20 text-slate-500 border border-slate-200/30'
                         }`}
                       >
@@ -410,7 +410,7 @@ const DSARManager: React.FC = () => {
                         </span>
                       )}
                       {request.isOverdue && (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-50 text-red-600 border border-red-200">
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-50 text-red-800 border border-red-200">
                           OVERDUE
                         </span>
                       )}
@@ -430,7 +430,7 @@ const DSARManager: React.FC = () => {
                         <Calendar className="h-3 w-3" />
                         <span>Due: {request.dueDate ? new Date(request.dueDate).toLocaleDateString() : 'Unknown'}</span>
                         {request.daysRemaining !== null && (
-                          <span className={`ml-1 ${request.daysRemaining < 0 ? 'text-red-600' : request.daysRemaining <= 7 ? 'text-amber-600' : 'text-slate-500'}`}>
+                          <span className={`ml-1 ${request.daysRemaining < 0 ? 'text-red-600' : request.daysRemaining <= 7 ? 'text-amber-700' : 'text-slate-500'}`}>
                             ({request.daysRemaining < 0 ? `${Math.abs(request.daysRemaining)} days overdue` : `${request.daysRemaining} days left`})
                           </span>
                         )}
@@ -462,9 +462,9 @@ const DSARManager: React.FC = () => {
                     <>
                       <button
                         onClick={() => handleApproveRequest(request)}
-                        className="flex flex-wrap items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors text-sm font-medium"
+                        className="flex flex-wrap items-center gap-1 px-3 py-1.5 bg-green-100 text-green-800 hover:bg-green-200 rounded-lg transition-colors text-sm font-medium"
                         title="Approve and start processing this request"
-                      >
+                       aria-label="Approve and start processing this request">
                         <CheckCircle className="h-4 w-4" />
                         Approve
                       </button>
@@ -472,7 +472,7 @@ const DSARManager: React.FC = () => {
                         onClick={() => handleRejectRequest(request)}
                         className="flex flex-wrap items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors text-sm font-medium"
                         title="Reject this request with reason"
-                      >
+                       aria-label="Reject this request with reason">
                         <XCircle className="h-4 w-4" />
                         Reject
                       </button>
@@ -483,7 +483,7 @@ const DSARManager: React.FC = () => {
                       onClick={() => handleCompleteRequest(request)}
                       className="flex flex-wrap items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors text-sm font-medium"
                       title="Mark this request as completed"
-                    >
+                     aria-label="Mark this request as completed">
                       <CheckCircle className="h-4 w-4" />
                       Complete
                     </button>
@@ -493,7 +493,7 @@ const DSARManager: React.FC = () => {
                     onClick={() => setSelectedRequest(request)}
                     className="flex flex-wrap items-center gap-1 px-3 py-1.5 text-blue-600 hover:text-blue-600-hover hover:bg-blue-50/10 rounded-lg transition-colors text-sm font-medium"
                     title="View detailed information"
-                  >
+                   aria-label="View detailed information">
                     <Eye className="h-4 w-4" />
                     Details
                   </button>
@@ -522,7 +522,7 @@ const DSARManager: React.FC = () => {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`px-3 py-2 rounded-lg transition-colors text-sm ${
+                className={`min-w-[44px] px-3 py-2 rounded-lg transition-colors text-sm ${
                   currentPage === page
                     ? 'bg-blue-50 text-white'
                     : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'

@@ -753,7 +753,7 @@ const UserManagement: React.FC = () => {
       case 'admin':
         return <Shield className="w-4 h-4 text-red-600" />;
       case 'csr':
-        return <Users className="w-4 h-4 text-green-600" />;
+        return <Users className="w-4 h-4 text-green-700" />;
       case 'customer':
         return <Users className="w-4 h-4 text-blue-600" />;
       case 'guardian':
@@ -767,7 +767,7 @@ const UserManagement: React.FC = () => {
       case 'admin':
         return 'bg-red-100 text-red-800';
       case 'csr':
-        return 'bg-green-50 text-green-600';
+        return 'bg-green-50 text-green-800';
       case 'customer':
         return 'bg-blue-100 text-blue-800';
       case 'guardian':
@@ -779,7 +779,7 @@ const UserManagement: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-50 text-green-600';
+        return 'bg-green-50 text-green-800';
       case 'inactive':
         return 'bg-white border border-slate-200 text-slate-500';
       case 'suspended':
@@ -823,7 +823,7 @@ const UserManagement: React.FC = () => {
               setError(null);
             }}
             disabled={loading}
-            className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex flex-wrap items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
+            className="px-3 sm:px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 transition-colors flex flex-wrap items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
           >
             <Plus className="w-4 h-4" />
             <span>Add User</span>
@@ -879,10 +879,10 @@ const UserManagement: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-sm font-medium text-slate-600">Total Users</p>
-              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600">{users.length}</p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700">{users.length}</p>
             </div>
             <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-blue-50/20 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
-              <Users className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-600" />
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-700" />
             </div>
           </div>
         </div>
@@ -890,12 +890,12 @@ const UserManagement: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-slate-600">Active Users</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-2xl font-bold text-green-700">
                 {users.filter(u => u.status === 'active').length}
               </p>
             </div>
             <div className="w-12 h-12 bg-blue-50/20 rounded-xl flex items-center justify-center">
-              <UserCheck className="w-6 h-6 text-green-600" />
+              <UserCheck className="w-6 h-6 text-green-700" />
             </div>
           </div>
         </div>
@@ -1008,7 +1008,7 @@ const UserManagement: React.FC = () => {
                   <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Status</th>
                   <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
                     Last Login
-                    <span className="ml-1 text-xs text-green-600" title="Sorted by most recent login first">↓</span>
+                    <span className="ml-1 text-xs text-green-700" title="Sorted by most recent login first">↓</span>
                   </th>
                   <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Department</th>
                   <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Actions</th>
@@ -1039,7 +1039,7 @@ const UserManagement: React.FC = () => {
                           {(user.name && user.name !== 'undefined undefined') ? user.name : (user.email || 'Unknown User')}
                         </div>
                         <div className="text-sm text-slate-600">{user.email || 'No email'}</div>
-                        {user.phone && <div className="text-xs text-gray-400">{user.phone}</div>}
+                        {user.phone && <div className="text-xs text-slate-500">{user.phone}</div>}
                       </div>
                     </div>
                   </td>
@@ -1067,7 +1067,7 @@ const UserManagement: React.FC = () => {
                     <div className="flex flex-col">
                       {user.hasNeverLoggedIn ? (
                         <>
-                          <span className="font-medium text-gray-400">Never logged in</span>
+                          <span className="font-medium text-slate-500">Never logged in</span>
                           <span className="text-xs text-gray-500">
                             Created: {new Date(user.createdAt).toLocaleDateString('en-US', {
                               year: 'numeric',
@@ -1103,7 +1103,7 @@ const UserManagement: React.FC = () => {
                         onClick={() => handleEditUser(user)}
                         className="text-blue-600 hover:text-blue-600-dark p-2 hover:bg-white border border-slate-200 rounded transition-colors"
                         title="Edit User"
-                      >
+                       aria-label="Edit User">
                         <Edit className="w-4 h-4" />
                       </button>
                       {/* Quick Status Actions */}
@@ -1114,15 +1114,15 @@ const UserManagement: React.FC = () => {
                             className="text-orange-600 hover:text-orange-800 p-2 hover:bg-orange-50 rounded transition-colors"
                             title="Deactivate User"
                             disabled={loading}
-                          >
+                           aria-label="Deactivate User">
                             <Pause className="w-4 h-4" />
                           </button>
                           <button 
                             onClick={() => handleStatusChange(user.id, 'suspended')}
-                            className="text-yellow-600 hover:text-yellow-800 p-2 hover:bg-yellow-50 rounded transition-colors"
+                            className="text-yellow-700 hover:text-yellow-800 p-2 hover:bg-yellow-50 rounded transition-colors"
                             title="Suspend User"
                             disabled={loading}
-                          >
+                           aria-label="Suspend User">
                             <UserX className="w-4 h-4" />
                           </button>
                         </>
@@ -1130,28 +1130,28 @@ const UserManagement: React.FC = () => {
                         <>
                           <button 
                             onClick={() => handleStatusChange(user.id, 'active')}
-                            className="text-green-600 hover:text-green-800 p-2 hover:bg-green-50 rounded transition-colors"
+                            className="text-green-700 hover:text-green-800 p-2 hover:bg-green-50 rounded transition-colors"
                             title="Activate User"
                             disabled={loading}
-                          >
+                           aria-label="Activate User">
                             <Play className="w-4 h-4" />
                           </button>
                           <button 
                             onClick={() => handleStatusChange(user.id, 'suspended')}
-                            className="text-yellow-600 hover:text-yellow-800 p-2 hover:bg-yellow-50 rounded transition-colors"
+                            className="text-yellow-700 hover:text-yellow-800 p-2 hover:bg-yellow-50 rounded transition-colors"
                             title="Suspend User"
                             disabled={loading}
-                          >
+                           aria-label="Suspend User">
                             <UserX className="w-4 h-4" />
                           </button>
                         </>
                       ) : (
                         <button 
                           onClick={() => handleStatusChange(user.id, 'active')}
-                          className="text-green-600 hover:text-green-800 p-2 hover:bg-green-50 rounded transition-colors"
+                          className="text-green-700 hover:text-green-800 p-2 hover:bg-green-50 rounded transition-colors"
                           title="Reactivate User"
                           disabled={loading}
-                        >
+                         aria-label="Reactivate User">
                           <Play className="w-4 h-4" />
                         </button>
                       )}
@@ -1162,7 +1162,7 @@ const UserManagement: React.FC = () => {
                           className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded transition-colors"
                           title="Delete User"
                           disabled={loading}
-                        >
+                         aria-label="Delete User">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       )}
@@ -1442,7 +1442,7 @@ const UserManagement: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-gray-600"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -1461,7 +1461,7 @@ const UserManagement: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-gray-600"
                       >
                         {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -1500,7 +1500,7 @@ const UserManagement: React.FC = () => {
               <button
                 onClick={handleAddUser}
                 disabled={loading || (newUser.role === 'guardian' ? (!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.phone || newUser.dependents.length === 0) : (!newUser.name || !newUser.email || !newUser.password || newUser.password !== newUser.confirmPassword))}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                className="px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
                 {loading ? (
                   <>
@@ -1659,7 +1659,7 @@ const UserManagement: React.FC = () => {
                 <h2 className="text-2xl font-bold text-slate-900">Edit Guardian</h2>
                 <button 
                   onClick={() => setIsEditModalOpen(false)}
-                  className="text-gray-400 hover:text-gray-600 p-2"
+                  className="text-slate-500 hover:text-gray-600 p-2"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -1761,7 +1761,7 @@ const UserManagement: React.FC = () => {
                           onClick={() => removeDependentFromEdit(index)}
                           className="text-red-600 hover:text-red-800 p-1"
                           title="Remove Child"
-                        >
+                         aria-label="Remove Child">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -1800,7 +1800,7 @@ const UserManagement: React.FC = () => {
                   ))}
                   {editGuardianData.dependents.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
-                      <Users className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                      <Users className="w-12 h-12 mx-auto mb-2 text-slate-500" />
                       <p>No children added yet</p>
                       <p className="text-sm">Click "Add Child" to add a dependent</p>
                     </div>

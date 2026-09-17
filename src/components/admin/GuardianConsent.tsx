@@ -167,7 +167,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
           </button>
           <div className="text-center">
             <div className="w-16 h-16 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
@@ -273,8 +273,8 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         consent.status === 'granted' 
-                          ? 'bg-green-600/20 text-green-600 border border-green-200/30' 
-                          : 'bg-red-50 text-red-600 border border-red-200'
+                          ? 'bg-green-600/20 text-green-700 border border-green-200/30' 
+                          : 'bg-red-50 text-red-800 border border-red-200'
                       }`}>
                         {consent.status}
                       </span>
@@ -393,7 +393,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
                           onChange={() => updateConsent(index, 'status', 'granted')}
                           className="mr-2 text-blue-600"
                         />
-                        <span className="text-sm text-green-600 font-medium">Allow</span>
+                        <span className="text-sm text-green-700 font-medium">Allow</span>
                       </label>
                       <label className="flex items-center">
                         <input

@@ -236,13 +236,13 @@ CSR User,csr@example.com,+1987654321,csr,true`
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-green-700" />;
       case 'failed':
         return <AlertCircle className="w-5 h-5 text-red-600" />;
       case 'processing':
         return <RefreshCw className="w-5 h-5 text-blue-600 animate-spin" />;
       case 'pending':
-        return <FileText className="w-5 h-5 text-yellow-600" />;
+        return <FileText className="w-5 h-5 text-yellow-700" />;
       default:
         return null;
     }
@@ -335,7 +335,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <Upload className="w-12 h-12 text-slate-500 mx-auto mb-4" />
             {selectedFile ? (
               <div className="space-y-4">
                 <div className="bg-white border border-slate-200 rounded-lg p-4">
@@ -409,7 +409,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
           {/* Filters */}
           <div className="mb-4 space-y-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search imports..."
@@ -480,7 +480,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
                       </div>
                       <div>
                         <p className="text-slate-500">Successful</p>
-                        <p className="font-medium text-green-600">{(item.successfulCount || 0).toLocaleString()}</p>
+                        <p className="font-medium text-green-700">{(item.successfulCount || 0).toLocaleString()}</p>
                       </div>
                       <div>
                         <p className="text-slate-500">Errors</p>
