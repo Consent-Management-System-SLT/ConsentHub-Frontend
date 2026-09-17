@@ -263,7 +263,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           <div className="text-center p-3 sm:p-4 bg-green-600/20 rounded-lg sm:rounded-xl">
-            <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">{insights.consentRate}%</div>
+            <div className="text-2xl sm:text-3xl font-bold text-green-700 mb-1">{insights.consentRate}%</div>
             <div className="text-xs sm:text-sm text-slate-600">Consent Grant Rate</div>
           </div>
           <div className="text-center p-3 sm:p-4 bg-white/20 rounded-lg sm:rounded-xl">

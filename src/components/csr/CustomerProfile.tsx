@@ -162,7 +162,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
             <>
               <button
                 onClick={handleSaveEdit}
-                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="flex items-center px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 <Save className="w-4 h-4 mr-2" />
                 Save Changes
@@ -172,7 +172,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                   setIsEditing(false);
                   setEditedData(customerData);
                 }}
-                className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="flex items-center px-4 py-2 border border-slate-300 bg-white text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 <X className="w-4 h-4 mr-2" />
                 Cancel
@@ -274,7 +274,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
             <h2 className="text-xl font-semibold text-slate-900 mb-6">Account Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center p-4 bg-green-50 rounded-lg">
-                <Shield className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <Shield className="w-8 h-8 text-green-700 mx-auto mb-2" />
                 <p className="text-2xl font-bold text-green-900">{consentStatus.active}</p>
                 <p className="text-sm text-green-700">Active Consents</p>
               </div>
@@ -340,7 +340,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                 onClick={() => onSectionChange('preference-editor')}
                 className="w-full flex items-center px-4 py-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
               >
-                <Settings className="w-5 h-5 text-green-600 mr-3" />
+                <Settings className="w-5 h-5 text-green-700 mr-3" />
                 <div>
                   <p className="font-medium text-green-900">Edit Preferences</p>
                   <p className="text-sm text-green-700">Communication settings</p>
@@ -364,7 +364,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
             <div className="space-y-3">
               {dsarStatus.pending > 0 && (
                 <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
-                  <Clock className="w-5 h-5 text-yellow-600 mr-3" />
+                  <Clock className="w-5 h-5 text-yellow-700 mr-3" />
                   <div>
                     <p className="font-medium text-yellow-900">Pending DSAR</p>
                     <p className="text-sm text-yellow-700">{dsarStatus.pending} requests waiting</p>
@@ -382,7 +382,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
               )}
               {dsarStatus.pending === 0 && consentStatus.revoked === 0 && (
                 <div className="flex items-center p-3 bg-green-50 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                  <CheckCircle className="w-5 h-5 text-green-700 mr-3" />
                   <div>
                     <p className="font-medium text-green-900">All Good</p>
                     <p className="text-sm text-green-700">No issues detected</p>

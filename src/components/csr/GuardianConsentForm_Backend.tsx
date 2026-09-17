@@ -178,9 +178,9 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
+        return <CheckCircle className="w-4 h-4 text-green-700" />;
       case 'pending':
-        return <Clock className="w-4 h-4 text-yellow-600" />;
+        return <Clock className="w-4 h-4 text-yellow-700" />;
       case 'expired':
         return <AlertCircle className="w-4 h-4 text-red-600" />;
       case 'revoked':
@@ -214,7 +214,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
           {onClose && (
             <button aria-label="Close"
               onClick={onClose}
-              className="text-gray-400 hover:text-slate-600 transition-colors"
+              className="text-slate-500 hover:text-slate-600 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
@@ -264,7 +264,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
         {activeTab === 'search' && (
           <div className="space-y-6">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search minor customers..."
@@ -303,7 +303,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
                       setFormData(prev => ({ ...prev, minorId: minor.id }));
                       setActiveTab('create');
                     }}
-                    className="w-full mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    className="w-full mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Create Consent
                   </button>
@@ -409,7 +409,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
               <button
                 onClick={handleCreateConsent}
                 disabled={saving}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors flex flex-wrap items-center space-x-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex flex-wrap items-center space-x-2"
               >
                 {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                 <span>{saving ? 'Creating...' : 'Create Consent'}</span>
@@ -424,7 +424,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
               <h3 className="text-lg font-medium text-slate-900">Guardian Consents</h3>
               <button
                 onClick={loadGuardianConsents}
-                className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Refresh</span>
@@ -472,16 +472,16 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
                               <>
                                 <button
                                   onClick={() => handleUpdateConsentStatus(consent.id, 'active')}
-                                  className="text-green-600 hover:text-green-800 transition-colors"
+                                  className="text-green-700 hover:text-green-800 transition-colors"
                                   title="Approve"
-                                >
+                                 aria-label="Approve">
                                   <Check className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => handleUpdateConsentStatus(consent.id, 'revoked')}
                                   className="text-red-600 hover:text-red-800 transition-colors"
                                   title="Reject"
-                                >
+                                 aria-label="Reject">
                                   <X className="w-4 h-4" />
                                 </button>
                               </>
@@ -491,7 +491,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
                                 onClick={() => handleUpdateConsentStatus(consent.id, 'revoked')}
                                 className="text-red-600 hover:text-red-800 transition-colors"
                                 title="Revoke"
-                              >
+                               aria-label="Revoke">
                                 <X className="w-4 h-4" />
                               </button>
                             )}

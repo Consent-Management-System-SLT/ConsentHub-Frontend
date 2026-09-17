@@ -525,7 +525,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                                   <button
                                     onClick={() => handleConsentUpdate(consent.id, 'revoked')}
                                     disabled={saving === consent.id}
-                                    className="flex-1 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
+                                    className="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
                                   >
                                     {saving === consent.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" />Revoke</>}
                                   </button>

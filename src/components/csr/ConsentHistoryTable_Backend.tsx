@@ -401,7 +401,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
             <button
               onClick={loadConsentsAndCustomers}
               disabled={loading}
-              className="px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex flex-wrap items-center gap-2 disabled:opacity-50"
+              className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center gap-2 disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               Refresh
@@ -411,7 +411,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       </div>
       {consents && consents.length === 0 ? (
         <div className="text-center py-12">
-          <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <FileText className="w-12 h-12 text-slate-500 mx-auto mb-4" />
           <p className="text-slate-600">No consent records found.</p>
           <p className="text-sm text-gray-500 mt-1">
             {customerId ? 'This customer has no consent records.' : 'No consent records exist in the system.'}
@@ -475,7 +475,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                       onClick={() => handleViewDetails(consent)}
                       className="text-indigo-600 hover:text-indigo-900 flex flex-wrap items-center space-x-1"
                       title="View Full History"
-                    >
+                     aria-label="View Full History">
                       <Eye className="w-4 h-4" />
                       <span className="text-xs">View</span>
                     </button>
@@ -498,7 +498,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                 </h3>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-slate-600 transition-colors"
+                  className="text-slate-500 hover:text-slate-600 transition-colors"
                 >
                   <span className="text-2xl">×</span>
                 </button>

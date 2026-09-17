@@ -38,7 +38,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
   const getCustomerIcon = (type: string) => {
     switch (type) {
       case 'guardian':
-        return <Shield className="w-4 h-4 text-amber-600" />;
+        return <Shield className="w-4 h-4 text-amber-700" />;
       case 'individual':
         return <User className="w-4 h-4 text-blue-600" />;
       default:
@@ -146,7 +146,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
                     <div className="flex flex-wrap items-center space-x-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         customer.status === 'active' 
-                          ? 'bg-green-600/20 text-green-600' 
+                          ? 'bg-green-600/20 text-green-700' 
                           : 'bg-white border border-slate-200 text-slate-600'
                       }`}>
                         {customer.status || 'active'}
@@ -164,13 +164,13 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
           </div>
         ) : searchTerm ? (
           <div className="text-center py-8">
-            <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <User className="w-12 h-12 text-slate-500 mx-auto mb-4" />
             <p className="text-slate-600">No customers found matching your search criteria.</p>
             <p className="text-sm text-slate-500 mt-1">Try adjusting your search terms or search type.</p>
           </div>
         ) : (
           <div className="text-center py-8">
-            <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <Search className="w-12 h-12 text-slate-500 mx-auto mb-4" />
             <p className="text-slate-600">Enter search criteria to find customers.</p>
           </div>
         )}

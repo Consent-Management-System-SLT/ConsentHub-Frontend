@@ -196,7 +196,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           <div className="w-64 bg-white border border-slate-200 border-r overflow-y-auto">
             <div className="p-4">
               <div className="relative">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
                 <input
                   type="text"
                   placeholder="Search help..."
@@ -238,7 +238,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                     <div className="space-y-2">
                       {section.steps.map((step, stepIndex) => (
                         <div key={stepIndex} className="flex flex-wrap items-start space-x-3">
-                          <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
+                          <div className="w-6 h-6 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
                             {stepIndex + 1}
                           </div>
                           <p className="text-gray-700">{step}</p>

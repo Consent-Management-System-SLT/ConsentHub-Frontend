@@ -204,7 +204,7 @@ const CSRCustomerVASManagement: React.FC = () => {
         {/* Search Section */}
         <div className="flex gap-3">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
             <input
               type="text"
               placeholder="Search customer by name, email, or phone..."
@@ -319,7 +319,7 @@ const CSRCustomerVASManagement: React.FC = () => {
             </div>
           ) : vasServices.length === 0 ? (
             <div className="text-center py-12">
-              <Settings className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <Settings className="w-12 h-12 text-slate-500 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No VAS Services</h3>
               <p className="text-gray-500">No Value Added Services available for this customer.</p>
             </div>
@@ -346,7 +346,7 @@ const CSRCustomerVASManagement: React.FC = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className={`text-sm font-medium ${
-                      service.isSubscribed ? 'text-green-600' : 'text-gray-500'
+                      service.isSubscribed ? 'text-green-700' : 'text-gray-500'
                     }`}>
                       {service.isSubscribed ? 'Active' : 'Available'}
                     </span>
@@ -377,7 +377,7 @@ const CSRCustomerVASManagement: React.FC = () => {
       {/* Empty State */}
       {!selectedCustomer && searchResults.length === 0 && searchTerm && !isSearching && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-          <Search className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+          <Search className="w-12 h-12 text-slate-500 mx-auto mb-3" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No customers found</h3>
           <p className="text-gray-500">
             Try searching with a different name or email address.

@@ -168,7 +168,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
           </div>
           <button
             onClick={loadAuditLogs}
-            className="px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex flex-wrap items-center gap-2"
+            className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center gap-2"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -179,21 +179,21 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       <div className="p-4 border-b border-slate-200 bg-white border">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex flex-wrap items-center space-x-2">
-            <Search className="w-4 h-4 text-gray-400" />
+            <Search className="w-4 h-4 text-slate-500" />
             <input
               type="text"
               placeholder="Search logs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
              aria-label="Search logs"/>
           </div>
           <div className="flex flex-wrap items-center space-x-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+            <Filter className="w-4 h-4 text-slate-500" />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
             >
               <option value="all">All Types</option>
               {getUniqueEventTypes().map(type => (
@@ -202,13 +202,13 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
             </select>
           </div>
           <div className="flex flex-wrap items-center space-x-2">
-            <Calendar className="w-4 h-4 text-gray-400" />
+            <Calendar className="w-4 h-4 text-slate-500" />
             <input
               type="date"
               aria-label="Filter by date"
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
             />
           </div>
           {(searchTerm || filterType !== 'all' || filterDate) && (
@@ -230,7 +230,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       </div>
       {filteredLogs.length === 0 ? (
         <div className="text-center py-12">
-          <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <Activity className="w-12 h-12 text-slate-500 mx-auto mb-4" />
           <p className="text-slate-600">
             {auditLogs.length === 0 ? 'No audit logs found.' : 'No logs match your current filters.'}
           </p>

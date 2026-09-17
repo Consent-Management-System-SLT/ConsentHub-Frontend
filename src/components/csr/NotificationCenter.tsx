@@ -412,7 +412,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
               <p className="text-slate-600 mb-6">{success}</p>
               <button
                 onClick={() => setSuccess(null)}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-600 hover:opacity-90 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-600 hover:opacity-90 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 OK
               </button>
@@ -457,7 +457,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                     }}
                     className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-100 transition-colors"
                     title="Clear template"
-                  >
+                   aria-label="Clear template">
                   </button>
                 </div>
               </div>
@@ -771,9 +771,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ml-2 ${
                           template.type === 'promotional' ? 'bg-white/20 text-blue-600 border border-blue-600/30' :
-                          template.type === 'informational' ? 'bg-green-600/20 text-green-600 border border-green-200/30' :
-                          template.type === 'alert' ? 'bg-amber-600/20 text-amber-600 border border-slate-200/30' :
-                          template.type === 'urgent' ? 'bg-red-50 text-red-600 border border-red-200' :
+                          template.type === 'informational' ? 'bg-green-600/20 text-green-700 border border-green-200/30' :
+                          template.type === 'alert' ? 'bg-amber-600/20 text-amber-700 border border-slate-200/30' :
+                          template.type === 'urgent' ? 'bg-red-50 text-red-800 border border-red-200' :
                           template.type === 'reminder' ? 'bg-blue-50/20 text-blue-600 border border-slate-200' :
                           'bg-blue-600/20 text-blue-600 border border-slate-200/30'
                         }`}>
@@ -808,7 +808,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                         </button>
                         <button 
                           onClick={() => handleTemplateEdit(template)}
-                          className="flex flex-wrap items-center space-x-1 text-amber-600 hover:text-amber-600/80 text-sm font-medium transition-colors"
+                          className="flex flex-wrap items-center space-x-1 text-amber-700 hover:text-amber-700/80 text-sm font-medium transition-colors"
                         >
                           <Edit3 className="w-4 h-4" />
                           <span>Edit</span>
