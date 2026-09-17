@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, User, Mail, Phone, Building, Lock, UserCheck, AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Phone, Building, Lock, UserCheck, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { RegisterRequest } from '../../services/authService';
 interface SignupFormData {
@@ -49,15 +49,17 @@ const Signup: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [generalError, setGeneralError] = useState('');
   const [showAlreadyRegistered, setShowAlreadyRegistered] = useState(false);
-  const getPasswordStrength = (password: string) => {
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/\d/.test(password)) strength++;
-    if (/[@$!%*?&#]/.test(password)) strength++;
-    return strength;
-  };
+  // One definition of the rules, shared by the checklist beside the field and
+  // the strength meter, so the two can never disagree.
+  const PASSWORD_RULES: { label: string; test: (p: string) => boolean }[] = [
+    { label: 'At least 8 characters', test: (p) => p.length >= 8 },
+    { label: 'A lowercase letter', test: (p) => /[a-z]/.test(p) },
+    { label: 'An uppercase letter', test: (p) => /[A-Z]/.test(p) },
+    { label: 'A number', test: (p) => /\d/.test(p) },
+    { label: 'A special character (@ $ ! % * ? & #)', test: (p) => /[@$!%*?&#]/.test(p) },
+  ];
+  const getPasswordStrength = (password: string) =>
+    PASSWORD_RULES.filter((r) => r.test(password)).length;
   const getPasswordStrengthText = (strength: number) => {
     if (strength === 0) return { text: '', color: '' };
     if (strength <= 2) return { text: 'Weak', color: 'text-red-500' };
@@ -203,14 +205,6 @@ const Signup: React.FC = () => {
               </div>
             </div>
           )}
-          {/* Information message */}
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-600/20 border border-slate-200/30 rounded-md flex flex-wrap items-start sm:items-center space-x-2 sm:space-x-3">
-            <Info className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0 mt-0.5 sm:mt-0" />
-            <div>
-              <p className="text-slate-900 font-medium text-sm">Password Requirements:</p>
-              <p className="text-slate-600 text-xs sm:text-sm">At least 8 characters with uppercase, lowercase, number, and special character.</p>
-            </div>
-          </div>
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Personal Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
@@ -366,6 +360,25 @@ const Signup: React.FC = () => {
                     {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </button>
                 </div>
+                {/* Requirements live beside the field and tick off as they are met */}
+                <ul className="mt-2 space-y-1" aria-live="polite">
+                  {PASSWORD_RULES.map((rule) => {
+                    const met = rule.test(formData.password);
+                    return (
+                      <li key={rule.label} className="flex items-center gap-2 text-xs">
+                        {met ? (
+                          <CheckCircle className="w-3.5 h-3.5 text-green-700 flex-shrink-0" aria-hidden="true" />
+                        ) : (
+                          <span className="w-3.5 h-3.5 rounded-full border border-slate-300 flex-shrink-0" aria-hidden="true" />
+                        )}
+                        <span className={met ? 'text-green-800' : 'text-slate-600'}>
+                          {rule.label}
+                          <span className="sr-only">{met ? ' (met)' : ' (not met)'}</span>
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
                 {formData.password && (
                   <div className="mt-2">
                     <div className="flex flex-wrap items-center space-x-1.5 sm:space-x-2">

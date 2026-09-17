@@ -151,7 +151,7 @@ const Login: React.FC = () => {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-              <div className="flex items-center order-2 sm:order-1">
+              <div className="flex items-center">
                 <input
                   id="remember-me"
                   name="remember-me"
@@ -164,7 +164,7 @@ const Login: React.FC = () => {
                   {t('auth.rememberMe')}
                 </label>
               </div>
-              <div className="text-sm order-1 sm:order-2">
+              <div className="text-sm">
                 <Link
                   to="/forgot-password"
                   className="font-medium text-blue-600 hover:text-blue-600 transition-colors"
