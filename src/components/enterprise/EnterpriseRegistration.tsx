@@ -77,9 +77,9 @@ const EnterpriseRegistration: React.FC = () => {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {step < 4 && (
             <div className="mb-8 flex items-center justify-between">
-              <span className={`font-bold ${step >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>1. Details</span>
-              <span className={`font-bold ${step >= 2 ? 'text-blue-600' : 'text-gray-400'}`}>2. Contacts</span>
-              <span className={`font-bold ${step >= 3 ? 'text-blue-600' : 'text-gray-400'}`}>3. Documents</span>
+              <span className={`font-bold ${step >= 1 ? 'text-blue-600' : 'text-slate-500'}`}>1. Details</span>
+              <span className={`font-bold ${step >= 2 ? 'text-blue-600' : 'text-slate-500'}`}>2. Contacts</span>
+              <span className={`font-bold ${step >= 3 ? 'text-blue-600' : 'text-slate-500'}`}>3. Documents</span>
             </div>
           )}
 
@@ -140,7 +140,7 @@ const EnterpriseRegistration: React.FC = () => {
                 <div className="mt-2 border-2 border-dashed p-6 text-center cursor-pointer">
                   <input type="file" onChange={handleFileChange} required className="mb-4"  aria-label="Business Registration Certificate"/>
                   <p className="text-sm text-gray-500">PDF, PNG, JPG up to 10MB</p>
-                  {file && <p className="text-green-600 mt-2">{file.name}</p>}
+                  {file && <p className="text-green-700 mt-2">{file.name}</p>}
                 </div>
               </div>
               <div className="flex gap-4">

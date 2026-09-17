@@ -183,7 +183,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
                 ))}
               </div>
               {formData.channels.includes('SMS') && (
-                  <p className="mt-2 text-sm text-amber-600 bg-amber-50 p-2 rounded">
+                  <p className="mt-2 text-sm text-amber-700 bg-amber-50 p-2 rounded">
                     SMS delivery is currently unavailable. For UAT, approved SMS campaigns may be delivered using the configured Email fallback.
                   </p>
               )}
@@ -305,7 +305,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
             ) : (
               <button 
                 onClick={handleSaveDraft}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-700"
               >
                 Finish & Save
               </button>

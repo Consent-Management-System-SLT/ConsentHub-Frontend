@@ -102,7 +102,7 @@ const CampaignList: React.FC<CampaignListProps> = ({ onCreateNew, onViewDetail }
                     </span>
                   </td>
                   <td className="p-4 text-right space-x-2">
-                    <button onClick={() => onViewDetail(camp._id)} className="text-blue-600 hover:text-blue-800" title="View Details">
+                    <button onClick={() => onViewDetail(camp._id)} className="text-blue-600 hover:text-blue-800" title="View Details" aria-label="View Details">
                       <Eye className="w-4 h-4 inline" />
                     </button>
                   </td>
