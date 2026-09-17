@@ -50,6 +50,10 @@ export default function DialogFocusManager() {
     const sync = () => {
       const dialog = topDialog();
 
+      // While a dialog is up, the page behind it must not scroll - only the
+      // dialog's own scroll regions move.
+      document.body.style.overflow = dialog ? 'hidden' : '';
+
       if (dialog && dialog !== current) {
         if (!current) opener = document.activeElement as HTMLElement | null;
         current = dialog;
@@ -93,6 +97,7 @@ export default function DialogFocusManager() {
     return () => {
       observer.disconnect();
       document.removeEventListener('keydown', onKeyDown, true);
+      document.body.style.overflow = '';
     };
   }, []);
 
