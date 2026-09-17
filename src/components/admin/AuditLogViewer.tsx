@@ -225,7 +225,7 @@ const AuditLogViewer: React.FC = () => {
           Showing {Math.min((currentPage - 1) * logsPerPage + 1, totalLogs)} to{' '}
           {Math.min(currentPage * logsPerPage, totalLogs)} of {totalLogs} audit logs
         </div>
-        <div className="flex flex-wrap items-center space-x-2">
+        <div className="flex items-center space-x-2">
           <button
             aria-label="Previous page"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -280,7 +280,7 @@ const AuditLogViewer: React.FC = () => {
         </div>
         <button
           onClick={exportLogs}
-          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600 transition-colors flex flex-wrap items-center space-x-2"
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center space-x-2"
         >
           <Download className="w-4 h-4" />
           <span>Export CSV</span>
@@ -324,7 +324,7 @@ const AuditLogViewer: React.FC = () => {
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-2 bg-white border border-slate-200 hover:bg-gray-200 rounded-lg transition-colors flex flex-wrap items-center space-x-2"
+              className="px-4 py-2 bg-white border border-slate-200 hover:bg-gray-200 rounded-lg transition-colors flex items-center space-x-2"
             >
               <Filter className="w-4 h-4 text-slate-600" />
               <span className="text-sm font-medium text-gray-700">Filters</span>
@@ -380,7 +380,7 @@ const AuditLogViewer: React.FC = () => {
                 </select>
               </div>
             </div>
-            <div className="mt-4 flex flex-wrap items-center space-x-2">
+            <div className="mt-4 flex items-center space-x-2">
               <button
                 onClick={clearFilters}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"

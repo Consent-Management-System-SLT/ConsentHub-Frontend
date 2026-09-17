@@ -823,7 +823,7 @@ const UserManagement: React.FC = () => {
               setError(null);
             }}
             disabled={loading}
-            className="px-3 sm:px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 transition-colors flex flex-wrap items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
+            className="px-3 sm:px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
           >
             <Plus className="w-4 h-4" />
             <span>Add User</span>
@@ -831,7 +831,7 @@ const UserManagement: React.FC = () => {
           <button 
             onClick={fetchUsers}
             disabled={loading}
-            className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
+            className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
             title={lastRefresh ? `Last updated: ${lastRefresh.toLocaleTimeString()}` : 'Click to refresh'}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -1098,7 +1098,7 @@ const UserManagement: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-800">{user.department || 'N/A'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex flex-wrap items-center space-x-1">
+                    <div className="flex items-center space-x-1">
                       <button 
                         onClick={() => handleEditUser(user)}
                         className="text-blue-600 hover:text-blue-600-dark p-2 hover:bg-white border border-slate-200 rounded transition-colors"
@@ -1309,7 +1309,7 @@ const UserManagement: React.FC = () => {
                       <button
                         type="button"
                         onClick={addDependent}
-                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center space-x-1"
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-1"
                       >
                         <Plus className="w-4 h-4" />
                         <span>Add Minor</span>
@@ -1641,7 +1641,7 @@ const UserManagement: React.FC = () => {
               <button
                 onClick={confirmDeleteUser}
                 disabled={loading}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex flex-wrap items-center space-x-2"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
               >
                 {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                 <span>{loading ? 'Deleting...' : 'Delete User'}</span>

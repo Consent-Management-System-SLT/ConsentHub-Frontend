@@ -379,10 +379,10 @@ const EventListenerManager: React.FC = () => {
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Event Listeners</h1>
             <p className="text-slate-600 mt-2">Manage webhooks and event notifications</p>
           </div>
-          <div className="flex flex-wrap items-center space-x-3">
+          <div className="flex items-center space-x-3">
             <button 
               onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center space-x-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center space-x-2"
             >
               <Plus className="w-4 h-4" />
               <span className="text-sm font-medium">Add Webhook</span>
@@ -390,7 +390,7 @@ const EventListenerManager: React.FC = () => {
             <button 
               onClick={handleRefresh}
               disabled={refreshing}
-              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center space-x-2 disabled:opacity-50"
+              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center space-x-2 disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
               <span className="text-sm font-medium">Refresh</span>
@@ -500,7 +500,7 @@ const EventListenerManager: React.FC = () => {
                   <div className="w-12 h-12 bg-blue-50/20 rounded-xl flex items-center justify-center">
                     <Webhook className="w-6 h-6 text-blue-600" />
                   </div>
-                  <div className="flex flex-wrap items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                     {getStatusIcon(webhook.status)}
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(webhook.status)}`}>
                       {webhook.status}
@@ -559,7 +559,7 @@ const EventListenerManager: React.FC = () => {
                 {/* Separator line */}
                 <div className="border-t border-slate-200/50 my-4"></div>
                 {/* Actions */}
-                <div className="flex flex-wrap items-center space-x-2">
+                <div className="flex items-center space-x-2">
                   <button 
                     onClick={() => handleTestWebhook(webhook._id)}
                     className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-3 flex items-center justify-center space-x-2"
@@ -610,7 +610,7 @@ const EventListenerManager: React.FC = () => {
               <div className="text-sm text-slate-500">
                 Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} webhooks
               </div>
-              <div className="flex flex-wrap items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <button
                   onClick={() => fetchWebhooks(pagination.page - 1)}
                   disabled={!pagination.hasPrev}
@@ -795,7 +795,7 @@ const WebhookModal: React.FC<WebhookModalProps> = ({ title, formData, setFormDat
               <h4 className="font-medium text-slate-900">Events</h4>
               <div className="max-h-96 sm:max-h-64 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-slate-100">
                 {availableEvents.map((event) => (
-                  <div key={event.value} className="flex flex-wrap items-start space-x-3 py-2">
+                  <div key={event.value} className="flex items-start space-x-3 py-2">
                     <input
                       type="checkbox"
                       id={event.value}
@@ -818,7 +818,7 @@ const WebhookModal: React.FC<WebhookModalProps> = ({ title, formData, setFormDat
           <div className="mt-6">
             <h4 className="font-medium text-slate-900 mb-4">Custom Headers</h4>
             {/* Add Header */}
-            <div className="flex flex-wrap space-x-2 mb-4">
+            <div className="flex space-x-2 mb-4">
               <input
                 type="text"
                 placeholder="Header name"
@@ -844,7 +844,7 @@ const WebhookModal: React.FC<WebhookModalProps> = ({ title, formData, setFormDat
             {/* Existing Headers */}
             <div className="space-y-2">
               {Object.entries(formData.headers).map(([key, value]) => (
-                <div key={key} className="flex flex-wrap items-center space-x-2 p-2 bg-slate-100 rounded">
+                <div key={key} className="flex items-center space-x-2 p-2 bg-slate-100 rounded">
                   <span className="font-medium text-slate-600">{key}:</span>
                   <span className="text-slate-900">{value as string}</span>
                   <button
@@ -869,7 +869,7 @@ const WebhookModal: React.FC<WebhookModalProps> = ({ title, formData, setFormDat
             <button 
               onClick={onSave}
               disabled={!formData.name || !formData.url || formData.events.length === 0}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex flex-wrap items-center space-x-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               <Save className="w-4 h-4" />
               <span>Save Webhook</span>
@@ -927,7 +927,7 @@ const LogsModal: React.FC<LogsModalProps> = ({ webhook, logs, onClose }) => {
               {logs.map((log) => (
                 <div key={log._id} className="bg-slate-100 border border-slate-200 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex flex-wrap items-center space-x-3">
+                    <div className="flex items-center space-x-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(log.deliveryStatus)}`}>
                         {log.deliveryStatus}
                       </span>

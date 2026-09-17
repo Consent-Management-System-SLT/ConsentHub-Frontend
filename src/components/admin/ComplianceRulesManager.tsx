@@ -164,17 +164,17 @@ const ComplianceRulesManager = () => {
           <h1 className="text-3xl font-bold text-slate-900">Compliance Rules Management</h1>
           <p className="text-slate-600 mt-2">Configure and manage automated compliance rules</p>
         </div>
-        <div className="flex flex-wrap items-center space-x-3">
+        <div className="flex items-center space-x-3">
           <button
             onClick={fetchRules}
-            className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center space-x-2"
+            className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center space-x-2"
           >
             <RefreshCw className="w-4 h-4" />
             <span className="text-sm font-medium">Refresh</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center space-x-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
             <span className="text-sm font-medium">Add Rule</span>
@@ -217,7 +217,7 @@ const ComplianceRulesManager = () => {
           {rules.map((rule: any) => (
             <div key={rule._id} className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
               <div className="flex items-start justify-between mb-4">
-                <div className="flex flex-wrap items-center space-x-3">
+                <div className="flex items-center space-x-3">
                   <div className="p-2 bg-slate-100 rounded-lg">
                     <Shield className="w-5 h-5 text-blue-600" />
                   </div>
@@ -245,7 +245,7 @@ const ComplianceRulesManager = () => {
                   <span className="font-medium text-slate-900">{rule.metrics?.enforcement_count || 0}</span>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <button
                   onClick={() => { setSelectedRule(rule); setShowDetailsModal(true); }}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-3 flex items-center justify-center space-x-2 text-sm"
@@ -340,7 +340,7 @@ const ComplianceRulesManager = () => {
               <button
                 onClick={handleAddRule}
                 disabled={!newRule.name || !newRule.description}
-                className="px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex flex-wrap items-center space-x-2"
+                className="px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
               >
                 <Save className="w-4 h-4" />
                 <span>Create Rule</span>
@@ -420,7 +420,7 @@ const ComplianceRulesManager = () => {
               </button>
               <button
                 onClick={() => { setShowDetailsModal(false); setShowEditModal(true); }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center space-x-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
               >
                 <Edit className="w-4 h-4" />
                 <span>Edit Rule</span>
@@ -496,7 +496,7 @@ const ComplianceRulesManager = () => {
               </button>
               <button
                 onClick={handleUpdateRule}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center space-x-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
               >
                 <Save className="w-4 h-4" />
                 <span>Update Rule</span>

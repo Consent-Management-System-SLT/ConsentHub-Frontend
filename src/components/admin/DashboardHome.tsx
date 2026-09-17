@@ -114,7 +114,7 @@ const DashboardHome: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-96">
-        <div className="flex flex-wrap items-center space-x-3">
+        <div className="flex items-center space-x-3">
           <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
           <span className="text-lg text-slate-600">Loading dashboard data...</span>
         </div>
@@ -125,7 +125,7 @@ const DashboardHome: React.FC = () => {
     return (
       <div className="p-8">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <div className="flex flex-wrap items-center space-x-3">
+          <div className="flex items-center space-x-3">
             <AlertTriangle className="w-6 h-6 text-red-600" />
             <div>
               <h3 className="text-lg font-semibold text-slate-900">Dashboard Error</h3>
@@ -229,7 +229,7 @@ const DashboardHome: React.FC = () => {
       </div>
       {/* Compliance Metrics */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-3 sm:mb-4 flex flex-wrap items-center space-x-2">
+        <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-3 sm:mb-4 flex items-center space-x-2">
           <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5" />
           <span>Compliance Metrics</span>
         </h2>
@@ -270,14 +270,14 @@ const DashboardHome: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         {/* System Health */}
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-3 sm:mb-4 flex flex-wrap items-center space-x-2">
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-3 sm:mb-4 flex items-center space-x-2">
             <Server className="w-4 sm:w-5 h-4 sm:h-5" />
             <span>System Health</span>
           </h2>
           <div className="space-y-3 sm:space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-slate-600 text-sm sm:text-base">Database</span>
-              <div className="flex flex-wrap items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 {dashboardData.systemHealth.databaseConnected ? (
                   <>
                     <CheckCircle className="w-4 h-4 text-green-700" />
@@ -313,13 +313,13 @@ const DashboardHome: React.FC = () => {
         </div>
         {/* Recent Activity */}
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-3 sm:mb-4 flex flex-wrap items-center space-x-2">
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-3 sm:mb-4 flex items-center space-x-2">
             <Activity className="w-4 sm:w-5 h-4 sm:h-5" />
             <span>Recent Activity</span>
           </h2>
           <div className="space-y-2 sm:space-y-3 max-h-96 sm:max-h-64 overflow-y-auto">
             {dashboardData.recentActivity.map((activity) => (
-              <div key={activity.id} className="flex flex-wrap items-center space-x-2 sm:space-x-3 p-2 hover:bg-slate-50 rounded">
+              <div key={activity.id} className="flex items-center space-x-2 sm:space-x-3 p-2 hover:bg-slate-50 rounded">
                 <div className="flex-shrink-0">
                   {activity.action === 'granted' ? (
                     <CheckCircle className="w-4 h-4 text-green-700" />
@@ -343,7 +343,7 @@ const DashboardHome: React.FC = () => {
       {/* Time Period Selector */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-3 sm:p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex flex-wrap items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <Calendar className="w-4 sm:w-5 h-4 sm:h-5 text-slate-500" />
             <span className="text-slate-900 font-medium text-sm sm:text-base">Data Period:</span>
           </div>

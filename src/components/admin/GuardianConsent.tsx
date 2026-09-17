@@ -174,7 +174,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
             <h3 className="text-lg font-medium text-slate-900 mb-2">Guardian Consent Created</h3>
             <p className="text-slate-600 mb-6">Consent preferences have been successfully recorded for your dependent.</p>
             {/* Action buttons */}
-            <div className="flex flex-wrap space-x-3">
+            <div className="flex space-x-3">
               <button
                 onClick={() => {
                   setShowConsentView(true);
@@ -207,7 +207,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
               <h1 className="text-2xl font-bold text-slate-900">Guardian Consent Records</h1>
               <p className="text-slate-600">Recently created consent preferences</p>
             </div>
-            <div className="flex flex-wrap space-x-3">
+            <div className="flex space-x-3">
               <button
                 onClick={() => {
                   setShowConsentView(false);
@@ -383,7 +383,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
                         Data processing for {consent.purpose.toLowerCase()} purposes
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center space-x-4">
+                    <div className="flex items-center space-x-4">
                       <label className="flex items-center">
                         <input
                           type="radio"

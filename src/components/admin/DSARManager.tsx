@@ -510,7 +510,7 @@ const DSARManager: React.FC = () => {
           <div className="text-sm text-slate-600">
             Showing {filteredRequests.length === 0 ? 0 : Math.min(startIndex + 1, filteredRequests.length)} to {Math.min(endIndex, filteredRequests.length)} of {filteredRequests.length} requests
           </div>
-          <div className="flex flex-wrap items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <button 
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}

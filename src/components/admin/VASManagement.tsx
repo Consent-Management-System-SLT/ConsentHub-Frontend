@@ -357,63 +357,70 @@ const VASManagement: React.FC = () => {
     return matchesSearch && matchesCategory && matchesStatus;
   });
   const categories = [...new Set(vasServices.map(service => service.category))];
+  // h-full + flex-col, with the description taking the slack, so every card in
+  // a row is the same height and the action buttons line up across the grid.
   const ServiceCard: React.FC<{ service: VASService }> = ({ service }) => (
-    <div className="bg-white p-6 rounded-lg shadow border border-gray-200 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex flex-wrap items-center space-x-3">
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+    <div className="h-full flex flex-col bg-white p-6 rounded-lg shadow border border-slate-200 hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="flex items-center space-x-3 min-w-0">
+          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
             <Smartphone className="w-6 h-6 text-blue-600" />
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
-            <p className="text-sm text-gray-600">{service.provider}</p>
+          <div className="min-w-0">
+            <h3 className="text-base font-semibold text-slate-900 leading-snug line-clamp-2">{service.name}</h3>
+            <p className="text-sm text-slate-600 truncate">{service.provider}</p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center space-x-2">
-          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-            service.status === 'active' ? 'bg-green-100 text-green-800' :
-            service.status === 'inactive' ? 'bg-yellow-100 text-yellow-800' :
-            'bg-red-100 text-red-800'
-          }`}>
-            {service.status}
-          </span>
+        <span className={`shrink-0 px-2 py-1 text-xs font-medium rounded-full ${
+          service.status === 'active' ? 'bg-green-100 text-green-800' :
+          service.status === 'inactive' ? 'bg-yellow-100 text-yellow-800' :
+          'bg-red-100 text-red-800'
+        }`}>
+          {service.status}
+        </span>
+      </div>
+
+      <p className="text-sm text-slate-600 mb-4 line-clamp-3">{service.description}</p>
+
+      {/* takes the slack between cards of different description lengths */}
+      <div className="flex-1" />
+
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <span className="text-lg font-bold text-slate-900">{service.price}</span>
+        <div className="flex items-center space-x-1 shrink-0">
+          <Star className="w-4 h-4 text-yellow-500 fill-current" aria-hidden="true" />
+          <span className="text-sm text-slate-600">{service.popularity}%</span>
         </div>
       </div>
-      <p className="text-gray-600 mb-4">{service.description}</p>
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-lg font-bold text-gray-900">{service.price}</span>
-        <div className="flex flex-wrap items-center space-x-1">
-          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-          <span className="text-sm text-gray-600">{service.popularity}%</span>
-        </div>
-      </div>
+
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="text-center">
-          <div className="text-lg font-bold text-blue-600">{service.totalSubscribers}</div>
-          <div className="text-sm text-gray-600">Subscribers</div>
+          <div className="text-lg font-bold text-blue-700">{service.totalSubscribers.toLocaleString()}</div>
+          <div className="text-xs text-slate-600">Subscribers</div>
         </div>
         <div className="text-center">
-          <div className="text-lg font-bold text-green-700">LKR {service.monthlyRevenue}</div>
-          <div className="text-sm text-gray-600">Monthly Revenue</div>
+          <div className="text-lg font-bold text-green-700">LKR {service.monthlyRevenue.toLocaleString()}</div>
+          <div className="text-xs text-slate-600">Monthly Revenue</div>
         </div>
       </div>
-      <div className="flex flex-wrap space-x-2">
+
+      <div className="flex gap-2">
         <button
           onClick={() => {
             setSelectedService(service);
             setShowEditModal(true);
           }}
-          className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1"
+          className="flex-1 min-w-0 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-1.5"
         >
-          <Edit className="w-4 h-4" />
+          <Edit className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span>Edit</span>
         </button>
         <button
           onClick={() => handleDeleteService(service.id)}
           aria-label={`Delete service ${service.name}`}
-          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+          className="shrink-0 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
     </div>
@@ -475,7 +482,7 @@ const VASManagement: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <Package className="w-4 h-4" />
               <span>Services</span>
             </div>
@@ -488,7 +495,7 @@ const VASManagement: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <Users className="w-4 h-4" />
               <span>Customer Subscriptions</span>
             </div>
@@ -501,7 +508,7 @@ const VASManagement: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <BarChart3 className="w-4 h-4" />
               <span>Analytics</span>
             </div>
@@ -514,7 +521,7 @@ const VASManagement: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <History className="w-4 h-4" />
               <span>Subscription History</span>
             </div>
@@ -526,7 +533,7 @@ const VASManagement: React.FC = () => {
         <div>
           {/* Services Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-            <div className="flex flex-wrap items-center space-x-4 mb-4 sm:mb-0">
+            <div className="flex items-center space-x-4 mb-4 sm:mb-0">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
                 <input
@@ -562,14 +569,14 @@ const VASManagement: React.FC = () => {
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center space-x-2"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
             >
               <Plus className="w-4 h-4" />
               <span>Create Service</span>
             </button>
             <button
               onClick={fetchVASServices}
-              className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex flex-wrap items-center space-x-2"
+              className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
             >
               <Activity className="w-4 h-4" />
               <span>Refresh</span>
@@ -896,7 +903,7 @@ const VASManagement: React.FC = () => {
                 </label>
                 <div className="space-y-2">
                   {formData.features.map((feature, index) => (
-                    <div key={index} className="flex flex-wrap items-center space-x-2">
+                    <div key={index} className="flex items-center space-x-2">
                       <input
                         type="text"
                         value={feature}
@@ -917,7 +924,7 @@ const VASManagement: React.FC = () => {
                   <button
                     type="button"
                     onClick={addFeature}
-                    className="text-blue-600 hover:text-blue-800 flex flex-wrap items-center space-x-1 text-sm"
+                    className="text-blue-600 hover:text-blue-800 flex items-center space-x-1 text-sm"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Add Feature</span>
@@ -931,7 +938,7 @@ const VASManagement: React.FC = () => {
                 </label>
                 <div className="space-y-2">
                   {formData.benefits.map((benefit, index) => (
-                    <div key={index} className="flex flex-wrap items-center space-x-2">
+                    <div key={index} className="flex items-center space-x-2">
                       <input
                         type="text"
                         value={benefit}
@@ -952,7 +959,7 @@ const VASManagement: React.FC = () => {
                   <button
                     type="button"
                     onClick={addBenefit}
-                    className="text-blue-600 hover:text-blue-800 flex flex-wrap items-center space-x-1 text-sm"
+                    className="text-blue-600 hover:text-blue-800 flex items-center space-x-1 text-sm"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Add Benefit</span>
