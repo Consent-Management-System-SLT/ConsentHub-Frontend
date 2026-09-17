@@ -22,11 +22,11 @@ const ToastNotification: React.FC<ToastNotificationProps> = ({ message, onDismis
   const getIcon = () => {
     switch (message.type) {
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
+        return <CheckCircle className="h-5 w-5 text-green-700" />;
       case 'error':
         return <XCircle className="h-5 w-5 text-red-600" />;
       case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
+        return <AlertTriangle className="h-5 w-5 text-yellow-700" />;
       case 'info':
         return <Info className="h-5 w-5 text-blue-600" />;
       default:
@@ -67,7 +67,7 @@ const ToastNotification: React.FC<ToastNotificationProps> = ({ message, onDismis
         </div>
         <div className="ml-4 flex-shrink-0">
           <button
-            className="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600"
+            className="inline-flex text-slate-500 hover:text-gray-600 focus:outline-none focus:text-gray-600"
             onClick={() => {
               setIsVisible(false);
               setTimeout(() => onDismiss(message.id), 300);

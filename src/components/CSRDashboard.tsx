@@ -271,7 +271,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
         onClick={() => setShowHelpModal(true)}
         className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 hover:bg-blue-700 transition-colors text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group z-40"
         title="Help & Documentation"
-      >
+       aria-label="Help & Documentation">
         <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 transition-colors" />
       </button>
       {/* Help Modal */}
@@ -364,7 +364,7 @@ const DashboardOverview: React.FC<{
               disabled={isRefreshing}
               className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               title="Refresh Data"
-            >
+             aria-label="Refresh Data">
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
             </button>
@@ -378,10 +378,10 @@ const DashboardOverview: React.FC<{
             <div>
               <p className="text-sm font-medium text-slate-600">Total Customers</p>
               <p className="text-2xl font-bold text-slate-900">{stats.totalCustomers.toLocaleString()}</p>
-              <p className="text-xs text-green-600 mt-1">Active accounts</p>
+              <p className="text-xs text-green-700 mt-1">Active accounts</p>
             </div>
             <div className="p-3 bg-green-600/20 rounded-full">
-              <Users className="w-6 h-6 text-green-600" />
+              <Users className="w-6 h-6 text-green-700" />
             </div>
           </div>
         </div>
@@ -402,10 +402,10 @@ const DashboardOverview: React.FC<{
             <div>
               <p className="text-sm font-medium text-slate-600">Consent Updates</p>
               <p className="text-2xl font-bold text-slate-900">{stats.consentUpdates}</p>
-              <p className="text-xs text-green-600 mt-1">This period</p>
+              <p className="text-xs text-green-700 mt-1">This period</p>
             </div>
             <div className="p-3 bg-green-600/20 rounded-full">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+              <CheckCircle className="w-6 h-6 text-green-700" />
             </div>
           </div>
         </div>
@@ -457,7 +457,7 @@ const DashboardOverview: React.FC<{
               className="w-full flex flex-wrap items-center space-x-3 p-3 bg-blue-50/30 hover:bg-blue-50/50 rounded-lg transition-colors"
             >
               <div className="p-2 bg-green-600/20 rounded-lg">
-                <Users className="w-5 h-5 text-green-600" />
+                <Users className="w-5 h-5 text-green-700" />
               </div>
               <div className="text-left">
                 <p className="font-medium text-slate-900">Search Customers</p>
@@ -481,7 +481,7 @@ const DashboardOverview: React.FC<{
               className="w-full flex flex-wrap items-center space-x-3 p-3 bg-green-600/20 hover:bg-green-600/30 rounded-lg transition-colors"
             >
               <div className="p-2 bg-green-600/30 rounded-lg">
-                <Shield className="w-5 h-5 text-green-600" />
+                <Shield className="w-5 h-5 text-green-700" />
               </div>
               <div className="text-left">
                 <p className="font-medium text-slate-900">Consent Management</p>
@@ -495,7 +495,7 @@ const DashboardOverview: React.FC<{
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-slate-900">Recent Activity</h3>
             {isRefreshing && (
-              <div className="flex items-center text-green-600 text-sm">
+              <div className="flex items-center text-green-700 text-sm">
                 <RefreshCw className="w-4 h-4 animate-spin mr-2" />
                 Refreshing...
               </div>
@@ -512,19 +512,19 @@ const DashboardOverview: React.FC<{
                   }`}>
                     {activity.type === 'consent' ? (
                       <Shield className={`w-4 h-4 ${
-                        activity.type === 'consent' ? 'text-green-600' :
+                        activity.type === 'consent' ? 'text-green-700' :
                         activity.type === 'dsar' ? 'text-orange-600' :
                         'text-blue-600'
                       }`} />
                     ) : activity.type === 'dsar' ? (
                       <FileText className={`w-4 h-4 ${
-                        activity.type === 'consent' ? 'text-green-600' :
+                        activity.type === 'consent' ? 'text-green-700' :
                         activity.type === 'dsar' ? 'text-orange-600' :
                         'text-blue-600'
                       }`} />
                     ) : (
                       <Activity className={`w-4 h-4 ${
-                        activity.type === 'consent' ? 'text-green-600' :
+                        activity.type === 'consent' ? 'text-green-700' :
                         activity.type === 'dsar' ? 'text-orange-600' :
                         'text-blue-600'
                       }`} />
@@ -550,7 +550,7 @@ const DashboardOverview: React.FC<{
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-slate-900">Today's Insights</h3>
           {isRefreshing && (
-            <div className="flex items-center text-green-600 text-sm">
+            <div className="flex items-center text-green-700 text-sm">
               <RefreshCw className="w-4 h-4 animate-spin mr-2" />
               Refreshing...
             </div>
@@ -567,11 +567,11 @@ const DashboardOverview: React.FC<{
           </div>
           <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
             <div className="flex flex-wrap items-center space-x-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <CheckCircle className="w-5 h-5 text-green-700" />
               <span className="text-sm font-medium text-green-800">Resolved Requests</span>
             </div>
             <p className="text-2xl font-bold text-green-900 mt-2">{insights?.resolvedRequests || 0}</p>
-            <p className="text-sm text-green-600">Completed DSAR requests</p>
+            <p className="text-sm text-green-700">Completed DSAR requests</p>
           </div>
           <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
             <div className="flex flex-wrap items-center space-x-2">

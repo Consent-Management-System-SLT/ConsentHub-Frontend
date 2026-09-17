@@ -263,7 +263,7 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-slate-500 hover:text-gray-600 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -327,7 +327,7 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
                     </div>
                   ))}
                   {notice.acknowledgments.length > 5 && (
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-xs text-slate-500 mt-2">
                       And {notice.acknowledgments.length - 5} more...
                     </p>
                   )}
@@ -341,7 +341,7 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
         <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            className="px-4 py-2 border border-slate-300 bg-white text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
           >
             Close
           </button>
@@ -657,14 +657,14 @@ export const PrivacyNotices: React.FC = () => {
             </button>
             <button
               onClick={() => handleExport('json')}
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex flex-wrap items-center gap-2"
+              className="border border-slate-300 bg-white text-slate-700 px-4 py-2 rounded-md hover:bg-slate-50 transition-colors flex flex-wrap items-center gap-2"
             >
               <Download className="h-4 w-4" />
               Export JSON
             </button>
             <button
               onClick={() => handleExport('csv')}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex flex-wrap items-center gap-2"
+              className="border border-slate-300 bg-white text-slate-700 px-4 py-2 rounded-md hover:bg-slate-50 transition-colors flex flex-wrap items-center gap-2"
             >
               <Download className="h-4 w-4" />
               Export CSV
@@ -679,12 +679,12 @@ export const PrivacyNotices: React.FC = () => {
             <div className="text-sm text-blue-600">Total</div>
           </div>
           <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
-            <div className="text-sm text-green-600">Active</div>
+            <div className="text-2xl font-bold text-green-700">{stats.active}</div>
+            <div className="text-sm text-green-700">Active</div>
           </div>
           <div className="bg-yellow-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-yellow-600">{stats.draft}</div>
-            <div className="text-sm text-yellow-600">Draft</div>
+            <div className="text-2xl font-bold text-yellow-700">{stats.draft}</div>
+            <div className="text-sm text-yellow-700">Draft</div>
           </div>
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="text-2xl font-bold text-gray-600">{stats.archived}</div>
@@ -696,7 +696,7 @@ export const PrivacyNotices: React.FC = () => {
         <div className="flex flex-wrap gap-4 mb-6">
           <div className="flex-1 min-w-64">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search notices..."
@@ -746,7 +746,7 @@ export const PrivacyNotices: React.FC = () => {
 
           <button
             onClick={loadNotices}
-            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors flex flex-wrap items-center gap-2"
+            className="px-4 py-2 border border-slate-300 bg-white text-slate-700 rounded-md hover:bg-slate-50 transition-colors flex flex-wrap items-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
             Refresh
@@ -773,14 +773,14 @@ export const PrivacyNotices: React.FC = () => {
                   }}
                   className="text-blue-600 hover:text-blue-800 p-1"
                   title="Edit"
-                >
+                 aria-label="Edit">
                   <Edit className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => handleDeleteNotice(notice.id)}
                   className="text-red-600 hover:text-red-800 p-1"
                   title="Delete"
-                >
+                 aria-label="Delete">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -829,7 +829,7 @@ export const PrivacyNotices: React.FC = () => {
 
       {notices.length === 0 && !loading && (
         <div className="text-center py-12 bg-white border border-slate-200 rounded-xl shadow-sm">
-          <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <FileText className="h-12 w-12 text-slate-500 mx-auto mb-4" />
           <p className="text-gray-500 mb-4">No privacy notices found.</p>
           <button
             onClick={() => setShowForm(true)}
