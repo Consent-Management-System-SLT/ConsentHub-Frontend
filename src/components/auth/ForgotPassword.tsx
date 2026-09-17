@@ -126,7 +126,7 @@ const ForgotPassword: React.FC = () => {
           <div className="mb-6 sm:mb-8">
             <div className="flex items-center">
               <div className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-medium ${
-                step >= 1 ? 'bg-blue-50 text-white' : 'bg-white border border-slate-200 rounded-xl shadow-sm text-slate-500'
+                step >= 1 ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 rounded-xl shadow-sm text-slate-500'
               }`}>
                 1
               </div>
@@ -134,7 +134,7 @@ const ForgotPassword: React.FC = () => {
                 step >= 2 ? 'bg-blue-50' : 'bg-white border border-slate-200 rounded-xl shadow-sm'
               }`}></div>
               <div className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-medium ${
-                step >= 2 ? 'bg-blue-50 text-white' : 'bg-white border border-slate-200 rounded-xl shadow-sm text-slate-500'
+                step >= 2 ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 rounded-xl shadow-sm text-slate-500'
               }`}>
                 2
               </div>

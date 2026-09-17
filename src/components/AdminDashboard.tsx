@@ -29,6 +29,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showConnectionAlert, setShowConnectionAlert] = useState(true);
+  // Bumping this remounts the active section, which re-runs its data fetch.
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const renderContent = () => {
     switch (activeSection) {
@@ -84,6 +86,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
       <DashboardHeader
         subtitle="Admin Dashboard"
         navId="admin-nav"
+        onRefresh={() => setRefreshKey((k) => k + 1)}
         sidebarOpen={sidebarOpen}
         onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
       />
@@ -102,7 +105,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
           className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden"
         >
           <div className="p-4 sm:p-5 lg:p-6">
-            <div className="max-w-7xl mx-auto">{renderContent()}</div>
+            <div className="max-w-7xl mx-auto" key={refreshKey}>
+              {renderContent()}
+            </div>
           </div>
         </main>
       </div>
