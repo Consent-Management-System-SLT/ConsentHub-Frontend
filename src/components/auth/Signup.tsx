@@ -161,9 +161,9 @@ const Signup: React.FC = () => {
     }
   };
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-4 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-blue-800 py-6 sm:py-10 px-4 sm:px-6">
       <div className="max-w-sm sm:max-w-md md:max-w-2xl w-full space-y-4 sm:space-y-6 md:space-y-8">
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
           <div className="text-center mb-4 sm:mb-6 md:mb-8">
             <img 
               src="/Logo-SLT.png" 
