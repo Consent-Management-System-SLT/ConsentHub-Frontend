@@ -618,7 +618,7 @@ const EventListenerManager: React.FC = () => {
                 >
                   Previous
                 </button>
-                <span className="px-3 py-1 text-sm bg-blue-50 text-white rounded">
+                <span className="px-3 py-1 text-sm bg-blue-600 text-white rounded">
                   {pagination.page}
                 </span>
                 <button

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { pageWindow } from '../../utils/pagination';
 import { 
   Search, 
-  Filter, 
   Download, 
   Eye,
   Edit,
@@ -627,10 +627,6 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
               </button>
             </div>
           )}
-          <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600/80 transition-colors flex flex-wrap items-center space-x-2">
-            <RefreshCw className="w-4 h-4" />
-            <span className="text-sm font-medium">Refresh</span>
-          </button>
         </div>
       </div>
       {/* Statistics Cards */}
@@ -732,12 +728,6 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                 <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               </div>
             </div>
-          </div>
-          <div className="flex flex-wrap items-center space-x-3">
-            <button className="px-4 py-2 bg-white border border-slate-200 hover:bg-gray-200 rounded-lg transition-colors flex flex-wrap items-center space-x-2">
-              <Filter className="w-4 h-4 text-slate-600" />
-              <span className="text-sm font-medium text-gray-700">More Filters</span>
-            </button>
           </div>
         </div>
       </div>
@@ -1007,19 +997,25 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           >
             Previous
           </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`min-w-[44px] px-3 py-2 rounded-lg transition-colors text-sm ${
-                currentPage === page
-                  ? 'bg-blue-600 text-white'
-                  : 'border border-gray-300 hover:bg-white border border-slate-200'
-              }`}
-            >
-              {page}
-            </button>
-          ))}
+          {pageWindow(currentPage, totalPages).map((page, i) =>
+            page === null ? (
+              <span key={`gap-${i}`} className="px-1 text-slate-500" aria-hidden="true">…</span>
+            ) : (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                aria-current={currentPage === page ? 'page' : undefined}
+                aria-label={`Page ${page}`}
+                className={`min-w-[44px] px-3 py-2 rounded-lg transition-colors text-sm ${
+                  currentPage === page
+                    ? 'bg-blue-600 text-white font-semibold'
+                    : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                {page}
+              </button>
+            )
+          )}
           <button 
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}

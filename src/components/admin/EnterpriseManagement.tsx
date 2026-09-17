@@ -52,7 +52,7 @@ export default function EnterpriseManagement() {
       }
     } catch (error) {
       console.error('Fetch error', error);
-      addNotification({ type: 'system', category: 'error', title: 'Error', message: 'Failed to load applications' });
+      addNotification({ type: 'system', category: 'urgent', title: 'Error', message: 'Failed to load applications' });
     } finally {
       setLoading(false);
     }
@@ -78,7 +78,7 @@ export default function EnterpriseManagement() {
         throw new Error(data.message);
       }
     } catch (e: any) {
-      addNotification({ type: 'system', category: 'error', title: 'Error', message: e.message || 'Failed to approve' });
+      addNotification({ type: 'system', category: 'urgent', title: 'Error', message: e.message || 'Failed to approve' });
     }
   };
 
@@ -141,7 +141,7 @@ export default function EnterpriseManagement() {
         throw new Error(data.message);
       }
     } catch (e: any) {
-      addNotification({ type: 'system', category: 'error', title: 'Error', message: e.message });
+      addNotification({ type: 'system', category: 'urgent', title: 'Error', message: e.message });
     }
   };
 
@@ -163,7 +163,7 @@ export default function EnterpriseManagement() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      addNotification({ type: 'system', category: 'error', title: 'Error', message: 'Could not load document securely' });
+      addNotification({ type: 'system', category: 'urgent', title: 'Error', message: 'Could not load document securely' });
     }
   };
 

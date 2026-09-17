@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+﻿import { pageWindow } from '../../utils/pagination';
 import { 
   Search, 
   Filter, 
@@ -518,19 +519,25 @@ const DSARManager: React.FC = () => {
               <ChevronLeft className="h-4 w-4" />
               Previous
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`min-w-[44px] px-3 py-2 rounded-lg transition-colors text-sm ${
-                  currentPage === page
-                    ? 'bg-blue-50 text-white'
-                    : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {pageWindow(currentPage, totalPages).map((page, i) =>
+              page === null ? (
+                <span key={`gap-${i}`} className="px-1 text-slate-500" aria-hidden="true">…</span>
+              ) : (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  aria-current={currentPage === page ? 'page' : undefined}
+                  aria-label={`Page ${page}`}
+                  className={`min-w-[44px] px-3 py-2 rounded-lg transition-colors text-sm ${
+                    currentPage === page
+                      ? 'bg-blue-600 text-white font-semibold'
+                      : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  {page}
+                </button>
+              )
+            )}
             <button 
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}

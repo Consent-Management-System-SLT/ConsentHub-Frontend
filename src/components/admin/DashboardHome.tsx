@@ -12,11 +12,9 @@ import {
   RefreshCw,
   Calendar,
   FileText,
-  BarChart3,
-  Bell
+  BarChart3
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useCRUDNotifications } from '../shared/withNotifications';
 interface DashboardData {
   systemOverview: {
     totalConsents: number;
@@ -54,29 +52,11 @@ interface DashboardData {
 }
 const DashboardHome: React.FC = () => {
   const { getAuthToken } = useAuth();
-  const { notifyCustom } = useCRUDNotifications();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [selectedPeriod, setSelectedPeriod] = useState('7d');
-  // Test notification function
-  const testNotification = () => {
-    const notifications = [
-      { type: 'success', title: 'System Update', message: 'Dashboard data refreshed successfully' },
-      { type: 'info', title: 'New Feature', message: 'Notification system is now active!' },
-      { type: 'warning', title: 'Maintenance Alert', message: 'System maintenance scheduled for tonight' },
-      { type: 'urgent', title: 'Action Required', message: 'High priority DSAR request needs attention' }
-    ] as const;
-    const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
-    notifyCustom(
-      'system',
-      randomNotification.type,
-      randomNotification.title,
-      randomNotification.message,
-      { source: 'dashboard_test' }
-    );
-  };
   useEffect(() => {
     fetchDashboardData();
     const interval = setInterval(fetchDashboardData, 30000); // Refresh every 30 seconds
@@ -185,22 +165,6 @@ const DashboardHome: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 shrink-0">
           <div className="text-xs sm:text-sm text-slate-500 text-center sm:text-left">
             Last updated: {lastUpdated}
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <button 
-              onClick={fetchDashboardData}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center justify-center space-x-2 px-3 sm:px-4 text-sm sm:text-base"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>Refresh</span>
-            </button>
-            <button 
-              onClick={testNotification}
-              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center justify-center space-x-2 px-3 sm:px-4 text-sm sm:text-base"
-            >
-              <Bell className="w-4 h-4" />
-              <span>Test</span>
-            </button>
           </div>
         </div>
       </div>
