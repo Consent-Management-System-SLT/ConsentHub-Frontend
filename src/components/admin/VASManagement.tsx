@@ -360,7 +360,7 @@ const VASManagement: React.FC = () => {
   const ServiceCard: React.FC<{ service: VASService }> = ({ service }) => (
     <div className="bg-white p-6 rounded-lg shadow border border-gray-200 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center space-x-3">
           <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
             <Smartphone className="w-6 h-6 text-blue-600" />
           </div>
@@ -369,7 +369,7 @@ const VASManagement: React.FC = () => {
             <p className="text-sm text-gray-600">{service.provider}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center space-x-2">
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${
             service.status === 'active' ? 'bg-green-100 text-green-800' :
             service.status === 'inactive' ? 'bg-yellow-100 text-yellow-800' :
@@ -382,7 +382,7 @@ const VASManagement: React.FC = () => {
       <p className="text-gray-600 mb-4">{service.description}</p>
       <div className="flex items-center justify-between mb-4">
         <span className="text-lg font-bold text-gray-900">{service.price}</span>
-        <div className="flex items-center space-x-1">
+        <div className="flex flex-wrap items-center space-x-1">
           <Star className="w-4 h-4 text-yellow-400 fill-current" />
           <span className="text-sm text-gray-600">{service.popularity}%</span>
         </div>
@@ -397,7 +397,7 @@ const VASManagement: React.FC = () => {
           <div className="text-sm text-gray-600">Monthly Revenue</div>
         </div>
       </div>
-      <div className="flex space-x-2">
+      <div className="flex flex-wrap space-x-2">
         <button
           onClick={() => {
             setSelectedService(service);
@@ -410,6 +410,7 @@ const VASManagement: React.FC = () => {
         </button>
         <button
           onClick={() => handleDeleteService(service.id)}
+          aria-label={`Delete service ${service.name}`}
           className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
         >
           <Trash2 className="w-4 h-4" />
@@ -465,7 +466,7 @@ const VASManagement: React.FC = () => {
       )}
       {/* Tabs */}
       <div className="mb-6">
-        <nav className="flex space-x-8">
+        <nav className="flex space-x-8 overflow-x-auto" >
           <button
             onClick={() => setActiveTab('services')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -474,7 +475,7 @@ const VASManagement: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center space-x-2">
               <Package className="w-4 h-4" />
               <span>Services</span>
             </div>
@@ -487,7 +488,7 @@ const VASManagement: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center space-x-2">
               <Users className="w-4 h-4" />
               <span>Customer Subscriptions</span>
             </div>
@@ -500,7 +501,7 @@ const VASManagement: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center space-x-2">
               <BarChart3 className="w-4 h-4" />
               <span>Analytics</span>
             </div>
@@ -513,7 +514,7 @@ const VASManagement: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center space-x-2">
               <History className="w-4 h-4" />
               <span>Subscription History</span>
             </div>
@@ -525,7 +526,7 @@ const VASManagement: React.FC = () => {
         <div>
           {/* Services Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-            <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+            <div className="flex flex-wrap items-center space-x-4 mb-4 sm:mb-0">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
@@ -534,7 +535,7 @@ const VASManagement: React.FC = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                 aria-label="Search services"/>
               </div>
               <select
                 value={selectedCategory}
@@ -561,14 +562,14 @@ const VASManagement: React.FC = () => {
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center space-x-2"
             >
               <Plus className="w-4 h-4" />
               <span>Create Service</span>
             </button>
             <button
               onClick={fetchVASServices}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex flex-wrap items-center space-x-2"
             >
               <Activity className="w-4 h-4" />
               <span>Refresh</span>
@@ -895,7 +896,7 @@ const VASManagement: React.FC = () => {
                 </label>
                 <div className="space-y-2">
                   {formData.features.map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-2">
+                    <div key={index} className="flex flex-wrap items-center space-x-2">
                       <input
                         type="text"
                         value={feature}
@@ -916,7 +917,7 @@ const VASManagement: React.FC = () => {
                   <button
                     type="button"
                     onClick={addFeature}
-                    className="text-blue-600 hover:text-blue-800 flex items-center space-x-1 text-sm"
+                    className="text-blue-600 hover:text-blue-800 flex flex-wrap items-center space-x-1 text-sm"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Add Feature</span>
@@ -930,7 +931,7 @@ const VASManagement: React.FC = () => {
                 </label>
                 <div className="space-y-2">
                   {formData.benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-center space-x-2">
+                    <div key={index} className="flex flex-wrap items-center space-x-2">
                       <input
                         type="text"
                         value={benefit}
@@ -951,7 +952,7 @@ const VASManagement: React.FC = () => {
                   <button
                     type="button"
                     onClick={addBenefit}
-                    className="text-blue-600 hover:text-blue-800 flex items-center space-x-1 text-sm"
+                    className="text-blue-600 hover:text-blue-800 flex flex-wrap items-center space-x-1 text-sm"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Add Benefit</span>

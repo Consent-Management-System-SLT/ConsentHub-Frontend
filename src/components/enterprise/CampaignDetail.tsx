@@ -65,7 +65,7 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId, onBack, onE
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200">
       <div className="p-6 border-b border-slate-200 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <button aria-label="Go back" onClick={onBack} className="text-slate-500 hover:text-slate-800">
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -80,14 +80,14 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId, onBack, onE
               <button onClick={() => onEdit(campaign._id)} className="px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md">
                 Edit
               </button>
-              <button onClick={submitCampaign} className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md flex items-center gap-2">
+              <button onClick={submitCampaign} className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md flex flex-wrap items-center gap-2">
                 <Send className="w-4 h-4" />
                 Submit for Approval
               </button>
             </>
           )}
           {campaign.status === 'APPROVED' && (
-            <button onClick={launchCampaign} className="px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-md flex items-center gap-2">
+            <button onClick={launchCampaign} className="px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-md flex flex-wrap items-center gap-2">
               <Play className="w-4 h-4" />
               Launch Campaign
             </button>

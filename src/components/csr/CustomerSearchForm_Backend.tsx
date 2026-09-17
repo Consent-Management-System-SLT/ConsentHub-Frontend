@@ -49,7 +49,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
     <div className={`bg-white rounded-xl shadow-sm border border-slate-200 ${className}`}>
       {/* Header */}
       <div className="p-6 border-b border-slate-200 bg-gradient-to-r from-blue-600/10 to-blue-600/10">
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center space-x-3">
           <Search className="w-6 h-6 text-blue-600" />
           <div>
             <h2 className="text-xl font-semibold text-slate-900">Customer Search</h2>
@@ -59,9 +59,9 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
       </div>
       {/* Search Form */}
       <div className="p-6 border-b border-slate-200">
-        <div className="flex space-x-4">
+        <div className="flex flex-wrap space-x-4">
           <div className="flex-1">
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap space-x-2">
               <select
                 value={searchType}
                 onChange={(e) => setSearchType(e.target.value)}
@@ -77,6 +77,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={`Search by ${searchType}...`}
+                aria-label={`Search customers by ${searchType}`}
                 className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-bg-white border-slate-300 px-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition-colors-bg placeholder-text-slate-500-muted"
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               />
@@ -85,7 +86,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
           <button
             onClick={handleSearch}
             disabled={!searchTerm.trim() || isSearching}
-            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium flex items-center gap-2"
+            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium flex flex-wrap items-center gap-2"
           >
             {isSearching ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             {isSearching ? 'Searching...' : 'Search'}
@@ -95,7 +96,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
       {/* Error Message */}
       {error && (
         <div className="p-4 mx-6 bg-red-50 border border-red-200 rounded-lg">
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center space-x-2">
             <AlertCircle className="w-5 h-5 text-red-600" />
             <span className="text-red-800">{error}</span>
           </div>
@@ -120,21 +121,21 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
                   onClick={() => handleCustomerSelect(customer)}
                   className="p-4 border border-slate-200 rounded-lg hover:border-blue-600 hover:bg-white cursor-pointer transition-all duration-200"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-3">
+                  <div className="flex flex-wrap gap-4 items-start justify-between">
+                    <div className="flex flex-wrap items-start space-x-3">
                       {getCustomerIcon(customer.type || customer.partyType)}
                       <div>
                         <div className="font-medium text-slate-900">{customer.name}</div>
                         <div className="text-sm text-slate-600">ID: {customer.id}</div>
-                        <div className="flex items-center space-x-4 mt-2">
+                        <div className="flex flex-wrap items-center space-x-4 mt-2">
                           {customer.email && (
-                            <div className="flex items-center space-x-1">
+                            <div className="flex flex-wrap items-center space-x-1">
                               <Mail className="w-4 h-4 text-slate-500" />
                               <span className="text-sm text-slate-600">{customer.email}</span>
                             </div>
                           )}
                           {(customer.phone || customer.mobile) && (
-                            <div className="flex items-center space-x-1">
+                            <div className="flex flex-wrap items-center space-x-1">
                               <Phone className="w-4 h-4 text-slate-500" />
                               <span className="text-sm text-slate-600">{customer.phone || customer.mobile}</span>
                             </div>
@@ -142,7 +143,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-wrap items-center space-x-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         customer.status === 'active' 
                           ? 'bg-green-600/20 text-green-600' 

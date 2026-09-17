@@ -228,7 +228,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
     return (
       <div className={`bg-white rounded-lg shadow-lg ${className}`}>
         <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap items-center space-x-3">
             <ShieldCheck className="w-6 h-6 text-indigo-600" />
             <div>
               <h2 className="text-xl font-semibold text-slate-900">DSAR Requests</h2>
@@ -247,7 +247,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
     return (
       <div className={`bg-white rounded-lg shadow-lg ${className}`}>
         <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap items-center space-x-3">
             <ShieldCheck className="w-6 h-6 text-indigo-600" />
             <div>
               <h2 className="text-xl font-semibold text-slate-900">DSAR Requests</h2>
@@ -256,7 +256,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
           </div>
         </div>
         <div className="p-6">
-          <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-4 rounded-lg">
+          <div className="flex flex-wrap items-center space-x-2 text-red-600 bg-red-50 p-4 rounded-lg">
             <AlertCircle className="w-5 h-5" />
             <span>{error}</span>
             <button 
@@ -274,7 +274,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
     <div className={`bg-white rounded-lg shadow-lg ${className}`}>
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap items-center space-x-3">
             <ShieldCheck className="w-6 h-6 text-indigo-600" />
             <div>
               <h2 className="text-xl font-semibold text-slate-900">DSAR Requests</h2>
@@ -285,7 +285,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
           </div>
           <button
             onClick={loadDSARRequests}
-            className="px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
+            className="px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex flex-wrap items-center gap-2"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -307,9 +307,9 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
             const isOverdue = daysRemaining < 0;
             return (
               <div key={request.id} className="p-6 hover:bg-white border border-slate-200">
-                <div className="flex items-start justify-between">
+                <div className="flex flex-wrap gap-4 items-start justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-3">
+                    <div className="flex flex-wrap items-center space-x-3 mb-3">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRequestTypeColor(request.requestType)}`}>
                         {request.requestType}
                       </span>
@@ -325,11 +325,11 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                       )}
                     </div>
                     <div className="space-y-2">
-                      <div className="flex items-center space-x-4 text-sm text-slate-600">
+                      <div className="flex flex-wrap items-center space-x-4 text-sm text-slate-600">
                         <span><strong>Request ID:</strong> {request.id}</span>
                         <span><strong>Customer:</strong> {getCustomerName(request.partyId, request)}</span>
                       </div>
-                      <div className="flex items-center space-x-4 text-sm text-slate-600">
+                      <div className="flex flex-wrap items-center space-x-4 text-sm text-slate-600">
                         <span className="flex items-center">
                           <Calendar className="w-4 h-4 mr-1" />
                           Submitted: {formatDate(request.submittedAt)}
@@ -343,7 +343,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2 ml-4">
+                  <div className="flex flex-wrap items-center space-x-2 ml-4">
                     <button
                       onClick={() => viewRequestDetails(request)}
                       className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full"
@@ -356,7 +356,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                         <button
                           onClick={() => handleApproveRequest(request.id)}
                           disabled={processing === request.id}
-                          className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+                          className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex flex-wrap items-center space-x-1"
                         >
                           <Check className="w-3 h-3" />
                           <span>Approve</span>
@@ -364,7 +364,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                         <button
                           onClick={() => handleRejectRequest(request.id)}
                           disabled={processing === request.id}
-                          className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+                          className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex flex-wrap items-center space-x-1"
                         >
                           <X className="w-3 h-3" />
                           <span>Reject</span>
@@ -375,7 +375,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                       <button
                         onClick={() => handleStartProcessing(request.id)}
                         disabled={processing === request.id}
-                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex flex-wrap items-center space-x-1"
                       >
                         <Play className="w-3 h-3" />
                         <span>Start Processing</span>
@@ -385,7 +385,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                       <button
                         onClick={() => handleCompleteRequest(request.id)}
                         disabled={processing === request.id}
-                        className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+                        className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex flex-wrap items-center space-x-1"
                       >
                         <CheckCircle className="w-3 h-3" />
                         <span>Complete</span>
@@ -394,7 +394,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                     {request.status === 'completed' && (
                       <button
                         onClick={() => downloadRequestData(request.id)}
-                        className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 flex items-center gap-1"
+                        className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 flex flex-wrap items-center gap-1"
                         title="Download Response"
                       >
                         <Download className="w-3 h-3" />
@@ -402,7 +402,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                       </button>
                     )}
                     {processing === request.id && (
-                      <div className="flex items-center space-x-2">
+                      <div className="flex flex-wrap items-center space-x-2">
                         <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />
                         <span className="text-sm text-slate-600">Processing...</span>
                       </div>

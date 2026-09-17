@@ -587,7 +587,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Consent Management</h1>
-          <div className="flex items-center space-x-4 mt-2">
+          <div className="flex flex-wrap items-center space-x-4 mt-2">
             <p className="text-slate-600">Manage and monitor all customer consents</p>
             <span className="text-xs text-slate-500 flex items-center">
               <RefreshCw className="w-3 h-3 mr-1" />
@@ -595,23 +595,23 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
             </span>
           </div>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center space-x-3">
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center space-x-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
             <span className="text-sm font-medium">Create New Consent</span>
           </button>
           <button 
             onClick={handleExportData}
-            className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center space-x-2"
+            className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center space-x-2"
           >
             <Download className="w-4 h-4" />
             <span className="text-sm font-medium">Export</span>
           </button>
           {selectedConsents.size > 0 && (
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center space-x-2">
               <span className="text-sm text-slate-600">{selectedConsents.size} selected</span>
               <button 
                 onClick={() => handleBulkAction('export')}
@@ -627,7 +627,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
               </button>
             </div>
           )}
-          <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600/80 transition-colors flex items-center space-x-2">
+          <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600/80 transition-colors flex flex-wrap items-center space-x-2">
             <RefreshCw className="w-4 h-4" />
             <span className="text-sm font-medium">Refresh</span>
           </button>
@@ -698,9 +698,9 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full sm:w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
+               aria-label="Search customers"/>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-wrap items-center space-x-3">
               <div className="relative">
                 <select
                   value={statusFilter}
@@ -733,8 +733,8 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <button className="px-4 py-2 bg-white border border-slate-200 hover:bg-gray-200 rounded-lg transition-colors flex items-center space-x-2">
+          <div className="flex flex-wrap items-center space-x-3">
+            <button className="px-4 py-2 bg-white border border-slate-200 hover:bg-gray-200 rounded-lg transition-colors flex flex-wrap items-center space-x-2">
               <Filter className="w-4 h-4 text-slate-600" />
               <span className="text-sm font-medium text-gray-700">More Filters</span>
             </button>
@@ -748,8 +748,8 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           <div className="p-4 space-y-4">
             {paginatedConsents.map((consent) => (
               <div key={consent.id} className="bg-white border border-slate-200 rounded-lg p-4 space-y-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-3">
+                <div className="flex flex-wrap gap-4 items-start justify-between">
+                  <div className="flex flex-wrap items-center space-x-3">
                     <input
                       type="checkbox"
                       aria-label={`Select ${consent.consentType} consent for ${consent.customerName}`}
@@ -765,7 +765,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                       <div className="text-xs text-slate-600">{consent.email}</div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-1">
+                  <div className="flex flex-wrap items-center space-x-1">
                     <button 
                       onClick={() => handleViewConsent(consent)}
                       className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded transition-colors"
@@ -834,7 +834,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     setSortOrder(sortBy === 'name' && sortOrder === 'asc' ? 'desc' : 'asc');
                   }}
                 >
-                  <div className="flex items-center space-x-1">
+                  <div className="flex flex-wrap items-center space-x-1">
                     <span>Customer</span>
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'name' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
@@ -849,7 +849,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     setSortOrder(sortBy === 'status' && sortOrder === 'asc' ? 'desc' : 'asc');
                   }}
                 >
-                  <div className="flex items-center space-x-1">
+                  <div className="flex flex-wrap items-center space-x-1">
                     <span>Status</span>
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'status' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
@@ -861,7 +861,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     setSortOrder(sortBy === 'date' && sortOrder === 'asc' ? 'desc' : 'asc');
                   }}
                 >
-                  <div className="flex items-center space-x-1">
+                  <div className="flex flex-wrap items-center space-x-1">
                     <span>Grant/Revoke Date</span>
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'date' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
@@ -971,7 +971,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-wrap items-center space-x-2">
                       <button 
                         onClick={() => handleViewConsent(consent)}
                         className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded transition-colors"
@@ -999,7 +999,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
         <div className="text-sm text-slate-600">
           Showing {sortedConsents.length === 0 ? 0 : Math.min(startIndex + 1, sortedConsents.length)} to {Math.min(endIndex, sortedConsents.length)} of {sortedConsents.length} consents
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center space-x-2">
           <button 
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
@@ -1087,10 +1087,10 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   })()}
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex flex-wrap items-center space-x-3">
                 <button 
                   onClick={() => handleEditConsent(modalData)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center space-x-2"
                 >
                   <Edit className="w-4 h-4" />
                   <span>Edit Consent</span>

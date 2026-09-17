@@ -288,10 +288,10 @@ CSR User,csr@example.com,+1987654321,csr,true`
           <h1 className="text-3xl font-bold text-slate-900">Bulk Import</h1>
           <p className="text-slate-600 mt-2">Import customer data and consents in bulk</p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center space-x-3">
           <button 
             onClick={handleDownloadTemplate}
-            className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-white transition-colors flex items-center space-x-2"
+            className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-white transition-colors flex flex-wrap items-center space-x-2"
           >
             <Download className="w-4 h-4 text-slate-500" />
             <span className="text-sm font-medium text-slate-600">Download Template</span>
@@ -299,7 +299,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
           <button 
             onClick={handleRefresh}
             disabled={refreshing}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex flex-wrap items-center space-x-2 disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
             <span className="text-sm font-medium">Refresh</span>
@@ -356,7 +356,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
                     </div>
                   </div>
                 )}
-                <div className="flex space-x-3">
+                <div className="flex flex-wrap space-x-3">
                   <button 
                     onClick={handleUpload}
                     disabled={isUploading}
@@ -416,7 +416,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+               aria-label="Search imports"/>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <select
@@ -453,7 +453,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
                 {importHistory.length > 0 ? importHistory.map((item) => (
                   <div key={item._id} className="border border-slate-200 p-4 bg-white rounded-xl shadow-sm">
                     <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center space-x-3">
+                      <div className="flex flex-wrap items-center space-x-3">
                         {getStatusIcon(item.status)}
                         <div>
                           <p className="text-sm font-medium text-slate-900">{item.fileName}</p>
@@ -529,7 +529,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
                   <div className="text-sm text-gray-500">
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} imports
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-wrap items-center space-x-2">
                     <button
                       onClick={() => fetchImportHistory(pagination.page - 1)}
                       disabled={!pagination.hasPrev}
@@ -579,7 +579,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
               </div>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {selectedImport.errors.map((error, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-red-50 rounded-lg">
+                  <div key={index} className="flex flex-wrap items-start space-x-3 p-3 bg-red-50 rounded-lg">
                     <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-sm text-red-800 font-medium">Row {error.row}</p>

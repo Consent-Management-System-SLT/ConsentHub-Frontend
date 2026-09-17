@@ -64,7 +64,7 @@ const PrivacyNoticeForm: React.FC<{
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="privacynotices-dialog-0-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
           <h3 id="privacynotices-dialog-0-title" className="text-lg font-semibold">
             {notice ? 'Edit Privacy Notice' : 'Create New Privacy Notice'}
           </h3>
@@ -209,7 +209,7 @@ const PrivacyNoticeForm: React.FC<{
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 bg-white text-white rounded-md hover:bg-slate-900 disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex flex-wrap items-center gap-2"
             >
               {isLoading ? (
                 <>
@@ -247,7 +247,7 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <div>
             <h2 id="privacynotices-dialog-1-title" className="text-2xl font-bold text-gray-900">{notice.title}</h2>
-            <div className="flex items-center space-x-4 mt-2">
+            <div className="flex flex-wrap items-center space-x-4 mt-2">
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                 notice.status === 'active' ? 'bg-green-100 text-green-800' : 
                 notice.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 
@@ -623,7 +623,7 @@ export const PrivacyNotices: React.FC = () => {
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={loadNotices}
-            className="bg-white text-white px-4 py-2 rounded-md hover:bg-slate-900 transition-colors"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
           >
             Retry
           </button>
@@ -636,7 +636,7 @@ export const PrivacyNotices: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
           <div>
             <h2 className="text-lg font-semibold text-slate-900 flex items-center">
               <FileText className="h-5 w-5 mr-2 text-blue-600" />
@@ -647,24 +647,24 @@ export const PrivacyNotices: React.FC = () => {
               {filters.status === 'active' && <span className="text-slate-500"> Deleted notices are archived and hidden.</span>}
             </p>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap space-x-2">
             <button
               onClick={() => setShowForm(true)}
-              className="bg-white text-white px-4 py-2 rounded-md hover:bg-slate-900 transition-colors flex items-center gap-2"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex flex-wrap items-center gap-2"
             >
               <Plus className="h-4 w-4" />
               Create Notice
             </button>
             <button
               onClick={() => handleExport('json')}
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex flex-wrap items-center gap-2"
             >
               <Download className="h-4 w-4" />
               Export JSON
             </button>
             <button
               onClick={() => handleExport('csv')}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex flex-wrap items-center gap-2"
             >
               <Download className="h-4 w-4" />
               Export CSV
@@ -704,7 +704,7 @@ export const PrivacyNotices: React.FC = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && loadNotices()}
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+               aria-label="Search notices"/>
             </div>
           </div>
           
@@ -746,7 +746,7 @@ export const PrivacyNotices: React.FC = () => {
 
           <button
             onClick={loadNotices}
-            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors flex flex-wrap items-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
             Refresh
@@ -759,13 +759,13 @@ export const PrivacyNotices: React.FC = () => {
         {notices.map((notice) => (
           <div key={notice.id} className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center space-x-2">
                 {getStatusIcon(notice.status)}
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(notice.status)}`}>
                   {notice.status.charAt(0).toUpperCase() + notice.status.slice(1)}
                 </span>
               </div>
-              <div className="flex space-x-1">
+              <div className="flex flex-wrap space-x-1">
                 <button
                   onClick={() => {
                     setEditingNotice(notice);
@@ -791,18 +791,18 @@ export const PrivacyNotices: React.FC = () => {
             </h3>
 
             <div className="space-y-2 mb-4 text-sm text-slate-600">
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center space-x-2">
                 <FileText className="h-4 w-4 text-slate-500" />
                 <span>{notice.category}</span>
                 <span className="text-xs bg-blue-50/20 text-slate-900 px-2 py-1 rounded">{notice.language}</span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center space-x-2">
                 <Calendar className="h-4 w-4 text-slate-500" />
                 <span>
                   Effective: {new Date(notice.effectiveDate).toLocaleDateString()}
                 </span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center space-x-2">
                 <Users className="h-4 w-4 text-slate-500" />
                 <span>{notice.acknowledgments.length} acknowledgments</span>
               </div>
@@ -814,7 +814,7 @@ export const PrivacyNotices: React.FC = () => {
               </p>
             )}
 
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap space-x-2">
               <button
                 onClick={() => setViewingNotice(notice)}
                 className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white border-slate-200 rounded-xl shadow-sm hover:bg-white transition-colors"
@@ -833,7 +833,7 @@ export const PrivacyNotices: React.FC = () => {
           <p className="text-gray-500 mb-4">No privacy notices found.</p>
           <button
             onClick={() => setShowForm(true)}
-            className="bg-white text-white px-4 py-2 rounded-md hover:bg-slate-900 transition-colors"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
           >
             Create your first notice
           </button>

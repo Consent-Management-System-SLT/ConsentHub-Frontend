@@ -191,11 +191,11 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
               const isProcessing = processingRequests.has(request.id);
               return (
                 <div key={request.id} className="p-4 sm:p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-4">
+                  <div className="flex flex-wrap gap-4 items-start justify-between">
+                    <div className="flex flex-wrap items-start space-x-4">
                       <div className="text-xl sm:text-2xl">{renderRequestTypeIcon(request.requestType)}</div>
                       <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
+                        <div className="flex flex-wrap items-center space-x-3 mb-2">
                           <h5 className="font-medium text-slate-900">
                             {request.requestType.charAt(0).toUpperCase() + request.requestType.slice(1)} Request
                           </h5>
@@ -244,7 +244,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3">
+                    <div className="flex flex-wrap items-center space-x-3">
                       <button
                         onClick={() => {
                           const requestId = request.id || request._id;
@@ -306,7 +306,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
           <div className="divide-y divide-slate-200 max-h-64 overflow-y-auto">
             {completedRequests.slice(0, 5).map(request => (
               <div key={request.id} className="p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-wrap items-center space-x-4">
                   <div className="text-lg sm:text-xl">{renderRequestTypeIcon(request.requestType)}</div>
                   <div>
                     <p className="font-medium text-slate-900">

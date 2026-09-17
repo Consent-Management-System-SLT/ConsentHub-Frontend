@@ -225,8 +225,9 @@ const AuditLogViewer: React.FC = () => {
           Showing {Math.min((currentPage - 1) * logsPerPage + 1, totalLogs)} to{' '}
           {Math.min(currentPage * logsPerPage, totalLogs)} of {totalLogs} audit logs
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center space-x-2">
           <button
+            aria-label="Previous page"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
             className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -247,6 +248,7 @@ const AuditLogViewer: React.FC = () => {
             </button>
           ))}
           <button
+            aria-label="Next page"
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
             className="px-3 py-1 rounded-md border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -278,7 +280,7 @@ const AuditLogViewer: React.FC = () => {
         </div>
         <button
           onClick={exportLogs}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center space-x-2"
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex flex-wrap items-center space-x-2"
         >
           <Download className="w-4 h-4" />
           <span>Export CSV</span>
@@ -304,7 +306,7 @@ const AuditLogViewer: React.FC = () => {
                 onKeyPress={handleSearchKeyPress}
                 placeholder="Search by user, action, entity, or description..."
                 className="pl-10 pr-4 py-2 w-full sm:w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
+               aria-label="Search by user, action, entity, or description"/>
               {searchTerm && (
                 <button aria-label="Close"
                   onClick={clearSearch}
@@ -322,7 +324,7 @@ const AuditLogViewer: React.FC = () => {
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-2 bg-white border border-slate-200 hover:bg-gray-200 rounded-lg transition-colors flex items-center space-x-2"
+              className="px-4 py-2 bg-white border border-slate-200 hover:bg-gray-200 rounded-lg transition-colors flex flex-wrap items-center space-x-2"
             >
               <Filter className="w-4 h-4 text-slate-600" />
               <span className="text-sm font-medium text-gray-700">Filters</span>
@@ -378,7 +380,7 @@ const AuditLogViewer: React.FC = () => {
                 </select>
               </div>
             </div>
-            <div className="mt-4 flex items-center space-x-2">
+            <div className="mt-4 flex flex-wrap items-center space-x-2">
               <button
                 onClick={clearFilters}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
@@ -463,6 +465,7 @@ const AuditLogViewer: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
                     <button
                       onClick={() => setSelectedLog(log)}
+                      aria-label={`View audit entry: ${log.action} by ${log.userEmail}`}
                       className="text-blue-600 hover:text-blue-600 p-1 hover:bg-blue-50/10 rounded transition-colors"
                     >
                       <Eye className="w-4 h-4" />

@@ -144,7 +144,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
                 <label className="block text-sm font-medium mb-2">Approved Scopes *</label>
                 <div className="space-y-2">
                   {config?.approvedScopes?.map((s: any) => (
-                    <label key={s._id} className="flex items-center gap-2">
+                    <label key={s._id} className="flex flex-wrap items-center gap-2">
                       <input type="checkbox" checked={formData.scopes.includes(s._id)} 
                         onChange={(e) => {
                           const scopes = e.target.checked 
@@ -169,7 +169,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
               <label className="block text-sm font-medium mb-2">Channel *</label>
               <div className="flex gap-4">
                 {config?.approvedChannels?.map((ch: string) => (
-                  <label key={ch} className="flex items-center gap-2">
+                  <label key={ch} className="flex flex-wrap items-center gap-2">
                     <input type="checkbox" checked={formData.channels.includes(ch)}
                       onChange={(e) => {
                           const channels = e.target.checked 
@@ -192,7 +192,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
               <label className="block text-sm font-medium mb-1">Target Age Range</label>
               <div className="flex gap-2 mb-4">
                 <input type="number" placeholder="Min Age" className="border rounded-md px-3 py-2 flex-1" value={formData.ageMin} onChange={e => setFormData({...formData, ageMin: e.target.value})}  aria-label="Target Age Range"/>
-                <input type="number" placeholder="Max Age" className="border rounded-md px-3 py-2 flex-1" value={formData.ageMax} onChange={e => setFormData({...formData, ageMax: e.target.value})} />
+                <input type="number" placeholder="Max Age" className="border rounded-md px-3 py-2 flex-1" value={formData.ageMax} onChange={e => setFormData({...formData, ageMax: e.target.value})}  aria-label="Max Age"/>
               </div>
               <label className="block text-sm font-medium mb-1">Region</label>
               <select className="w-full border rounded-md px-3 py-2 mb-4" value={formData.region} onChange={e => setFormData({...formData, region: e.target.value})} aria-label="Region">
@@ -264,7 +264,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 max-w-3xl mx-auto">
-      <div className="p-6 border-b border-slate-200 flex items-center gap-4">
+      <div className="p-6 border-b border-slate-200 flex flex-wrap items-center gap-4">
         <button aria-label="Go back" onClick={onCancel} className="text-slate-500 hover:text-slate-800">
             <ArrowLeft className="w-5 h-5" />
         </button>

@@ -366,11 +366,11 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
             <h1 className="text-2xl font-bold text-text-slate-500">Notification Center</h1>
             <p className="text-slate-600 mt-1">Send notifications and manage campaigns</p>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap items-center space-x-3">
             <button
               onClick={loadAnalytics}
               disabled={loading}
-              className="flex items-center space-x-2 px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors disabled:opacity-50"
+              className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
@@ -378,7 +378,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
           </div>
         </div>
         {/* Tab Navigation */}
-        <div className="flex space-x-1 mt-6">
+        <div className="flex flex-wrap space-x-1 mt-6">
           {[
             { key: 'send', label: 'Send Notification', icon: Send },
             { key: 'templates', label: 'Templates', icon: Edit3 },
@@ -390,7 +390,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
               onClick={() => setActiveTab(key as any)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                 activeTab === key
-                  ? 'bg-white text-white shadow-md'
+                  ? 'bg-blue-600 text-white shadow-md'
                   : 'text-slate-600 hover:bg-blue-50/10'
               }`}
             >
@@ -422,7 +422,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
       )}
       {/* Error Alert Banner */}
       {error && (
-        <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
+        <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex flex-wrap items-center space-x-2">
           <AlertCircle className="w-5 h-5 text-red-600" />
           <span className="text-red-800">{error}</span>
         </div>
@@ -435,7 +435,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
             {(selectedPreBuiltTemplate || selectedTemplate) && (
               <div className="lg:col-span-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex flex-wrap items-center space-x-3">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                       <Edit3 className="w-5 h-5 text-blue-600" />
                     </div>
@@ -468,7 +468,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-text-slate-500">Select Customers</h3>
                   {selectedCustomers.length > 0 && (
-                    <span className="bg-white text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
                       {selectedCustomers.length} selected
                     </span>
                   )}
@@ -482,12 +482,12 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                     value={customerSearch}
                     onChange={(e) => setCustomerSearch(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  />
+                   aria-label="Search customers"/>
                 </div>
                 {/* Customer List */}
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {(filteredCustomers || []).map(customer => (
-                    <label key={customer.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-blue-50/5 cursor-pointer">
+                    <label key={customer.id} className="flex flex-wrap items-start space-x-3 p-3 rounded-lg hover:bg-blue-50/5 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={selectedCustomers.includes(customer.id)}
@@ -543,7 +543,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                         { key: 'push', label: 'Push', icon: Bell },
                         { key: 'inapp', label: 'In-App', icon: Smartphone }
                       ].map(({ key, label, icon: Icon }) => (
-                        <label key={key} className="flex items-center space-x-2">
+                        <label key={key} className="flex flex-wrap items-center space-x-2">
                           <input
                             type="checkbox"
                             checked={channels.includes(key)}
@@ -588,7 +588,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                     <button
                       onClick={handleSendNotification}
                       disabled={isSending || !selectedCustomers.length || !subject.trim() || !message.trim()}
-                      className="flex items-center space-x-2 px-6 py-3 bg-white text-white rounded-lg hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="flex flex-wrap items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Send className={`w-4 h-4 ${isSending ? 'animate-pulse' : ''}`} />
                       <span>{isSending ? 'Sending...' : `Send to ${selectedCustomers.length} Selected`}</span>
@@ -596,7 +596,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                     <button
                       onClick={handleSendBulkNotification}
                       disabled={isSending || !subject.trim() || !message.trim()}
-                      className="flex items-center space-x-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="flex flex-wrap items-center space-x-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Users className={`w-4 h-4 ${isSending ? 'animate-pulse' : ''}`} />
                       <span>
@@ -659,7 +659,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {Object.entries(analytics?.channels || {}).map(([channel, data]) => (
                   <div key={channel} className="border border-slate-200 rounded-lg p-4">
-                    <div className="flex items-center space-x-2 mb-2">
+                    <div className="flex flex-wrap items-center space-x-2 mb-2">
                       {getChannelIcon(channel)}
                       <span className="font-medium text-text-slate-500 capitalize">{channel}</span>
                     </div>
@@ -690,7 +690,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                 <h3 className="text-lg font-semibold text-text-slate-500">Campaigns</h3>
                 <button
                   onClick={() => setShowCampaignForm(!showCampaignForm)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors"
+                  className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Create Campaign</span>
@@ -718,12 +718,12 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                       </div>
                       <p className="text-slate-600 mb-3">{campaign.description}</p>
                       <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center space-x-4">
+                        <div className="flex flex-wrap items-center space-x-4">
                           <span className="text-slate-600">Audience: {campaign.audienceSize}</span>
                           <span className="text-slate-600">Sent: {campaign.performance.sent}</span>
                           <span className="text-slate-600">Delivered: {campaign.performance.delivered}</span>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-wrap items-center space-x-2">
                           <button aria-label="Run" className="p-1 text-slate-600 hover:text-blue-600">
                             <Play className="w-4 h-4" />
                           </button>
@@ -746,12 +746,12 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
           <div className="space-y-6">
             {/* Pre-Built Templates Section */}
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-semibold text-text-slate-500">Pre-Built Professional Templates</h3>
                   <p className="text-sm text-slate-600">Ready-to-use templates with beautiful designs</p>
                 </div>
-                <div className="flex items-center space-x-2 text-sm text-slate-600">
+                <div className="flex flex-wrap items-center space-x-2 text-sm text-slate-600">
                   <span>{preBuiltTemplates.length} templates available</span>
                 </div>
               </div>
@@ -788,10 +788,10 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                         </p>
                       </div>
                       {/* Channels */}
-                      <div className="flex items-center space-x-3 mb-4">
+                      <div className="flex flex-wrap items-center space-x-3 mb-4">
                         <span className="text-xs text-slate-600 font-medium">Channels:</span>
                         {(template.channels || ['email']).map(channel => (
-                          <div key={channel} className="flex items-center space-x-1 text-xs text-blue-600 bg-white/10 px-2 py-1 rounded border border-blue-600/20">
+                          <div key={channel} className="flex flex-wrap items-center space-x-1 text-xs text-blue-600 bg-white/10 px-2 py-1 rounded border border-blue-600/20">
                             {getChannelIcon(channel)}
                             <span>{channel}</span>
                           </div>
@@ -801,21 +801,21 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                       <div className="flex items-center justify-between pt-3 border-t border-blue-600/20">
                         <button 
                           onClick={() => handleTemplatePreview(template)}
-                          className="flex items-center space-x-1 text-blue-600 hover:text-blue-600/80 text-sm font-medium transition-colors"
+                          className="flex flex-wrap items-center space-x-1 text-blue-600 hover:text-blue-600/80 text-sm font-medium transition-colors"
                         >
                           <Eye className="w-4 h-4" />
                           <span>Preview</span>
                         </button>
                         <button 
                           onClick={() => handleTemplateEdit(template)}
-                          className="flex items-center space-x-1 text-amber-600 hover:text-amber-600/80 text-sm font-medium transition-colors"
+                          className="flex flex-wrap items-center space-x-1 text-amber-600 hover:text-amber-600/80 text-sm font-medium transition-colors"
                         >
                           <Edit3 className="w-4 h-4" />
                           <span>Edit</span>
                         </button>
                         <button 
                           onClick={() => handlePreBuiltTemplateSelect(template)}
-                          className="flex items-center space-x-1 px-3 py-1.5 bg-white text-slate-900 rounded-lg hover:bg-white/90 text-sm font-medium transition-colors"
+                          className="flex flex-wrap items-center space-x-1 px-3 py-1.5 bg-white text-slate-900 rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors"
                         >
                           <Play className="w-4 h-4" />
                           <span>Use</span>
@@ -835,7 +835,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                 </div>
                 <button
                   onClick={() => setShowTemplateForm(!showTemplateForm)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors"
+                  className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Create Template</span>
@@ -914,7 +914,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                           { key: 'push', label: 'Push', icon: Bell },
                           { key: 'inapp', label: 'In-App', icon: Smartphone }
                         ].map(({ key, label, icon: Icon }) => (
-                          <label key={key} className="flex items-center space-x-2">
+                          <label key={key} className="flex flex-wrap items-center space-x-2">
                             <input
                               type="checkbox"
                               checked={templateChannels.includes(key)}
@@ -934,7 +934,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                     </div>
                   </div>
                   {/* Form Actions */}
-                  <div className="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-blue-600/20">
+                  <div className="flex flex-wrap items-center justify-end space-x-3 mt-6 pt-4 border-t border-blue-600/20">
                     <button
                       onClick={() => {
                         setShowTemplateForm(false);
@@ -949,7 +949,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                     </button>
                     <button
                       onClick={saveCustomTemplate}
-                      className="px-6 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors"
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       Save Template
                     </button>
@@ -978,9 +978,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                         </span>
                       </div>
                       <p className="text-slate-600 text-sm mb-3">{template.description}</p>
-                      <div className="flex items-center space-x-2 mb-3">
+                      <div className="flex flex-wrap items-center space-x-2 mb-3">
                         {(template.channels || []).map((channel: string) => (
-                          <div key={channel} className="flex items-center space-x-1 text-xs text-slate-600">
+                          <div key={channel} className="flex flex-wrap items-center space-x-1 text-xs text-slate-600">
                             {getChannelIcon(channel)}
                             <span>{channel}</span>
                           </div>
@@ -988,7 +988,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-slate-600">Used: {template.usage?.timesUsed || 0} times</span>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-wrap items-center space-x-2">
                           <button 
                             onClick={() => handleTemplateSelect(template)}
                             className="text-blue-600 hover:text-blue-600/80"
@@ -1038,16 +1038,16 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                       </div>
                     </div>
                     <div className="flex items-center justify-between pt-4 border-t border-blue-600/20">
-                      <div className="flex items-center space-x-4">
+                      <div className="flex flex-wrap items-center space-x-4">
                         <span className="text-sm text-slate-600">Type: {selectedPreBuiltTemplate.type || 'informational'}</span>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-wrap items-center space-x-2">
                           <span className="text-sm text-slate-600">Channels:</span>
                           {(selectedPreBuiltTemplate.channels || ['email']).map(channel => (
                             <span key={channel} className="bg-gray-100 px-2 py-1 rounded text-xs">{channel}</span>
                           ))}
                         </div>
                       </div>
-                      <div className="flex items-center space-x-3">
+                      <div className="flex flex-wrap items-center space-x-3">
                         <button 
                           onClick={() => {
                             handleTemplateEdit(selectedPreBuiltTemplate);
@@ -1062,7 +1062,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                             handlePreBuiltTemplateSelect(selectedPreBuiltTemplate);
                             setShowTemplatePreview(false);
                           }}
-                          className="px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90"
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                         >
                           Use Template
                         </button>

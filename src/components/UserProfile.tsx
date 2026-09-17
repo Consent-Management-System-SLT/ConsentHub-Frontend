@@ -72,7 +72,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                     className="w-full px-3 py-2 border border-slate-200 bg-white text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-2 bg-white border border-slate-200 rounded-lg">
+                  <div className="flex flex-wrap items-center space-x-2 p-2 bg-white border border-slate-200 rounded-lg">
                     <User className="w-4 h-4 text-slate-500" />
                     <span className="text-slate-900">{user?.firstName || 'Not set'}</span>
                   </div>
@@ -90,7 +90,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                     className="w-full px-3 py-2 border border-slate-200 bg-white text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                   />
                 ) : (
-                  <div className="flex items-center space-x-2 p-2 bg-white border border-slate-200 rounded-lg">
+                  <div className="flex flex-wrap items-center space-x-2 p-2 bg-white border border-slate-200 rounded-lg">
                     <User className="w-4 h-4 text-slate-500" />
                     <span className="text-slate-900">{user?.lastName || 'Not set'}</span>
                   </div>
@@ -110,7 +110,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                   disabled
                 />
               ) : (
-                <div className="flex items-center space-x-2 p-2 bg-white border border-slate-200 rounded-lg">
+                <div className="flex flex-wrap items-center space-x-2 p-2 bg-white border border-slate-200 rounded-lg">
                   <Mail className="w-4 h-4 text-slate-500" />
                   <span className="text-slate-900">{user?.email || 'Not set'}</span>
                 </div>
@@ -128,7 +128,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                   className="w-full px-3 py-2 border border-slate-200 bg-white text-slate-900 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                 />
               ) : (
-                <div className="flex items-center space-x-2 p-2 bg-blue-50/20 rounded-lg">
+                <div className="flex flex-wrap items-center space-x-2 p-2 bg-blue-50/20 rounded-lg">
                   <Phone className="w-4 h-4 text-slate-500" />
                   <span className="text-slate-900">{user?.phone || 'Not set'}</span>
                 </div>
@@ -146,7 +146,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                   className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full"
                 />
               ) : (
-                <div className="flex items-center space-x-2 p-2 bg-blue-50/20 rounded-lg">
+                <div className="flex flex-wrap items-center space-x-2 p-2 bg-blue-50/20 rounded-lg">
                   <Building className="w-4 h-4 text-slate-500" />
                   <span className="text-slate-900">{user?.company || 'Not set'}</span>
                 </div>
@@ -164,7 +164,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                   className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full"
                 />
               ) : (
-                <div className="flex items-center space-x-2 p-2 bg-blue-50/20 rounded-lg">
+                <div className="flex flex-wrap items-center space-x-2 p-2 bg-blue-50/20 rounded-lg">
                   <Building className="w-4 h-4 text-slate-500" />
                   <span className="text-slate-900">{user?.department || 'Not set'}</span>
                 </div>
@@ -182,7 +182,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                   className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full"
                 />
               ) : (
-                <div className="flex items-center space-x-2 p-2 bg-blue-50/20 rounded-lg">
+                <div className="flex flex-wrap items-center space-x-2 p-2 bg-blue-50/20 rounded-lg">
                   <Building className="w-4 h-4 text-slate-500" />
                   <span className="text-slate-900">{user?.jobTitle || 'Not set'}</span>
                 </div>
@@ -202,7 +202,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                   <option value="admin">Admin</option>
                 </select>
               ) : (
-                <div className="flex items-center space-x-2 p-2 bg-blue-50/20 rounded-lg">
+                <div className="flex flex-wrap items-center space-x-2 p-2 bg-blue-50/20 rounded-lg">
                   <User className="w-4 h-4 text-slate-500" />
                   <span className="text-slate-900">{user?.role || 'Not set'}</span>
                 </div>
@@ -221,7 +221,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors flex items-center space-x-2"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center space-x-2"
                 >
                   <Save className="w-4 h-4" />
                   <span>Save Changes</span>
@@ -230,7 +230,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-white text-white rounded-lg hover:bg-white/90 transition-colors flex items-center space-x-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center space-x-2"
               >
                 <Edit2 className="w-4 h-4" />
                 <span>Edit Profile</span>

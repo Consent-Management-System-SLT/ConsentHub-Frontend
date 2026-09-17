@@ -180,7 +180,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
       <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap items-center space-x-3">
             <HelpCircle className="w-6 h-6 text-blue-600" />
             <h2 className="text-xl font-semibold text-gray-900">CSR Dashboard Help</h2>
           </div>
@@ -203,7 +203,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
+                 aria-label="Search help"/>
               </div>
             </div>
             <nav className="px-2 pb-4">
@@ -211,7 +211,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                  className={`w-full flex flex-wrap items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
                     activeCategory === category.id
                       ? 'bg-blue-100 text-blue-700'
                       : 'text-slate-600 hover:bg-white'
@@ -226,7 +226,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           {/* Content */}
           <div className="flex-1 overflow-y-auto">
             <div className="p-6">
-              <div className="flex items-center space-x-3 mb-6">
+              <div className="flex flex-wrap items-center space-x-3 mb-6">
                 <filteredContent.icon className="w-8 h-8 text-blue-600" />
                 <h3 className="text-2xl font-bold text-gray-900">{filteredContent.title}</h3>
               </div>
@@ -237,7 +237,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                     <p className="text-gray-600 mb-4">{section.description}</p>
                     <div className="space-y-2">
                       {section.steps.map((step, stepIndex) => (
-                        <div key={stepIndex} className="flex items-start space-x-3">
+                        <div key={stepIndex} className="flex flex-wrap items-start space-x-3">
                           <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
                             {stepIndex + 1}
                           </div>

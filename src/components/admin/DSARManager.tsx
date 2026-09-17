@@ -275,11 +275,11 @@ const DSARManager: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-900">DSAR Management</h1>
           <p className="text-slate-600 mt-1">Manage Data Subject Access Requests</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button aria-label="Refresh"
             onClick={handleRefresh}
             disabled={loading || refreshing}
-            className={`bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center gap-2 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
@@ -319,7 +319,7 @@ const DSARManager: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-10 pr-10"
-              />
+               aria-label="Search by request ID, email, name, type, or subject"/>
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
@@ -373,11 +373,11 @@ const DSARManager: React.FC = () => {
         ) : (
           paginatedRequests.map((request) => (
             <div key={request._id} className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
-              <div className="flex items-start justify-between">
+              <div className="flex flex-wrap gap-4 items-start justify-between">
                 <div className="flex-1 space-y-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
                     <h3 className="font-semibold text-slate-900">{request.requestId}</h3>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
                           request.status === 'pending'
@@ -417,7 +417,7 @@ const DSARManager: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <User className="h-4 w-4 text-slate-500" />
                       <span className="text-sm">
                         <span className="font-medium text-slate-900">{request.requesterName || request.customerName || 'N/A'}</span>
@@ -425,8 +425,8 @@ const DSARManager: React.FC = () => {
                       </span>
                     </div>
                     <p className="text-sm text-slate-600">{request.description}</p>
-                    <div className="flex items-center gap-4 text-xs text-slate-500">
-                      <div className="flex items-center gap-1">
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                      <div className="flex flex-wrap items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         <span>Due: {request.dueDate ? new Date(request.dueDate).toLocaleDateString() : 'Unknown'}</span>
                         {request.daysRemaining !== null && (
@@ -435,7 +435,7 @@ const DSARManager: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex flex-wrap items-center gap-1">
                         <span>Type: </span>
                         <span className="font-medium">
                           {request.requestType === 'data_access' ? 'Data Access (Art. 15)' :
@@ -448,7 +448,7 @@ const DSARManager: React.FC = () => {
                         </span>
                       </div>
                       {request.applicableLaws && request.applicableLaws.length > 0 && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex flex-wrap items-center gap-1">
                           <span>Laws: {request.applicableLaws.join(', ')}</span>
                         </div>
                       )}
@@ -456,13 +456,13 @@ const DSARManager: React.FC = () => {
                   </div>
                 </div>
                 {/* Action Buttons */}
-                <div className="flex items-center gap-2 ml-4">
+                <div className="flex flex-wrap items-center gap-2 sm:ml-4">
                   {/* Status-based action buttons */}
                   {request.status === 'pending' && (
                     <>
                       <button
                         onClick={() => handleApproveRequest(request)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors text-sm font-medium"
+                        className="flex flex-wrap items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors text-sm font-medium"
                         title="Approve and start processing this request"
                       >
                         <CheckCircle className="h-4 w-4" />
@@ -470,7 +470,7 @@ const DSARManager: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleRejectRequest(request)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors text-sm font-medium"
+                        className="flex flex-wrap items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors text-sm font-medium"
                         title="Reject this request with reason"
                       >
                         <XCircle className="h-4 w-4" />
@@ -481,7 +481,7 @@ const DSARManager: React.FC = () => {
                   {request.status === 'in_progress' && (
                     <button
                       onClick={() => handleCompleteRequest(request)}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors text-sm font-medium"
+                      className="flex flex-wrap items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors text-sm font-medium"
                       title="Mark this request as completed"
                     >
                       <CheckCircle className="h-4 w-4" />
@@ -491,7 +491,7 @@ const DSARManager: React.FC = () => {
                   {/* View Details Button - Always Available */}
                   <button
                     onClick={() => setSelectedRequest(request)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-blue-600 hover:text-blue-600-hover hover:bg-blue-50/10 rounded-lg transition-colors text-sm font-medium"
+                    className="flex flex-wrap items-center gap-1 px-3 py-1.5 text-blue-600 hover:text-blue-600-hover hover:bg-blue-50/10 rounded-lg transition-colors text-sm font-medium"
                     title="View detailed information"
                   >
                     <Eye className="h-4 w-4" />
@@ -509,11 +509,11 @@ const DSARManager: React.FC = () => {
           <div className="text-sm text-slate-600">
             Showing {filteredRequests.length === 0 ? 0 : Math.min(startIndex + 1, filteredRequests.length)} to {Math.min(endIndex, filteredRequests.length)} of {filteredRequests.length} requests
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center space-x-2">
             <button 
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-1 px-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center gap-1 px-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-4 w-4" />
               Previous
@@ -534,7 +534,7 @@ const DSARManager: React.FC = () => {
             <button 
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-1 px-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center gap-1 px-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
               <ChevronRight className="h-4 w-4" />

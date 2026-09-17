@@ -210,11 +210,11 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">CSR Dashboard</h1>
           <p className="text-slate-600 mt-1 text-sm sm:text-base">Customer Service Representative Overview</p>
         </div>
-        <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
+        <div className="flex flex-wrap items-center space-x-3 sm:space-x-4 shrink-0">
           <button aria-label="Refresh"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+            className="flex flex-wrap items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
@@ -255,7 +255,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       </div>
       {/* Key Insights */}
       <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-slate-200 p-3 sm:p-4 lg:p-6">
-        <div className="flex items-center space-x-2 mb-3 sm:mb-4 lg:mb-6">
+        <div className="flex flex-wrap items-center space-x-2 mb-3 sm:mb-4 lg:mb-6">
           <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg">
             <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
           </div>
@@ -278,7 +278,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       </div>
       {/* Quick Actions */}
       <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-slate-200 p-3 sm:p-4 lg:p-6">
-        <div className="flex items-center space-x-2 mb-3 sm:mb-4 lg:mb-6">
+        <div className="flex flex-wrap items-center space-x-2 mb-3 sm:mb-4 lg:mb-6">
           <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg">
             <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
           </div>
@@ -299,7 +299,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
                     : 'border-slate-200 bg-white border border-slate-200 hover:border-slate-200'
                 }`}
               >
-                <div className="flex items-start space-x-2 sm:space-x-3">
+                <div className="flex flex-wrap items-start space-x-2 sm:space-x-3">
                   <div className={`p-1.5 sm:p-2 rounded-lg shrink-0 ${
                     action.priority === 'high' ? 'bg-red-800/50' :
                     action.priority === 'medium' ? 'bg-amber-800/50' : 'bg-blue-50/20'

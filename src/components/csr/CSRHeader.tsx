@@ -59,7 +59,7 @@ const CSRHeader: React.FC<CSRHeaderProps> = ({
             </div>
           </div>
           {/* Right Side Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
             {/* Language Selector - Hidden on mobile to save space */}
             <div className="hidden md:flex items-center">
               <LanguageSelector />
@@ -89,7 +89,7 @@ const CSRHeader: React.FC<CSRHeaderProps> = ({
               </button>
             </div>
             {/* User Profile */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <div className="hidden lg:flex flex-col text-right min-w-0">
                 <p className="text-sm font-medium text-slate-900 max-w-[8rem] xl:max-w-[12rem]">CSR User</p>
                 <p className="text-xs text-slate-600">Customer Service Rep</p>
@@ -102,7 +102,7 @@ const CSRHeader: React.FC<CSRHeaderProps> = ({
             <div className="flex items-center">
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-slate-900 bg-white border border-slate-200 shadow-sm hover:bg-slate-50 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex flex-wrap items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-slate-900 bg-white border border-slate-200 shadow-sm hover:bg-slate-50 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">Logout</span>

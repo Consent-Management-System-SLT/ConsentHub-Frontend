@@ -175,7 +175,7 @@ const Signup: React.FC = () => {
           </div>
           {/* Success message */}
           {success && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-600/20 border border-green-200/30 rounded-md flex items-start sm:items-center space-x-2 sm:space-x-3">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-600/20 border border-green-200/30 rounded-md flex flex-wrap items-start sm:items-center space-x-2 sm:space-x-3">
               <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 flex-shrink-0 mt-0.5 sm:mt-0" />
               <div>
                 <p className="text-slate-900 font-medium text-sm sm:text-base">Success!</p>
@@ -185,7 +185,7 @@ const Signup: React.FC = () => {
           )}
           {/* General error message */}
           {generalError && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-md flex items-start sm:items-center space-x-2 sm:space-x-3">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-md flex flex-wrap items-start sm:items-center space-x-2 sm:space-x-3">
               <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600 flex-shrink-0 mt-0.5 sm:mt-0" />
               <div>
                 <p className="text-slate-900 font-medium text-sm sm:text-base">Error</p>
@@ -195,7 +195,7 @@ const Signup: React.FC = () => {
           )}
           {/* Already registered modal/alert */}
           {showAlreadyRegistered && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-amber-600/20 border border-slate-200/30 rounded-md flex items-start sm:items-center space-x-2 sm:space-x-3">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-amber-600/20 border border-slate-200/30 rounded-md flex flex-wrap items-start sm:items-center space-x-2 sm:space-x-3">
               <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600 flex-shrink-0 mt-0.5 sm:mt-0" />
               <div>
                 <p className="text-slate-900 font-medium text-sm sm:text-base">Account already registered</p>
@@ -204,7 +204,7 @@ const Signup: React.FC = () => {
             </div>
           )}
           {/* Information message */}
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-600/20 border border-slate-200/30 rounded-md flex items-start sm:items-center space-x-2 sm:space-x-3">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-600/20 border border-slate-200/30 rounded-md flex flex-wrap items-start sm:items-center space-x-2 sm:space-x-3">
             <Info className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0 mt-0.5 sm:mt-0" />
             <div>
               <p className="text-slate-900 font-medium text-sm">Password Requirements:</p>
@@ -229,7 +229,7 @@ const Signup: React.FC = () => {
                       errors.firstName ? 'border-slate-200' : ''
                     }`}
                     placeholder="Enter your first name"
-                  />
+                   aria-label="Enter your first name"/>
                 </div>
                 {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
               </div>
@@ -248,7 +248,7 @@ const Signup: React.FC = () => {
                       errors.lastName ? 'border-slate-200' : ''
                     }`}
                     placeholder="Enter your last name"
-                  />
+                   aria-label="Enter your last name"/>
                 </div>
                 {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
               </div>
@@ -269,7 +269,7 @@ const Signup: React.FC = () => {
                     errors.email ? 'border-slate-200' : ''
                   }`}
                   placeholder="Enter your email address"
-                />
+                 aria-label="Enter your email address"/>
               </div>
               {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
             </div>
@@ -288,7 +288,7 @@ const Signup: React.FC = () => {
                     errors.phone ? 'border-slate-200' : ''
                   }`}
                   placeholder="+94 XX XXX XXXX"
-                />
+                 aria-label="+94 XX XXX XXXX"/>
               </div>
               {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
             </div>
@@ -307,7 +307,7 @@ const Signup: React.FC = () => {
                     onChange={(e) => handleInputChange('company', e.target.value)}
                     className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 py-2.5 sm:py-3 text-sm sm:text-base"
                     placeholder="Enter your company name"
-                  />
+                   aria-label="Enter your company name"/>
                 </div>
               </div>
               <div>
@@ -323,7 +323,7 @@ const Signup: React.FC = () => {
                     onChange={(e) => handleInputChange('department', e.target.value)}
                     className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 py-2.5 sm:py-3 text-sm sm:text-base"
                     placeholder="Enter your department"
-                  />
+                   aria-label="Enter your department"/>
                 </div>
               </div>
             </div>
@@ -338,7 +338,7 @@ const Signup: React.FC = () => {
                 onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                 className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full py-2.5 sm:py-3 text-sm sm:text-base"
                 placeholder="Enter your job title"
-              />
+               aria-label="Enter your job title"/>
             </div>
             {/* Password Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
@@ -357,7 +357,7 @@ const Signup: React.FC = () => {
                       errors.password ? 'border-slate-200' : ''
                     }`}
                     placeholder="Create a password"
-                  />
+                   aria-label="Create a password"/>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -368,7 +368,7 @@ const Signup: React.FC = () => {
                 </div>
                 {formData.password && (
                   <div className="mt-2">
-                    <div className="flex items-center space-x-1.5 sm:space-x-2">
+                    <div className="flex flex-wrap items-center space-x-1.5 sm:space-x-2">
                       <div className="flex-1 h-1.5 sm:h-2 bg-white border border-slate-200 rounded-xl shadow-sm">
                         <div 
                           className={`h-1.5 sm:h-2 rounded transition-all duration-300 ${
@@ -403,7 +403,7 @@ const Signup: React.FC = () => {
                       errors.confirmPassword ? 'border-slate-200' : ''
                     }`}
                     placeholder="Confirm your password"
-                  />
+                   aria-label="Confirm your password"/>
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}

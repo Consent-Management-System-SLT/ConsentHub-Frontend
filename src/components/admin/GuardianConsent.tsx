@@ -174,7 +174,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
             <h3 className="text-lg font-medium text-slate-900 mb-2">Guardian Consent Created</h3>
             <p className="text-slate-600 mb-6">Consent preferences have been successfully recorded for your dependent.</p>
             {/* Action buttons */}
-            <div className="flex space-x-3">
+            <div className="flex flex-wrap space-x-3">
               <button
                 onClick={() => {
                   setShowConsentView(true);
@@ -207,7 +207,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
               <h1 className="text-2xl font-bold text-slate-900">Guardian Consent Records</h1>
               <p className="text-slate-600">Recently created consent preferences</p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex flex-wrap space-x-3">
               <button
                 onClick={() => {
                   setShowConsentView(false);
@@ -339,7 +339,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
                 setSelectedMinor('');
               }
             }}
-            className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           >
             <option value="">Select a guardian...</option>
             {guardians.map(guardian => (
@@ -360,7 +360,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
             <select
               value={selectedMinor}
               onChange={(e) => setSelectedMinor(e.target.value)}
-              className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               required
              aria-label="Select Dependent">
               <option value="">Select a dependent...</option>
@@ -376,14 +376,14 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
             <div className="space-y-4">
               {consents.map((consent, index) => (
                 <div key={index} className="bg-slate-100 p-4 rounded-lg border border-slate-200">
-                  <div className="flex items-start justify-between">
+                  <div className="flex flex-wrap gap-4 items-start justify-between">
                     <div className="flex-1">
                       <h4 className="font-medium text-slate-900">{consent.purpose}</h4>
                       <p className="text-sm text-slate-600 mt-1">
                         Data processing for {consent.purpose.toLowerCase()} purposes
                       </p>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex flex-wrap items-center space-x-4">
                       <label className="flex items-center">
                         <input
                           type="radio"
@@ -416,7 +416,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
                       type="date"
                       value={consent.validTo?.split('T')[0] || ''}
                       onChange={(e) => updateConsent(index, 'validTo', e.target.value ? new Date(e.target.value).toISOString() : undefined)}
-                      className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-48"
+                      className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-48"
                       min={new Date().toISOString().split('T')[0]}
                      aria-label="Valid Until"/>
                   </div>

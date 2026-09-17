@@ -204,7 +204,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
       {/* Header */}
       <div className="p-6 border-b border-slate-200">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap items-center space-x-3">
             <Shield className="w-6 h-6 text-purple-600" />
             <div>
               <h2 className="text-xl font-semibold text-slate-900">Guardian Consent Management</h2>
@@ -223,7 +223,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
       </div>
       {/* Tabs */}
       <div className="border-b border-slate-200">
-        <div className="flex space-x-8 px-6">
+        <div className="flex flex-wrap space-x-8 px-6">
           <button
             onClick={() => setActiveTab('search')}
             className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
@@ -271,12 +271,12 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              />
+               aria-label="Search minor customers"/>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredMinors.map(minor => (
                 <div key={minor.id} className="bg-white border border-slate-200 rounded-lg p-4 hover:bg-white transition-colors">
-                  <div className="flex items-center space-x-3 mb-3">
+                  <div className="flex flex-wrap items-center space-x-3 mb-3">
                     <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
                       <User className="w-5 h-5 text-purple-600" />
                     </div>
@@ -409,7 +409,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
               <button
                 onClick={handleCreateConsent}
                 disabled={saving}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors flex items-center space-x-2"
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors flex flex-wrap items-center space-x-2"
               >
                 {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                 <span>{saving ? 'Creating...' : 'Create Consent'}</span>
@@ -424,7 +424,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
               <h3 className="text-lg font-medium text-slate-900">Guardian Consents</h3>
               <button
                 onClick={loadGuardianConsents}
-                className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Refresh</span>
@@ -467,7 +467,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
                           {consent.createdAt ? new Date(consent.createdAt).toLocaleDateString() : 'N/A'}
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex space-x-2">
+                          <div className="flex flex-wrap space-x-2">
                             {consent.status === 'pending' && (
                               <>
                                 <button

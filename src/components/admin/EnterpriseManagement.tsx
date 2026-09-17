@@ -174,7 +174,7 @@ export default function EnterpriseManagement() {
   if (selectedOrg) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-wrap items-center space-x-4">
           <button onClick={() => setSelectedOrg(null)} className="p-2 bg-white rounded-lg border hover:bg-slate-50">
             <ArrowLeft className="w-5 h-5 text-slate-600" />
           </button>
@@ -198,7 +198,7 @@ export default function EnterpriseManagement() {
             </div>
             <button 
               onClick={() => handleResendActivation(selectedOrg._id)}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Send className="w-4 h-4" />
               <span>Resend Activation Email</span>
@@ -255,7 +255,7 @@ export default function EnterpriseManagement() {
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h3 className="text-lg font-semibold border-b pb-2 mb-4">F. Documents</h3>
             {selectedOrg.documents && selectedOrg.documents.length > 0 ? selectedOrg.documents.map((doc: any) => (
-              <div key={doc._id} className="flex items-center space-x-2 py-2 border-b last:border-0">
+              <div key={doc._id} className="flex flex-wrap items-center space-x-2 py-2 border-b last:border-0">
                 <FileText className="w-5 h-5 text-slate-400" />
                 <div className="flex flex-col flex-1">
                   <span className="text-sm font-medium">{doc.documentType}</span>
@@ -273,14 +273,14 @@ export default function EnterpriseManagement() {
         </div>
 
         {['SUBMITTED', 'UNDER_REVIEW', 'MORE_INFORMATION_REQUIRED'].includes(selectedOrg.status) && (
-          <div className="flex space-x-4 bg-white p-6 rounded-xl border shadow-sm">
-            <button onClick={() => handleApprove(selectedOrg._id)} className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+          <div className="flex flex-wrap space-x-4 bg-white p-6 rounded-xl border shadow-sm">
+            <button onClick={() => handleApprove(selectedOrg._id)} className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
               <CheckCircle className="w-5 h-5" /> <span>Approve</span>
             </button>
-            <button onClick={() => setShowRejectModal(true)} className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+            <button onClick={() => setShowRejectModal(true)} className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
               <XCircle className="w-5 h-5" /> <span>Reject</span>
             </button>
-            <button onClick={() => setShowRequestInfoModal(true)} className="flex items-center space-x-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+            <button onClick={() => setShowRequestInfoModal(true)} className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
               <span>Request Info</span>
             </button>
           </div>
@@ -295,7 +295,7 @@ export default function EnterpriseManagement() {
                 onChange={e => setReviewReason(e.target.value)}
                 className="w-full border rounded-lg p-3 h-32 mb-4"
                 placeholder="Provide reason for rejection..."
-              />
+               aria-label="Provide reason for rejection"/>
               <div className="flex justify-end space-x-3">
                 <button onClick={() => setShowRejectModal(false)} className="px-4 py-2 text-slate-500">Cancel</button>
                 <button onClick={handleReject} className="px-4 py-2 bg-red-600 text-white rounded-lg">Reject Application</button>
@@ -313,7 +313,7 @@ export default function EnterpriseManagement() {
                 onChange={e => setReviewReason(e.target.value)}
                 className="w-full border rounded-lg p-3 h-32 mb-4"
                 placeholder="What information do you need?..."
-              />
+               aria-label="What information do you need?"/>
               <div className="flex justify-end space-x-3">
                 <button onClick={() => setShowRequestInfoModal(false)} className="px-4 py-2 text-slate-500">Cancel</button>
                 <button onClick={handleRequestInfo} className="px-4 py-2 bg-yellow-500 text-white rounded-lg">Send Request</button>
@@ -332,7 +332,7 @@ export default function EnterpriseManagement() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-        <div className="flex border-b">
+        <div className="flex border-b overflow-x-auto">
           {[
             { id: 'overview', label: 'Overview', count: organizations.length },
             { id: 'pending', label: 'Pending Review', count: pending.length },

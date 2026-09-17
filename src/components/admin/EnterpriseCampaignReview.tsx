@@ -87,15 +87,15 @@ const EnterpriseCampaignReview: React.FC = () => {
               placeholder="Provide reason for rejection or changes..."
               value={reason}
               onChange={e => setReason(e.target.value)}
-            />
+             aria-label="Provide reason for rejection or changes"/>
             <div className="flex gap-3">
-              <button onClick={() => handleAction('approve')} className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+              <button onClick={() => handleAction('approve')} className="flex flex-wrap items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
                 <CheckCircle className="w-4 h-4" /> Approve
               </button>
-              <button onClick={() => handleAction('request-changes')} className="flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">
+              <button onClick={() => handleAction('request-changes')} className="flex flex-wrap items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">
                 <AlertCircle className="w-4 h-4" /> Request Changes
               </button>
-              <button onClick={() => handleAction('reject')} className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+              <button onClick={() => handleAction('reject')} className="flex flex-wrap items-center gap-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
                 <XCircle className="w-4 h-4" /> Reject
               </button>
             </div>

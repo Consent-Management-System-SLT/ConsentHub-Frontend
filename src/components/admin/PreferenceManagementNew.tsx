@@ -318,13 +318,13 @@ const PreferenceManagement: React.FC = () => {
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-gray-900 flex flex-wrap items-center gap-2">
                   <Settings className="h-6 w-6 text-blue-600" />
                   Preference Management
                 </h1>
                 <p className="text-gray-600 mt-1">Configure communication channels and topic subscriptions for customer preferences</p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <button aria-label="Download"
                   onClick={loadStandardPreferences}
                   disabled={loadingStandard}
@@ -350,7 +350,7 @@ const PreferenceManagement: React.FC = () => {
           </div>
           {/* Tab Navigation */}
           <div className="px-6">
-            <nav className="flex space-x-8">
+            <nav className="flex space-x-8 overflow-x-auto" >
               <button
                 onClick={() => setActiveTab('channels')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
@@ -472,8 +472,12 @@ const PreferenceManagement: React.FC = () => {
                         <div className="text-sm text-gray-900">{channel.description}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <button
+                            type="button"
+                            role="switch"
+                            aria-checked={channel.enabled}
+                            aria-label={`${channel.name} channel`}
                             onClick={() => toggleChannelStatus(channel._id)}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                               channel.enabled ? 'bg-blue-600' : 'bg-gray-200'
@@ -558,8 +562,12 @@ const PreferenceManagement: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <button
+                            type="button"
+                            role="switch"
+                            aria-checked={topic.enabled}
+                            aria-label={`${topic.name} topic`}
                             onClick={() => toggleTopicStatus(topic._id)}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                               topic.enabled ? 'bg-blue-600' : 'bg-gray-200'
@@ -855,7 +863,7 @@ const PreferenceManagement: React.FC = () => {
                   {topics.filter(t => t.enabled).map(topic => (
                     <div key={topic._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <div className="text-sm font-medium">{topic.name}</div>
                           <span className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(topic.priority)}`}>
                             {topic.priority}

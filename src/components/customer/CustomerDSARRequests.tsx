@@ -382,7 +382,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
           <p className="text-slate-500 mt-2">Submit and manage your data subject access rights requests</p>
         </div>
         {/* Fast Real-time Connection Status */}
-        <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+        <div className={`flex flex-wrap items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium ${
           realTimeConnected 
             ? 'bg-green-100 text-green-800 border border-green-200' 
             : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
@@ -430,7 +430,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
           {/* Status Summary */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
-              <div className="flex items-center space-x-3">
+              <div className="flex flex-wrap items-center space-x-3">
                 <Clock className="w-8 h-8 text-yellow-600" />
                 <div>
                   <p className="text-2xl font-bold text-slate-900">
@@ -441,7 +441,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
               </div>
             </div>
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
-              <div className="flex items-center space-x-3">
+              <div className="flex flex-wrap items-center space-x-3">
                 <RefreshCw className="w-8 h-8 text-blue-600" />
                 <div>
                   <p className="text-2xl font-bold text-slate-900">
@@ -452,7 +452,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
               </div>
             </div>
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
-              <div className="flex items-center space-x-3">
+              <div className="flex flex-wrap items-center space-x-3">
                 <CheckCircle className="w-8 h-8 text-green-600" />
                 <div>
                   <p className="text-2xl font-bold text-slate-900">
@@ -463,7 +463,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
               </div>
             </div>
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
-              <div className="flex items-center space-x-3">
+              <div className="flex flex-wrap items-center space-x-3">
                 <Database className="w-8 h-8 text-blue-600" />
                 <div>
                   <p className="text-2xl font-bold text-slate-900">{dsarRequests.length}</p>
@@ -478,7 +478,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
             <button
               onClick={loadDSARRequests}
               disabled={loading}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:text-blue-600-hover hover:bg-blue-50/10 rounded-lg transition-colors disabled:opacity-50"
+              className="flex flex-wrap items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:text-blue-600-hover hover:bg-blue-50/10 rounded-lg transition-colors disabled:opacity-50"
               title="Refresh to see latest status updates"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -488,7 +488,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
           {/* Requests List */}
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="flex items-center space-x-3">
+              <div className="flex flex-wrap items-center space-x-3">
                 <RefreshCw className="w-6 h-6 text-blue-600 animate-spin" />
                 <span className="text-slate-500">Loading your DSAR requests...</span>
               </div>
@@ -498,7 +498,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
               {dsarRequests.map((request) => (
               <div key={request.id} className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-wrap items-center space-x-4">
                     <div className="flex-shrink-0">
                       {getTypeIcon(request.type)}
                     </div>
@@ -507,7 +507,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
                       <p className="text-sm text-slate-500">Request ID: {request.id}</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex flex-wrap items-center space-x-3">
                     {getStatusIcon(request.status)}
                     <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(request.status)}`}>
                       {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
@@ -543,11 +543,11 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
                   </div>
                 )}
                 <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                  <div className="flex space-x-3">
+                  <div className="flex flex-wrap space-x-3">
                     {request.status === 'completed' && request.downloadUrl && (
                       <button
                         onClick={() => console.log('Download', request.downloadUrl)}
-                        className="flex items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
+                        className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
                       >
                         <Download className="w-4 h-4" />
                         <span>Download</span>
@@ -555,7 +555,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
                     )}
                     <button
                       onClick={() => console.log('View details', request.id)}
-                      className="flex items-center space-x-2 px-4 py-2 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium"
+                      className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium"
                     >
                       <Eye className="w-4 h-4" />
                       <span>View Details</span>
@@ -602,7 +602,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
                 {requestTypeOptions.map((option) => (
                   <label
                     key={option.value}
-                    className={`flex items-start space-x-4 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
+                    className={`flex flex-wrap items-start space-x-4 p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                       requestType === option.value
                         ? 'border-blue-500 bg-blue-50'
                         : `border-gray-200 hover:border-gray-300 ${option.color}`
@@ -639,7 +639,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Please explain why you're making this request..."
-              />
+               aria-label="Please explain why you're making this request"/>
             </div>
             {/* Additional Details */}
             <div>
@@ -653,11 +653,11 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Any specific information or data categories you'd like to include..."
-              />
+               aria-label="Any specific information or data categories you'd like to include"/>
             </div>
             {/* Important Notice */}
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-start space-x-3">
+              <div className="flex flex-wrap items-start space-x-3">
                 <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
                 <div>
                   <h4 className="font-medium text-yellow-900">Important Notice</h4>
@@ -671,7 +671,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
             {/* Status Messages */}
             {submitStatus === 'success' && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-wrap items-center space-x-3">
                   <CheckCircle className="w-5 h-5 text-green-600" />
                   <p className="text-sm font-medium text-green-900">
                     Request submitted successfully! We'll process it within 30 days.
@@ -681,7 +681,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
             )}
             {submitStatus === 'error' && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-wrap items-center space-x-3">
                   <XCircle className="w-5 h-5 text-red-600" />
                   <p className="text-sm font-medium text-red-900">
                     Error submitting request. Please try again later.
@@ -701,7 +701,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center space-x-2"
+                className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors flex flex-wrap items-center space-x-2"
               >
                 {isSubmitting ? (
                   <>

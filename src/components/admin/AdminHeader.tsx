@@ -18,7 +18,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, sidebarOpen = f
       <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Brand Text - Logo moved to sidebar */}
-          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
+          <div className="flex flex-wrap items-center space-x-2 sm:space-x-3 md:space-x-4">
             {/* Mobile menu button */}
             <button
               type="button"
@@ -30,7 +30,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, sidebarOpen = f
             >
               <Menu className="w-6 h-6" aria-hidden="true" />
             </button>
-            <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="flex flex-wrap items-center space-x-2 sm:space-x-3">
               <div className="min-w-0">
                 <h1 className="text-base sm:text-lg md:text-xl font-bold text-slate-900">
                   <span className="hidden sm:inline">ConsentHub</span>
@@ -44,7 +44,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, sidebarOpen = f
             </div>
           </div>
           {/* Right Side Actions */}
-          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
             {/* Language Selector */}
             <div className="hidden md:flex items-center">
               <LanguageSelector />
@@ -58,10 +58,10 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, sidebarOpen = f
               </button>
             </div>
             {/* Admin Profile */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <div className="hidden lg:flex flex-col text-right">
                 <p className="text-sm font-medium text-slate-900">Admin User</p>
-                <p className="text-xs text-slate-600 flex items-center gap-1">
+                <p className="text-xs text-slate-600 flex flex-wrap items-center gap-1">
                   <Shield className="w-3 h-3" />
                   System Administrator
                 </p>
@@ -74,7 +74,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, sidebarOpen = f
             <div className="flex items-center">
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-slate-900 bg-white border border-slate-200 shadow-sm hover:bg-slate-50 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex flex-wrap items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-slate-900 bg-white border border-slate-200 shadow-sm hover:bg-slate-50 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">Logout</span>

@@ -89,14 +89,14 @@ const Login: React.FC = () => {
           </div>
           {/* Success message */}
           {success && (
-            <div role="status" aria-live="polite" className="mt-3 sm:mt-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-start sm:items-center gap-2">
+            <div role="status" aria-live="polite" className="mt-3 sm:mt-4 p-3 bg-green-50 border border-green-200 rounded-md flex flex-wrap items-start sm:items-center gap-2">
               <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-700 flex-shrink-0 mt-0.5 sm:mt-0" aria-hidden="true" />
               <span className="text-slate-900 text-sm">{success}</span>
             </div>
           )}
           {/* Error message */}
           {error && (
-            <div role="alert" className="mt-3 sm:mt-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-start sm:items-center gap-2">
+            <div role="alert" className="mt-3 sm:mt-4 p-3 bg-red-50 border border-red-200 rounded-md flex flex-wrap items-start sm:items-center gap-2">
               <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-700 flex-shrink-0 mt-0.5 sm:mt-0" aria-hidden="true" />
               <span className="text-slate-900 text-sm">{error}</span>
             </div>
@@ -117,7 +117,7 @@ const Login: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors mt-1 block w-full py-2.5 sm:py-3 text-sm sm:text-base"
                 placeholder="Enter your email"
-              />
+               aria-label="Enter your email"/>
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-900 mb-1">
@@ -134,7 +134,7 @@ const Login: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors block w-full py-2.5 sm:py-3 pr-10 text-sm sm:text-base"
                   placeholder="Enter your password"
-                />
+                 aria-label="Enter your password"/>
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"

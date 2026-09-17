@@ -166,7 +166,7 @@ const ForgotPassword: React.FC = () => {
                         errors.email ? 'border-slate-200' : ''
                       }`}
                       placeholder="Enter your email address"
-                    />
+                     aria-label="Enter your email address"/>
                   </div>
                   {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                 </div>
@@ -217,7 +217,7 @@ const ForgotPassword: React.FC = () => {
                         errors.firstName ? 'border-slate-200' : ''
                       }`}
                       placeholder="First name"
-                    />
+                     aria-label="First name"/>
                   </div>
                   {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
                 </div>
@@ -236,7 +236,7 @@ const ForgotPassword: React.FC = () => {
                         errors.lastName ? 'border-slate-200' : ''
                       }`}
                       placeholder="Last name"
-                    />
+                     aria-label="Last name"/>
                   </div>
                   {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
                 </div>
@@ -256,7 +256,7 @@ const ForgotPassword: React.FC = () => {
                       errors.phone ? 'border-slate-200' : ''
                     }`}
                     placeholder="+94 XX XXX XXXX"
-                  />
+                   aria-label="+94 XX XXX XXXX"/>
                 </div>
                 {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
               </div>
@@ -273,7 +273,7 @@ const ForgotPassword: React.FC = () => {
                     onChange={(e) => handleInputChange('company', e.target.value)}
                     className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 py-2.5 sm:py-3 text-sm sm:text-base"
                     placeholder="Company name"
-                  />
+                   aria-label="Company name"/>
                 </div>
               </div>
               {/* Security Question */}
@@ -309,7 +309,7 @@ const ForgotPassword: React.FC = () => {
                     errors.securityAnswer ? 'border-slate-200' : ''
                   }`}
                   placeholder="Enter your answer"
-                />
+                 aria-label="Enter your answer"/>
                 {errors.securityAnswer && <p className="mt-1 text-sm text-red-600">{errors.securityAnswer}</p>}
               </div>
               <button

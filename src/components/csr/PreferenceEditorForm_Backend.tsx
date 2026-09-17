@@ -309,7 +309,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
           <h1 className="text-3xl font-bold text-slate-900">Communication Preferences</h1>
           <p className="text-slate-600 mt-2">Manage customer communication preferences and settings</p>
           {selectedCustomer && (
-            <div className="flex items-center space-x-2 mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex flex-wrap items-center space-x-2 mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
               <div className="w-2 h-2 bg-green-600 rounded-full"></div>
               <span className="text-sm text-green-700 font-medium">
                 Displaying actual data from {customers.find(c => c.id === selectedCustomer)?.name}'s preference dashboard
@@ -321,7 +321,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
       {/* Customer Selection */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200">
         <div className="p-6 border-b border-slate-200">
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap items-center space-x-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <User className="w-5 h-5 text-blue-600" />
             </div>
@@ -335,7 +335,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
           </div>
         </div>
         <div className="p-6">
-          <div className="flex space-x-4">
+          <div className="flex flex-wrap space-x-4">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-2">Select Customer</label>
               <div className="relative">
@@ -366,7 +366,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                       className="p-3 hover:bg-white border border-slate-200 cursor-pointer border-b last:border-b-0 transition-colors"
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
+                        <div className="flex flex-wrap items-center space-x-3">
                           <User className="w-5 h-5 text-gray-500" />
                           <div>
                             <div className="font-medium text-slate-900">{customer.name}</div>
@@ -399,7 +399,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
             </div>
             <div className="flex items-end space-x-2">
               {selectedCustomer && (
-                <div className="flex items-center space-x-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex flex-wrap items-center space-x-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
                   <User className="w-4 h-4 text-blue-600" />
                   <span className="text-sm font-medium text-blue-800">
                     {customers.find(c => c.id === selectedCustomer)?.name || `Customer ${selectedCustomer}`}
@@ -420,7 +420,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
               {selectedCustomer && (
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center space-x-2"
                 >
                   <Settings className="w-4 h-4" />
                   <span>{isEditing ? 'Cancel Edit' : 'Edit Preferences'}</span>
@@ -435,13 +435,13 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
         <div className="flex items-center justify-between">
           <div></div>
           {saveStatus === 'success' && (
-            <div className="flex items-center space-x-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg border border-green-200">
+            <div className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg border border-green-200">
               <CheckCircle className="w-4 h-4" />
               <span className="text-sm font-medium">Preferences saved successfully!</span>
             </div>
           )}
           {saveStatus === 'error' && (
-            <div className="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg border border-red-200">
+            <div className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg border border-red-200">
               <AlertCircle className="w-4 h-4" />
               <span className="text-sm font-medium">Failed to save preferences. Please try again.</span>
             </div>
@@ -456,7 +456,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
             {/* Communication Channels Section */}
             <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl shadow-lg border border-blue-700/30 text-white">
               <div className="p-6 border-b border-blue-700/30">
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-wrap items-center space-x-3">
                   <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
                     <Settings className="w-6 h-6 text-white" />
                   </div>
@@ -499,7 +499,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
             {/* Topic Subscriptions Section */}
             <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl shadow-lg border border-blue-700/30 text-white">
               <div className="p-6 border-b border-blue-700/30">
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-wrap items-center space-x-3">
                   <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
                     <Bell className="w-6 h-6 text-white" />
                   </div>
@@ -545,7 +545,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
             {/* Do Not Disturb Section */}
             <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl shadow-lg border border-blue-700/30 text-white">
               <div className="p-6 border-b border-blue-700/30">
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-wrap items-center space-x-3">
                   <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
                     <VolumeX className="w-6 h-6 text-white" />
                   </div>
@@ -608,7 +608,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
             {/* Frequency Limits Section */}
             <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-xl shadow-lg border border-blue-700/30 text-white">
               <div className="p-6 border-b border-blue-700/30">
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-wrap items-center space-x-3">
                   <div className="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center">
                     <Clock className="w-6 h-6 text-white" />
                   </div>
@@ -688,7 +688,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
               <button
                 onClick={handleSave}
                 disabled={!hasChanges || saving}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 transition-colors"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex flex-wrap items-center space-x-2 transition-colors"
               >
                 {saving ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />

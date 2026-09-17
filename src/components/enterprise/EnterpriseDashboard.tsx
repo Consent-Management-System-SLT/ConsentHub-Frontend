@@ -47,7 +47,7 @@ const EnterpriseDashboard: React.FC = () => {
       {/* Sidebar */}
       <div className="w-64 bg-slate-900 text-white flex flex-col">
         <div className="p-4 border-b border-slate-800">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Building className="h-6 w-6 text-blue-400" />
             <span className="font-bold text-lg">Partner Portal</span>
           </div>
@@ -66,7 +66,7 @@ const EnterpriseDashboard: React.FC = () => {
           </button>
           <button 
             onClick={() => { setActiveTab('campaigns'); setCampaignView('list'); }}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+            className={`w-full flex flex-wrap items-center gap-3 px-3 py-2 rounded-md transition-colors ${
               activeTab === 'campaigns' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'
             }`}
           >
@@ -75,7 +75,7 @@ const EnterpriseDashboard: React.FC = () => {
           </button>
           <button 
             onClick={() => { setActiveTab('audience'); setCampaignView('list'); }}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+            className={`w-full flex flex-wrap items-center gap-3 px-3 py-2 rounded-md transition-colors ${
               activeTab === 'audience' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'
             }`}
           >
@@ -91,7 +91,7 @@ const EnterpriseDashboard: React.FC = () => {
           </div>
           <button 
             onClick={logout}
-            className="w-full flex items-center gap-2 px-3 py-2 text-red-400 hover:bg-slate-800 rounded-md transition-colors"
+            className="w-full flex flex-wrap items-center gap-2 px-3 py-2 text-red-400 hover:bg-slate-800 rounded-md transition-colors"
           >
             <LogOut className="h-4 w-4" />
             <span>Logout</span>

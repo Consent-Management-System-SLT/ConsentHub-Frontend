@@ -312,11 +312,11 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
               </p>
             )}
           </div>
-          <div className="flex flex-row space-x-3 items-center justify-between sm:justify-start">
+          <div className="flex flex-wrap flex-row space-x-3 items-center justify-between sm:justify-start">
             <button
               onClick={loadDashboardData}
               disabled={isLoading}
-              className="bg-green-600 hover:bg-green-600/90 text-whitepx-3 sm:px-4 py-2 rounded-lg flex items-center space-x-2 transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-xl text-sm sm:text-base"
+              className="bg-green-600 hover:bg-green-600/90 text-whitepx-3 sm:px-4 py-2 rounded-lg flex flex-wrap items-center space-x-2 transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-xl text-sm sm:text-base"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
@@ -330,28 +330,28 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
         </div>
         <div className="mt-4 sm:mt-6 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
           <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
-            <div className="flex items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
+            <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-green-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.granted}</span>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.activeConsents')}</p>
           </div>
           <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
-            <div className="flex items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
+            <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <XCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-red-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.revoked}</span>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.revoked')}</p>
           </div>
           <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
-            <div className="flex items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
+            <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <Clock className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-yellow-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.expired}</span>
             </div>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.expired')}</p>
           </div>
           <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
-            <div className="flex items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
+            <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-orange-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.pending}</span>
             </div>
@@ -363,7 +363,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       {isLoading ? (
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-6 animate-pulse">
           <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-wrap items-center space-x-3">
               <div className="flex-shrink-0 p-2 rounded-lg bg-gray-200 w-9 h-9"></div>
               <div>
                 <div className="h-5 bg-gray-200 rounded w-40 mb-2"></div>
@@ -381,7 +381,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       ) : latestConsent ? (
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-wrap items-center space-x-3">
               <div className="flex-shrink-0 p-2 rounded-lg bg-blue-50/10">
                 <Bell className="w-5 h-5 text-blue-600" />
               </div>
@@ -407,7 +407,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                 </p>
               </div>
             </div>
-            <div className="flex items-center space-x-2 text-xs text-slate-500">
+            <div className="flex flex-wrap items-center space-x-2 text-xs text-slate-500">
               <Calendar className="w-4 h-4" />
               <span>
                 {(() => {
@@ -421,9 +421,9 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
             </div>
           </div>
           <div className="bg-blue-50/5 rounded-lg p-4 border border-slate-200/10">
-            <div className="flex items-start justify-between">
+            <div className="flex flex-wrap gap-4 items-start justify-between">
               <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-2">
+                <div className="flex flex-wrap items-center space-x-2 mb-2">
                   <div className={`flex-shrink-0 p-1.5 rounded-full ${
                     latestConsent.status === 'granted' 
                       ? 'bg-green-100 text-green-600' 
@@ -451,7 +451,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                 </div>
                 <h4 className="font-medium text-slate-900 mb-1">{latestConsent.purpose}</h4>
                 <p className="text-sm text-slate-600 mb-2">{latestConsent.description}</p>
-                <div className="flex items-center space-x-4 text-xs text-slate-500">
+                <div className="flex flex-wrap items-center space-x-4 text-xs text-slate-500">
                   <span>Category: {latestConsent.dataCategory}</span>
                   {latestConsent.grantedAt && (
                     <span className={latestConsent.status === 'granted' ? 'font-medium text-green-600' : ''}>
@@ -482,7 +482,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {quickStats.map((stat) => (
           <div key={stat.label} className="bg-white border border-slate-200 rounded-xl shadow-sm p-3 sm:p-4 lg:p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between">
+            <div className="flex flex-wrap gap-4 items-start justify-between">
               <div className="flex-1 min-w-0 pr-2">
                 <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2 line-clamp-2">{stat.label}</p>
                 <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mb-1">{stat.value}</p>
@@ -513,7 +513,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                 }
               }}
             >
-              <div className="flex items-start space-x-2 sm:space-x-3 lg:space-x-4 mb-2 sm:mb-3 lg:mb-4">
+              <div className="flex flex-wrap items-start space-x-2 sm:space-x-3 lg:space-x-4 mb-2 sm:mb-3 lg:mb-4">
                 <div className="flex-shrink-0 mt-1">
                   {action.icon}
                 </div>
@@ -536,7 +536,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
           </div>
           <div className="space-y-2 sm:space-y-3 lg:space-y-4">
             {recentActivity.map((activity, index) => (
-              <div key={activity.id || `activity-${index}`} className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg hover:bg-blue-50/10 transition-colors">
+              <div key={activity.id || `activity-${index}`} className="flex flex-wrap items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg hover:bg-blue-50/10 transition-colors">
                 <div className="flex-shrink-0 mt-1">
                   {'icon' in activity && activity.icon ? 
                     activity.icon : 

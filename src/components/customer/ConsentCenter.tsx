@@ -388,10 +388,10 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-lg mb-6">
-        <div className="p-6 border-b border-slate-200 bg-slate-50 text-white rounded-t-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Shield className="w-8 h-8" />
+        <div className="p-6 border-b border-slate-200 bg-slate-50 text-slate-900 rounded-t-xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3 min-w-0">
+              <Shield className="w-8 h-8 text-blue-600 flex-shrink-0" />
               <div>
                 <h1 className="text-2xl font-bold">{t('consentCenter.title')}</h1>
                 <p className="text-slate-600">{t('consentCenter.subtitle')}</p>
@@ -400,7 +400,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
             <button aria-label="Refresh"
               onClick={loadConsents}
               disabled={loading}
-              className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors flex items-center"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               {t('common.refresh')}
@@ -416,19 +416,21 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                 <input
                   type="text"
                   placeholder={t('consentCenter.searchPlaceholder')}
+                  aria-label={t('consentCenter.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50"
                 />
               </div>
             </div>
-            <div className="flex gap-3">
-              <div className="relative">
+            <div className="flex flex-wrap gap-3">
+              <div className="relative flex-1 min-w-[10rem]">
                 <Filter className="absolute left-3 top-3 w-5 h-5 text-slate-600" />
                 <select
+                  aria-label={t('consentCenter.filters.allStatus')}
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="pl-10 pr-8 py-3 border border-slate-200 rounded-lg bg-slate-50 appearance-none"
+                  className="w-full pl-10 pr-8 py-3 border border-slate-200 rounded-lg bg-slate-50 appearance-none"
                 >
                   <option value="all">{t('consentCenter.filters.allStatus')}</option>
                   <option value="granted">{t('consentCenter.filters.granted')}</option>
@@ -437,12 +439,13 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                   <option value="pending">{t('consentCenter.filters.pending')}</option>
                 </select>
               </div>
-              <div className="relative">
+              <div className="relative flex-1 min-w-[10rem]">
                 <Tag className="absolute left-3 top-3 w-5 h-5 text-slate-600" />
                 <select
+                  aria-label={t('consentCenter.filters.allCategories')}
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="pl-10 pr-8 py-3 border border-slate-200 rounded-lg bg-slate-50 appearance-none"
+                  className="w-full pl-10 pr-8 py-3 border border-slate-200 rounded-lg bg-slate-50 appearance-none"
                 >
                   <option value="all">{t('consentCenter.filters.allCategories')}</option>
                   <option value="Marketing">{t('consentCenter.categories.marketing')}</option>
@@ -513,9 +516,9 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
             ) : (
               filteredConsents.map(consent => (
                 <div key={consent.id} className="bg-slate-50 border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between">
+                  <div className="flex flex-wrap gap-4 items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-start space-x-4">
+                      <div className="flex flex-wrap items-start space-x-4">
                         <div className="flex-shrink-0 mt-1">
                           {getStatusIcon(consent.status)}
                         </div>
@@ -546,7 +549,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                               {consent.jurisdiction}
                             </span>
                           </div>
-                          <div className="flex items-center space-x-3">
+                          <div className="flex flex-wrap items-center space-x-3">
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(consent.status)}`}>
                               {consent.status.charAt(0).toUpperCase() + consent.status.slice(1)}
                             </span>
@@ -607,9 +610,9 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
       {selectedConsent && (
         <div role="dialog" aria-modal="true" aria-labelledby="consentcenter-dialog-8-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
-            <div className="p-6 border-b border-slate-200 bg-slate-50 text-white rounded-t-2xl">
+            <div className="p-6 border-b border-slate-200 bg-slate-50 text-slate-900 rounded-t-2xl">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-wrap items-center space-x-3">
                   <Shield className="w-8 h-8" />
                   <div>
                     <h2 id="consentcenter-dialog-8-title" className="text-2xl font-bold">{selectedConsent.purpose}</h2>
@@ -676,7 +679,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                 <span className="text-sm text-slate-500">
                   {t('consentCenter.details.grantedBy')}: {selectedConsent.grantedBy}
                 </span>
-                <div className="flex space-x-3">
+                <div className="flex flex-wrap space-x-3">
                   <button
                     onClick={() => setSelectedConsent(null)}
                     className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-blue-50/5 transition-colors"
