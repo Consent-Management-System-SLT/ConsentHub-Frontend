@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import CustomerMainDashboard from './customer/CustomerMainDashboard';
 import ServerConnectionAlert from './shared/ServerConnectionAlert';
 const CustomerDashboard: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [showConnectionAlert, setShowConnectionAlert] = useState(true);
   if (!user) {
     return (
@@ -25,10 +25,7 @@ const CustomerDashboard: React.FC = () => {
           autoHideDelay={4000}
         />
       )}
-      <CustomerMainDashboard 
-        customerName={user.name || user.email || 'Customer'} 
-        onLogout={logout} 
-      />
+      <CustomerMainDashboard customerName={user.name || user.email || 'Customer'} />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 // Import admin components
-import AdminHeader from './admin/AdminHeader';
+import DashboardHeader from './shared/DashboardHeader';
+import DashboardFooter from './shared/DashboardFooter';
 import AdminSidebar from './admin/AdminSidebar';
 import DashboardHome from './admin/DashboardHome';
 import ConsentOverviewTable from './admin/ConsentOverviewTable';
@@ -69,7 +70,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
   };
 
   return (
-    <div className={`min-h-screen bg-slate-50 flex flex-col lg:flex-row ${className}`}>
+    <div className={`h-screen bg-slate-50 flex flex-col overflow-hidden ${className}`}>
       {/* Server Connection Alert */}
       {showConnectionAlert && (
         <ServerConnectionAlert 
@@ -79,26 +80,34 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
         />
       )}
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      {/* Sidebar */}
-      <AdminSidebar
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
+
+      <DashboardHeader
+        subtitle="Admin Dashboard"
+        navId="admin-nav"
+        sidebarOpen={sidebarOpen}
+        onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
       />
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header */}
-        <AdminHeader onMenuToggle={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
-        {/* Main Content */}
-        <main id="main-content" tabIndex={-1} className="flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 max-w-full">
-            <div className="max-w-7xl mx-auto">
-              {renderContent()}
-            </div>
+
+      {/* Rail and content each scroll on their own */}
+      <div className="flex flex-1 min-h-0">
+        <AdminSidebar
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
+        />
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden"
+        >
+          <div className="p-4 sm:p-5 lg:p-6">
+            <div className="max-w-7xl mx-auto">{renderContent()}</div>
           </div>
         </main>
       </div>
+
+      <DashboardFooter />
     </div>
   );
 };

@@ -62,7 +62,7 @@ const PrivacyNoticeForm: React.FC<{
   };
 
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="privacynotices-dialog-0-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+    <div role="dialog" aria-modal="true" aria-labelledby="privacynotices-dialog-0-title" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
           <h3 id="privacynotices-dialog-0-title" className="text-lg font-semibold">
@@ -241,7 +241,7 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
   if (!isOpen || !notice) return null;
 
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="privacynotices-dialog-1-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
+    <div role="dialog" aria-modal="true" aria-labelledby="privacynotices-dialog-1-title" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">

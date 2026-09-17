@@ -14,7 +14,8 @@ import {
 import { csrDashboardService } from '../services/csrDashboardService';
 import { websocketService } from '../services/websocketService';
 // Import CSR components (using backend-integrated versions)
-import CSRHeader from './csr/CSRHeader';
+import DashboardHeader from './shared/DashboardHeader';
+import DashboardFooter from './shared/DashboardFooter';
 import SidebarNav from './csr/SidebarNav';
 import CustomerSearchForm from './csr/CustomerSearchForm_Backend';
 import ConsentHistoryTable from './csr/ConsentHistoryTable_Backend';
@@ -231,7 +232,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
     }
   };
   return (
-    <div className={`min-h-screen bg-slate-50 flex flex-col lg:flex-row ${className}`}>
+    <div className={`h-screen bg-slate-50 flex flex-col overflow-hidden ${className}`}>
       {/* Server Connection Alert */}
       {showConnectionAlert && (
         <ServerConnectionAlert 
@@ -241,25 +242,30 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
         />
       )}
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      {/* Sidebar */}
-      <SidebarNav
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
+
+      <DashboardHeader
+        subtitle="CSR Dashboard"
+        navId="csr-nav"
+        sidebarOpen={sidebarOpen}
+        onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+        onRefresh={handleRefresh}
+        isRefreshing={isRefreshing}
       />
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header */}
-        <CSRHeader
-          onRefresh={handleRefresh}
-          isRefreshing={isRefreshing}
-          onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
-          sidebarOpen={sidebarOpen}
+
+      {/* Rail and content each scroll on their own */}
+      <div className="flex flex-1 min-h-0">
+        <SidebarNav
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
         />
-        {/* Main Content */}
-        <main id="main-content" tabIndex={-1} className="flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 max-w-full">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden"
+        >
+          <div className="p-4 sm:p-5 lg:p-6">
             <div className="max-w-7xl mx-auto">
               {renderContent()}
             </div>
@@ -281,6 +287,8 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
       />
       {/* Real-time Notification Container */}
       <NotificationContainer />
+
+      <DashboardFooter />
     </div>
   );
 };
