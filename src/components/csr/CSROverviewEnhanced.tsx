@@ -238,7 +238,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       </div>
       {/* Key Insights */}
       <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-slate-200 p-3 sm:p-4 lg:p-6">
-        <div className="flex flex-wrap items-center space-x-2 mb-3 sm:mb-4 lg:mb-6">
+        <div className="flex items-center space-x-2 mb-3 sm:mb-4 lg:mb-6">
           <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg">
             <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
           </div>
@@ -261,7 +261,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       </div>
       {/* Quick Actions */}
       <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-slate-200 p-3 sm:p-4 lg:p-6">
-        <div className="flex flex-wrap items-center space-x-2 mb-3 sm:mb-4 lg:mb-6">
+        <div className="flex items-center space-x-2 mb-3 sm:mb-4 lg:mb-6">
           <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg">
             <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
           </div>
@@ -282,7 +282,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
                     : 'border-slate-200 bg-white border border-slate-200 hover:border-slate-200'
                 }`}
               >
-                <div className="flex flex-wrap items-start space-x-2 sm:space-x-3">
+                <div className="flex items-start space-x-2 sm:space-x-3">
                   <div className={`p-1.5 sm:p-2 rounded-lg shrink-0 ${
                     action.priority === 'high' ? 'bg-red-800/50' :
                     action.priority === 'medium' ? 'bg-amber-800/50' : 'bg-blue-50/20'

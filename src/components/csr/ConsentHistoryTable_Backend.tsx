@@ -321,7 +321,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
     return (
       <div className={`bg-white rounded-lg shadow-lg ${className}`}>
         <div className="p-6 border-b border-gray-200">
-          <div className="flex flex-wrap items-center space-x-3">
+          <div className="flex items-center space-x-3">
             <FileText className="w-6 h-6 text-indigo-600" />
             <div>
               <h2 className="text-xl font-semibold text-slate-900">Consent History</h2>
@@ -340,7 +340,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
     return (
       <div className={`bg-white rounded-lg shadow-lg ${className}`}>
         <div className="p-6 border-b border-gray-200">
-          <div className="flex flex-wrap items-center space-x-3">
+          <div className="flex items-center space-x-3">
             <FileText className="w-6 h-6 text-indigo-600" />
             <div>
               <h2 className="text-xl font-semibold text-slate-900">Consent History</h2>
@@ -349,7 +349,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
           </div>
         </div>
         <div className="p-6">
-          <div className="flex flex-wrap items-center space-x-2 text-red-600 bg-red-50 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-4 rounded-lg">
             <AlertCircle className="w-5 h-5" />
             <span>{error}</span>
             <button 
@@ -367,19 +367,19 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
     <div className={`bg-white rounded-lg shadow-lg ${className}`}>
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <div className="flex flex-wrap items-center space-x-3">
+          <div className="flex items-center space-x-3">
             <History className="w-6 h-6 text-indigo-600" />
             <div>
               <h2 className="text-xl font-semibold text-slate-900">Consent History & Audit Trail</h2>
               <p className="text-sm text-slate-600">
                 {customerId ? `Showing consent history for customer: ${getCustomerName(customerId)}` : 'Real-time tracking of all customer consent changes'}
               </p>
-              <div className="flex flex-wrap items-center space-x-4 text-xs text-slate-500 mt-1">
-                <span className="flex flex-wrap items-center space-x-1">
+              <div className="flex items-center space-x-4 text-xs text-slate-500 mt-1">
+                <span className="flex items-center space-x-1">
                   <Clock className="w-3 h-3" />
                   <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
                 </span>
-                <span className="flex flex-wrap items-center space-x-1">
+                <span className="flex items-center space-x-1">
                   <div className={`w-2 h-2 rounded-full ${autoRefresh ? 'bg-green-500' : 'bg-red-500'}`}></div>
                   <span>{autoRefresh ? 'Auto-refresh ON' : 'Auto-refresh OFF'}</span>
                 </span>
@@ -387,7 +387,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
               className={`px-3 py-1 rounded-lg text-sm transition-colors ${
@@ -473,7 +473,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
                       onClick={() => handleViewDetails(consent)}
-                      className="text-indigo-600 hover:text-indigo-900 flex flex-wrap items-center space-x-1"
+                      className="text-indigo-600 hover:text-indigo-900 flex items-center space-x-1"
                       title="View Full History"
                      aria-label="View Full History">
                       <Eye className="w-4 h-4" />

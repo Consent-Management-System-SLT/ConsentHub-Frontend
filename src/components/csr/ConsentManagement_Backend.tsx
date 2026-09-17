@@ -301,7 +301,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <button
               onClick={() => { loadCustomers(); loadAllConsents(); }}
               className="px-4 py-2 bg-blue-50/10 text-blue-600 rounded-lg hover:bg-blue-50/20 transition-colors flex items-center"
@@ -357,7 +357,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                     <p className="text-sm text-slate-600">{selectedCustomerInfo.email}</p>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center space-x-4 text-sm text-slate-600">
+                <div className="flex items-center space-x-4 text-sm text-slate-600">
                   <span>Phone: {selectedCustomerInfo.phone}</span>
                   <span>Customer Since: {new Date(selectedCustomerInfo.createdAt).toLocaleDateString()}</span>
                   <span className="flex items-center">
@@ -438,14 +438,14 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                     {/* Consent Header */}
                     <div className="p-4">
                       <div className="flex items-center justify-between">
-                        <div className="flex flex-wrap items-center space-x-3">
+                        <div className="flex items-center space-x-3">
                           {getConsentTypeIcon(consent.purpose)}
                           <div>
                             <h4 className="font-semibold text-slate-900">{formatPurposeName(consent.purpose)}</h4>
                             <p className="text-sm text-slate-600">{consent.description || generateDescription(consent.purpose)}</p>
                           </div>
                         </div>
-                        <div className="flex flex-wrap items-center space-x-3">
+                        <div className="flex items-center space-x-3">
                           {getStatusBadge(consent.status)}
                           <button
                             onClick={() => setExpandedConsent(expandedConsent === consent.id ? null : consent.id)}
@@ -459,7 +459,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                         </div>
                       </div>
                       {/* Quick Info */}
-                      <div className="mt-3 flex flex-wrap items-center space-x-6 text-sm text-slate-600">
+                      <div className="mt-3 flex items-center space-x-6 text-sm text-slate-600">
                         <span className="flex items-center">
                           <Calendar className="w-4 h-4 mr-1" />
                           {consent.grantedAt ? `Granted: ${new Date(consent.grantedAt).toLocaleDateString()}` : 
@@ -514,7 +514,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                                   className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"
                                   rows={3}
                                  aria-label="Add notes for this update"/>
-                                <div className="flex flex-wrap space-x-2">
+                                <div className="flex space-x-2">
                                   <button
                                     onClick={() => handleConsentUpdate(consent.id, 'granted')}
                                     disabled={saving === consent.id}

@@ -183,7 +183,7 @@ const CSRCustomerVASManagement: React.FC = () => {
       {/* Header */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex flex-wrap items-center space-x-3">
+          <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-lg">
               <Settings className="w-5 h-5 text-white" />
             </div>
@@ -193,8 +193,8 @@ const CSRCustomerVASManagement: React.FC = () => {
             </div>
           </div>
           {selectedCustomer && (
-            <div className="flex flex-wrap items-center space-x-4 text-sm text-gray-600">
-              <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
                 <span className="font-medium">Managing:</span>
                 <span className="text-blue-600">{selectedCustomer.name}</span>
               </div>
@@ -217,7 +217,7 @@ const CSRCustomerVASManagement: React.FC = () => {
           <button
             onClick={handleSearch}
             disabled={isSearching || !searchTerm.trim()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex flex-wrap items-center space-x-2"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
           >
             {isSearching ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
@@ -237,7 +237,7 @@ const CSRCustomerVASManagement: React.FC = () => {
         </div>
         {/* Error Display */}
         {error && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex flex-wrap items-center space-x-2">
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 text-red-500" />
             <span className="text-red-700 text-sm">{error}</span>
           </div>
@@ -255,19 +255,19 @@ const CSRCustomerVASManagement: React.FC = () => {
                 className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex flex-wrap items-center space-x-3">
+                  <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                       <User className="w-4 h-4 text-blue-600" />
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900">{customer.name}</h3>
-                      <div className="flex flex-wrap items-center space-x-4 text-sm text-gray-500">
-                        <span className="flex flex-wrap items-center space-x-1">
+                      <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <span className="flex items-center space-x-1">
                           <Mail className="w-3 h-3" />
                           <span>{customer.email}</span>
                         </span>
                         {customer.phone && (
-                          <span className="flex flex-wrap items-center space-x-1">
+                          <span className="flex items-center space-x-1">
                             <Phone className="w-3 h-3" />
                             <span>{customer.phone}</span>
                           </span>
@@ -298,14 +298,14 @@ const CSRCustomerVASManagement: React.FC = () => {
               </h2>
               <p className="text-sm text-gray-500">{selectedCustomer.email}</p>
             </div>
-            <div className="flex flex-wrap items-center space-x-4">
+            <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-600">
                 <span className="font-medium">Active:</span> {stats.activeSubscriptions} / {stats.totalServices}
               </div>
               <button
                 onClick={() => handleSelectCustomer(selectedCustomer)}
                 disabled={isLoadingVAS}
-                className="flex flex-wrap items-center space-x-2 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg"
+                className="flex items-center space-x-2 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg"
               >
                 <RefreshCw className={`w-4 h-4 ${isLoadingVAS ? 'animate-spin' : ''}`} />
                 <span>Refresh</span>
@@ -338,7 +338,7 @@ const CSRCustomerVASManagement: React.FC = () => {
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900 mb-1">{service.name}</h3>
                       <p className="text-sm text-gray-600 mb-2">{service.description}</p>
-                      <div className="flex flex-wrap items-center space-x-2 text-xs text-gray-500">
+                      <div className="flex items-center space-x-2 text-xs text-gray-500">
                         <span className="bg-gray-100 px-2 py-1 rounded">{service.category}</span>
                         <span>{service.price}</span>
                       </div>
