@@ -21,68 +21,37 @@ interface NotificationContextType {
   getNotificationsByType: (type: Notification['type']) => Notification[];
   getNotificationsByCategory: (category: Notification['category']) => Notification[];
 }
+const STORAGE_KEY = 'consentHub_notifications';
+
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  // Load notifications from localStorage on mount
-  useEffect(() => {
-    const savedNotifications = localStorage.getItem('consentHub_notifications');
-    if (savedNotifications) {
-      try {
-        const parsed = JSON.parse(savedNotifications);
-        setNotifications(parsed);
-      } catch (error) {
-        console.error('Error loading notifications:', error);
-        // Add some sample notifications for demo
-        setNotifications([
-          {
-            id: 'sample-1',
-            type: 'dsar',
-            category: 'urgent',
-            title: 'New DSAR Request',
-            message: 'Customer John Doe has submitted a data deletion request.',
-            timestamp: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
-            read: false
-          },
-          {
-            id: 'sample-2',
-            type: 'preference',
-            category: 'info',
-            title: 'Preference Updated',
-            message: 'Customer updated marketing preferences.',
-            timestamp: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
-            read: false
-          }
-        ]);
-      }
-    } else {
-      // Add some sample notifications for demo
-      setNotifications([
-        {
-          id: 'sample-1',
-          type: 'dsar',
-          category: 'urgent',
-          title: 'New DSAR Request',
-          message: 'Customer John Doe has submitted a data deletion request.',
-          timestamp: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
-          read: false
-        },
-        {
-          id: 'sample-2',
-          type: 'preference',
-          category: 'info',
-          title: 'Preference Updated',
-          message: 'Customer updated marketing preferences.',
-          timestamp: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
-          read: false
-        }
-      ]);
+  /**
+   * Read straight from storage on the first render.
+   *
+   * This used to load in an effect while a second effect wrote the state back
+   * out. Under StrictMode the effects run twice, so the empty initial state was
+   * written to storage before the second load read it, and every notification
+   * was lost on reload. It also seeded fabricated "DSAR request from John Doe"
+   * entries, which look identical to real alerts.
+   */
+  const [notifications, setNotifications] = useState<Notification[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
     }
-  }, []);
-  // Save notifications to localStorage whenever they change
+  });
+
   useEffect(() => {
-    localStorage.setItem('consentHub_notifications', JSON.stringify(notifications));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+    } catch {
+      /* storage blocked: notifications stay in memory for this session */
+    }
   }, [notifications]);
+
   const addNotification = useCallback((notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
     const newNotification: Notification = {
       ...notification,

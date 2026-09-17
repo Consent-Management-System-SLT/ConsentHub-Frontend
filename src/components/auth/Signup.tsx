@@ -177,7 +177,7 @@ const Signup: React.FC = () => {
           </div>
           {/* Success message */}
           {success && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-600/20 border border-green-200/30 rounded-md flex flex-wrap items-start sm:items-center space-x-2 sm:space-x-3">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-600/20 border border-green-200/30 rounded-md flex items-start sm:items-center space-x-2 sm:space-x-3">
               <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-700 flex-shrink-0 mt-0.5 sm:mt-0" />
               <div>
                 <p className="text-slate-900 font-medium text-sm sm:text-base">Success!</p>
@@ -187,7 +187,7 @@ const Signup: React.FC = () => {
           )}
           {/* General error message */}
           {generalError && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-md flex flex-wrap items-start sm:items-center space-x-2 sm:space-x-3">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-md flex items-start sm:items-center space-x-2 sm:space-x-3">
               <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600 flex-shrink-0 mt-0.5 sm:mt-0" />
               <div>
                 <p className="text-slate-900 font-medium text-sm sm:text-base">Error</p>
@@ -197,7 +197,7 @@ const Signup: React.FC = () => {
           )}
           {/* Already registered modal/alert */}
           {showAlreadyRegistered && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-amber-600/20 border border-slate-200/30 rounded-md flex flex-wrap items-start sm:items-center space-x-2 sm:space-x-3">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-amber-600/20 border border-slate-200/30 rounded-md flex items-start sm:items-center space-x-2 sm:space-x-3">
               <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-700 flex-shrink-0 mt-0.5 sm:mt-0" />
               <div>
                 <p className="text-slate-900 font-medium text-sm sm:text-base">Account already registered</p>
@@ -381,7 +381,7 @@ const Signup: React.FC = () => {
                 </ul>
                 {formData.password && (
                   <div className="mt-2">
-                    <div className="flex flex-wrap items-center space-x-1.5 sm:space-x-2">
+                    <div className="flex items-center space-x-1.5 sm:space-x-2">
                       <div className="flex-1 h-1.5 sm:h-2 bg-white border border-slate-200 rounded-xl shadow-sm">
                         <div 
                           className={`h-1.5 sm:h-2 rounded transition-all duration-300 ${
