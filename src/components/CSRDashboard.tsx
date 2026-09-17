@@ -356,8 +356,8 @@ const DashboardOverview: React.FC<{
           <h1 className="text-3xl font-bold text-slate-900">Dashboard Overview</h1>
           <p className="text-slate-600 mt-1">Customer Support Representative Dashboard</p>
         </div>
-        <div className="flex flex-wrap items-center space-x-4">
-          <div className="flex flex-wrap items-center space-x-2">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             <label className="text-sm font-medium text-slate-600">Auto-refresh:</label>
             <input
               type="checkbox"
@@ -370,7 +370,7 @@ const DashboardOverview: React.FC<{
             <button
               onClick={onRefresh}
               disabled={isRefreshing}
-              className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               title="Refresh Data"
              aria-label="Refresh Data">
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -462,7 +462,7 @@ const DashboardOverview: React.FC<{
           <div className="space-y-3">
             <button
               onClick={() => onSectionChange('customer-search')}
-              className="w-full flex flex-wrap items-center space-x-3 p-3 bg-blue-50/30 hover:bg-blue-50/50 rounded-lg transition-colors"
+              className="w-full flex items-center space-x-3 p-3 bg-blue-50/30 hover:bg-blue-50/50 rounded-lg transition-colors"
             >
               <div className="p-2 bg-green-600/20 rounded-lg">
                 <Users className="w-5 h-5 text-green-700" />
@@ -474,7 +474,7 @@ const DashboardOverview: React.FC<{
             </button>
             <button
               onClick={() => onSectionChange('dsar-requests')}
-              className="w-full flex flex-wrap items-center space-x-3 p-3 bg-orange-400/20 hover:bg-orange-400/30 rounded-lg transition-colors"
+              className="w-full flex items-center space-x-3 p-3 bg-orange-400/20 hover:bg-orange-400/30 rounded-lg transition-colors"
             >
               <div className="p-2 bg-orange-400/30 rounded-lg">
                 <FileText className="w-5 h-5 text-orange-400" />
@@ -486,7 +486,7 @@ const DashboardOverview: React.FC<{
             </button>
             <button
               onClick={() => onSectionChange('consent-history')}
-              className="w-full flex flex-wrap items-center space-x-3 p-3 bg-green-600/20 hover:bg-green-600/30 rounded-lg transition-colors"
+              className="w-full flex items-center space-x-3 p-3 bg-green-600/20 hover:bg-green-600/30 rounded-lg transition-colors"
             >
               <div className="p-2 bg-green-600/30 rounded-lg">
                 <Shield className="w-5 h-5 text-green-700" />
@@ -512,7 +512,7 @@ const DashboardOverview: React.FC<{
           <div className="space-y-4">
             {activities.length > 0 ? (
               activities.slice(0, 5).map((activity, index) => (
-                <div key={index} className="flex flex-wrap items-start space-x-3 p-3 bg-white border border-slate-200 rounded-lg">
+                <div key={index} className="flex items-start space-x-3 p-3 bg-white border border-slate-200 rounded-lg">
                   <div className={`p-2 rounded-lg ${
                     activity.type === 'consent' ? 'bg-green-100' :
                     activity.type === 'dsar' ? 'bg-orange-100' :
@@ -566,7 +566,7 @@ const DashboardOverview: React.FC<{
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <TrendingUp className="w-5 h-5 text-blue-600" />
               <span className="text-sm font-medium text-slate-900">Consent Rate</span>
             </div>
@@ -574,7 +574,7 @@ const DashboardOverview: React.FC<{
             <p className="text-sm text-blue-600">Based on active consents</p>
           </div>
           <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5 text-green-700" />
               <span className="text-sm font-medium text-green-800">Resolved Requests</span>
             </div>
@@ -582,7 +582,7 @@ const DashboardOverview: React.FC<{
             <p className="text-sm text-green-700">Completed DSAR requests</p>
           </div>
           <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <Users className="w-5 h-5 text-orange-600" />
               <span className="text-sm font-medium text-orange-800">New Customers</span>
             </div>

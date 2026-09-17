@@ -247,7 +247,7 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <div>
             <h2 id="privacynotices-dialog-1-title" className="text-2xl font-bold text-gray-900">{notice.title}</h2>
-            <div className="flex flex-wrap items-center space-x-4 mt-2">
+            <div className="flex items-center space-x-4 mt-2">
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                 notice.status === 'active' ? 'bg-green-100 text-green-800' : 
                 notice.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 
@@ -647,7 +647,7 @@ export const PrivacyNotices: React.FC = () => {
               {filters.status === 'active' && <span className="text-slate-500"> Deleted notices are archived and hidden.</span>}
             </p>
           </div>
-          <div className="flex flex-wrap space-x-2">
+          <div className="flex space-x-2">
             <button
               onClick={() => setShowForm(true)}
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex flex-wrap items-center gap-2"
@@ -757,15 +757,15 @@ export const PrivacyNotices: React.FC = () => {
       {/* Notices Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {notices.map((notice) => (
-          <div key={notice.id} className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
+          <div key={notice.id} className="h-full flex flex-col bg-white border border-slate-200 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex flex-wrap items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 {getStatusIcon(notice.status)}
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(notice.status)}`}>
                   {notice.status.charAt(0).toUpperCase() + notice.status.slice(1)}
                 </span>
               </div>
-              <div className="flex flex-wrap space-x-1">
+              <div className="flex space-x-1">
                 <button
                   onClick={() => {
                     setEditingNotice(notice);
@@ -791,35 +791,36 @@ export const PrivacyNotices: React.FC = () => {
             </h3>
 
             <div className="space-y-2 mb-4 text-sm text-slate-600">
-              <div className="flex flex-wrap items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <FileText className="h-4 w-4 text-slate-500" />
                 <span>{notice.category}</span>
                 <span className="text-xs bg-blue-50/20 text-slate-900 px-2 py-1 rounded">{notice.language}</span>
               </div>
-              <div className="flex flex-wrap items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4 text-slate-500" />
                 <span>
                   Effective: {new Date(notice.effectiveDate).toLocaleDateString()}
                 </span>
               </div>
-              <div className="flex flex-wrap items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 <Users className="h-4 w-4 text-slate-500" />
                 <span>{notice.acknowledgments.length} acknowledgments</span>
               </div>
             </div>
 
             {notice.description && (
-              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+              <p className="text-slate-600 text-sm mb-4 line-clamp-3">
                 {notice.description}
               </p>
             )}
 
-            <div className="flex flex-wrap space-x-2">
+            {/* pushes the action to the bottom, so it lines up across the row */}
+            <div className="mt-auto pt-2">
               <button
                 onClick={() => setViewingNotice(notice)}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white border-slate-200 rounded-xl shadow-sm hover:bg-white transition-colors"
+                className="w-full inline-flex items-center justify-center px-3 py-2 border border-slate-300 text-sm font-medium text-slate-700 bg-white rounded-lg shadow-sm hover:bg-slate-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               >
-                <Eye className="h-4 w-4 mr-2" />
+                <Eye className="h-4 w-4 mr-2" aria-hidden="true" />
                 View
               </button>
             </div>
