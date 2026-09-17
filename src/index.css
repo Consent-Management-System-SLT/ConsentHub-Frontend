@@ -40,13 +40,31 @@
     }
   }
 
-  /* Comfortable touch targets on phones and tablets. */
+  /* Comfortable touch targets on phones and tablets. WCAG 2.5.8 asks for 24px
+     minimum; 44px is the size a finger actually hits reliably. Form controls
+     are included - a 37px select is as hard to tap as a 37px button. */
   @media (pointer: coarse) {
     button,
     [role='button'],
+    [role='switch'],
     a.btn,
-    summary {
+    summary,
+    select,
+    input:not([type='checkbox']):not([type='radio']):not([type='hidden']),
+    textarea {
       min-height: 44px;
+    }
+    input[type='checkbox'],
+    input[type='radio'] {
+      min-width: 20px;
+      min-height: 20px;
+    }
+
+    /* An icon-only button is as wide as its icon plus padding, which lands
+       around 24px - too narrow to hit. Give it a square target. */
+    button:has(> svg:only-child),
+    a:has(> svg:only-child) {
+      min-width: 44px;
     }
   }
 }
