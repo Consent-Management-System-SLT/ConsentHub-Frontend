@@ -59,7 +59,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
   const handleSelect = (id: string) => {
     onSectionChange(id);
-    if (window.innerWidth < 1024) onToggle();
+    // only closes the drawer; onToggle would otherwise open it on a wide-to-narrow resize
+    if (isOpen && window.innerWidth < 1024) onToggle();
   };
 
   return (
@@ -128,7 +129,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                 {/* description sits under it, aligned to the label */}
                 <span
                   id={descId}
-                  className="block pl-[26px] mt-0.5 text-[11px] leading-snug text-slate-500 line-clamp-2"
+                  className="block pl-[26px] mt-0.5 text-[11px] leading-snug text-slate-600 line-clamp-2"
                 >
                   {item.description}
                 </span>

@@ -58,7 +58,7 @@ const EnterpriseRegistration: React.FC = () => {
         throw new Error('Submission failed');
       }
     } catch (error) {
-      addNotification({ type: 'system', category: 'error', title: 'Submission Failed', message: 'There was an error submitting your application. Please try again.' });
+      addNotification({ type: 'system', category: 'urgent', title: 'Submission Failed', message: 'There was an error submitting your application. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }

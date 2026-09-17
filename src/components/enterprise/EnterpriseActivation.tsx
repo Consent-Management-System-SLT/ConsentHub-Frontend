@@ -18,17 +18,17 @@ const EnterpriseActivation: React.FC = () => {
 
   useEffect(() => {
     if (!token || !email) {
-      addNotification({ type: 'system', category: 'error', title: 'Invalid Link', message: 'Missing activation token or email' });
+      addNotification({ type: 'system', category: 'urgent', title: 'Invalid Link', message: 'Missing activation token or email' });
     }
   }, [token, email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      return addNotification({ type: 'system', category: 'error', title: 'Error', message: 'Passwords do not match' });
+      return addNotification({ type: 'system', category: 'urgent', title: 'Error', message: 'Passwords do not match' });
     }
     if (password.length < 8) {
-      return addNotification({ type: 'system', category: 'error', title: 'Error', message: 'Password must be at least 8 characters' });
+      return addNotification({ type: 'system', category: 'urgent', title: 'Error', message: 'Password must be at least 8 characters' });
     }
 
     try {
@@ -47,7 +47,7 @@ const EnterpriseActivation: React.FC = () => {
         throw new Error(data.message || 'Activation failed');
       }
     } catch (e: any) {
-      addNotification({ type: 'system', category: 'error', title: 'Error', message: e.message });
+      addNotification({ type: 'system', category: 'urgent', title: 'Error', message: e.message });
     } finally {
       setLoading(false);
     }

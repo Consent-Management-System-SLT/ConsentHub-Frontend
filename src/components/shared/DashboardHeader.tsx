@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Menu, User, LogOut, Settings, Bell, ChevronDown, RefreshCw } from 'lucide-react';
+import { Menu, User, LogOut, Settings, ChevronDown, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import LanguageSelector from '../LanguageSelector';
+import NotificationBell from './NotificationBell';
+import UserProfile from '../UserProfile';
 
 const ROLE_LABELS: Record<string, string> = {
   admin: 'System Administrator',
@@ -20,7 +22,7 @@ interface DashboardHeaderProps {
   onMenuToggle: () => void;
   onRefresh?: () => void;
   isRefreshing?: boolean;
-  onOpenNotifications?: () => void;
+  /** only rendered when the dashboard has somewhere for it to go */
   onOpenSettings?: () => void;
 }
 
@@ -38,13 +40,13 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onMenuToggle,
   onRefresh,
   isRefreshing = false,
-  onOpenNotifications,
   onOpenSettings,
 }) => {
   const { user, logout } = useAuth();
   const userName = user?.name || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Signed in';
   const userRole = ROLE_LABELS[user?.role || ''] || user?.role || '';
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // close on outside click or Escape, as a menu should
@@ -107,6 +109,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </button>
           )}
 
+          <NotificationBell />
+
           <div className="hidden sm:block">
             <LanguageSelector />
           </div>
@@ -147,25 +151,27 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   className={itemClass}
                   onClick={() => {
                     setMenuOpen(false);
-                    onOpenNotifications?.();
+                    setProfileOpen(true);
                   }}
                 >
-                  <Bell className="w-4 h-4 text-slate-500" aria-hidden="true" />
-                  Notifications
+                  <User className="w-4 h-4 text-slate-500" aria-hidden="true" />
+                  My profile
                 </button>
 
-                <button
-                  role="menuitem"
-                  type="button"
-                  className={itemClass}
-                  onClick={() => {
-                    setMenuOpen(false);
-                    onOpenSettings?.();
-                  }}
-                >
-                  <Settings className="w-4 h-4 text-slate-500" aria-hidden="true" />
-                  Settings
-                </button>
+                {onOpenSettings && (
+                  <button
+                    role="menuitem"
+                    type="button"
+                    className={itemClass}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onOpenSettings();
+                    }}
+                  >
+                    <Settings className="w-4 h-4 text-slate-500" aria-hidden="true" />
+                    Settings
+                  </button>
+                )}
 
                 <div className="sm:hidden border-t border-slate-100 mt-1 pt-1 px-3 py-2">
                   <LanguageSelector />
@@ -190,6 +196,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           </div>
         </div>
       </div>
+
+      <UserProfile isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
     </header>
   );
 };
