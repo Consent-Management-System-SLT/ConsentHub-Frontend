@@ -290,7 +290,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
           {/* Header */}
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between">
-              <div className="flex flex-wrap items-center space-x-3">
+              <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setSelectedNotice(null)}
                   className="p-2 rounded-lg bg-blue-50/10 hover:bg-blue-50/20 transition-colors"
@@ -305,7 +305,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                   <p className="text-slate-600">Version {selectedNotice.version}</p>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center space-x-2">
+              <div className="flex items-center space-x-2">
                 {getStatusIcon(selectedNotice)}
                 <span className={`px-3 py-1 rounded-full border text-sm font-medium ${getStatusBadgeClass(selectedNotice)}`}>
                   {getStatusText(selectedNotice)}
@@ -316,7 +316,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
           {/* Notice Details */}
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="flex flex-wrap items-center space-x-3">
+              <div className="flex items-center space-x-3">
                 <Calendar className="w-5 h-5 text-slate-500" />
                 <div>
                   <p className="text-sm text-slate-600">Effective Date</p>
@@ -325,14 +325,14 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center space-x-3">
+              <div className="flex items-center space-x-3">
                 <Globe className="w-5 h-5 text-slate-500" />
                 <div>
                   <p className="text-sm text-slate-600">Category</p>
                   <p className="font-medium text-slate-900 capitalize">{selectedNotice.category}</p>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center space-x-3">
+              <div className="flex items-center space-x-3">
                 <User className="w-5 h-5 text-slate-500" />
                 <div>
                   <p className="text-sm text-slate-600">Language</p>
@@ -361,17 +361,17 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
               </p>
               {error && (
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex flex-wrap items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                     <AlertTriangle className="w-4 h-4 text-red-500" />
                     <span className="text-red-700">{error}</span>
                   </div>
                 </div>
               )}
-              <div className="flex flex-wrap space-x-4">
+              <div className="flex space-x-4">
                 <button
                   onClick={() => handleDecision(selectedNotice.id || selectedNotice._id || selectedNotice.noticeId || '', 'accept')}
                   disabled={isProcessing !== null}
-                  className="flex-1 flex items-center justify-center space-x-2 py-3 px-6 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center space-x-2 py-3 px-6 bg-green-700 hover:bg-green-800 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
                   {isProcessing === (selectedNotice.id || selectedNotice._id || selectedNotice.noticeId) ? (
                     <RefreshCw className="w-5 h-5 animate-spin" />
@@ -398,7 +398,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
           {/* Already responded */}
           {selectedNotice.acknowledged && (
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
-              <div className="flex flex-wrap items-center space-x-3">
+              <div className="flex items-center space-x-3">
                 {selectedNotice.customerDecision === 'accept' ? (
                   <CheckCircle className="w-6 h-6 text-green-500" />
                 ) : (
@@ -500,7 +500,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                 className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                aria-label="Search privacy notices"/>
             </div>
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <Filter className="w-4 h-4 text-slate-500" />
               <select
                 value={statusFilter}
@@ -518,7 +518,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-            <div className="flex flex-wrap items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <AlertTriangle className="w-5 h-5 text-red-500" />
               <div>
                 <span className="text-red-700 font-medium">Error Processing Request</span>
@@ -537,12 +537,12 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
               <div key={notice.id || notice._id} className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
                 <div className="flex flex-wrap gap-4 items-start justify-between">
                   <div className="flex-1">
-                    <div className="flex flex-wrap items-start space-x-4">
+                    <div className="flex items-start space-x-4">
                       <div className="p-2 bg-blue-100 rounded-lg">
                         <FileText className="w-5 h-5 text-blue-600" />
                       </div>
                       <div className="flex-1">
-                        <div className="flex flex-wrap items-center space-x-3 mb-2">
+                        <div className="flex items-center space-x-3 mb-2">
                           <h3 className="text-lg font-semibold text-slate-900">{notice.title}</h3>
                           <span className={`px-2 py-1 rounded-full border text-xs font-medium ${getStatusBadgeClass(notice)}`}>
                             {getStatusText(notice)}
@@ -556,16 +556,16 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                         {notice.description && (
                           <p className="text-slate-600 mb-3">{notice.description}</p>
                         )}
-                        <div className="flex flex-wrap items-center space-x-6 text-sm text-slate-500">
-                          <span className="flex flex-wrap items-center space-x-1">
+                        <div className="flex items-center space-x-6 text-sm text-slate-500">
+                          <span className="flex items-center space-x-1">
                             <Calendar className="w-4 h-4" />
                             <span>Version {notice.version}</span>
                           </span>
-                          <span className="flex flex-wrap items-center space-x-1">
+                          <span className="flex items-center space-x-1">
                             <Globe className="w-4 h-4" />
                             <span className="capitalize">{notice.category}</span>
                           </span>
-                          <span className="flex flex-wrap items-center space-x-1">
+                          <span className="flex items-center space-x-1">
                             <Clock className="w-4 h-4" />
                             <span>{new Date(notice.effectiveDate).toLocaleDateString()}</span>
                           </span>
@@ -579,21 +579,21 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center space-x-3">
+                  <div className="flex items-center space-x-3">
                     {getStatusIcon(notice)}
                     <button
                       onClick={() => setSelectedNotice(notice)}
-                      className="flex flex-wrap items-center space-x-2 px-4 py-2 text-green-700 hover:bg-green-50 border border-green-200/30 rounded-lg transition-colors"
+                      className="flex items-center space-x-2 px-4 py-2 text-green-700 hover:bg-green-50 border border-green-200/30 rounded-lg transition-colors"
                     >
                       <Eye className="w-4 h-4" />
                       <span>Review</span>
                     </button>
                     {!notice.acknowledged && (
-                      <div className="flex flex-wrap space-x-2">
+                      <div className="flex space-x-2">
                         <button
                           onClick={() => handleDecision(notice.id || notice._id || notice.noticeId || '', 'accept')}
                           disabled={isProcessing !== null}
-                          className="flex flex-wrap items-center space-x-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm transition-colors disabled:opacity-50"
+                          className="flex items-center space-x-1 px-3 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg text-sm transition-colors disabled:opacity-50"
                         >
                           {isProcessing === (notice.id || notice._id || notice.noticeId) ? (
                             <RefreshCw className="w-4 h-4 animate-spin" />
@@ -605,7 +605,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                         <button
                           onClick={() => handleDecision(notice.id || notice._id || notice.noticeId || '', 'decline')}
                           disabled={isProcessing !== null}
-                          className="flex flex-wrap items-center space-x-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors disabled:opacity-50"
+                          className="flex items-center space-x-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors disabled:opacity-50"
                         >
                           {isProcessing === (notice.id || notice._id || notice.noticeId) ? (
                             <RefreshCw className="w-4 h-4 animate-spin" />

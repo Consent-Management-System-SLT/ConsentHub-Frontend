@@ -311,7 +311,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
               </p>
             )}
           </div>
-          <div className="flex flex-wrap flex-row space-x-3 items-center justify-between sm:justify-start">
+          <div className="flex flex-row space-x-3 items-center justify-between sm:justify-start">
             <div className="flex-shrink-0 sm:hidden lg:block">
               <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-white/15 rounded-full flex items-center justify-center">
                 <Shield className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
@@ -354,7 +354,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       {isLoading ? (
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-6 animate-pulse">
           <div className="flex items-start justify-between mb-4">
-            <div className="flex flex-wrap items-center space-x-3">
+            <div className="flex items-center space-x-3">
               <div className="flex-shrink-0 p-2 rounded-lg bg-gray-200 w-9 h-9"></div>
               <div>
                 <div className="h-5 bg-gray-200 rounded w-40 mb-2"></div>
@@ -372,7 +372,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       ) : latestConsent ? (
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-start justify-between mb-4">
-            <div className="flex flex-wrap items-center space-x-3">
+            <div className="flex items-center space-x-3">
               <div className="flex-shrink-0 p-2 rounded-lg bg-blue-50/10">
                 <Bell className="w-5 h-5 text-blue-600" />
               </div>
@@ -398,7 +398,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center space-x-2 text-xs text-slate-500">
+            <div className="flex items-center space-x-2 text-xs text-slate-500">
               <Calendar className="w-4 h-4" />
               <span>
                 {(() => {
@@ -414,7 +414,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
           <div className="bg-blue-50/5 rounded-lg p-4 border border-slate-200/10">
             <div className="flex flex-wrap gap-4 items-start justify-between">
               <div className="flex-1">
-                <div className="flex flex-wrap items-center space-x-2 mb-2">
+                <div className="flex items-center space-x-2 mb-2">
                   <div className={`flex-shrink-0 p-1.5 rounded-full ${
                     latestConsent.status === 'granted' 
                       ? 'bg-green-100 text-green-800' 
@@ -442,7 +442,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                 </div>
                 <h4 className="font-medium text-slate-900 mb-1">{latestConsent.purpose}</h4>
                 <p className="text-sm text-slate-600 mb-2">{latestConsent.description}</p>
-                <div className="flex flex-wrap items-center space-x-4 text-xs text-slate-500">
+                <div className="flex items-center space-x-4 text-xs text-slate-500">
                   <span>Category: {latestConsent.dataCategory}</span>
                   {latestConsent.grantedAt && (
                     <span className={latestConsent.status === 'granted' ? 'font-medium text-green-700' : ''}>
@@ -504,7 +504,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                 }
               }}
             >
-              <div className="flex flex-wrap items-start space-x-2 sm:space-x-3 lg:space-x-4 mb-2 sm:mb-3 lg:mb-4">
+              <div className="flex items-start space-x-2 sm:space-x-3 lg:space-x-4 mb-2 sm:mb-3 lg:mb-4">
                 <div className="flex-shrink-0 mt-1">
                   {action.icon}
                 </div>
@@ -530,7 +530,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
           </div>
           <div className="space-y-2 sm:space-y-3 lg:space-y-4">
             {recentActivity.map((activity, index) => (
-              <div key={activity.id || `activity-${index}`} className="flex flex-wrap items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg hover:bg-blue-50/10 transition-colors">
+              <div key={activity.id || `activity-${index}`} className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg hover:bg-blue-50/10 transition-colors">
                 <div className="flex-shrink-0 mt-1">
                   {'icon' in activity && activity.icon ? 
                     activity.icon : 

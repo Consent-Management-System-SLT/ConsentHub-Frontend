@@ -518,7 +518,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                 <div key={consent.id} className="bg-slate-50 border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                   <div className="flex flex-wrap gap-4 items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex flex-wrap items-start space-x-4">
+                      <div className="flex items-start space-x-4">
                         <div className="flex-shrink-0 mt-1">
                           {getStatusIcon(consent.status)}
                         </div>
@@ -549,7 +549,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                               {consent.jurisdiction}
                             </span>
                           </div>
-                          <div className="flex flex-wrap items-center space-x-3">
+                          <div className="flex items-center space-x-3">
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(consent.status)}`}>
                               {consent.status.charAt(0).toUpperCase() + consent.status.slice(1)}
                             </span>
@@ -612,7 +612,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
           <div className="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
             <div className="p-6 border-b border-slate-200 bg-slate-50 text-slate-900 rounded-t-2xl">
               <div className="flex items-center justify-between">
-                <div className="flex flex-wrap items-center space-x-3">
+                <div className="flex items-center space-x-3">
                   <Shield className="w-8 h-8" />
                   <div>
                     <h2 id="consentcenter-dialog-8-title" className="text-2xl font-bold">{selectedConsent.purpose}</h2>
@@ -679,7 +679,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                 <span className="text-sm text-slate-500">
                   {t('consentCenter.details.grantedBy')}: {selectedConsent.grantedBy}
                 </span>
-                <div className="flex flex-wrap space-x-3">
+                <div className="flex space-x-3">
                   <button
                     onClick={() => setSelectedConsent(null)}
                     className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-blue-50/5 transition-colors"

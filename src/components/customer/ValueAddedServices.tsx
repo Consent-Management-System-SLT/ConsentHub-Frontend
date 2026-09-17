@@ -185,7 +185,7 @@ const ValueAddedServices: React.FC = () => {
   };
   const getColorForCategory = (category: string) => {
     const colorMap: { [key: string]: string } = {
-      'entertainment': 'text-red-600 bg-red-50 border-red-200',
+      'entertainment': 'text-blue-700 bg-blue-50 border-blue-200',
       'security': 'text-orange-600 bg-orange-50 border-orange-200',
       'healthcare': 'text-green-700 bg-green-50 border-green-200',
       'cloud': 'text-blue-600 bg-blue-50 border-blue-200',
@@ -314,9 +314,9 @@ const ValueAddedServices: React.FC = () => {
   return (
     <div className="space-y-6 p-4 sm:p-6">
       {/* Header - SLT Red Theme */}
-      <div className="bg-gradient-to-r from-red-600 via-red-500 to-red-700 rounded-xl p-6 text-white shadow-lg">
+      <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-900 rounded-xl p-6 text-white shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center space-x-4 mb-4 lg:mb-0">
+          <div className="flex items-center space-x-4 mb-4 lg:mb-0">
             <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
               <Activity className="w-8 h-8 text-white" />
             </div>
@@ -324,9 +324,9 @@ const ValueAddedServices: React.FC = () => {
               <h1 className="text-2xl font-bold">{t('valueAddedServices.title')}</h1>
               <p className="text-white/90">Enhance your SLT experience with premium services</p>
               {/* WebSocket Status Indicator */}
-              <div className="flex flex-wrap items-center space-x-2 mt-2">
+              <div className="flex items-center space-x-2 mt-2">
                 <div className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                <span className="text-white/75 text-xs">
+                <span className="text-white/90 text-xs">
                   {wsConnected ? 'Real-time updates active' : 'Real-time updates offline'}
                 </span>
               </div>
@@ -340,14 +340,14 @@ const ValueAddedServices: React.FC = () => {
             </div>
             {/* Monthly Total */}
             <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-              <div className="flex flex-wrap items-center justify-center space-x-2 mb-1">
+              <div className="flex items-center justify-center space-x-2 mb-1">
                 <CreditCard className="w-4 h-4 text-white/90" />
                 <span className="text-white/90 text-xs font-medium">Monthly Total</span>
               </div>
               <div className="text-2xl font-bold text-white">
                 Rs. {monthlyTotal.toLocaleString()}
               </div>
-              <div className="text-white/75 text-xs">
+              <div className="text-white/90 text-xs">
                 {subscribedCount > 0 ? (
                   <>
                     <div>{subscribedCount} service{subscribedCount > 1 ? 's' : ''} active</div>
@@ -365,17 +365,17 @@ const ValueAddedServices: React.FC = () => {
       {subscribedCount > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex flex-wrap items-center space-x-2">
-              <Calendar className="w-5 h-5 text-red-600" />
+            <div className="flex items-center space-x-2">
+              <Calendar className="w-5 h-5 text-blue-700" />
               <h3 className="text-lg font-semibold text-gray-900">Active Subscriptions</h3>
             </div>
-            <div className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
+            <div className="bg-blue-50 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
               Rs. {monthlyTotal.toLocaleString()}/month
             </div>
           </div>
           {/* Billing Information */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <div className="flex flex-wrap items-start space-x-3">
+            <div className="flex items-start space-x-3">
               <Info className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
                 <h4 className="text-blue-900 font-medium text-sm">Billing Information</h4>
@@ -395,10 +395,10 @@ const ValueAddedServices: React.FC = () => {
                 const price = parseFloat(priceString) || 0;
                 return (
                   <div key={service.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex flex-wrap items-center space-x-3">
-                      <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                         {React.createElement(service.icon || Activity, { 
-                          className: "w-4 h-4 text-red-600" 
+                          className: "w-4 h-4 text-blue-700" 
                         })}
                       </div>
                       <div>
@@ -420,7 +420,7 @@ const ValueAddedServices: React.FC = () => {
       {/* Error/Info Message */}
       {message && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-          <div className="flex flex-wrap items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <Info className="w-5 h-5 text-yellow-700" />
             <p className="text-yellow-800">{message}</p>
           </div>
@@ -429,16 +429,16 @@ const ValueAddedServices: React.FC = () => {
       {/* Search and Filter */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1">
+          <div className="flex-1 lg:min-w-[220px]">
             <input
               type="text"
               placeholder="Search services..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
              aria-label="Search services"/>
           </div>
-          <div className="flex gap-2 overflow-x-auto">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {categories.map((category) => (
               <button
                 key={category.id}
@@ -464,7 +464,7 @@ const ValueAddedServices: React.FC = () => {
           return (
             <div
               key={service.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 hover:border-red-200"
+              className="h-full flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md hover:border-blue-200 transition-all duration-200"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${service.color}`}>
@@ -479,15 +479,15 @@ const ValueAddedServices: React.FC = () => {
                 </div>
               </div>
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{service.name}</h3>
-                <p className="text-gray-600 text-sm mb-3">{service.description}</p>
-                <div className="text-red-600 font-bold text-lg">{service.price}</div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">{service.name}</h3>
+                <p className="text-slate-600 text-sm mb-3 line-clamp-3">{service.description}</p>
+                <div className="text-blue-800 font-bold text-lg">{service.price}</div>
               </div>
-              <div className="mb-4">
-                <div className="text-xs text-gray-500 mb-2 font-medium">Features:</div>
+              <div className="mb-4 flex-1">
+                <div className="text-xs text-slate-600 mb-2 font-medium">Features:</div>
                 <div className="space-y-1">
                   {service.features.slice(0, 3).map((feature, index) => (
-                    <div key={index} className="flex flex-wrap items-center space-x-2 text-xs">
+                    <div key={index} className="flex items-center space-x-2 text-xs">
                       <CheckCircle className="w-3 h-3 text-green-500" />
                       <span className="text-gray-600">{feature}</span>
                     </div>
@@ -497,10 +497,11 @@ const ValueAddedServices: React.FC = () => {
               <button
                 onClick={() => handleSubscriptionToggle(service.id)}
                 disabled={isLoading}
-                className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
+                className={`mt-auto w-full py-3 px-4 rounded-lg font-medium transition-colors
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 ${
                   service.isSubscribed
-                    ? 'bg-gray-600 hover:bg-gray-700 text-white'
-                    : 'bg-red-600 hover:bg-red-700 text-white'
+                    ? 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {isLoading ? (
