@@ -717,7 +717,7 @@ const WebhookModal: React.FC<WebhookModalProps> = ({ title, formData, setFormDat
     setFormData({ ...formData, events: newEvents });
   };
   return (
-    <div role="dialog" aria-modal="true" aria-label="Basic Settings" className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+    <div role="dialog" aria-modal="true" aria-label="Basic Settings" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-slate-200">
           <div className="flex items-center justify-between">
@@ -905,7 +905,7 @@ const LogsModal: React.FC<LogsModalProps> = ({ webhook, logs, onClose }) => {
     return new Date(dateString).toLocaleString();
   };
   return (
-    <div role="dialog" aria-modal="true" aria-label="Delivery Logs" className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+    <div role="dialog" aria-modal="true" aria-label="Delivery Logs" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white border border-slate-200 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-slate-200">
           <div className="flex items-center justify-between">

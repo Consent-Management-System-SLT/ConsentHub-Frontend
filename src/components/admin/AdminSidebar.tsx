@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import {
   BarChart3,
   Shield,
@@ -8,9 +8,6 @@ import {
   Upload,
   Webhook,
   Users,
-  AlertTriangle,
-  X,
-  ChevronRight,
   UserCheck,
   Zap,
   Cog,
@@ -19,6 +16,26 @@ import {
   ScrollText,
   ShieldCheck,
 } from 'lucide-react';
+import DashboardSidebar, { NavItem } from '../shared/DashboardSidebar';
+
+export const adminNavItems: NavItem[] = [
+  { id: 'dashboard', label: 'Dashboard', icon: BarChart3, description: 'Overview and analytics' },
+  { id: 'enterprise-management', label: 'Enterprise Management', icon: Webhook, description: 'Manage enterprise registrations' },
+  { id: 'enterprise-campaigns', label: 'Enterprise Campaigns', icon: Megaphone, description: 'Review and approve campaigns' },
+  { id: 'consents', label: 'Consents', icon: Shield, description: 'Manage all customer consents' },
+  { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Consent for minors' },
+  { id: 'preference-management', label: 'Preference Management', icon: Cog, description: 'Channels and topic preferences' },
+  { id: 'vas-management', label: 'VAS Management', icon: Smartphone, description: 'Value Added Services' },
+  { id: 'privacy-notices', label: 'Privacy Notices', icon: FileText, description: 'Manage privacy policies' },
+  { id: 'dsar-requests', label: 'DSAR Requests', icon: Database, description: 'Data subject access requests' },
+  { id: 'dsar-automation', label: 'DSAR Automation', icon: Zap, description: 'Automated DSAR processing' },
+  { id: 'audit-logs', label: 'Audit Logs', icon: ScrollText, description: 'Recorded system activity' },
+  { id: 'bulk-import', label: 'Bulk Import', icon: Upload, description: 'Import customer data' },
+  { id: 'event-listeners', label: 'Event Listeners', icon: Activity, description: 'System events and errors' },
+  { id: 'user-management', label: 'User Management', icon: Users, description: 'Manage users and roles' },
+  { id: 'customer-management', label: 'Customer Management', icon: UserCheck, description: 'Customer accounts and data' },
+  { id: 'compliance-rules', label: 'Compliance Rules', icon: ShieldCheck, description: 'Automated compliance rules' },
+];
 
 interface AdminSidebarProps {
   activeSection: string;
@@ -27,175 +44,8 @@ interface AdminSidebarProps {
   onToggle: () => void;
 }
 
-const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: BarChart3, description: 'Overview and analytics' },
-  { id: 'enterprise-management', label: 'Enterprise Management', icon: Webhook, description: 'Manage enterprise registrations' },
-  { id: 'enterprise-campaigns', label: 'Enterprise Campaigns', icon: Megaphone, description: 'Review and approve enterprise campaigns' },
-  { id: 'consents', label: 'Consents', icon: Shield, description: 'Manage all customer consents' },
-  { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Manage guardian consent for minors' },
-  { id: 'preference-management', label: 'Preference Management', icon: Cog, description: 'Configure communication channels & topic preferences' },
-  { id: 'vas-management', label: 'VAS Management', icon: Smartphone, description: 'Manage Value Added Services and customer subscriptions' },
-  { id: 'privacy-notices', label: 'Privacy Notices', icon: FileText, description: 'Manage privacy policies' },
-  { id: 'dsar-requests', label: 'DSAR Requests', icon: Database, description: 'Data subject access requests' },
-  { id: 'dsar-automation', label: 'DSAR Automation', icon: Zap, description: 'Automated DSAR processing' },
-  { id: 'audit-logs', label: 'Audit Logs', icon: ScrollText, description: 'Review recorded system activity' },
-  { id: 'bulk-import', label: 'Bulk Import', icon: Upload, description: 'Import customer data' },
-  { id: 'event-listeners', label: 'Event Listeners', icon: Activity, description: 'Monitor system events and errors' },
-  { id: 'user-management', label: 'User Management', icon: Users, description: 'Manage users and roles' },
-  { id: 'customer-management', label: 'Customer Management', icon: UserCheck, description: 'Manage customer accounts and data' },
-  { id: 'compliance-rules', label: 'Compliance Rules', icon: ShieldCheck, description: 'Define automated compliance rules' },
-];
-
-const AdminSidebar: React.FC<AdminSidebarProps> = ({
-  activeSection,
-  onSectionChange,
-  isOpen,
-  onToggle,
-}) => {
-  const navRef = useRef<HTMLElement>(null);
-
-  // Close the mobile drawer on Escape, matching standard dialog behaviour.
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onToggle();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, onToggle]);
-
-  // Move focus into the drawer when it opens on small screens.
-  useEffect(() => {
-    if (isOpen && window.innerWidth < 1024) {
-      navRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
-    }
-  }, [isOpen]);
-
-  const handleSelect = (id: string) => {
-    onSectionChange(id);
-    if (window.innerWidth < 1024) onToggle();
-  };
-
-  return (
-    <>
-      {/* Mobile scrim - dims the page instead of hiding it */}
-      {isOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-slate-900/50 z-40 transition-opacity duration-300"
-          onClick={onToggle}
-          aria-hidden="true"
-        />
-      )}
-
-
-      <aside
-        className={`
-          fixed lg:relative left-0 top-0 h-full w-64 bg-white border-r-2 border-slate-200 z-50
-          transform transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}
-      >
-        <div className="flex flex-col h-full">
-          <div className="px-4 sm:px-6 bg-white border-b-2 border-slate-200 h-16 flex items-center justify-center">
-            <div className="flex items-center justify-center w-full">
-              <img src="/Logo-SLT.png" alt="SLT Mobitel" className="h-10 w-auto" />
-            </div>
-            <button
-              onClick={onToggle}
-              className="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors absolute right-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
-              aria-label="Close navigation menu"
-            >
-              <X className="w-5 h-5 text-slate-600" aria-hidden="true" />
-            </button>
-          </div>
-
-          <nav
-            ref={navRef}
-            id="admin-nav"
-            aria-label="Admin sections"
-            className="flex-1 px-3 sm:px-4 py-6 space-y-2 overflow-y-auto"
-          >
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeSection === item.id;
-              const descId = `admin-nav-${item.id}-desc`;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => handleSelect(item.id)}
-                  aria-current={isActive ? 'page' : undefined}
-                  aria-describedby={descId}
-                  className={`
-                    w-full flex items-start gap-3 sm:gap-4 px-3 sm:px-4 py-4 rounded-xl text-left
-                    transition-all duration-200 group hover:shadow-sm border-2
-                    focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2
-                    ${isActive
-                      ? 'bg-blue-50 border-blue-200 text-slate-900 shadow-sm'
-                      : 'border-transparent hover:bg-slate-50 hover:border-slate-200 text-slate-700'
-                    }
-                  `}
-                >
-                  <span
-                    className={`
-                      flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center transition-all duration-200
-                      ${isActive
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200 group-hover:text-slate-900'
-                      }
-                    `}
-                  >
-                    <Icon className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
-                  </span>
-                  <span className="flex-1 min-w-0">
-                    <span className="flex flex-wrap items-start justify-between gap-2 mb-1">
-                      <span className="font-semibold text-sm sm:text-base text-slate-900">
-                        {item.label}
-                      </span>
-                      <ChevronRight
-                        className={`
-                          flex-shrink-0 w-4 h-4 transition-all duration-200
-                          ${isActive
-                            ? 'text-blue-600 rotate-90'
-                            : 'text-slate-400 group-hover:text-slate-600'
-                          }
-                        `}
-                        aria-hidden="true"
-                      />
-                    </span>
-                    <span
-                      id={descId}
-                      className={`block text-xs sm:text-sm leading-relaxed line-clamp-2 ${
-                        isActive ? 'text-slate-600' : 'text-slate-500 group-hover:text-slate-600'
-                      }`}
-                    >
-                      {item.description}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
-
-          <div className="px-3 sm:px-4 py-4 border-t border-slate-200 bg-slate-50/60">
-            <div className="bg-white rounded-xl p-3 sm:p-4 border border-red-200">
-              <div className="flex flex-wrap items-start gap-3">
-                <span className="w-8 h-8 lg:w-9 lg:h-9 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle className="w-4 h-4 lg:w-5 lg:h-5 text-red-700" aria-hidden="true" />
-                </span>
-                <div className="min-w-0">
-                  <h2 className="text-sm font-semibold text-red-900 mb-1">Admin Access</h2>
-                  <p className="text-xs text-red-800 leading-relaxed">
-                    Full system privileges - use responsibly
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </>
-  );
-};
+const AdminSidebar: React.FC<AdminSidebarProps> = (props) => (
+  <DashboardSidebar navId="admin-nav" navLabel="Admin sections" items={adminNavItems} {...props} />
+);
 
 export default AdminSidebar;

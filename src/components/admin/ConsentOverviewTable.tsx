@@ -828,7 +828,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   />
                 </th>
                 <th scope="col" 
-                  className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-white border border-slate-200"
+                  className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide cursor-pointer hover:bg-slate-100"
                   onClick={() => {
                     setSortBy('name');
                     setSortOrder(sortBy === 'name' && sortOrder === 'asc' ? 'desc' : 'asc');
@@ -839,11 +839,11 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'name' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
                 </th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   Consent Type
                 </th>
                 <th scope="col" 
-                  className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-white border border-slate-200"
+                  className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide cursor-pointer hover:bg-slate-100"
                   onClick={() => {
                     setSortBy('status');
                     setSortOrder(sortBy === 'status' && sortOrder === 'asc' ? 'desc' : 'asc');
@@ -855,7 +855,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   </div>
                 </th>
                 <th scope="col" 
-                  className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-white border border-slate-200"
+                  className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide cursor-pointer hover:bg-slate-100"
                   onClick={() => {
                     setSortBy('date');
                     setSortOrder(sortBy === 'date' && sortOrder === 'asc' ? 'desc' : 'asc');
@@ -866,13 +866,13 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'date' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
                 </th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   Expiry Date
                 </th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   Source
                 </th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-900 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   Actions
                 </th>
               </tr>
@@ -914,7 +914,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-800">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 text-slate-500 mr-2" />
                       <div>
@@ -955,7 +955,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-800">
                     {consent.expiryDate ? (
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 text-slate-500 mr-2" />
@@ -1031,7 +1031,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       </div>
       {/* Consent Details Modal */}
       {showModal && modalData && (
-        <div role="dialog" aria-modal="true" aria-label="Consent Details" className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Consent Details" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-slate-200">
               <div className="flex items-center justify-between">
@@ -1108,7 +1108,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       )}
       {/* Create Consent Modal */}
       {showCreateModal && (
-        <div role="dialog" aria-modal="true" aria-label="Create New Consent" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+        <div role="dialog" aria-modal="true" aria-label="Create New Consent" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Create New Consent</h3>
@@ -1238,7 +1238,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       )}
       {/* Edit Consent Modal */}
       {showEditModal && editingConsent && (
-        <div role="dialog" aria-modal="true" aria-labelledby="consentoverviewtable-dialog-3-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+        <div role="dialog" aria-modal="true" aria-labelledby="consentoverviewtable-dialog-3-title" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 id="consentoverviewtable-dialog-3-title" className="text-lg font-semibold text-gray-900">Edit Consent - {editingConsent.customerName}</h3>

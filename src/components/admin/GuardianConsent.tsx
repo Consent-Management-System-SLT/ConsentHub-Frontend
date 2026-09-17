@@ -153,7 +153,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
   };
   if (success) {
     return (
-      <div role="dialog" aria-modal="true" aria-label="Guardian Consent Created" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+      <div role="dialog" aria-modal="true" aria-label="Guardian Consent Created" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8 max-w-md w-full relative">
           {/* Close button */}
           <button
@@ -244,22 +244,22 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-100">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                     Purpose
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                     Status
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                     Guardian
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                     Minor
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                     Age
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                     Created
                   </th>
                 </tr>
@@ -279,10 +279,10 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
                         {consent.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-800">
                       {consent.guardianName}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-800">
                       {consent.minorName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">

@@ -544,7 +544,7 @@ const DSARManager: React.FC = () => {
       )}
       {/* Detail Modal */}
       {selectedRequest && (
-        <div role="dialog" aria-modal="true" aria-label="Request Information" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+        <div role="dialog" aria-modal="true" aria-label="Request Information" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm max-w-2xl w-full max-h-[90vh] overflow-auto">
             <div className="p-6 border-b border-slate-200">
               <div className="flex items-center justify-between">

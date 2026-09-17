@@ -256,13 +256,13 @@ const CustomerManagement: React.FC = () => {
           <table className="w-full">
             <thead className="bg-blue-50/5">
               <tr>
-                <th scope="col" className="text-left px-6 py-3 text-sm font-medium text-slate-600">Customer</th>
-                <th scope="col" className="text-left px-6 py-3 text-sm font-medium text-slate-600">Contact</th>
-                <th scope="col" className="text-left px-6 py-3 text-sm font-medium text-slate-600">Status</th>
-                <th scope="col" className="text-left px-6 py-3 text-sm font-medium text-slate-600">Consents</th>
-                <th scope="col" className="text-left px-6 py-3 text-sm font-medium text-slate-600">Preferences</th>
-                <th scope="col" className="text-left px-6 py-3 text-sm font-medium text-slate-600">Last Activity</th>
-                <th scope="col" className="text-left px-6 py-3 text-sm font-medium text-slate-600">Actions</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Customer</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Contact</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Consents</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Preferences</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Last Activity</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-blue-600/10">
@@ -331,7 +331,7 @@ const CustomerManagement: React.FC = () => {
       </div>
       {/* Customer Details Modal */}
       {showCustomerDetails && selectedCustomer && (
-        <div role="dialog" aria-modal="true" aria-label="Customer Details" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+        <div role="dialog" aria-modal="true" aria-label="Customer Details" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-slate-900">Customer Details</h2>

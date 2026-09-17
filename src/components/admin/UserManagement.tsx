@@ -1003,15 +1003,15 @@ const UserManagement: React.FC = () => {
             <table className="w-full">
               <thead className="bg-slate-50">
                 <tr>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">User</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Role</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Status</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">User</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Role</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                     Last Login
                     <span className="ml-1 text-xs text-green-700" title="Sorted by most recent login first">↓</span>
                   </th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Department</th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Actions</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Department</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white border border-slate-200 rounded-xl shadow-sm divide-y divide-blue-600/20">
@@ -1063,7 +1063,7 @@ const UserManagement: React.FC = () => {
                       <option value="suspended">Suspended</option>
                     </select>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-800">
                     <div className="flex flex-col">
                       {user.hasNeverLoggedIn ? (
                         <>
@@ -1096,7 +1096,7 @@ const UserManagement: React.FC = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{user.department || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-800">{user.department || 'N/A'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex flex-wrap items-center space-x-1">
                       <button 
@@ -1178,7 +1178,7 @@ const UserManagement: React.FC = () => {
       )}
       {/* Add User Modal */}
       {showAddModal && (
-        <div role="dialog" aria-modal="true" aria-labelledby="usermanagement-dialog-4-title" className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-labelledby="usermanagement-dialog-4-title" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className={`bg-white rounded-xl shadow-lg border border-gray-200 ${
             newUser.role === 'guardian' ? 'max-w-2xl w-full max-h-[90vh] overflow-y-auto' : 'max-w-md w-full'
           }`}>
@@ -1517,7 +1517,7 @@ const UserManagement: React.FC = () => {
       )}
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
-        <div role="dialog" aria-modal="true" aria-label="Edit User" className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Edit User" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-xl shadow-xl max-w-md w-full">
             <div className="p-6 border-b border-slate-200">
               <h3 className="text-lg font-semibold text-slate-900">Edit User</h3>
@@ -1595,7 +1595,7 @@ const UserManagement: React.FC = () => {
       )}
       {/* Delete Confirmation Modal */}
       {showDeleteModal && userToDelete && (
-        <div role="dialog" aria-modal="true" aria-label="Delete User" className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Delete User" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center">
@@ -1652,7 +1652,7 @@ const UserManagement: React.FC = () => {
       )}
       {/* Edit Guardian Modal */}
       {isEditModalOpen && editGuardianData && (
-        <div role="dialog" aria-modal="true" aria-label="Edit Guardian" className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Edit Guardian" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">

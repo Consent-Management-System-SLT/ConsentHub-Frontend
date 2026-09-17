@@ -272,7 +272,7 @@ const ComplianceRulesManager = () => {
       )}
       {/* Add Rule Modal */}
       {showAddModal && (
-        <div role="dialog" aria-modal="true" aria-label="Add New Compliance Rule" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+        <div role="dialog" aria-modal="true" aria-label="Add New Compliance Rule" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Add New Compliance Rule</h2>
@@ -351,7 +351,7 @@ const ComplianceRulesManager = () => {
       )}
       {/* Details Modal */}
       {showDetailsModal && selectedRule && (
-        <div role="dialog" aria-modal="true" aria-label="Compliance Rule Details" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+        <div role="dialog" aria-modal="true" aria-label="Compliance Rule Details" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Compliance Rule Details</h2>
@@ -431,7 +431,7 @@ const ComplianceRulesManager = () => {
       )}
       {/* Edit Modal */}
       {showEditModal && selectedRule && (
-        <div role="dialog" aria-modal="true" aria-label="Edit Compliance Rule" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+        <div role="dialog" aria-modal="true" aria-label="Edit Compliance Rule" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Edit Compliance Rule</h2>

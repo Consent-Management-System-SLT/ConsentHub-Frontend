@@ -117,24 +117,24 @@ const EnterpriseCampaignReview: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b text-sm text-slate-600">
-                <th scope="col" className="p-4 font-medium">Enterprise</th>
-                <th scope="col" className="p-4 font-medium">Campaign Name</th>
-                <th scope="col" className="p-4 font-medium">Status</th>
-                <th scope="col" className="p-4 font-medium text-right">Actions</th>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Enterprise</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Campaign Name</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody>
               {campaigns.map(c => (
                 <tr key={c._id} className="border-b hover:bg-slate-50">
-                  <td className="p-4 font-medium">{c.organizationId?.legalName}</td>
-                  <td className="p-4">{c.campaignName}</td>
-                  <td className="p-4">
+                  <td className="px-6 py-4 text-sm text-slate-700 font-medium">{c.organizationId?.legalName}</td>
+                  <td className="px-6 py-4 text-sm text-slate-700">{c.campaignName}</td>
+                  <td className="px-6 py-4 text-sm text-slate-700">
                     <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
                       {c.status}
                     </span>
                   </td>
-                  <td className="p-4 text-right">
+                  <td className="px-6 py-4 text-sm text-slate-700 text-right">
                     <button onClick={() => setSelectedCampaign(c)} className="text-blue-600 hover:underline">
                       Review <Eye className="w-4 h-4 inline" />
                     </button>

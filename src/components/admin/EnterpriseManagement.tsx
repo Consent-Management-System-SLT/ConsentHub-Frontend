@@ -287,7 +287,7 @@ export default function EnterpriseManagement() {
         )}
 
         {showRejectModal && (
-          <div role="dialog" aria-modal="true" aria-label="Reject Application" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+          <div role="dialog" aria-modal="true" aria-label="Reject Application" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl w-full max-w-md">
               <h3 className="text-lg font-bold mb-4">Reject Application</h3>
               <textarea
@@ -305,7 +305,7 @@ export default function EnterpriseManagement() {
         )}
 
         {showRequestInfoModal && (
-          <div role="dialog" aria-modal="true" aria-label="Request More Information" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+          <div role="dialog" aria-modal="true" aria-label="Request More Information" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl w-full max-w-md">
               <h3 className="text-lg font-bold mb-4">Request More Information</h3>
               <textarea
@@ -362,16 +362,16 @@ export default function EnterpriseManagement() {
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-sm text-slate-500 border-b">
-                    <th scope="col" className="pb-3 font-medium">Company</th>
-                    <th scope="col" className="pb-3 font-medium">Registration</th>
-                    <th scope="col" className="pb-3 font-medium">Industry</th>
-                    <th scope="col" className="pb-3 font-medium">Representative</th>
-                    <th scope="col" className="pb-3 font-medium">Status</th>
-                    <th scope="col" className="pb-3 font-medium text-right">Actions</th>
+                  <tr className="bg-slate-50 border-b border-slate-200">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Company</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Registration</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Industry</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Representative</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-slate-200">
                   {organizations
                     .filter(o => {
                       if (activeTab === 'pending') return ['SUBMITTED', 'UNDER_REVIEW', 'MORE_INFORMATION_REQUIRED'].includes(o.status);
@@ -381,17 +381,17 @@ export default function EnterpriseManagement() {
                     })
                     .map(org => (
                     <tr key={org._id} className="hover:bg-slate-50">
-                      <td className="py-4">
+                      <td className="px-6 py-4">
                         <div className="font-medium text-slate-800">{org.legalName}</div>
                         <div className="text-sm text-slate-500">{org.country}</div>
                       </td>
-                      <td className="py-4 text-sm text-slate-600">{org.registrationNumber}</td>
-                      <td className="py-4 text-sm text-slate-600">{org.industry}</td>
-                      <td className="py-4">
+                      <td className="px-6 py-4 text-sm text-slate-700">{org.registrationNumber}</td>
+                      <td className="px-6 py-4 text-sm text-slate-700">{org.industry}</td>
+                      <td className="px-6 py-4">
                         <div className="text-sm font-medium text-slate-800">{org.authorizedRepresentative?.name || 'N/A'}</div>
                         <div className="text-sm text-slate-500">{org.authorizedRepresentative?.email || 'N/A'}</div>
                       </td>
-                      <td className="py-4">
+                      <td className="px-6 py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           org.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
                           org.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
@@ -400,7 +400,7 @@ export default function EnterpriseManagement() {
                           {org.status}
                         </span>
                       </td>
-                      <td className="py-4 text-right">
+                      <td className="px-6 py-4 text-right">
                         <button 
                           onClick={() => setSelectedOrg(org)}
                           className="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 border border-blue-200 rounded-md hover:bg-blue-50"
