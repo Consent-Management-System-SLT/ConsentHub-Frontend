@@ -23,9 +23,9 @@ const WebSocketStatus: React.FC<WebSocketStatusProps> = ({ className = '' }) => 
   const getStatusColor = () => {
     switch (connectionStatus) {
       case 'connected':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-green-700 bg-green-50 border-green-200';
       case 'connecting':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+        return 'text-yellow-700 bg-yellow-50 border-yellow-200';
       case 'disconnected':
         return 'text-red-600 bg-red-50 border-red-200';
       default:

@@ -126,7 +126,7 @@ const ServerConnectionAlert: React.FC<ServerConnectionAlertProps> = ({
         };
       case 'retrying':
         return {
-          icon: <RefreshCw className="w-5 h-5 text-yellow-600 animate-spin" />,
+          icon: <RefreshCw className="w-5 h-5 text-yellow-700 animate-spin" />,
           bgColor: 'bg-yellow-50',
           borderColor: 'border-yellow-200',
           textColor: 'text-yellow-800',
@@ -135,7 +135,7 @@ const ServerConnectionAlert: React.FC<ServerConnectionAlertProps> = ({
         };
       case 'connected':
         return {
-          icon: <CheckCircle className="w-5 h-5 text-green-600" />,
+          icon: <CheckCircle className="w-5 h-5 text-green-700" />,
           bgColor: 'bg-green-50',
           borderColor: 'border-green-200',
           textColor: 'text-green-800',
@@ -195,7 +195,7 @@ const ServerConnectionAlert: React.FC<ServerConnectionAlertProps> = ({
           onClick={handleClose}
           className="flex-shrink-0 p-1 hover:bg-gray-200 rounded-md transition-colors"
         >
-          <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+          <X className="w-4 h-4 text-slate-500 hover:text-gray-600" />
         </button>
       </div>
       {/* Progress bar for testing/retrying states */}

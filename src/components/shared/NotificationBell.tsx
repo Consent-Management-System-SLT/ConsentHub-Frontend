@@ -64,10 +64,10 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
       return <AlertCircle className="w-4 h-4 text-slate-500 text-red-600" />;
     }
     if (category === 'success') {
-      return <CheckCircle className="w-4 h-4 text-slate-500 text-green-600" />;
+      return <CheckCircle className="w-4 h-4 text-slate-500 text-green-700" />;
     }
     if (category === 'warning') {
-      return <AlertCircle className="w-4 h-4 text-slate-500 text-amber-600" />;
+      return <AlertCircle className="w-4 h-4 text-slate-500 text-amber-700" />;
     }
     return <Info className="w-4 h-4 text-slate-500 text-blue-600" />;
   };
@@ -95,7 +95,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
         onClick={() => setIsOpen(!isOpen)}
         className={`relative ${sizeClasses.button} text-slate-600 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors`}
         title="Notifications"
-      >
+       aria-label="Notifications">
         <Bell className={sizeClasses.bell} />
         {unreadCount > 0 && (
           <span className={`absolute -top-1 -right-1 ${sizeClasses.badge} rounded-full bg-red-600 ring-2 ring-blue-600 font-bold text-white flex items-center justify-center`}>
@@ -127,7 +127,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-sm text-green-600 hover:text-green-600/80 font-medium"
+                  className="text-sm text-green-700 hover:text-green-700/80 font-medium"
                 >
                   Mark all read
                 </button>

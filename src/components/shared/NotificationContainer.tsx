@@ -78,11 +78,11 @@ const NotificationContainer: React.FC<NotificationManagerProps> = ({ className =
   const getIcon = (type: string) => {
     switch (type) {
       case 'success':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-green-700" />;
       case 'error':
         return <XCircle className="w-5 h-5 text-red-600" />;
       case 'warning':
-        return <AlertCircle className="w-5 h-5 text-yellow-600" />;
+        return <AlertCircle className="w-5 h-5 text-yellow-700" />;
       case 'info':
         return <AlertCircle className="w-5 h-5 text-blue-600" />;
       default:
