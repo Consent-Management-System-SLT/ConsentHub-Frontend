@@ -586,7 +586,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
           <p className="text-slate-500 mt-2">{t('preferences.description')}</p>
         </div>
         {saveStatus === 'success' && (
-          <div className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-green-50 text-green-600 rounded-lg border border-green-200">
+          <div className="flex flex-wrap items-center space-x-2 px-4 py-2 bg-green-50 text-green-800 rounded-lg border border-green-200">
             <CheckCircle className="w-4 h-4" />
             <span className="text-sm font-medium">{t('preferences.preferencesUpdated')}</span>
           </div>
@@ -621,7 +621,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
           <div className="p-6 border-b border-slate-200">
             <div className="flex flex-wrap items-center space-x-3">
               <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                <Bell className="w-5 h-5 text-green-600" />
+                <Bell className="w-5 h-5 text-green-700" />
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-slate-900">Topic Subscriptions</h2>

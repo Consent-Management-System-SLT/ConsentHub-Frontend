@@ -187,7 +187,7 @@ const ValueAddedServices: React.FC = () => {
     const colorMap: { [key: string]: string } = {
       'entertainment': 'text-red-600 bg-red-50 border-red-200',
       'security': 'text-orange-600 bg-orange-50 border-orange-200',
-      'healthcare': 'text-green-600 bg-green-50 border-green-200',
+      'healthcare': 'text-green-700 bg-green-50 border-green-200',
       'cloud': 'text-blue-600 bg-blue-50 border-blue-200',
       'connectivity': 'text-purple-600 bg-purple-50 border-purple-200',
       'default': 'text-gray-600 bg-gray-50 border-gray-200'
@@ -421,7 +421,7 @@ const ValueAddedServices: React.FC = () => {
       {message && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
           <div className="flex flex-wrap items-center space-x-2">
-            <Info className="w-5 h-5 text-yellow-600" />
+            <Info className="w-5 h-5 text-yellow-700" />
             <p className="text-yellow-800">{message}</p>
           </div>
         </div>
@@ -445,8 +445,8 @@ const ValueAddedServices: React.FC = () => {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
                   selectedCategory === category.id
-                    ? 'bg-red-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-red-50 hover:text-red-600'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-blue-50 hover:text-blue-700'
                 }`}
               >
                 <category.icon className="w-4 h-4" />
@@ -517,7 +517,7 @@ const ValueAddedServices: React.FC = () => {
       </div>
       {filteredServices.length === 0 && (
         <div className="text-center py-12">
-          <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <AlertCircle className="w-12 h-12 text-slate-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No services found</h3>
           <p className="text-gray-600">Try adjusting your search or filter criteria.</p>
         </div>

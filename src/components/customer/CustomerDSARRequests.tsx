@@ -227,11 +227,11 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-green-700" />;
       case 'processing':
         return <RefreshCw className="w-5 h-5 text-blue-600 animate-spin" />;
       case 'pending':
-        return <Clock className="w-5 h-5 text-yellow-600" />;
+        return <Clock className="w-5 h-5 text-yellow-700" />;
       case 'rejected':
         return <XCircle className="w-5 h-5 text-red-600" />;
       case 'expired':
@@ -243,7 +243,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-50 text-green-600 border-green-200';
+        return 'bg-green-50 text-green-800 border-green-200';
       case 'processing':
         return 'bg-white/10 text-blue-600 border-blue-600/20';
       case 'pending':
@@ -349,7 +349,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
       value: 'portability' as const,
       label: 'Data Portability',
       description: 'Receive your data in a portable format to transfer elsewhere',
-      icon: <Download className="w-6 h-6 text-green-600" />,
+      icon: <Download className="w-6 h-6 text-green-700" />,
       color: 'border-green-200 hover:border-green-300'
     },
     {
@@ -370,7 +370,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
       value: 'withdraw' as const,
       label: 'Withdraw Consent',
       description: 'Withdraw your consent for data processing',
-      icon: <AlertTriangle className="w-6 h-6 text-yellow-600" />,
+      icon: <AlertTriangle className="w-6 h-6 text-yellow-700" />,
       color: 'border-yellow-200 hover:border-yellow-300'
     }
   ];
@@ -431,7 +431,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
               <div className="flex flex-wrap items-center space-x-3">
-                <Clock className="w-8 h-8 text-yellow-600" />
+                <Clock className="w-8 h-8 text-yellow-700" />
                 <div>
                   <p className="text-2xl font-bold text-slate-900">
                     {dsarRequests.filter(r => r.status === 'pending').length}
@@ -453,7 +453,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
             </div>
             <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
               <div className="flex flex-wrap items-center space-x-3">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+                <CheckCircle className="w-8 h-8 text-green-700" />
                 <div>
                   <p className="text-2xl font-bold text-slate-900">
                     {dsarRequests.filter(r => r.status === 'completed').length}
@@ -480,7 +480,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
               disabled={loading}
               className="flex flex-wrap items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:text-blue-600-hover hover:bg-blue-50/10 rounded-lg transition-colors disabled:opacity-50"
               title="Refresh to see latest status updates"
-            >
+             aria-label="Refresh to see latest status updates">
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </button>
@@ -658,7 +658,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
             {/* Important Notice */}
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex flex-wrap items-start space-x-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-yellow-700 mt-0.5" />
                 <div>
                   <h4 className="font-medium text-yellow-900">Important Notice</h4>
                   <p className="text-sm text-yellow-800 mt-1">
@@ -672,7 +672,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
             {submitStatus === 'success' && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex flex-wrap items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CheckCircle className="w-5 h-5 text-green-700" />
                   <p className="text-sm font-medium text-green-900">
                     Request submitted successfully! We'll process it within 30 days.
                   </p>

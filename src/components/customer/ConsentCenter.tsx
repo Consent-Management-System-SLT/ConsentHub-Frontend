@@ -277,13 +277,13 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'granted':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-green-700" />;
       case 'revoked':
         return <XCircle className="w-5 h-5 text-red-600" />;
       case 'expired':
         return <Clock className="w-5 h-5 text-gray-600" />;
       case 'pending':
-        return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
+        return <AlertTriangle className="w-5 h-5 text-yellow-700" />;
       default:
         return <Shield className="w-5 h-5 text-gray-600" />;
     }
@@ -291,7 +291,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'granted':
-        return 'bg-green-50 text-green-600 border-green-200';
+        return 'bg-green-50 text-green-800 border-green-200';
       case 'revoked':
         return 'bg-red-100 text-red-800 border-red-200';
       case 'expired':
@@ -468,7 +468,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
               <div className="text-sm text-slate-600">{t('customerDashboard.overview.totalConsents')}</div>
             </div>
             <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-green-700">
                 {filteredConsents.filter(c => c.status === 'granted').length}
               </div>
               <div className="text-sm text-green-700">{t('customerDashboard.overview.activeConsents')}</div>
@@ -480,7 +480,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
               <div className="text-sm text-red-700">{t('customerDashboard.overview.revoked')}</div>
             </div>
             <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-              <div className="text-2xl font-bold text-yellow-600">
+              <div className="text-2xl font-bold text-yellow-700">
                 {filteredConsents.filter(c => c.status === 'pending').length}
               </div>
               <div className="text-sm text-yellow-700">{t('consentCenter.status.pending')}</div>
@@ -573,9 +573,9 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                         <button
                           onClick={() => handleConsentAction(consent.id, 'revoke')}
                           disabled={updating === consent.id}
-                          className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Click to revoke this consent"
-                        >
+                         aria-label="Click to revoke this consent">
                           {updating === consent.id ? (
                             <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
                           ) : (
@@ -694,7 +694,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                         setSelectedConsent(null);
                       }}
                       disabled={updating === selectedConsent.id}
-                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {updating === selectedConsent.id ? (
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />

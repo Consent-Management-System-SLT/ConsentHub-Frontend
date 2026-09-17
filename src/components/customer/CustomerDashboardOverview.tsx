@@ -132,7 +132,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       label: t('customerDashboard.overview.activeConsents'),
       value: String(dashboardData?.data?.consents?.active || dashboardData?.consents?.active || 0),
       icon: <CheckCircle className="w-6 h-6" />,
-      color: 'text-green-600 bg-green-50 border-green-200',
+      color: 'text-green-700 bg-green-50 border-green-200',
       trend: `+${dashboardData?.data?.consents?.active || dashboardData?.consents?.active || 0} this month`
     },
     {
@@ -163,7 +163,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
     action: activity.action || activity.description,
     timestamp: activity.date || new Date(activity.timestamp).toLocaleDateString(),
     type: activity.type,
-    icon: activity.type === 'consent_granted' ? <CheckCircle className="w-4 h-4 text-green-600" /> :
+    icon: activity.type === 'consent_granted' ? <CheckCircle className="w-4 h-4 text-green-700" /> :
           activity.type === 'profile_updated' ? <User className="w-4 h-4 text-blue-600" /> :
           activity.type === 'preferences_updated' ? <Settings className="w-4 h-4 text-blue-600" /> :
           activity.type === 'privacy_notice_acknowledged' ? <FileText className="w-4 h-4 text-purple-600" /> :
@@ -174,7 +174,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       action: t('customerDashboard.overview.activities.grantedConsent'),
       timestamp: t('customerDashboard.overview.timestamps.hoursAgo', { count: 2 }),
       type: 'consent',
-      icon: <CheckCircle className="w-4 h-4 text-green-600" />
+      icon: <CheckCircle className="w-4 h-4 text-green-700" />
     },
     {
       id: 2,
@@ -209,7 +209,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
     {
       title: t('customerDashboard.overview.actions.communicationPrefs'),
       description: t('customerDashboard.overview.actions.communicationPrefsDesc'),
-      icon: <Settings className="w-8 h-8 text-green-600" />,
+      icon: <Settings className="w-8 h-8 text-green-700" />,
       action: 'preferences',
       color: 'bg-white border border-slate-200 hover:bg-white border-green-200/30'
     },
@@ -236,8 +236,8 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       description: `Version ${privacyStatus?.version || '2.1'} - Current`,
       status: privacyStatus?.privacyPolicyAccepted ? 'Active' : 'Pending',
       icon: privacyStatus?.privacyPolicyAccepted 
-        ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-        : <Clock className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />,
+        ? <CheckCircle className="w-5 h-5 text-green-700 mt-0.5 flex-shrink-0" />
+        : <Clock className="w-5 h-5 text-yellow-700 mt-0.5 flex-shrink-0" />,
       bgColor: 'bg-white border border-slate-200',
       borderColor: privacyStatus?.privacyPolicyAccepted 
         ? 'border-green-200/30' 
@@ -248,8 +248,8 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
         ? 'bg-green-50' 
         : 'bg-yellow-100/50',
       statusText: privacyStatus?.privacyPolicyAccepted 
-        ? 'text-green-600' 
-        : 'text-yellow-600'
+        ? 'text-green-700' 
+        : 'text-yellow-700'
     },
     {
       id: 'communication-prefs',
@@ -258,7 +258,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       status: privacyStatus?.communicationPrefsConfigured ? 'Configured' : 'Not Configured',
       icon: privacyStatus?.communicationPrefsConfigured 
         ? <Settings className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-        : <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />,
+        : <AlertTriangle className="w-5 h-5 text-yellow-700 mt-0.5 flex-shrink-0" />,
       bgColor: 'bg-white border border-slate-200',
       borderColor: privacyStatus?.communicationPrefsConfigured 
         ? 'border-blue-600/30'
@@ -270,7 +270,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
         : 'bg-yellow-100/50',
       statusText: privacyStatus?.communicationPrefsConfigured 
         ? 'text-blue-600'
-        : 'text-yellow-600'
+        : 'text-yellow-700'
     },
     {
       id: 'dsar-request',
@@ -278,16 +278,16 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       description: privacyStatus?.pendingDSARStatus || 'No pending requests',
       status: privacyStatus?.dsarProcessingStatus || 'None',
       icon: privacyStatus?.dsarProcessingStatus === 'Processing' 
-        ? <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+        ? <AlertTriangle className="w-5 h-5 text-yellow-700 mt-0.5 flex-shrink-0" />
         : privacyStatus?.dsarProcessingStatus === 'Completed'
-        ? <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-        : <XCircle className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />,
+        ? <CheckCircle className="w-5 h-5 text-green-700 mt-0.5 flex-shrink-0" />
+        : <XCircle className="w-5 h-5 text-slate-500 mt-0.5 flex-shrink-0" />,
       bgColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'bg-yellow-50' : 'bg-white border border-slate-200',
       borderColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'border-yellow-200' : 'border-gray-200',
       textColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-900' : 'text-slate-900',
       descColor: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-700' : 'text-slate-600',
       statusBg: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'bg-yellow-100' : 'bg-gray-100',
-      statusText: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-600' : 'text-gray-600'
+      statusText: privacyStatus?.dsarProcessingStatus === 'Processing' ? 'text-yellow-700' : 'text-gray-600'
     }
   ];
   return (
@@ -316,7 +316,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
             <button
               onClick={loadDashboardData}
               disabled={isLoading}
-              className="bg-green-600 hover:bg-green-600/90 text-whitepx-3 sm:px-4 py-2 rounded-lg flex flex-wrap items-center space-x-2 transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-xl text-sm sm:text-base"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg flex flex-wrap items-center space-x-2 transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-xl text-sm sm:text-base"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
@@ -426,10 +426,10 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                 <div className="flex flex-wrap items-center space-x-2 mb-2">
                   <div className={`flex-shrink-0 p-1.5 rounded-full ${
                     latestConsent.status === 'granted' 
-                      ? 'bg-green-100 text-green-600' 
+                      ? 'bg-green-100 text-green-800' 
                       : latestConsent.status === 'revoked' 
-                      ? 'bg-red-100 text-red-600'
-                      : 'bg-yellow-100 text-yellow-600'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     {latestConsent.status === 'granted' ? (
                       <CheckCircle className="w-4 h-4" />
@@ -454,7 +454,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
                 <div className="flex flex-wrap items-center space-x-4 text-xs text-slate-500">
                   <span>Category: {latestConsent.dataCategory}</span>
                   {latestConsent.grantedAt && (
-                    <span className={latestConsent.status === 'granted' ? 'font-medium text-green-600' : ''}>
+                    <span className={latestConsent.status === 'granted' ? 'font-medium text-green-700' : ''}>
                       Granted: {new Date(latestConsent.grantedAt).toLocaleDateString()} at {new Date(latestConsent.grantedAt).toLocaleTimeString()}
                     </span>
                   )}
@@ -530,7 +530,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-3 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4 lg:mb-6">
             <h3 className="text-base sm:text-lg font-semibold text-slate-900">Recent Activity</h3>
-            <button className="text-xs sm:text-sm text-green-600 hover:text-green-600/80 font-medium">
+            <button className="text-xs sm:text-sm text-green-700 hover:text-green-700/80 font-medium">
               View All
             </button>
           </div>

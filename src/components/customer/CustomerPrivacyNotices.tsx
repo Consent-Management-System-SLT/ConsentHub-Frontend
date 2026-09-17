@@ -277,7 +277,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50">
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-green-600 mx-auto mb-4" />
+          <RefreshCw className="w-8 h-8 animate-spin text-green-700 mx-auto mb-4" />
           <p className="text-slate-600">Loading privacy notices...</p>
         </div>
       </div>
@@ -458,13 +458,13 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
               <div className="text-sm text-blue-800">Total Notices</div>
             </div>
             <div className="text-center p-4 bg-amber-50 rounded-lg">
-              <div className="text-2xl font-bold text-amber-600">
+              <div className="text-2xl font-bold text-amber-700">
                 {notices.filter(n => !n.acknowledged).length}
               </div>
               <div className="text-sm text-amber-800">Pending Review</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-green-700">
                 {notices.filter(n => n.customerDecision === 'accept').length}
               </div>
               <div className="text-sm text-green-800">Accepted</div>
@@ -583,7 +583,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                     {getStatusIcon(notice)}
                     <button
                       onClick={() => setSelectedNotice(notice)}
-                      className="flex flex-wrap items-center space-x-2 px-4 py-2 text-green-600 hover:bg-green-50 border border-green-200/30 rounded-lg transition-colors"
+                      className="flex flex-wrap items-center space-x-2 px-4 py-2 text-green-700 hover:bg-green-50 border border-green-200/30 rounded-lg transition-colors"
                     >
                       <Eye className="w-4 h-4" />
                       <span>Review</span>
