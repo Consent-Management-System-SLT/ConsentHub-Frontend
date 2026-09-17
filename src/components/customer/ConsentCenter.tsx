@@ -608,7 +608,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
       </div>
       {/* Detail Modal */}
       {selectedConsent && (
-        <div role="dialog" aria-modal="true" aria-labelledby="consentcenter-dialog-8-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
+        <div role="dialog" aria-modal="true" aria-labelledby="consentcenter-dialog-8-title" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
             <div className="p-6 border-b border-slate-200 bg-slate-50 text-slate-900 rounded-t-2xl">
               <div className="flex items-center justify-between">
