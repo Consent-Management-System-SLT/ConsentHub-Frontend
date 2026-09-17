@@ -771,11 +771,11 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ml-2 ${
                           template.type === 'promotional' ? 'bg-white/20 text-blue-600 border border-blue-600/30' :
-                          template.type === 'informational' ? 'bg-green-600/20 text-green-700 border border-green-200/30' :
-                          template.type === 'alert' ? 'bg-amber-600/20 text-amber-700 border border-slate-200/30' :
+                          template.type === 'informational' ? 'bg-green-600/20 text-green-800 border border-green-200/30' :
+                          template.type === 'alert' ? 'bg-amber-600/20 text-amber-800 border border-slate-200/30' :
                           template.type === 'urgent' ? 'bg-red-50 text-red-800 border border-red-200' :
                           template.type === 'reminder' ? 'bg-blue-50/20 text-blue-600 border border-slate-200' :
-                          'bg-blue-600/20 text-blue-600 border border-slate-200/30'
+                          'bg-blue-600/20 text-blue-800 border border-slate-200/30'
                         }`}>
                           {template.type || 'informational'}
                         </span>

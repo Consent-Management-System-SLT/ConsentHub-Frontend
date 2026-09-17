@@ -311,10 +311,10 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
                   </div>
                   <div className="flex-1 min-w-0 pr-2">
                     <h4 className="font-medium text-slate-900 text-sm sm:text-base line-clamp-2">{action.title}</h4>
-                    <p className="text-xs sm:text-sm text-slate-600 mt-1 line-clamp-2">{action.description}</p>
+                    <p className="text-xs sm:text-sm text-slate-700 mt-1 line-clamp-2">{action.description}</p>
                   </div>
                   {action.priority === 'high' && (
-                    <span className="px-2 py-1 bg-red-800/50 text-red-400 text-xs font-medium rounded-full whitespace-nowrap shrink-0">
+                    <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full whitespace-nowrap shrink-0">
                       Urgent
                     </span>
                   )}

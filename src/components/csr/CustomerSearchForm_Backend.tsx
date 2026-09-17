@@ -146,7 +146,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
                     <div className="flex flex-wrap items-center space-x-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         customer.status === 'active' 
-                          ? 'bg-green-600/20 text-green-700' 
+                          ? 'bg-green-600/20 text-green-800' 
                           : 'bg-white border border-slate-200 text-slate-600'
                       }`}>
                         {customer.status || 'active'}
