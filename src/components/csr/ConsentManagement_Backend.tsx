@@ -518,7 +518,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                                   <button
                                     onClick={() => handleConsentUpdate(consent.id, 'granted')}
                                     disabled={saving === consent.id}
-                                    className="flex-1 px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
+                                    className="flex-1 px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
                                   >
                                     {saving === consent.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" />Grant</>}
                                   </button>
@@ -540,7 +540,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                             ) : (
                               <button
                                 onClick={() => setEditingConsent(consent.id)}
-                                className="w-full px-4 py-2 bg-blue-50 text-white rounded-lg hover:bg-blue-50/90 transition-colors flex items-center justify-center"
+                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
                               >
                                 <Edit className="w-4 h-4 mr-2" />
                                 Update Consent

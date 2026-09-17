@@ -17,6 +17,8 @@ const CustomerMainDashboard: React.FC<CustomerMainDashboardProps> = ({
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  // Bumping this remounts the active section, which re-runs its data fetch.
+  const [refreshKey, setRefreshKey] = useState(0);
   const renderContent = () => {
     switch (activeSection) {
       case 'dashboard':
@@ -44,6 +46,7 @@ const CustomerMainDashboard: React.FC<CustomerMainDashboardProps> = ({
         navId="customer-nav"
         sidebarOpen={sidebarOpen}
         onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+        onRefresh={() => setRefreshKey((k) => k + 1)}
         onOpenSettings={() => setShowProfile(true)}
       />
 
@@ -61,7 +64,7 @@ const CustomerMainDashboard: React.FC<CustomerMainDashboardProps> = ({
           className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden"
         >
           <div className="p-4 sm:p-5 lg:p-6">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-7xl mx-auto" key={refreshKey}>
               {activeSection === 'dashboard' ? (
                 <CustomerDashboardOverview
                   customerName={customerName}

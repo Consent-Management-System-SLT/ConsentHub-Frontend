@@ -6,7 +6,6 @@ import {
   TrendingUp,
   Activity,
   Shield,
-  RefreshCw
 } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
 interface CSROverviewEnhancedProps {
@@ -111,7 +110,6 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
   });
   const [quickActions, setQuickActions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   useEffect(() => {
     loadDetailedStats();
   }, []);
@@ -187,11 +185,6 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
       setLoading(false);
     }
   };
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await loadDetailedStats();
-    setIsRefreshing(false);
-  };
   if (loading) {
     return (
       <div className={`bg-white rounded-xl shadow-sm border border-slate-200 ${className}`}>
@@ -209,16 +202,6 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
         <div className="min-w-0">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">CSR Dashboard</h1>
           <p className="text-slate-600 mt-1 text-sm sm:text-base">Customer Service Representative Overview</p>
-        </div>
-        <div className="flex flex-wrap items-center space-x-3 sm:space-x-4 shrink-0">
-          <button aria-label="Refresh"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="flex flex-wrap items-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
-          >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
-          </button>
         </div>
       </div>
       {/* Key Metrics */}

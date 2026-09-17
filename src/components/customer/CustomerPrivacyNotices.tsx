@@ -477,14 +477,14 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
             </div>
           </div>
           {/* Status Information */}
-          <div className="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-600">
-            <h4 className="font-semibold text-white mb-2">How Privacy Notices Work</h4>
-            <div className="text-sm text-gray-200 space-y-1">
-              <p>• <strong className="text-yellow-400">Pending:</strong> Notices that require your response</p>
-              <p>• <strong className="text-green-400">Accepted:</strong> Notices you have agreed to</p>
-              <p>• <strong className="text-red-400">Declined:</strong> Notices you have refused</p>
-              <p>• You can change your decision at any time by reviewing and responding again</p>
-            </div>
+          <div className="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+            <h4 className="font-semibold text-slate-900 mb-2">How Privacy Notices Work</h4>
+            <ul className="text-sm text-slate-700 space-y-1 list-disc pl-5">
+              <li><strong className="text-amber-700">Pending:</strong> Notices that require your response</li>
+              <li><strong className="text-green-700">Accepted:</strong> Notices you have agreed to</li>
+              <li><strong className="text-red-700">Declined:</strong> Notices you have refused</li>
+              <li>You can change your decision at any time by reviewing and responding again</li>
+            </ul>
           </div>
         </div>
         {/* Filters */}

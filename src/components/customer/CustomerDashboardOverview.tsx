@@ -10,7 +10,6 @@ import {
   FileText, 
   Download,
   User,
-  RefreshCw,
   Bell,
   Calendar
 } from 'lucide-react';
@@ -300,62 +299,54 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
       <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-900 rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 text-white shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-slate-900 truncate">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-white truncate">
               {t('customerDashboard.overview.welcomeBack', { name: currentCustomerName })}!
             </h1>
-            <p className="text-slate-600 text-sm sm:text-base lg:text-lg">
+            <p className="text-blue-100 text-sm sm:text-base lg:text-lg">
               {t('customerDashboard.overview.welcomeDesc')}
             </p>
             {dashboardData?.customer?.lastLogin && (
-              <p className="text-slate-500 text-xs sm:text-sm mt-2">
+              <p className="text-blue-200 text-xs sm:text-sm mt-2">
                 Last login: {new Date(dashboardData.customer.lastLogin).toLocaleString()}
               </p>
             )}
           </div>
           <div className="flex flex-wrap flex-row space-x-3 items-center justify-between sm:justify-start">
-            <button
-              onClick={loadDashboardData}
-              disabled={isLoading}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg flex flex-wrap items-center space-x-2 transition-all duration-200 disabled:opacity-50 shadow-lg hover:shadow-xl text-sm sm:text-base"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Refresh</span>
-            </button>
             <div className="flex-shrink-0 sm:hidden lg:block">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-blue-50 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-white/15 rounded-full flex items-center justify-center">
                 <Shield className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" />
               </div>
             </div>
           </div>
         </div>
         <div className="mt-4 sm:mt-6 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-          <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
+          <div className="bg-white/10 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-green-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.granted}</span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.activeConsents')}</p>
+            <p className="text-xs sm:text-sm text-blue-50 font-medium leading-tight">{t('customerDashboard.overview.activeConsents')}</p>
           </div>
-          <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
+          <div className="bg-white/10 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <XCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-red-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.revoked}</span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.revoked')}</p>
+            <p className="text-xs sm:text-sm text-blue-50 font-medium leading-tight">{t('customerDashboard.overview.revoked')}</p>
           </div>
-          <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
+          <div className="bg-white/10 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <Clock className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-yellow-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.expired}</span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.expired')}</p>
+            <p className="text-xs sm:text-sm text-blue-50 font-medium leading-tight">{t('customerDashboard.overview.expired')}</p>
           </div>
-          <div className="bg-blue-50 bg-opacity-20 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
+          <div className="bg-white/10 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-orange-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.pending}</span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium leading-tight">{t('customerDashboard.overview.pendingReview')}</p>
+            <p className="text-xs sm:text-sm text-blue-50 font-medium leading-tight">{t('customerDashboard.overview.pendingReview')}</p>
           </div>
         </div>
       </div>
@@ -530,7 +521,10 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-3 sm:p-4 lg:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4 lg:mb-6">
             <h3 className="text-base sm:text-lg font-semibold text-slate-900">Recent Activity</h3>
-            <button className="text-xs sm:text-sm text-green-700 hover:text-green-700/80 font-medium">
+            <button
+              onClick={() => onNavigate && onNavigate('consent-center')}
+              className="text-xs sm:text-sm text-green-700 hover:text-green-700/80 font-medium"
+            >
               View All
             </button>
           </div>

@@ -596,7 +596,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                     <button
                       onClick={handleSendBulkNotification}
                       disabled={isSending || !subject.trim() || !message.trim()}
-                      className="flex flex-wrap items-center space-x-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="flex flex-wrap items-center space-x-2 px-6 py-3 bg-orange-700 text-white rounded-lg hover:bg-orange-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Users className={`w-4 h-4 ${isSending ? 'animate-pulse' : ''}`} />
                       <span>
@@ -722,17 +722,6 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                           <span className="text-slate-600">Audience: {campaign.audienceSize}</span>
                           <span className="text-slate-600">Sent: {campaign.performance.sent}</span>
                           <span className="text-slate-600">Delivered: {campaign.performance.delivered}</span>
-                        </div>
-                        <div className="flex flex-wrap items-center space-x-2">
-                          <button aria-label="Run" className="p-1 text-slate-600 hover:text-blue-600">
-                            <Play className="w-4 h-4" />
-                          </button>
-                          <button aria-label="Edit" className="p-1 text-slate-600 hover:text-blue-600">
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                          <button aria-label="Delete" className="p-1 text-slate-600 hover:text-red-500">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
                         </div>
                       </div>
                     </div>

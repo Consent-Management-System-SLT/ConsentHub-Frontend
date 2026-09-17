@@ -587,7 +587,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                         <button
                           onClick={() => handleConsentAction(consent.id, 'grant')}
                           disabled={updating === consent.id}
-                          className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors flex items-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                           title={`Click to grant this ${consent.status} consent`}
                         >
                           {updating === consent.id ? (
@@ -710,7 +710,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                         setSelectedConsent(null);
                       }}
                       disabled={updating === selectedConsent.id}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {updating === selectedConsent.id ? (
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
