@@ -176,7 +176,7 @@ const Signup: React.FC = () => {
           {/* Success message */}
           {success && (
             <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-600/20 border border-green-200/30 rounded-md flex flex-wrap items-start sm:items-center space-x-2 sm:space-x-3">
-              <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 flex-shrink-0 mt-0.5 sm:mt-0" />
+              <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-700 flex-shrink-0 mt-0.5 sm:mt-0" />
               <div>
                 <p className="text-slate-900 font-medium text-sm sm:text-base">Success!</p>
                 <p className="text-slate-600 text-sm">{success}</p>
@@ -196,7 +196,7 @@ const Signup: React.FC = () => {
           {/* Already registered modal/alert */}
           {showAlreadyRegistered && (
             <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-amber-600/20 border border-slate-200/30 rounded-md flex flex-wrap items-start sm:items-center space-x-2 sm:space-x-3">
-              <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600 flex-shrink-0 mt-0.5 sm:mt-0" />
+              <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-700 flex-shrink-0 mt-0.5 sm:mt-0" />
               <div>
                 <p className="text-slate-900 font-medium text-sm sm:text-base">Account already registered</p>
                 <p className="text-slate-600 text-sm">This email is already registered. Please <button className="underline text-blue-600 hover:text-blue-600" onClick={() => navigate('/login', { state: { email: formData.email, message: 'You already have an account. Please login.' } })}>login to your account</button>.</p>
@@ -380,7 +380,7 @@ const Signup: React.FC = () => {
                           style={{ width: `${(getPasswordStrength(formData.password) / 5) * 100}%` }}
                         ></div>
                       </div>
-                      <span className={`text-xs font-medium ${getPasswordStrengthText(getPasswordStrength(formData.password)).color.replace('text-red-500', 'text-red-600').replace('text-yellow-500', 'text-amber-600').replace('text-blue-500', 'text-blue-600').replace('text-green-500', 'text-green-600')}`}>
+                      <span className={`text-xs font-medium ${getPasswordStrengthText(getPasswordStrength(formData.password)).color.replace('text-red-500', 'text-red-600').replace('text-yellow-500', 'text-amber-700').replace('text-blue-500', 'text-blue-600').replace('text-green-500', 'text-green-700')}`}>
                         {getPasswordStrengthText(getPasswordStrength(formData.password)).text}
                       </span>
                     </div>
