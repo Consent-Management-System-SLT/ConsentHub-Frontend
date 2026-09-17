@@ -86,7 +86,9 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
   const loadPreferenceConfig = async () => {
     try {
       const baseURL = import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001';
-      const response = await fetch(`${baseURL}/api/v1/customer/preference-config`);
+      const response = await fetch(`${baseURL}/api/v1/customer/preference-config`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+      });
       const data = await response.json();
       if (data.success) {
         setPreferenceConfig(data.config);
