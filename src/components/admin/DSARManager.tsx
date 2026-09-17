@@ -381,11 +381,11 @@ const DSARManager: React.FC = () => {
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
                           request.status === 'pending'
-                            ? 'bg-amber-600/20 text-amber-700 border border-slate-200/30'
+                            ? 'bg-amber-600/20 text-amber-800 border border-slate-200/30'
                             : request.status === 'in_progress'
-                            ? 'bg-blue-600/20 text-blue-600 border border-slate-200/30'
+                            ? 'bg-blue-600/20 text-blue-800 border border-slate-200/30'
                             : request.status === 'completed'
-                            ? 'bg-green-600/20 text-green-700 border border-green-200/30'
+                            ? 'bg-green-600/20 text-green-800 border border-green-200/30'
                             : request.status === 'rejected'
                             ? 'bg-red-50 text-red-800 border border-red-200'
                             : 'bg-slate-50/20 text-slate-500 border border-slate-200/30'
@@ -398,7 +398,7 @@ const DSARManager: React.FC = () => {
                           request.priority === 'high'
                             ? 'bg-red-50 text-red-800 border border-red-200'
                             : request.priority === 'medium'
-                            ? 'bg-amber-600/20 text-amber-700 border border-slate-200/30'
+                            ? 'bg-amber-600/20 text-amber-800 border border-slate-200/30'
                             : 'bg-slate-50/20 text-slate-500 border border-slate-200/30'
                         }`}
                       >

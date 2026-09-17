@@ -499,11 +499,11 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-600/20 text-green-700';
+        return 'bg-green-600/20 text-green-800';
       case 'withdrawn':
         return 'bg-red-50 text-red-800';
       case 'expired':
-        return 'bg-amber-600/20 text-amber-700';
+        return 'bg-amber-600/20 text-amber-800';
       case 'pending':
         return 'bg-blue-50/20 text-blue-600';
       default:
@@ -513,11 +513,11 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const getConsentTypeColor = (type: string) => {
     switch (type) {
       case 'marketing':
-        return 'bg-blue-600/20 text-blue-600';
+        return 'bg-blue-600/20 text-blue-800';
       case 'analytics':
         return 'bg-blue-50/20 text-blue-600';
       case 'functional':
-        return 'bg-green-600/20 text-green-700';
+        return 'bg-green-600/20 text-green-800';
       case 'necessary':
         return 'bg-white border border-slate-200 rounded-xl shadow-sm text-slate-600';
       default:

@@ -273,7 +273,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         consent.status === 'granted' 
-                          ? 'bg-green-600/20 text-green-700 border border-green-200/30' 
+                          ? 'bg-green-600/20 text-green-800 border border-green-200/30' 
                           : 'bg-red-50 text-red-800 border border-red-200'
                       }`}>
                         {consent.status}
@@ -404,7 +404,7 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
                           onChange={() => updateConsent(index, 'status', 'revoked')}
                           className="mr-2 text-blue-600"
                         />
-                        <span className="text-sm text-red-600 font-medium">Deny</span>
+                        <span className="text-sm text-red-700 font-medium">Deny</span>
                       </label>
                     </div>
                   </div>
@@ -430,8 +430,8 @@ const GuardianConsent: React.FC<GuardianConsentProps> = ({ guardianId, onClose }
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <h4 className="text-sm font-medium text-blue-600">Guardian Consent Notice</h4>
-                <p className="text-sm text-blue-600 mt-1">
+                <h4 className="text-sm font-medium text-blue-800">Guardian Consent Notice</h4>
+                <p className="text-sm text-blue-800 mt-1">
                   As a legal guardian, you are providing consent on behalf of your dependent. 
                   This consent can be modified or revoked at any time through your guardian portal.
                 </p>

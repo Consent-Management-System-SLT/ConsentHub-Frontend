@@ -358,7 +358,7 @@ const EventListenerManager: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-600/20 text-green-700 border border-green-200/30';
+        return 'bg-green-600/20 text-green-800 border border-green-200/30';
       case 'inactive':
         return 'bg-slate-50/20 text-slate-500 border border-slate-200';
       case 'error':
@@ -529,7 +529,7 @@ const EventListenerManager: React.FC = () => {
                   <p className="text-sm font-medium text-slate-600 mb-2">Events ({webhook.events.length}):</p>
                   <div className="flex flex-wrap gap-1">
                     {webhook.events.slice(0, 3).map((event, index) => (
-                      <span key={index} className="px-2 py-1 bg-blue-600/20 text-blue-600 text-xs rounded border border-slate-200/30">
+                      <span key={index} className="px-2 py-1 bg-blue-600/20 text-blue-800 text-xs rounded border border-slate-200/30">
                         {event}
                       </span>
                     ))}

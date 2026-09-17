@@ -449,7 +449,7 @@ const AuditLogViewer: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     {log.complianceRelevant ? (
                       <div className="flex flex-col">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600/20 text-green-700 mb-1">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600/20 text-green-800 mb-1">
                           GDPR Relevant
                         </span>
                         {log.regulatoryFramework.length > 0 && (
