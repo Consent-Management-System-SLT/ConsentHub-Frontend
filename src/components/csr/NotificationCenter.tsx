@@ -402,7 +402,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
       </div>
       {/* Success Popup Modal */}
       {success && (
-        <div role="dialog" aria-modal="true" aria-label="Success!" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-label="Success!" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
           <div className="bg-white border border-slate-200 rounded-xl p-6 max-w-md w-full mx-4 shadow-lg transform animate-slideUp border-green-200">
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-600 mb-4">
@@ -1010,7 +1010,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
             </div>
             {/* Template Preview Modal */}
             {showTemplatePreview && selectedPreBuiltTemplate && (
-              <div role="dialog" aria-modal="true" aria-label="Template Preview" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+              <div role="dialog" aria-modal="true" aria-label="Template Preview" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
                 <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto border-blue-600/30">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-semibold text-slate-900">Template Preview</h3>

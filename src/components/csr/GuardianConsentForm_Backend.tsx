@@ -434,12 +434,12 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
               <table className="w-full border border-slate-200 rounded-lg">
                 <thead className="bg-white border border-slate-200">
                   <tr>
-                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-gray-700">Minor</th>
-                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-gray-700">Guardian</th>
-                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-gray-700">Consent Type</th>
-                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-gray-700">Created</th>
-                    <th scope="col" className="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Minor</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Guardian</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Consent Type</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Created</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -448,13 +448,13 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
                     const guardian = guardians.find(g => g.id === consent.guardianId);
                     return (
                       <tr key={consent.id} className="hover:bg-white border border-slate-200">
-                        <td className="px-4 py-3 text-sm text-slate-900">
+                        <td className="px-6 py-4 text-sm text-slate-800">
                           {minor?.name || 'Unknown'}
                         </td>
-                        <td className="px-4 py-3 text-sm text-slate-900">
+                        <td className="px-6 py-4 text-sm text-slate-800">
                           {guardian?.name || 'Unknown'}
                         </td>
-                        <td className="px-4 py-3 text-sm text-slate-900 capitalize">
+                        <td className="px-6 py-4 text-sm text-slate-800 capitalize">
                           {consent.consentType?.replace(/_/g, ' ') || 'N/A'}
                         </td>
                         <td className="px-4 py-3">
@@ -463,7 +463,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
                             <span className="ml-1 capitalize">{consent.status}</span>
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-slate-900">
+                        <td className="px-6 py-4 text-sm text-slate-800">
                           {consent.createdAt ? new Date(consent.createdAt).toLocaleDateString() : 'N/A'}
                         </td>
                         <td className="px-4 py-3">

@@ -422,22 +422,22 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-white border border-slate-200">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   Customer Name
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   Consent Purpose
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   Current Status
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   Last Modified
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   Channel
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   View Details
                 </th>
               </tr>
@@ -488,7 +488,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       )}
       {/* Modal for viewing consent details */}
       {showModal && selectedConsent && (
-        <div role="dialog" aria-modal="true" aria-labelledby="consenthistorytable-backend-dialog-6-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+        <div role="dialog" aria-modal="true" aria-labelledby="consenthistorytable-backend-dialog-6-title" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">

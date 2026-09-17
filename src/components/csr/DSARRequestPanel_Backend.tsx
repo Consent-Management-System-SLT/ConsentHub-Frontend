@@ -416,7 +416,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       )}
       {/* Approval/Rejection Modal */}
       {showApprovalModal && pendingAction && (
-        <div role="dialog" aria-modal="true" aria-labelledby="dsarrequestpanel-backend-dialog-7-title" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+        <div role="dialog" aria-modal="true" aria-labelledby="dsarrequestpanel-backend-dialog-7-title" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg max-w-md w-full mx-4">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -487,7 +487,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
       )}
       {/* Request Detail Modal */}
       {showDetailModal && selectedRequest && (
-        <div role="dialog" aria-modal="true" aria-label="DSAR Request Details" className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50">
+        <div role="dialog" aria-modal="true" aria-label="DSAR Request Details" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">

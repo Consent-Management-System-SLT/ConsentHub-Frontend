@@ -176,7 +176,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
   const filteredContent = helpContent[activeCategory as keyof typeof helpContent];
   if (!isOpen) return null;
   return (
-    <div role="dialog" aria-modal="true" aria-label="CSR Dashboard Help" className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+    <div role="dialog" aria-modal="true" aria-label="CSR Dashboard Help" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
@@ -193,7 +193,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         </div>
         <div className="flex h-[calc(90vh-80px)]">
           {/* Sidebar */}
-          <div className="w-64 bg-white border border-slate-200 border-r overflow-y-auto">
+          <div className="w-64 bg-white border border-slate-200 border-r overflow-y-auto overscroll-contain">
             <div className="p-4">
               <div className="relative">
                 <Search className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
@@ -224,7 +224,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             </nav>
           </div>
           {/* Content */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto overscroll-contain">
             <div className="p-6">
               <div className="flex flex-wrap items-center space-x-3 mb-6">
                 <filteredContent.icon className="w-8 h-8 text-blue-600" />
