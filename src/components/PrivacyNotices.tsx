@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Modal from './shared/Modal';
+import { Spinner } from './shared/Loading';
 import { 
   FileText, 
   Eye, 
@@ -62,18 +64,34 @@ const PrivacyNoticeForm: React.FC<{
   };
 
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="privacynotices-dialog-0-title" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
-          <h3 id="privacynotices-dialog-0-title" className="text-lg font-semibold">
-            {notice ? 'Edit Privacy Notice' : 'Create New Privacy Notice'}
-          </h3>
-          <button aria-label="Close" onClick={onCancel} className="text-gray-500 hover:text-gray-700">
-            <X className="h-5 w-5" />
+    <Modal
+      isOpen
+      onClose={onCancel}
+      title={notice ? 'Edit Privacy Notice' : 'Create New Privacy Notice'}
+      size="lg"
+      footer={
+        <>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isLoading}
+            className="px-4 py-2.5 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 disabled:opacity-50"
+          >
+            Cancel
           </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
+          <button
+            type="submit"
+            form="privacy-notice-form"
+            disabled={isLoading}
+            className="px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:opacity-50 flex items-center gap-2"
+          >
+            {isLoading ? <Spinner size="sm" tone="white" /> : <Save className="h-4 w-4" aria-hidden="true" />}
+            {isLoading ? 'Saving…' : notice ? 'Update' : 'Create'}
+          </button>
+        </>
+      }
+    >
+        <form id="privacy-notice-form" onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -197,36 +215,8 @@ const PrivacyNoticeForm: React.FC<{
              aria-label="Content"/>
           </div>
 
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              disabled={isLoading}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex flex-wrap items-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  {notice ? 'Update' : 'Create'}
-                </>
-              )}
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 };
 
@@ -241,38 +231,36 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
   if (!isOpen || !notice) return null;
 
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="privacynotices-dialog-1-title" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <div>
-            <h2 id="privacynotices-dialog-1-title" className="text-2xl font-bold text-gray-900">{notice.title}</h2>
-            <div className="flex items-center space-x-4 mt-2">
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                notice.status === 'active' ? 'bg-green-100 text-green-800' : 
-                notice.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 
-                'bg-gray-100 text-gray-800'
-              }`}>
-                {notice.status}
-              </span>
-              <span className="text-sm text-gray-500">Version {notice.version}</span>
-              <span className="text-sm text-gray-500">
-                Last updated: {new Date(notice.updatedAt).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-slate-500 hover:text-gray-600 transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="px-6 py-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={notice.title}
+      size="lg"
+      subtitle={
+        <>
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+            notice.status === 'active' ? 'bg-green-100 text-green-800' :
+            notice.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+            'bg-slate-100 text-slate-800'
+          }`}>
+            {notice.status}
+          </span>
+          <span className="text-sm text-slate-600">Version {notice.version}</span>
+          <span className="text-sm text-slate-600">
+            Last updated: {new Date(notice.updatedAt).toLocaleDateString()}
+          </span>
+        </>
+      }
+      footer={
+        <button
+          onClick={onClose}
+          className="px-4 py-2.5 border border-slate-300 bg-white text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+        >
+          Close
+        </button>
+      }
+    >
+        <div>
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
@@ -336,18 +324,7 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border border-slate-300 bg-white text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
+    </Modal>
   );
 };
 

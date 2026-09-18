@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Modal from '../shared/Modal';
 ﻿import { pageWindow } from '../../utils/pagination';
 import { 
   Search, 
@@ -550,24 +551,24 @@ const DSARManager: React.FC = () => {
         </div>
       )}
       {/* Detail Modal */}
-      {selectedRequest && (
-        <div role="dialog" aria-modal="true" aria-label="Request Information" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm max-w-2xl w-full max-h-[90vh] overflow-auto">
-            <div className="p-6 border-b border-slate-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-slate-900">
-                  Request Details - {selectedRequest.requestId}
-                </h2>
-                <button
-                  onClick={() => setSelectedRequest(null)}
-                  className="text-slate-500 hover:text-slate-600 transition-colors"
-                >
-                  <XCircle className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+      <Modal
+        isOpen={!!selectedRequest}
+        onClose={() => setSelectedRequest(null)}
+        title={selectedRequest ? `Request Details - ${selectedRequest.requestId}` : ''}
+        size="md"
+        footer={
+          <button
+            onClick={() => setSelectedRequest(null)}
+            className="px-4 py-2.5 border border-slate-300 bg-white text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+          >
+            Close
+          </button>
+        }
+      >
+        {selectedRequest && (
+            <div className="space-y-5">
+              {/* stacks on a phone instead of forcing two columns */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <h3 className="font-medium text-slate-900 mb-2">Request Information</h3>
                   <div className="space-y-1 text-sm">
@@ -591,12 +592,11 @@ const DSARManager: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-medium text-slate-900 mb-2">Description</h3>
-                <p className="text-sm text-slate-600 bg-slate-100 p-3 rounded-lg border border-slate-200">{selectedRequest.description}</p>
+                <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200">{selectedRequest.description}</p>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 };

@@ -209,6 +209,17 @@
    Anything genuinely per-component still uses a normal `dark:` variant.
    --------------------------------------------------------------------------- */
 @layer utilities {
+  /* A full-screen overlay must not inherit spacing from whatever stack it is
+     rendered into. Tailwind's space-y-* and divide-y put a margin on every
+     sibling after the first, and that margin applies to a `fixed inset-0`
+     element too: a modal declared in the middle of a `space-y-6` section was
+     pushed 24px down, so the scrim missed the top bar and left it uncovered. */
+  [role='dialog'].fixed.inset-0 {
+    margin: 0 !important;
+  }
+}
+
+@layer utilities {
   .dark body { background-color: #0b1220; color: #e8edf5; }
 
   /* surfaces */
