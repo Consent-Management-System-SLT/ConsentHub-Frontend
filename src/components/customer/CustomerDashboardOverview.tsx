@@ -296,17 +296,17 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
         <UserProfile isOpen={showProfile} onClose={() => setShowProfile && setShowProfile(false)} />
       )}
       {/* Welcome Section - SLT Mobitel Style */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-900 rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 text-white shadow-sm">
+      <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-900 rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 text-white shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex-1 min-w-0">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-white truncate">
               {t('customerDashboard.overview.welcomeBack', { name: currentCustomerName })}!
             </h1>
-            <p className="text-blue-100 text-sm sm:text-base lg:text-lg">
+            <p className="text-blue-50 text-sm sm:text-base lg:text-lg">
               {t('customerDashboard.overview.welcomeDesc')}
             </p>
             {dashboardData?.customer?.lastLogin && (
-              <p className="text-blue-200 text-xs sm:text-sm mt-2">
+              <p className="text-blue-50 text-xs sm:text-sm mt-2">
                 Last login: {new Date(dashboardData.customer.lastLogin).toLocaleString()}
               </p>
             )}
@@ -325,28 +325,28 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
               <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-green-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.granted}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-50 font-medium leading-tight">{t('customerDashboard.overview.activeConsents')}</p>
+            <p className="text-xs sm:text-sm text-white font-medium leading-tight">{t('customerDashboard.overview.activeConsents')}</p>
           </div>
           <div className="bg-white/10 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <XCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-red-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.revoked}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-50 font-medium leading-tight">{t('customerDashboard.overview.revoked')}</p>
+            <p className="text-xs sm:text-sm text-white font-medium leading-tight">{t('customerDashboard.overview.revoked')}</p>
           </div>
           <div className="bg-white/10 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <Clock className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-yellow-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.expired}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-50 font-medium leading-tight">{t('customerDashboard.overview.expired')}</p>
+            <p className="text-xs sm:text-sm text-white font-medium leading-tight">{t('customerDashboard.overview.expired')}</p>
           </div>
           <div className="bg-white/10 rounded-lg p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
             <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-1 sm:mb-2">
               <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0 text-orange-200" />
               <span className="font-bold text-lg sm:text-xl lg:text-2xl leading-none">{consentSummary.pending}</span>
             </div>
-            <p className="text-xs sm:text-sm text-blue-50 font-medium leading-tight">{t('customerDashboard.overview.pendingReview')}</p>
+            <p className="text-xs sm:text-sm text-white font-medium leading-tight">{t('customerDashboard.overview.pendingReview')}</p>
           </div>
         </div>
       </div>
@@ -523,7 +523,7 @@ const CustomerDashboardOverview: React.FC<CustomerDashboardOverviewProps> = ({
             <h3 className="text-base sm:text-lg font-semibold text-slate-900">Recent Activity</h3>
             <button
               onClick={() => onNavigate && onNavigate('consent-center')}
-              className="text-xs sm:text-sm text-green-700 hover:text-green-700/80 font-medium"
+              className="min-h-[36px] px-3 py-2 -mr-2 rounded-lg text-xs sm:text-sm text-green-700 hover:text-green-800 hover:bg-green-50 font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
             >
               View All
             </button>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Spinner } from '../shared/Loading';
 import { Search, User, Phone, Mail, Shield, AlertCircle, RefreshCw } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
 interface CustomerSearchFormProps {
@@ -63,14 +64,15 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
           <div className="flex-1">
             <div className="flex space-x-2">
               <select
+                aria-label="Search by"
                 value={searchType}
                 onChange={(e) => setSearchType(e.target.value)}
-                className="px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition-colors-bg"
+                className="px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
               >
-                <option value="email" className="bg-bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors-bg">Email</option>
-                <option value="phone" className="bg-bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors-bg">Phone</option>
-                <option value="name" className="bg-bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors-bg">Name</option>
-                <option value="id" className="bg-bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors-bg">Customer ID</option>
+                <option value="email">Email</option>
+                <option value="phone">Phone</option>
+                <option value="name">Name</option>
+                <option value="id">Customer ID</option>
               </select>
               <input
                 type="text"
@@ -78,7 +80,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={`Search by ${searchType}...`}
                 aria-label={`Search customers by ${searchType}`}
-                className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-bg-white border-slate-300 px-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition-colors-bg placeholder-text-slate-500-muted"
+                className="flex-1 px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
@@ -106,7 +108,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
       <div className="p-6">
         {isSearching ? (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <Spinner size="md" />
             <span className="ml-2 text-slate-600">Searching customers...</span>
           </div>
         ) : searchResults.length > 0 ? (

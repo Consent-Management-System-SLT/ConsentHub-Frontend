@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Spinner } from '../shared/Loading';
 import { useTranslation } from 'react-i18next';
 import { 
   Settings, 
@@ -571,7 +572,7 @@ const CustomerPreferences: React.FC<CustomerPreferencesProps> = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto mb-4"></div>
+            <Spinner size="md" className="mx-auto mb-4" />
             <p className="text-slate-500">Loading your preferences...</p>
           </div>
         </div>

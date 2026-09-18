@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Spinner } from '../shared/Loading';
 import { 
   Users, 
   FileText, 
@@ -189,7 +190,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
     return (
       <div className={`bg-white rounded-xl shadow-sm border border-slate-200 ${className}`}>
         <div className="p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <Spinner size="lg" className="mx-auto mb-4" />
           <p className="text-slate-900">Loading CSR overview...</p>
         </div>
       </div>

@@ -314,7 +314,7 @@ const ValueAddedServices: React.FC = () => {
   return (
     <div className="space-y-6 p-4 sm:p-6">
       {/* Header - SLT Red Theme */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-900 rounded-xl p-6 text-white shadow-sm">
+      <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-900 rounded-xl p-6 text-white shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center space-x-4 mb-4 lg:mb-0">
             <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
@@ -322,7 +322,7 @@ const ValueAddedServices: React.FC = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold">{t('valueAddedServices.title')}</h1>
-              <p className="text-white/90">Enhance your SLT experience with premium services</p>
+              <p className="text-blue-50">Enhance your SLT experience with premium services</p>
               {/* WebSocket Status Indicator */}
               <div className="flex items-center space-x-2 mt-2">
                 <div className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>

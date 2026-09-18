@@ -473,11 +473,11 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
                       onClick={() => handleViewDetails(consent)}
-                      className="text-indigo-600 hover:text-indigo-900 flex items-center space-x-1"
-                      title="View Full History"
-                     aria-label="View Full History">
-                      <Eye className="w-4 h-4" />
-                      <span className="text-xs">View</span>
+                      className="inline-flex items-center gap-1.5 min-h-[36px] px-3 py-2 -mx-1 rounded-lg text-sm text-blue-700 hover:text-blue-800 hover:bg-blue-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                      aria-label="View full history"
+                    >
+                      <Eye className="w-4 h-4 shrink-0" aria-hidden="true" />
+                      View
                     </button>
                   </td>
                 </tr>

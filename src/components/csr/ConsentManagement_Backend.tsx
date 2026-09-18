@@ -335,7 +335,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                 value={selectedCustomer}
                 onChange={(e) => setSelectedCustomer(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 appearance-none"
-              >
+               aria-label="Select a customer">
                 <option value="">Select a customer...</option>
                 {filteredCustomers.map(customer => (
                   <option key={customer.id} value={customer.id}>
@@ -382,7 +382,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"
-                  >
+                   aria-label="Filter by status">
                     <option value="all">All Status</option>
                     <option value="granted">Granted</option>
                     <option value="revoked">Revoked</option>
@@ -394,7 +394,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                     value={purposeFilter}
                     onChange={(e) => setPurposeFilter(e.target.value)}
                     className="px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"
-                  >
+                   aria-label="Filter by purpose">
                     <option value="all">All Purposes</option>
                     <option value="marketing">Marketing Communications</option>
                     <option value="analytics">Analytics & Performance</option>

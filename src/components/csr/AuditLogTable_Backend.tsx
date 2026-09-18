@@ -194,7 +194,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-            >
+             aria-label="Filter by type">
               <option value="all">All Types</option>
               {getUniqueEventTypes().map(type => (
                 <option key={type} value={type}>{type}</option>
@@ -205,7 +205,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
             <Calendar className="w-4 h-4 text-slate-500" />
             <input
               type="date"
-              aria-label="Filter by date"
+              aria-label="Filter by time period"
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
