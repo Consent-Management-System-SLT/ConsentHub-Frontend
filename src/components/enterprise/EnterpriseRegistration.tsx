@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Building, Upload, CheckCircle } from 'lucide-react';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { API_ORIGIN } from '../../config/api';
 import { Link } from 'react-router-dom';
 
 const EnterpriseRegistration: React.FC = () => {
@@ -45,7 +46,7 @@ const EnterpriseRegistration: React.FC = () => {
       });
       data.append('document', file);
 
-      const res = await fetch('http://localhost:3001/api/v2/enterprise/register', {
+      const res = await fetch(`${API_ORIGIN}/api/v2/enterprise/register`, {
         method: 'POST',
         body: data
       });
@@ -57,7 +58,7 @@ const EnterpriseRegistration: React.FC = () => {
         throw new Error('Submission failed');
       }
     } catch (error) {
-      addNotification({ type: 'system', category: 'error', title: 'Submission Failed', message: 'There was an error submitting your application. Please try again.' });
+      addNotification({ type: 'system', category: 'urgent', title: 'Submission Failed', message: 'There was an error submitting your application. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -76,34 +77,34 @@ const EnterpriseRegistration: React.FC = () => {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {step < 4 && (
             <div className="mb-8 flex items-center justify-between">
-              <span className={`font-bold ${step >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>1. Details</span>
-              <span className={`font-bold ${step >= 2 ? 'text-blue-600' : 'text-gray-400'}`}>2. Contacts</span>
-              <span className={`font-bold ${step >= 3 ? 'text-blue-600' : 'text-gray-400'}`}>3. Documents</span>
+              <span className={`font-bold ${step >= 1 ? 'text-blue-600' : 'text-slate-500'}`}>1. Details</span>
+              <span className={`font-bold ${step >= 2 ? 'text-blue-600' : 'text-slate-500'}`}>2. Contacts</span>
+              <span className={`font-bold ${step >= 3 ? 'text-blue-600' : 'text-slate-500'}`}>3. Documents</span>
             </div>
           )}
 
           {step === 1 && (
             <form onSubmit={() => setStep(2)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-sm font-medium">Legal Name</label><input required type="text" name="legalName" value={formData.legalName} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
-                <div><label className="block text-sm font-medium">Trading Name</label><input type="text" name="tradingName" value={formData.tradingName} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
-                <div><label className="block text-sm font-medium">Registration Number</label><input required type="text" name="registrationNumber" value={formData.registrationNumber} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
+                <div><label className="block text-sm font-medium">Legal Name</label><input required type="text" name="legalName" value={formData.legalName} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Legal Name"/></div>
+                <div><label className="block text-sm font-medium">Trading Name</label><input type="text" name="tradingName" value={formData.tradingName} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Trading Name"/></div>
+                <div><label className="block text-sm font-medium">Registration Number</label><input required type="text" name="registrationNumber" value={formData.registrationNumber} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Registration Number"/></div>
                 <div>
                   <label className="block text-sm font-medium">Organization Type</label>
-                  <select name="organizationType" value={formData.organizationType} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2">
+                  <select name="organizationType" value={formData.organizationType} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" aria-label="Organization Type">
                     <option>Corporation</option><option>LLC</option><option>Partnership</option><option>Non-Profit</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium">Industry</label>
-                  <select required name="industry" value={formData.industry} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2">
+                  <select required name="industry" value={formData.industry} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" aria-label="Industry">
                     <option value="">Select Industry</option><option value="Finance">Finance</option><option value="Healthcare">Healthcare</option><option value="Retail">Retail</option><option value="Technology">Technology</option><option value="Telecommunications">Telecommunications</option>
                   </select>
                 </div>
-                <div><label className="block text-sm font-medium">Website</label><input type="url" name="website" value={formData.website} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
-                <div><label className="block text-sm font-medium">Country</label><input required type="text" name="country" value={formData.country} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
+                <div><label className="block text-sm font-medium">Website</label><input type="url" name="website" value={formData.website} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Website"/></div>
+                <div><label className="block text-sm font-medium">Country</label><input required type="text" name="country" value={formData.country} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Country"/></div>
               </div>
-              <div><label className="block text-sm font-medium">Registered Address</label><textarea required name="registeredAddress" value={formData.registeredAddress} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"></textarea></div>
+              <div><label className="block text-sm font-medium">Registered Address</label><textarea required name="registeredAddress" value={formData.registeredAddress} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" aria-label="Registered Address"></textarea></div>
               <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded-md">Next</button>
             </form>
           )}
@@ -112,18 +113,18 @@ const EnterpriseRegistration: React.FC = () => {
             <form onSubmit={() => setStep(3)} className="space-y-6">
               <h3 className="font-bold border-b pb-2">Authorized Representative</h3>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-sm">Full Name</label><input required type="text" name="authRepName" value={formData.authRepName} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
-                <div><label className="block text-sm">Email</label><input required type="email" name="authRepEmail" value={formData.authRepEmail} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
-                <div><label className="block text-sm">Phone</label><input required type="text" name="authRepPhone" value={formData.authRepPhone} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
-                <div><label className="block text-sm">Designation</label><input required type="text" name="authRepDesignation" value={formData.authRepDesignation} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
-                <div><label className="block text-sm">Department</label><input type="text" name="authRepDepartment" value={formData.authRepDepartment} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
+                <div><label className="block text-sm">Full Name</label><input required type="text" name="authRepName" value={formData.authRepName} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Full Name"/></div>
+                <div><label className="block text-sm">Email</label><input required type="email" name="authRepEmail" value={formData.authRepEmail} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Email"/></div>
+                <div><label className="block text-sm">Phone</label><input required type="text" name="authRepPhone" value={formData.authRepPhone} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Phone"/></div>
+                <div><label className="block text-sm">Designation</label><input required type="text" name="authRepDesignation" value={formData.authRepDesignation} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Designation"/></div>
+                <div><label className="block text-sm">Department</label><input type="text" name="authRepDepartment" value={formData.authRepDepartment} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Department"/></div>
               </div>
               <h3 className="font-bold border-b pb-2">Privacy/Compliance Contact</h3>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-sm">Full Name</label><input required type="text" name="privacyName" value={formData.privacyName} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
-                <div><label className="block text-sm">Email</label><input required type="email" name="privacyEmail" value={formData.privacyEmail} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
-                <div><label className="block text-sm">Phone</label><input required type="text" name="privacyPhone" value={formData.privacyPhone} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
-                <div><label className="block text-sm">Designation</label><input type="text" name="privacyDesignation" value={formData.privacyDesignation} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2" /></div>
+                <div><label className="block text-sm">Full Name</label><input required type="text" name="privacyName" value={formData.privacyName} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Full Name"/></div>
+                <div><label className="block text-sm">Email</label><input required type="email" name="privacyEmail" value={formData.privacyEmail} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Email"/></div>
+                <div><label className="block text-sm">Phone</label><input required type="text" name="privacyPhone" value={formData.privacyPhone} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Phone"/></div>
+                <div><label className="block text-sm">Designation</label><input type="text" name="privacyDesignation" value={formData.privacyDesignation} onChange={handleInputChange} className="mt-1 block w-full border rounded-md p-2"  aria-label="Designation"/></div>
               </div>
               <div className="flex gap-4">
                 <button type="button" onClick={() => setStep(1)} className="w-1/3 bg-gray-200 p-2 rounded-md">Back</button>
@@ -137,9 +138,9 @@ const EnterpriseRegistration: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium">Business Registration Certificate</label>
                 <div className="mt-2 border-2 border-dashed p-6 text-center cursor-pointer">
-                  <input type="file" onChange={handleFileChange} required className="mb-4" />
+                  <input type="file" onChange={handleFileChange} required className="mb-4"  aria-label="Business Registration Certificate"/>
                   <p className="text-sm text-gray-500">PDF, PNG, JPG up to 10MB</p>
-                  {file && <p className="text-green-600 mt-2">{file.name}</p>}
+                  {file && <p className="text-green-700 mt-2">{file.name}</p>}
                 </div>
               </div>
               <div className="flex gap-4">

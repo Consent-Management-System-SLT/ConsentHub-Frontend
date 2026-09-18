@@ -1,53 +1,51 @@
 /** @type {import('tailwindcss').Config} */
+
+/**
+ * SLT-Mobitel brand palette.
+ *
+ * Sampled from sltmobitel.lk: the brand sits on a navy-blue family
+ * (#0d478b primary, #0b2a58 deep navy, #1055a7 lighter) with a green accent.
+ *
+ * Rather than introduce a parallel `slt-*` scale and leave 190-odd existing
+ * `blue-600` usages on Tailwind's default blue, the `blue` ramp itself is
+ * redefined to SLT's blues. Every existing blue utility therefore renders in
+ * brand colour with no change at the call site, and one primary stays one
+ * primary. The 50-400 steps are lighter tints of the same hue so backgrounds,
+ * borders and badges stay coherent.
+ */
+const sltBlue = {
+  50: '#eff5fc',
+  100: '#d8e6f7',
+  200: '#b3ccef',
+  300: '#7fa8e0',
+  400: '#4a80cb',
+  500: '#1f60b4',
+  600: '#0d478b', // primary - brand blue
+  700: '#0f3b7a', // hover / pressed
+  800: '#0b2a58', // deep navy - headers, footers
+  900: '#081f42',
+  950: '#05142b',
+};
+
 export default {
+  // Dark mode is driven by a `dark` class on <html>, set by ThemeContext.
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       screens: {
-        'xs': '475px',
+        xs: '475px',
       },
       colors: {
-        'brand': {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb', // Primary brand color
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554',
-        },
-        'myslt': {
-          primary: '#2563eb',
-          'primary-dark': '#1e3a8a',
-          'primary-light': '#60a5fa',
-          secondary: '#3b82f6',
-          accent: '#2563eb',
-          success: '#16a34a',
-          background: '#f8fafc', // Light slate
-          card: '#ffffff', // White cards
-          'card-solid': '#ffffff',
-          'service-card': '#f1f5f9',
-          'input-bg': '#ffffff',
-          warning: '#d97706',
-          danger: '#dc2626',
-          info: '#2563eb',
-          text: {
-            primary: '#0f172a',    // Dark slate for text
-            secondary: '#475569',
-            muted: '#64748b',
-            accent: '#2563eb',
-          }
+        blue: sltBlue,
+        slt: {
+          ...sltBlue,
+          accent: '#69ca8e', // brand green, used sparingly for success
         },
       },
-      backgroundImage: {
-        'slt-gradient': 'none',
-        'myslt-gradient': 'none',
-        'myslt-card-gradient': 'none',
-        'success-gradient': 'none',
+      fontFamily: {
+        // SLT-Mobitel sets Poppins across its properties.
+        sans: ['Poppins', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
     },
   },

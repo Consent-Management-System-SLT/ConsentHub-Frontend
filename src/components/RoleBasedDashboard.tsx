@@ -23,7 +23,20 @@ const RoleBasedDashboard: React.FC = () => {
     case 'enterprise':
       return <EnterpriseDashboard />;
     default:
-      return <AdminDashboard />; // Default to admin dashboard
+      // Never fall through to the admin dashboard for an unrecognised role.
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <div className="max-w-md text-center">
+            <h1 className="text-xl font-semibold text-slate-900 mb-2">
+              No dashboard available
+            </h1>
+            <p className="text-sm text-slate-600">
+              Your account role ({user.role}) has no dashboard assigned. Please
+              contact your administrator.
+            </p>
+          </div>
+        </div>
+      );
   }
 };
 

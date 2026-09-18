@@ -80,29 +80,29 @@ const CampaignList: React.FC<CampaignListProps> = ({ onCreateNew, onViewDetail }
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-sm text-slate-600">
-                <th className="p-4 font-medium">Campaign Name</th>
-                <th className="p-4 font-medium">Channel</th>
-                <th className="p-4 font-medium">Dates</th>
-                <th className="p-4 font-medium">Status</th>
-                <th className="p-4 font-medium text-right">Actions</th>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Campaign Name</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Channel</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Dates</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody className="text-sm">
               {campaigns.map((camp) => (
                 <tr key={camp._id} className="border-b border-slate-100 hover:bg-slate-50">
-                  <td className="p-4 font-medium text-slate-800">{camp.campaignName}</td>
-                  <td className="p-4 text-slate-600">{camp.channels?.join(', ')}</td>
-                  <td className="p-4 text-slate-600">
+                  <td className="px-6 py-4 text-sm text-slate-700 font-medium text-slate-800">{camp.campaignName}</td>
+                  <td className="px-6 py-4 text-sm text-slate-700 text-slate-600">{camp.channels?.join(', ')}</td>
+                  <td className="px-6 py-4 text-sm text-slate-700 text-slate-600">
                     {new Date(camp.campaignStart).toLocaleDateString()} - {new Date(camp.campaignEnd).toLocaleDateString()}
                   </td>
-                  <td className="p-4">
+                  <td className="px-6 py-4 text-sm text-slate-700">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(camp.status)}`}>
                       {camp.status}
                     </span>
                   </td>
-                  <td className="p-4 text-right space-x-2">
-                    <button onClick={() => onViewDetail(camp._id)} className="text-blue-600 hover:text-blue-800" title="View Details">
+                  <td className="px-6 py-4 text-sm text-slate-700 text-right space-x-2">
+                    <button onClick={() => onViewDetail(camp._id)} className="text-blue-600 hover:text-blue-800" title="View Details" aria-label="View Details">
                       <Eye className="w-4 h-4 inline" />
                     </button>
                   </td>

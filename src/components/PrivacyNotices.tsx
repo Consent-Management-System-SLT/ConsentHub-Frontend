@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Modal from './shared/Modal';
+import { Spinner } from './shared/Loading';
 import { 
   FileText, 
   Eye, 
@@ -62,18 +64,34 @@ const PrivacyNoticeForm: React.FC<{
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold">
-            {notice ? 'Edit Privacy Notice' : 'Create New Privacy Notice'}
-          </h3>
-          <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
-            <X className="h-5 w-5" />
+    <Modal
+      isOpen
+      onClose={onCancel}
+      title={notice ? 'Edit Privacy Notice' : 'Create New Privacy Notice'}
+      size="lg"
+      footer={
+        <>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isLoading}
+            className="px-4 py-2.5 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 disabled:opacity-50"
+          >
+            Cancel
           </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
+          <button
+            type="submit"
+            form="privacy-notice-form"
+            disabled={isLoading}
+            className="px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:opacity-50 flex items-center gap-2"
+          >
+            {isLoading ? <Spinner size="sm" tone="white" /> : <Save className="h-4 w-4" aria-hidden="true" />}
+            {isLoading ? 'Saving…' : notice ? 'Update' : 'Create'}
+          </button>
+        </>
+      }
+    >
+        <form id="privacy-notice-form" onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -85,7 +103,7 @@ const PrivacyNoticeForm: React.FC<{
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
-              />
+               aria-label="Title"/>
             </div>
 
             <div>
@@ -96,7 +114,7 @@ const PrivacyNoticeForm: React.FC<{
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+               aria-label="Category">
                 <option value="general">General</option>
                 <option value="marketing">Marketing</option>
                 <option value="analytics">Analytics</option>
@@ -116,7 +134,7 @@ const PrivacyNoticeForm: React.FC<{
                 value={formData.legalBasis}
                 onChange={(e) => setFormData({ ...formData, legalBasis: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+               aria-label="Legal Basis">
                 <option value="consent">Consent</option>
                 <option value="contract">Contract</option>
                 <option value="legal_obligation">Legal Obligation</option>
@@ -134,7 +152,7 @@ const PrivacyNoticeForm: React.FC<{
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+               aria-label="Status">
                 <option value="draft">Draft</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -150,7 +168,7 @@ const PrivacyNoticeForm: React.FC<{
                 value={formData.language}
                 onChange={(e) => setFormData({ ...formData, language: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+               aria-label="Language">
                 <option value="en">English</option>
                 <option value="si">Sinhala</option>
                 <option value="ta">Tamil</option>
@@ -166,7 +184,7 @@ const PrivacyNoticeForm: React.FC<{
                 value={formData.effectiveDate}
                 onChange={(e) => setFormData({ ...formData, effectiveDate: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+               aria-label="Effective Date"/>
             </div>
           </div>
 
@@ -180,7 +198,7 @@ const PrivacyNoticeForm: React.FC<{
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Brief description of the privacy notice"
-            />
+             aria-label="Description"/>
           </div>
 
           <div>
@@ -194,39 +212,11 @@ const PrivacyNoticeForm: React.FC<{
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Privacy notice content..."
               required
-            />
+             aria-label="Content"/>
           </div>
 
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              disabled={isLoading}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-white text-white rounded-md hover:bg-slate-900 disabled:opacity-50 flex items-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  {notice ? 'Update' : 'Create'}
-                </>
-              )}
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 };
 
@@ -241,38 +231,36 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
   if (!isOpen || !notice) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">{notice.title}</h2>
-            <div className="flex items-center space-x-4 mt-2">
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                notice.status === 'active' ? 'bg-green-100 text-green-800' : 
-                notice.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 
-                'bg-gray-100 text-gray-800'
-              }`}>
-                {notice.status}
-              </span>
-              <span className="text-sm text-gray-500">Version {notice.version}</span>
-              <span className="text-sm text-gray-500">
-                Last updated: {new Date(notice.updatedAt).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="px-6 py-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={notice.title}
+      size="lg"
+      subtitle={
+        <>
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+            notice.status === 'active' ? 'bg-green-100 text-green-800' :
+            notice.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
+            'bg-slate-100 text-slate-800'
+          }`}>
+            {notice.status}
+          </span>
+          <span className="text-sm text-slate-600">Version {notice.version}</span>
+          <span className="text-sm text-slate-600">
+            Last updated: {new Date(notice.updatedAt).toLocaleDateString()}
+          </span>
+        </>
+      }
+      footer={
+        <button
+          onClick={onClose}
+          className="px-4 py-2.5 border border-slate-300 bg-white text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+        >
+          Close
+        </button>
+      }
+    >
+        <div>
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
@@ -327,7 +315,7 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
                     </div>
                   ))}
                   {notice.acknowledgments.length > 5 && (
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-xs text-slate-500 mt-2">
                       And {notice.acknowledgments.length - 5} more...
                     </p>
                   )}
@@ -336,18 +324,7 @@ const ViewModal: React.FC<ViewModalProps> = ({ notice, isOpen, onClose }) => {
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
+    </Modal>
   );
 };
 
@@ -623,7 +600,7 @@ export const PrivacyNotices: React.FC = () => {
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={loadNotices}
-            className="bg-white text-white px-4 py-2 rounded-md hover:bg-slate-900 transition-colors"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
           >
             Retry
           </button>
@@ -636,7 +613,7 @@ export const PrivacyNotices: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
           <div>
             <h2 className="text-lg font-semibold text-slate-900 flex items-center">
               <FileText className="h-5 w-5 mr-2 text-blue-600" />
@@ -650,21 +627,21 @@ export const PrivacyNotices: React.FC = () => {
           <div className="flex space-x-2">
             <button
               onClick={() => setShowForm(true)}
-              className="bg-white text-white px-4 py-2 rounded-md hover:bg-slate-900 transition-colors flex items-center gap-2"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex flex-wrap items-center gap-2"
             >
               <Plus className="h-4 w-4" />
               Create Notice
             </button>
             <button
               onClick={() => handleExport('json')}
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
+              className="border border-slate-300 bg-white text-slate-700 px-4 py-2 rounded-md hover:bg-slate-50 transition-colors flex flex-wrap items-center gap-2"
             >
               <Download className="h-4 w-4" />
               Export JSON
             </button>
             <button
               onClick={() => handleExport('csv')}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="border border-slate-300 bg-white text-slate-700 px-4 py-2 rounded-md hover:bg-slate-50 transition-colors flex flex-wrap items-center gap-2"
             >
               <Download className="h-4 w-4" />
               Export CSV
@@ -679,12 +656,12 @@ export const PrivacyNotices: React.FC = () => {
             <div className="text-sm text-blue-600">Total</div>
           </div>
           <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
-            <div className="text-sm text-green-600">Active</div>
+            <div className="text-2xl font-bold text-green-700">{stats.active}</div>
+            <div className="text-sm text-green-700">Active</div>
           </div>
           <div className="bg-yellow-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-yellow-600">{stats.draft}</div>
-            <div className="text-sm text-yellow-600">Draft</div>
+            <div className="text-2xl font-bold text-yellow-700">{stats.draft}</div>
+            <div className="text-sm text-yellow-700">Draft</div>
           </div>
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="text-2xl font-bold text-gray-600">{stats.archived}</div>
@@ -696,7 +673,7 @@ export const PrivacyNotices: React.FC = () => {
         <div className="flex flex-wrap gap-4 mb-6">
           <div className="flex-1 min-w-64">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search notices..."
@@ -704,7 +681,7 @@ export const PrivacyNotices: React.FC = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && loadNotices()}
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+               aria-label="Search notices"/>
             </div>
           </div>
           
@@ -713,7 +690,7 @@ export const PrivacyNotices: React.FC = () => {
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             title="Filter notices by status. Deleted notices are archived and hidden by default."
-          >
+           aria-label="Filter by status">
             <option value="">All Statuses</option>
             <option value="active">Active (Default)</option>
             <option value="draft">Draft</option>
@@ -725,7 +702,7 @@ export const PrivacyNotices: React.FC = () => {
             value={filters.category || ''}
             onChange={(e) => setFilters({ ...filters, category: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
+           aria-label="Filter by category">
             <option value="">All Categories</option>
             <option value="general">General</option>
             <option value="marketing">Marketing</option>
@@ -737,7 +714,7 @@ export const PrivacyNotices: React.FC = () => {
             value={filters.language || ''}
             onChange={(e) => setFilters({ ...filters, language: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
+           aria-label="Filter by language">
             <option value="">All Languages</option>
             <option value="en">English</option>
             <option value="si">Sinhala</option>
@@ -746,7 +723,7 @@ export const PrivacyNotices: React.FC = () => {
 
           <button
             onClick={loadNotices}
-            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors flex items-center gap-2"
+            className="px-4 py-2 border border-slate-300 bg-white text-slate-700 rounded-md hover:bg-slate-50 transition-colors flex flex-wrap items-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
             Refresh
@@ -757,7 +734,7 @@ export const PrivacyNotices: React.FC = () => {
       {/* Notices Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {notices.map((notice) => (
-          <div key={notice.id} className="bg-white border border-slate-200 rounded-xl shadow-sm border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div key={notice.id} className="h-full flex flex-col bg-white border border-slate-200 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 {getStatusIcon(notice.status)}
@@ -773,14 +750,14 @@ export const PrivacyNotices: React.FC = () => {
                   }}
                   className="text-blue-600 hover:text-blue-800 p-1"
                   title="Edit"
-                >
+                 aria-label="Edit">
                   <Edit className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => handleDeleteNotice(notice.id)}
                   className="text-red-600 hover:text-red-800 p-1"
                   title="Delete"
-                >
+                 aria-label="Delete">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -809,17 +786,18 @@ export const PrivacyNotices: React.FC = () => {
             </div>
 
             {notice.description && (
-              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+              <p className="text-slate-600 text-sm mb-4 line-clamp-3">
                 {notice.description}
               </p>
             )}
 
-            <div className="flex space-x-2">
+            {/* pushes the action to the bottom, so it lines up across the row */}
+            <div className="mt-auto pt-2">
               <button
                 onClick={() => setViewingNotice(notice)}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-white border border-slate-200 transition-colors"
+                className="w-full inline-flex items-center justify-center px-3 py-2 border border-slate-300 text-sm font-medium text-slate-700 bg-white rounded-lg shadow-sm hover:bg-slate-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               >
-                <Eye className="h-4 w-4 mr-2" />
+                <Eye className="h-4 w-4 mr-2" aria-hidden="true" />
                 View
               </button>
             </div>
@@ -828,12 +806,12 @@ export const PrivacyNotices: React.FC = () => {
       </div>
 
       {notices.length === 0 && !loading && (
-        <div className="text-center py-12 bg-white border border-slate-200 rounded-xl shadow-sm rounded-lg">
-          <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+        <div className="text-center py-12 bg-white border border-slate-200 rounded-xl shadow-sm">
+          <FileText className="h-12 w-12 text-slate-500 mx-auto mb-4" />
           <p className="text-gray-500 mb-4">No privacy notices found.</p>
           <button
             onClick={() => setShowForm(true)}
-            className="bg-white text-white px-4 py-2 rounded-md hover:bg-slate-900 transition-colors"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
           >
             Create your first notice
           </button>
