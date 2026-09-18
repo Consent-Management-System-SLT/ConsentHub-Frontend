@@ -3,7 +3,7 @@ import { useLockedLightTheme } from '../../contexts/ThemeContext';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle, Smartphone } from 'lucide-react';
 const Login: React.FC = () => {
   useLockedLightTheme(); // the auth screens are a fixed brand panel
   const [email, setEmail] = useState('');
@@ -199,12 +199,25 @@ const Login: React.FC = () => {
               <span className="text-sm text-slate-600">{t('auth.noAccount')} </span>
               <Link
                 to="/signup"
-                className="font-medium text-blue-600 hover:text-blue-600 transition-colors"
+                className="font-medium text-blue-700 hover:text-blue-800 transition-colors"
               >
                 {t('auth.signUp')}
               </Link>
             </div>
           </form>
+
+          {/* EasyApply customers authenticate with an OTP instead of a password,
+              so this is a separate route rather than another field above. */}
+          <div className="mt-6 pt-6 border-t border-slate-200 text-center">
+            <p className="text-sm text-slate-600 mb-3">Are you an EasyApply customer?</p>
+            <Link
+              to="/customer/login"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:py-3 rounded-lg border border-blue-600 text-blue-700 font-semibold hover:bg-blue-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+            >
+              <Smartphone className="w-4 h-4 shrink-0" aria-hidden="true" />
+              Sign in with Mobile Number
+            </Link>
+          </div>
         </div>
       </div>
     </div>

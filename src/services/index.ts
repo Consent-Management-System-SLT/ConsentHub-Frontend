@@ -7,14 +7,10 @@ export { preferenceService } from './preferenceService';
 export { partyService } from './partyService';
 export { dsarService } from './dsarService';
 export { customerService } from './customerService';
-export { tmf620ProductCatalogService } from './tmf620ProductCatalogService';
 // Supporting services
 export { privacyNoticeService } from './privacyNoticeService';
-export { tmf669EventService } from './eventService';
 export { authService } from './authService';
 export { auditService } from './auditService';
-export { dashboardService } from './dashboardService';
-export { advancedMonitoringService } from './advancedMonitoringService';
 // Type exports
 export type { ApiResponse, ApiError } from './apiClient';
 export type { 
@@ -41,13 +37,6 @@ export type {
   PrivacyNoticeListResponse 
 } from './privacyNoticeService';
 export type { 
-  TMF669Event, 
-  PrivacyConsentChangeEvent, 
-  PrivacyPreferenceChangeEvent, 
-  PrivacyNoticeChangeEvent, 
-  DSARRequestEvent 
-} from './eventService';
-export type { 
   DSARRequest
 } from './dsarService';
 export type { 
@@ -56,12 +45,3 @@ export type {
   AuthResponse, 
   User 
 } from './authService';
-export type {
-  ProductOffering,
-  ProductOfferingCategory,
-  ProductSpecificationRef,
-  ConsentRequirement,
-  OfferPrivacyPreference,
-  ProductOfferingQuery,
-  OfferSpecificConsentRequest
-} from './tmf620ProductCatalogService';
