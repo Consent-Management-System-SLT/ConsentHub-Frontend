@@ -61,35 +61,11 @@ export interface CustomerConsent {
   createdAt?: string;
 }
 
-interface RawConsent {
-  id: string;
-  purpose: string;
-  status: string;
-  grantedAt?: string;
-  revokedAt?: string;
-  expiresAt?: string;
-  versionAccepted?: string;
-  channel?: string;
-  createdAt?: string;
-}
-
-// Served by GET /api/v1/customer/consents in comprehensive-backend.js - shared with
-// the regular customer-portal login, so the shape is theirs: { data: { consents: [] } }
-// with raw Mongoose field names (id, versionAccepted) rather than our own.
+// Own endpoint, deliberately separate from the internal customer-portal's
+// GET /api/v1/customer/consents, so EasyApply's contract doesn't move under it.
 export async function fetchCustomerConsents(): Promise<CustomerConsent[]> {
-  const { data } = await api.get('/customer/consents');
-  const raw: RawConsent[] = data?.data?.consents ?? [];
-  return raw.map((c) => ({
-    consentId: c.id,
-    purpose: c.purpose,
-    status: c.status,
-    grantedAt: c.grantedAt,
-    revokedAt: c.revokedAt,
-    expiresAt: c.expiresAt,
-    privacyNoticeVersion: c.versionAccepted,
-    channel: c.channel,
-    createdAt: c.createdAt,
-  }));
+  const { data } = await api.get('/customer-auth/consents');
+  return data?.data ?? [];
 }
 
 export function logoutCustomer() {
