@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { Spinner } from '../shared/Loading';
 import { Shield, Settings, Plus, AlertTriangle, Eye, Edit, Trash2, X, Save, RefreshCw, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 const ComplianceRulesManager = () => {
@@ -199,7 +200,7 @@ const ComplianceRulesManager = () => {
       )}
       {loading ? (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-200"></div>
+          <Spinner size="lg" />
         </div>
       ) : rules.length === 0 ? (
         <div className="text-center py-12">

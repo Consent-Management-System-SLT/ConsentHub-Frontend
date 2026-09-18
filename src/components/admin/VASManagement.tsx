@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Spinner } from '../shared/Loading';
 import { 
   Search, 
   Plus, 
@@ -548,7 +549,7 @@ const VASManagement: React.FC = () => {
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+               aria-label="Filter by category">
                 <option value="all">All Categories</option>
                 {categories.map(category => (
                   <option key={category} value={category}>
@@ -560,7 +561,7 @@ const VASManagement: React.FC = () => {
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
+               aria-label="Filter by status">
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -591,7 +592,7 @@ const VASManagement: React.FC = () => {
           {/* Services Grid */}
           {loadingServices ? (
             <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+              <Spinner size="lg" />
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -611,7 +612,7 @@ const VASManagement: React.FC = () => {
             </div>
             {loadingSubscriptions ? (
               <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+                <Spinner size="lg" />
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -719,7 +720,7 @@ const VASManagement: React.FC = () => {
           </div>
           {loadingHistory ? (
             <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+              <Spinner size="lg" />
             </div>
           ) : (
             <div className="overflow-x-auto">

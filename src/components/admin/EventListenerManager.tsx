@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import Modal from '../shared/Modal';
 import { 
   Webhook, Plus, Settings, Activity, CheckCircle, XCircle, RefreshCw, 
   Search, Edit, Trash2, Eye, AlertTriangle, Clock, TrendingUp,
@@ -464,7 +465,7 @@ const EventListenerManager: React.FC = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          >
+           aria-label="Filter by status">
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -473,7 +474,7 @@ const EventListenerManager: React.FC = () => {
             value={eventFilter}
             onChange={(e) => setEventFilter(e.target.value)}
             className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          >
+           aria-label="Filter by event">
             <option value="">All Events</option>
             {availableEvents.map(event => (
               <option key={event.value} value={event.value}>
@@ -716,168 +717,205 @@ const WebhookModal: React.FC<WebhookModalProps> = ({ title, formData, setFormDat
       : [...formData.events, eventValue];
     setFormData({ ...formData, events: newEvents });
   };
+  const allSelected = availableEvents.length > 0 && formData.events.length === availableEvents.length;
+  const toggleAll = () =>
+    setFormData({ ...formData, events: allSelected ? [] : availableEvents.map((e) => e.value) });
+
   return (
-    <div role="dialog" aria-modal="true" aria-label="Basic Settings" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-slate-200">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-            <button aria-label="Close" 
-              onClick={onClose}
-              className="p-2 hover:bg-slate-50 rounded-lg transition-colors"
+    <Modal
+      isOpen
+      onClose={onClose}
+      title={title}
+      size="xl"
+      footer={
+        <>
+          <button
+            type="button"
+            onClick={onClose}
+            className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={!formData.name || !formData.url || formData.events.length === 0}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            <Save className="w-4 h-4" aria-hidden="true" />
+            Save Webhook
+          </button>
+        </>
+      }
+    >
+      {/* Two equal columns on a laptop; the events list fills its column rather
+          than sitting in a short box that clips a row in half. */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        <fieldset className="space-y-4 min-w-0">
+          <legend className="text-sm font-semibold text-slate-900 mb-1">Basic settings</legend>
+
+          <div>
+            <label htmlFor="wh-name" className="block text-sm font-medium text-slate-700 mb-1.5">Name</label>
+            <input
+              id="wh-name"
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
+              placeholder="Enter webhook name"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="wh-url" className="block text-sm font-medium text-slate-700 mb-1.5">Endpoint URL</label>
+            <input
+              id="wh-url"
+              type="url"
+              value={formData.url}
+              onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
+              placeholder="https://example.com/webhook"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="wh-retries" className="block text-sm font-medium text-slate-700 mb-1.5">Retry attempts</label>
+              <input
+                id="wh-retries"
+                type="number"
+                min="0"
+                max="10"
+                value={formData.retryAttempts}
+                onChange={(e) => setFormData({ ...formData, retryAttempts: parseInt(e.target.value) })}
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
+              />
+            </div>
+            <div>
+              <label htmlFor="wh-timeout" className="block text-sm font-medium text-slate-700 mb-1.5">Timeout (ms)</label>
+              <input
+                id="wh-timeout"
+                type="number"
+                min="1000"
+                max="120000"
+                value={formData.timeout}
+                onChange={(e) => setFormData({ ...formData, timeout: parseInt(e.target.value) })}
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
+              />
+            </div>
+          </div>
+
+          {/* a state toggle, not a form field, so it reads as a switch row */}
+          <label className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 cursor-pointer">
+            <input
+              type="checkbox"
+              id="isActive"
+              checked={formData.isActive}
+              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+              className="mt-0.5 w-4 h-4 shrink-0 rounded border-slate-400 text-blue-600 focus:ring-2 focus:ring-blue-600"
+            />
+            <span>
+              <span className="block text-sm font-medium text-slate-900">Active</span>
+              <span className="block text-xs text-slate-600">Deliver events to this endpoint as they happen</span>
+            </span>
+          </label>
+        </fieldset>
+
+        <fieldset className="min-w-0 flex flex-col">
+          <div className="flex items-center justify-between gap-3 mb-1.5">
+            <legend className="text-sm font-semibold text-slate-900">
+              Events
+              <span className="ml-2 font-normal text-slate-600">
+                {formData.events.length} of {availableEvents.length} selected
+              </span>
+            </legend>
+            <button
+              type="button"
+              onClick={toggleAll}
+              className="text-xs font-medium text-blue-700 hover:text-blue-800 underline shrink-0"
             >
-              <X className="w-5 h-5 text-slate-500" />
+              {allSelected ? 'Clear all' : 'Select all'}
             </button>
           </div>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Basic Settings */}
-            <div className="space-y-4">
-              <h4 className="font-medium text-slate-900">Basic Settings</h4>
-              <div>
-                <label className="block text-sm font-medium text-slate-600 mb-2">Name</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full"
-                  placeholder="Enter webhook name"
-                 aria-label="Name"/>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-600 mb-2">URL</label>
-                <input
-                  type="url"
-                  value={formData.url}
-                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                  className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full"
-                  placeholder="https://example.com/webhook"
-                 aria-label="URL"/>
-              </div>
-              <div className="flex items-center">
+
+          <div className="rounded-lg border border-slate-200 divide-y divide-slate-100 overflow-y-auto max-h-[22rem]">
+            {availableEvents.map((event) => (
+              <label
+                key={event.value}
+                htmlFor={event.value}
+                className="flex items-start gap-3 p-3 cursor-pointer hover:bg-slate-50 transition-colors"
+              >
                 <input
                   type="checkbox"
-                  id="isActive"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
+                  id={event.value}
+                  checked={formData.events.includes(event.value)}
+                  onChange={() => toggleEvent(event.value)}
+                  className="mt-0.5 w-4 h-4 shrink-0 rounded border-slate-400 text-blue-600 focus:ring-2 focus:ring-blue-600"
                 />
-                <label htmlFor="isActive" className="ml-2 text-sm text-slate-900">
-                  Active
-                </label>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-600 mb-2">Retry Attempts</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="10"
-                  value={formData.retryAttempts}
-                  onChange={(e) => setFormData({ ...formData, retryAttempts: parseInt(e.target.value) })}
-                  className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full"
-                 aria-label="Retry Attempts"/>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-600 mb-2">Timeout (ms)</label>
-                <input
-                  type="number"
-                  min="1000"
-                  max="120000"
-                  value={formData.timeout}
-                  onChange={(e) => setFormData({ ...formData, timeout: parseInt(e.target.value) })}
-                  className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full"
-                 aria-label="Timeout (ms)"/>
-              </div>
-            </div>
-            {/* Events Selection */}
-            <div className="space-y-4">
-              <h4 className="font-medium text-slate-900">Events</h4>
-              <div className="max-h-96 sm:max-h-64 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-slate-100">
-                {availableEvents.map((event) => (
-                  <div key={event.value} className="flex items-start space-x-3 py-2">
-                    <input
-                      type="checkbox"
-                      id={event.value}
-                      checked={formData.events.includes(event.value)}
-                      onChange={() => toggleEvent(event.value)}
-                      className="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded focus:ring-blue-500 focus:ring-2 mt-1"
-                    />
-                    <div className="flex-1">
-                      <label htmlFor={event.value} className="block text-sm font-medium text-slate-900 cursor-pointer">
-                        {event.label}
-                      </label>
-                      <p className="text-xs text-slate-500 mt-1">{event.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium text-slate-900">{event.label}</span>
+                  <span className="block text-xs text-slate-600 mt-0.5">{event.description}</span>
+                </span>
+              </label>
+            ))}
           </div>
-          {/* Custom Headers */}
-          <div className="mt-6">
-            <h4 className="font-medium text-slate-900 mb-4">Custom Headers</h4>
-            {/* Add Header */}
-            <div className="flex space-x-2 mb-4">
-              <input
-                type="text"
-                placeholder="Header name"
-                value={newHeaderKey}
-                onChange={(e) => setNewHeaderKey(e.target.value)}
-                className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors flex-1"
-               aria-label="Header name"/>
-              <input
-                type="text"
-                placeholder="Header value"
-                value={newHeaderValue}
-                onChange={(e) => setNewHeaderValue(e.target.value)}
-                className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors flex-1"
-               aria-label="Header value"/>
-              <button
-                type="button"
-                onClick={addHeader}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                Add
-              </button>
-            </div>
-            {/* Existing Headers */}
-            <div className="space-y-2">
-              {Object.entries(formData.headers).map(([key, value]) => (
-                <div key={key} className="flex items-center space-x-2 p-2 bg-slate-100 rounded">
-                  <span className="font-medium text-slate-600">{key}:</span>
-                  <span className="text-slate-900">{value as string}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeHeader(key)}
-                    className="ml-auto p-1 text-red-600 hover:bg-red-50 rounded"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Actions */}
-          <div className="mt-8 flex justify-end space-x-3">
-            <button 
-              onClick={onClose}
-              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={onSave}
-              disabled={!formData.name || !formData.url || formData.events.length === 0}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-            >
-              <Save className="w-4 h-4" />
-              <span>Save Webhook</span>
-            </button>
-          </div>
-        </div>
+          {formData.events.length === 0 && (
+            <p className="mt-2 text-xs text-amber-700">Choose at least one event before saving.</p>
+          )}
+        </fieldset>
       </div>
-    </div>
+
+      <div className="mt-8 pt-6 border-t border-slate-200">
+        <h4 className="text-sm font-semibold text-slate-900 mb-1">Custom headers</h4>
+        <p className="text-xs text-slate-600 mb-3">Sent with every delivery, for example an authorisation token.</p>
+
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <input
+            type="text"
+            placeholder="Header name"
+            aria-label="Header name"
+            value={newHeaderKey}
+            onChange={(e) => setNewHeaderKey(e.target.value)}
+            className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 sm:flex-1"
+          />
+          <input
+            type="text"
+            placeholder="Header value"
+            aria-label="Header value"
+            value={newHeaderValue}
+            onChange={(e) => setNewHeaderValue(e.target.value)}
+            className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 sm:flex-1"
+          />
+          <button
+            type="button"
+            onClick={addHeader}
+            disabled={!newHeaderKey.trim() || !newHeaderValue.trim()}
+            className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-5 py-2.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Add
+          </button>
+        </div>
+
+        {Object.keys(formData.headers).length > 0 && (
+          <ul className="space-y-2">
+            {Object.entries(formData.headers).map(([key, value]) => (
+              <li key={key} className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg">
+                <span className="text-sm font-medium text-slate-700 shrink-0">{key}</span>
+                <span className="text-sm text-slate-900 truncate">{value as string}</span>
+                <button
+                  type="button"
+                  onClick={() => removeHeader(key)}
+                  aria-label={`Remove header ${key}`}
+                  className="ml-auto shrink-0 p-1.5 text-slate-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                >
+                  <X className="w-4 h-4" aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </Modal>
   );
 };
 // Logs Modal Component

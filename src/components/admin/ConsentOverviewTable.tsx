@@ -595,40 +595,57 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
             </span>
           </div>
         </div>
-        <div className="flex items-center space-x-3">
-          <button 
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center space-x-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 flex items-center gap-2 whitespace-nowrap"
           >
-            <Plus className="w-4 h-4" />
-            <span className="text-sm font-medium">Create New Consent</span>
+            <Plus className="w-4 h-4 shrink-0" aria-hidden="true" />
+            Create New Consent
           </button>
-          <button 
+          <button
             onClick={handleExportData}
-            className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center space-x-2"
+            className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-medium rounded-lg px-4 py-2.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 flex items-center gap-2 whitespace-nowrap"
           >
-            <Download className="w-4 h-4" />
-            <span className="text-sm font-medium">Export</span>
+            <Download className="w-4 h-4 shrink-0" aria-hidden="true" />
+            Export
           </button>
-          {selectedConsents.size > 0 && (
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-slate-600">{selectedConsents.size} selected</span>
-              <button 
-                onClick={() => handleBulkAction('export')}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 px-3 text-sm"
-              >
-                Export Selected
-              </button>
-              <button 
-                onClick={() => handleBulkAction('delete')}
-                className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600/80 transition-colors text-sm"
-              >
-                Delete Selected
-              </button>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Bulk actions get their own bar once rows are ticked, rather than being
+          squeezed in beside the page actions. */}
+      {selectedConsents.size > 0 && (
+        <div
+          role="region"
+          aria-label="Bulk actions"
+          className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3"
+        >
+          <span className="text-sm font-medium text-blue-900 whitespace-nowrap">
+            {selectedConsents.size} selected
+          </span>
+          <span className="flex-1" />
+          <button
+            onClick={() => handleBulkAction('export')}
+            className="bg-white border border-blue-300 text-blue-800 hover:bg-blue-100 text-sm font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 whitespace-nowrap"
+          >
+            Export selected
+          </button>
+          <button
+            onClick={() => handleBulkAction('delete')}
+            className="bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600 whitespace-nowrap"
+          >
+            Delete selected
+          </button>
+          <button
+            onClick={() => setSelectedConsents(new Set())}
+            className="text-sm font-medium text-blue-800 hover:text-blue-900 underline px-2 py-2 whitespace-nowrap"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
@@ -702,7 +719,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                >
+                 aria-label="Filter by status">
                   <option value="all">All Status</option>
                   <option value="active">Active/Granted</option>
                   <option value="withdrawn">Withdrawn/Revoked</option>
@@ -718,7 +735,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   value={consentTypeFilter}
                   onChange={(e) => setConsentTypeFilter(e.target.value)}
                   className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                >
+                 aria-label="Filter by type">
                   <option value="all">All Types</option>
                   <option value="marketing">Marketing</option>
                   <option value="analytics">Analytics</option>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Spinner } from '../shared/Loading';
 import { Users, Plus, Search, Edit, Trash2, Shield, UserCheck, RefreshCw, Eye, EyeOff, X, UserX, Pause, Play, AlertTriangle } from 'lucide-react';
 import { useCRUDNotifications } from '../shared/withNotifications';
 // Utility function to format dates
@@ -956,7 +957,7 @@ const UserManagement: React.FC = () => {
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          >
+           aria-label="Filter by role">
             <option value="all">All Roles</option>
             <option value="admin">Admin</option>
             <option value="csr">CSR</option>
@@ -967,7 +968,7 @@ const UserManagement: React.FC = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          >
+           aria-label="Filter by status">
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -979,7 +980,7 @@ const UserManagement: React.FC = () => {
       {loading && users.length === 0 ? (
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <Spinner size="md" className="mx-auto mb-4" />
             <p className="text-slate-600">Loading users...</p>
           </div>
         </div>
@@ -1504,7 +1505,7 @@ const UserManagement: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <Spinner size="sm" tone="white" className="mr-2" />
                     Creating...
                   </>
                 ) : (
@@ -1823,7 +1824,7 @@ const UserManagement: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <Spinner size="sm" tone="white" />
                     Updating...
                   </>
                 ) : (

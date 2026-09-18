@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Spinner } from '../shared/Loading';
 import { Plus, Trash2, X, Settings, Users, MessageSquare, Bell, Mail, Smartphone, CheckCircle, AlertCircle, Download, Loader } from 'lucide-react';
 interface CommunicationChannel {
   _id: string;
@@ -305,7 +306,7 @@ const PreferenceManagement: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <Spinner size="md" />
         <span className="ml-2 text-gray-600">Loading preferences...</span>
       </div>
     );

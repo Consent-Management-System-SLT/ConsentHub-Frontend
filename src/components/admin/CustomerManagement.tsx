@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Modal from '../shared/Modal';
 import { Users, Search, Eye, Shield, Calendar, Phone, Mail, RefreshCw, Filter, UserPlus, X } from 'lucide-react';
 import { useCRUDNotifications } from '../shared/withNotifications';
 interface Customer {
@@ -237,7 +238,7 @@ const CustomerManagement: React.FC = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
             className="px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-          >
+           aria-label="Filter by status">
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -330,70 +331,64 @@ const CustomerManagement: React.FC = () => {
         </div>
       </div>
       {/* Customer Details Modal */}
-      {showCustomerDetails && selectedCustomer && (
-        <div role="dialog" aria-modal="true" aria-label="Customer Details" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-slate-900">Customer Details</h2>
-              <button
-                onClick={() => setShowCustomerDetails(false)}
-                className="p-2 hover:bg-slate-50 rounded-lg transition-colors text-slate-500 hover:text-slate-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-6">
-              {/* Customer Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Name</label>
-                  <p className="text-slate-900">{selectedCustomer.name}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Email</label>
-                  <p className="text-slate-900">{selectedCustomer.email}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Phone</label>
-                  <p className="text-slate-900">{selectedCustomer.phone || 'Not provided'}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Company</label>
-                  <p className="text-slate-900">{selectedCustomer.company}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Status</label>
-                  {getStatusBadge(selectedCustomer.status)}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Member Since</label>
-                  <p className="text-slate-900">{formatDate(selectedCustomer.createdAt)}</p>
-                </div>
+      <Modal
+        isOpen={showCustomerDetails && !!selectedCustomer}
+        onClose={() => setShowCustomerDetails(false)}
+        title="Customer Details"
+        size="lg"
+      >
+        {selectedCustomer && (
+          <div className="space-y-6">
+            {/* three across on a laptop instead of two, so the panel uses its width */}
+            <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+              <div>
+                <dt className="text-sm font-medium text-slate-600 mb-1">Name</dt>
+                <dd className="text-slate-900 break-words">{selectedCustomer.name}</dd>
               </div>
-              {/* Activity Summary */}
-              <div className="border-t pt-6">
-                <h3 className="font-medium text-slate-900 mb-4">Activity Summary</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">{selectedCustomer.totalConsents}</div>
-                    <div className="text-sm text-blue-800">Total Consents</div>
-                    <div className="text-xs text-blue-600">{selectedCustomer.activeConsents} active</div>
-                  </div>
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-green-700">{selectedCustomer.totalPreferences}</div>
-                    <div className="text-sm text-green-800">Total Preferences</div>
-                    <div className="text-xs text-green-700">{selectedCustomer.activePreferences} active</div>
-                  </div>
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">{selectedCustomer.dsarRequests}</div>
-                    <div className="text-sm text-purple-800">DSAR Requests</div>
-                  </div>
+              <div>
+                <dt className="text-sm font-medium text-slate-600 mb-1">Email</dt>
+                <dd className="text-slate-900 break-words">{selectedCustomer.email}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-slate-600 mb-1">Phone</dt>
+                <dd className="text-slate-900">{selectedCustomer.phone || 'Not provided'}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-slate-600 mb-1">Company</dt>
+                <dd className="text-slate-900 break-words">{selectedCustomer.company}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-slate-600 mb-1">Status</dt>
+                <dd>{getStatusBadge(selectedCustomer.status)}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-slate-600 mb-1">Member Since</dt>
+                <dd className="text-slate-900">{formatDate(selectedCustomer.createdAt)}</dd>
+              </div>
+            </dl>
+
+            <div className="border-t border-slate-200 pt-6">
+              <h3 className="font-semibold text-slate-900 mb-4">Activity Summary</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-700">{selectedCustomer.totalConsents}</div>
+                  <div className="text-sm text-blue-900">Total Consents</div>
+                  <div className="text-xs text-blue-700 mt-0.5">{selectedCustomer.activeConsents} active</div>
+                </div>
+                <div className="bg-green-50 border border-green-100 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-green-700">{selectedCustomer.totalPreferences}</div>
+                  <div className="text-sm text-green-900">Total Preferences</div>
+                  <div className="text-xs text-green-700 mt-0.5">{selectedCustomer.activePreferences} active</div>
+                </div>
+                <div className="bg-purple-50 border border-purple-100 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-700">{selectedCustomer.dsarRequests}</div>
+                  <div className="text-sm text-purple-900">DSAR Requests</div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 };

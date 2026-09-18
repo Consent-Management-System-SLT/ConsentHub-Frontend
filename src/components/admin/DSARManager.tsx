@@ -335,7 +335,7 @@ const DSARManager: React.FC = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          >
+           aria-label="Filter by status">
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
             <option value="in-review">In Review</option>
