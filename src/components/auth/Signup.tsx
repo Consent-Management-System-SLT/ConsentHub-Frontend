@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { useLockedLightTheme } from '../../contexts/ThemeContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, User, Mail, Phone, Building, Lock, UserCheck, AlertCircle, CheckCircle } from 'lucide-react';
+import {
+  Eye, EyeOff, User, Mail, Phone, Building, Lock, Briefcase,
+  AlertCircle, CheckCircle, ArrowLeft, ArrowRight, ShieldQuestion,
+} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { RegisterRequest } from '../../services/authService';
+import StepProgress from './StepProgress';
+import AuthField from './AuthField';
+import { Spinner } from '../shared/Loading';
+
 interface SignupFormData {
   firstName: string;
   lastName: string;
@@ -11,108 +19,117 @@ interface SignupFormData {
   company: string;
   department: string;
   jobTitle: string;
+  securityQuestion: string;
+  securityAnswer: string;
   password: string;
   confirmPassword: string;
   agreeToTerms: boolean;
 }
-interface SignupErrors {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  phone?: string;
-  company?: string;
-  department?: string;
-  jobTitle?: string;
-  password?: string;
-  confirmPassword?: string;
-  agreeToTerms?: string;
-}
+
+type FieldErrors = Partial<Record<keyof SignupFormData, string>>;
+
+const STEPS = ['Your details', 'Organisation', 'Security'];
+
+const SECURITY_QUESTIONS = [
+  'What was the name of your first school?',
+  'What is your mother’s maiden name?',
+  'What was the name of your first pet?',
+  'In which city were you born?',
+  'What is your favourite book?',
+];
+
+// One definition of the rules, shared by the checklist beside the field and the
+// strength meter, so the two can never disagree.
+const PASSWORD_RULES: { label: string; test: (p: string) => boolean }[] = [
+  { label: 'At least 8 characters', test: (p) => p.length >= 8 },
+  { label: 'A lowercase letter', test: (p) => /[a-z]/.test(p) },
+  { label: 'An uppercase letter', test: (p) => /[A-Z]/.test(p) },
+  { label: 'A number', test: (p) => /\d/.test(p) },
+  { label: 'A special character (@ $ ! % * ? & #)', test: (p) => /[@$!%*?&#]/.test(p) },
+];
+
+const getPasswordStrength = (password: string) => PASSWORD_RULES.filter((r) => r.test(password)).length;
+
+const STRENGTH = [
+  { text: '', bar: '', color: '' },
+  { text: 'Very weak', bar: 'w-1/5 bg-red-600', color: 'text-red-700' },
+  { text: 'Weak', bar: 'w-2/5 bg-red-600', color: 'text-red-700' },
+  { text: 'Fair', bar: 'w-3/5 bg-amber-500', color: 'text-amber-700' },
+  { text: 'Good', bar: 'w-4/5 bg-blue-600', color: 'text-blue-700' },
+  { text: 'Strong', bar: 'w-full bg-green-700', color: 'text-green-700' },
+];
+
 const Signup: React.FC = () => {
   const navigate = useNavigate();
+  useLockedLightTheme(); // the auth screens are a fixed brand panel
   const { register } = useAuth();
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<SignupFormData>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    company: '',
-    department: '',
-    jobTitle: '',
-    password: '',
-    confirmPassword: '',
-    agreeToTerms: false
+    firstName: '', lastName: '', email: '', phone: '',
+    company: '', department: '', jobTitle: '',
+    securityQuestion: SECURITY_QUESTIONS[0], securityAnswer: '',
+    password: '', confirmPassword: '', agreeToTerms: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<SignupErrors>({});
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [success, setSuccess] = useState('');
   const [generalError, setGeneralError] = useState('');
   const [showAlreadyRegistered, setShowAlreadyRegistered] = useState(false);
-  // One definition of the rules, shared by the checklist beside the field and
-  // the strength meter, so the two can never disagree.
-  const PASSWORD_RULES: { label: string; test: (p: string) => boolean }[] = [
-    { label: 'At least 8 characters', test: (p) => p.length >= 8 },
-    { label: 'A lowercase letter', test: (p) => /[a-z]/.test(p) },
-    { label: 'An uppercase letter', test: (p) => /[A-Z]/.test(p) },
-    { label: 'A number', test: (p) => /\d/.test(p) },
-    { label: 'A special character (@ $ ! % * ? & #)', test: (p) => /[@$!%*?&#]/.test(p) },
-  ];
-  const getPasswordStrength = (password: string) =>
-    PASSWORD_RULES.filter((r) => r.test(password)).length;
-  const getPasswordStrengthText = (strength: number) => {
-    if (strength === 0) return { text: '', color: '' };
-    if (strength <= 2) return { text: 'Weak', color: 'text-red-500' };
-    if (strength === 3) return { text: 'Fair', color: 'text-yellow-500' };
-    if (strength === 4) return { text: 'Good', color: 'text-blue-500' };
-    return { text: 'Strong', color: 'text-green-500' };
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  const set = (field: keyof SignupFormData, value: string | boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+    if (generalError) setGeneralError('');
   };
-  const handleInputChange = (field: keyof SignupFormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+
+  /** Validates one step so a person is never sent forward with a bad field. */
+  const validateStep = (n: number): FieldErrors => {
+    const e: FieldErrors = {};
+    if (n === 1) {
+      if (!formData.firstName.trim()) e.firstName = 'First name is required';
+      if (!formData.lastName.trim()) e.lastName = 'Last name is required';
+      if (!formData.email.trim()) e.email = 'Email is required';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) e.email = 'Enter a valid email address';
+      if (!formData.phone.trim()) e.phone = 'Phone number is required';
+      else if (!/^\+?[0-9]{10,15}$/.test(formData.phone.replace(/\s/g, '')))
+        e.phone = 'Enter a valid phone number';
     }
-    // Clear general error when user makes changes
-    if (generalError) {
-      setGeneralError('');
+    if (n === 3) {
+      if (!formData.securityAnswer.trim()) e.securityAnswer = 'An answer is required';
+      else if (formData.securityAnswer.trim().length < 3) e.securityAnswer = 'Use at least 3 characters';
+      if (!formData.password) e.password = 'Password is required';
+      else if (getPasswordStrength(formData.password) < PASSWORD_RULES.length)
+        e.password = 'Password does not meet all the requirements below';
+      if (formData.password !== formData.confirmPassword) e.confirmPassword = 'Passwords do not match';
+      if (!formData.agreeToTerms) e.agreeToTerms = 'You must accept the terms to continue';
     }
+    return e;
   };
-  const validateForm = (): boolean => {
-    const newErrors: SignupErrors = {};
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!/^[\+]?[0-9]{10,15}$/.test(formData.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Please enter a valid phone number';
-    }
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]/.test(formData.password)) {
-      newErrors.password = 'Password must contain uppercase, lowercase, number and special character';
-    }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = 'You must agree to the terms and conditions';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+  const goTo = (n: number) => {
+    setStep(n);
+    // move focus to the new step's heading, or a keyboard user is left at the
+    // bottom of the form with no idea the panel changed
+    requestAnimationFrame(() => headingRef.current?.focus());
   };
+
+  const next = () => {
+    const e = validateStep(step);
+    setErrors(e);
+    if (Object.keys(e).length === 0) goTo(step + 1);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setGeneralError('');
     setSuccess('');
-    if (!validateForm()) return;
+    const stepErrors = validateStep(3);
+    setErrors(stepErrors);
+    if (Object.keys(stepErrors).length) return;
+
     setIsLoading(true);
     try {
       const registrationData: RegisterRequest = {
@@ -124,352 +141,346 @@ const Signup: React.FC = () => {
         company: formData.company,
         department: formData.department,
         jobTitle: formData.jobTitle,
+        securityQuestion: formData.securityQuestion,
+        securityAnswer: formData.securityAnswer,
         acceptTerms: formData.agreeToTerms,
         acceptPrivacy: formData.agreeToTerms,
-        language: 'en'
+        language: 'en',
       };
-      const success = await register(registrationData);
-      if (success) {
-        setSuccess('Account created successfully! Redirecting to sign in page...');
+      const ok = await register(registrationData);
+      if (ok) {
+        setSuccess('Account created. Taking you to sign in…');
         setTimeout(() => {
-          navigate('/login', { 
-            state: { 
-              message: 'Account created successfully! Please sign in with your credentials.',
-              email: formData.email // Pre-fill email on login page
-            } 
+          navigate('/login', {
+            state: {
+              message: 'Account created successfully. Please sign in with your credentials.',
+              email: formData.email,
+            },
           });
-        }, 2000);
+        }, 1600);
       } else {
         setGeneralError('Registration failed. Please check your information and try again.');
       }
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      // Handle specific errors
-      if (error.message.includes('User with this email already exists')) {
-        setShowAlreadyRegistered(true);
-      } else if (error.message.includes('404')) {
-        setGeneralError('Registration service is not available. Please try again later.');
-      } else if (error.message.includes('Network Error')) {
-        setGeneralError('Network connection failed. Please check your internet connection.');
-      } else if (error.message.includes('timeout')) {
-        setGeneralError('Request timed out. Please try again.');
-      } else {
-        setGeneralError(error.message || 'Registration failed. Please try again.');
-      }
+    } catch (err: any) {
+      const message = String(err?.message || '');
+      if (message.includes('User with this email already exists')) setShowAlreadyRegistered(true);
+      else if (message.includes('404')) setGeneralError('Registration service is unavailable. Please try again later.');
+      else if (message.includes('Network Error')) setGeneralError('Network connection failed. Please check your connection.');
+      else if (message.includes('timeout')) setGeneralError('The request timed out. Please try again.');
+      else setGeneralError(message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  const strength = getPasswordStrength(formData.password);
+  const meter = STRENGTH[strength];
+
+  const secondary =
+    'inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg border border-slate-300 ' +
+    'text-slate-700 font-medium hover:bg-slate-50 transition-colors focus:outline-none ' +
+    'focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2';
+  const primary =
+    'inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-blue-600 text-white ' +
+    'font-medium hover:bg-blue-700 transition-colors disabled:opacity-60 focus:outline-none ' +
+    'focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2';
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-800 py-6 sm:py-10 px-4 sm:px-6">
-      <div className="max-w-sm sm:max-w-md md:max-w-2xl w-full space-y-4 sm:space-y-6 md:space-y-8">
-        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
-          <div className="text-center mb-4 sm:mb-6 md:mb-8">
-            <img 
-              src="/Logo-SLT.png" 
-              alt="Logo" 
-              className="mx-auto h-12 sm:h-14 md:h-16 w-auto mb-3 sm:mb-4"
-            />
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1 sm:mb-2">
-              Create Account
-            </h2>
+      <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 lg:p-10">
+          <div className="text-center mb-6">
+            <img src="/Logo-SLT.png" alt="SLT Mobitel" className="mx-auto h-12 sm:h-14 w-auto mb-3" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">Create Account</h1>
             <p className="text-slate-600 text-sm sm:text-base">Join our Consent Management System</p>
           </div>
-          {/* Success message */}
+
+          <StepProgress steps={STEPS} current={step} />
+
           {success && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-600/20 border border-green-200/30 rounded-md flex items-start sm:items-center space-x-2 sm:space-x-3">
-              <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-700 flex-shrink-0 mt-0.5 sm:mt-0" />
+            <div role="status" className="mb-5 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-green-700 shrink-0 mt-0.5" aria-hidden="true" />
               <div>
-                <p className="text-slate-900 font-medium text-sm sm:text-base">Success!</p>
-                <p className="text-slate-600 text-sm">{success}</p>
+                <p className="text-slate-900 font-medium text-sm">Success</p>
+                <p className="text-slate-700 text-sm">{success}</p>
               </div>
             </div>
           )}
-          {/* General error message */}
           {generalError && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-md flex items-start sm:items-center space-x-2 sm:space-x-3">
-              <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600 flex-shrink-0 mt-0.5 sm:mt-0" />
+            <div role="alert" className="mb-5 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-red-700 shrink-0 mt-0.5" aria-hidden="true" />
               <div>
-                <p className="text-slate-900 font-medium text-sm sm:text-base">Error</p>
-                <p className="text-slate-600 text-sm">{generalError}</p>
+                <p className="text-slate-900 font-medium text-sm">We could not create your account</p>
+                <p className="text-slate-700 text-sm">{generalError}</p>
               </div>
             </div>
           )}
-          {/* Already registered modal/alert */}
           {showAlreadyRegistered && (
-            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-amber-600/20 border border-slate-200/30 rounded-md flex items-start sm:items-center space-x-2 sm:space-x-3">
-              <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-700 flex-shrink-0 mt-0.5 sm:mt-0" />
+            <div role="alert" className="mb-5 p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" aria-hidden="true" />
               <div>
-                <p className="text-slate-900 font-medium text-sm sm:text-base">Account already registered</p>
-                <p className="text-slate-600 text-sm">This email is already registered. Please <button className="underline text-blue-600 hover:text-blue-600" onClick={() => navigate('/login', { state: { email: formData.email, message: 'You already have an account. Please login.' } })}>login to your account</button>.</p>
+                <p className="text-slate-900 font-medium text-sm">This email is already registered</p>
+                <p className="text-slate-700 text-sm">
+                  <button
+                    type="button"
+                    className="underline text-blue-700 hover:text-blue-800 font-medium"
+                    onClick={() =>
+                      navigate('/login', {
+                        state: { email: formData.email, message: 'You already have an account. Please sign in.' },
+                      })
+                    }
+                  >
+                    Sign in to your account
+                  </button>{' '}
+                  instead.
+                </p>
               </div>
             </div>
           )}
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-            {/* Personal Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-slate-900 mb-1">
-                  First Name *
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
-                  <input
-                    id="firstName"
-                    type="text"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    className={`bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 py-2.5 sm:py-3 text-sm sm:text-base ${
-                      errors.firstName ? 'border-slate-200' : ''
-                    }`}
-                    placeholder="Enter your first name"
-                   aria-label="Enter your first name"/>
+
+          <form onSubmit={handleSubmit} noValidate>
+            <h2
+              ref={headingRef}
+              tabIndex={-1}
+              className="text-base font-semibold text-slate-900 mb-4 focus:outline-none"
+            >
+              Step {step} of {STEPS.length}: {STEPS[step - 1]}
+            </h2>
+
+            {step === 1 && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <AuthField
+                    id="firstName" label="First Name" icon={User} required error={errors.firstName}
+                    inputProps={{
+                      type: 'text', autoComplete: 'given-name', value: formData.firstName,
+                      onChange: (e) => set('firstName', e.target.value), placeholder: 'Enter your first name',
+                    }}
+                  />
+                  <AuthField
+                    id="lastName" label="Last Name" icon={User} required error={errors.lastName}
+                    inputProps={{
+                      type: 'text', autoComplete: 'family-name', value: formData.lastName,
+                      onChange: (e) => set('lastName', e.target.value), placeholder: 'Enter your last name',
+                    }}
+                  />
                 </div>
-                {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
+                <AuthField
+                  id="email" label="Email Address" icon={Mail} required error={errors.email}
+                  inputProps={{
+                    type: 'email', autoComplete: 'email', value: formData.email,
+                    onChange: (e) => set('email', e.target.value), placeholder: 'Enter your email address',
+                  }}
+                />
+                <AuthField
+                  id="phone" label="Phone Number" icon={Phone} required error={errors.phone}
+                  hint="Include the country code, for example +94 71 234 5678"
+                  inputProps={{
+                    type: 'tel', autoComplete: 'tel', value: formData.phone,
+                    onChange: (e) => set('phone', e.target.value), placeholder: '+94 XX XXX XXXX',
+                  }}
+                />
               </div>
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-slate-900 mb-1">
-                  Last Name *
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
-                  <input
-                    id="lastName"
-                    type="text"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    className={`bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 py-2.5 sm:py-3 text-sm sm:text-base ${
-                      errors.lastName ? 'border-slate-200' : ''
-                    }`}
-                    placeholder="Enter your last name"
-                   aria-label="Enter your last name"/>
-                </div>
-                {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
-              </div>
-            </div>
-            {/* Contact Information */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-900 mb-1">
-                Email Address *
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
-                <input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={`bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 py-2.5 sm:py-3 text-sm sm:text-base ${
-                    errors.email ? 'border-slate-200' : ''
-                  }`}
-                  placeholder="Enter your email address"
-                 aria-label="Enter your email address"/>
-              </div>
-              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-            </div>
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-slate-900 mb-1">
-                Phone Number *
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
-                <input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  className={`bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 py-2.5 sm:py-3 text-sm sm:text-base ${
-                    errors.phone ? 'border-slate-200' : ''
-                  }`}
-                  placeholder="+94 XX XXX XXXX"
-                 aria-label="+94 XX XXX XXXX"/>
-              </div>
-              {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
-            </div>
-            {/* Professional Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label htmlFor="company" className="block text-sm font-medium text-slate-900 mb-1">
-                  Company/Organization
-                </label>
-                <div className="relative">
-                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
-                  <input
-                    id="company"
-                    type="text"
-                    value={formData.company}
-                    onChange={(e) => handleInputChange('company', e.target.value)}
-                    className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 py-2.5 sm:py-3 text-sm sm:text-base"
-                    placeholder="Enter your company name"
-                   aria-label="Enter your company name"/>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-4">
+                <p className="text-sm text-slate-600">
+                  These are optional — they help our team route requests to the right place.
+                </p>
+                <AuthField
+                  id="company" label="Company / Organisation" icon={Building} error={errors.company}
+                  inputProps={{
+                    type: 'text', autoComplete: 'organization', value: formData.company,
+                    onChange: (e) => set('company', e.target.value), placeholder: 'Enter your company name',
+                  }}
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <AuthField
+                    id="department" label="Department" icon={Building} error={errors.department}
+                    inputProps={{
+                      type: 'text', value: formData.department,
+                      onChange: (e) => set('department', e.target.value), placeholder: 'Enter your department',
+                    }}
+                  />
+                  <AuthField
+                    id="jobTitle" label="Designation" icon={Briefcase} error={errors.jobTitle}
+                    inputProps={{
+                      type: 'text', autoComplete: 'organization-title', value: formData.jobTitle,
+                      onChange: (e) => set('jobTitle', e.target.value), placeholder: 'Enter your job title',
+                    }}
+                  />
                 </div>
               </div>
-              <div>
-                <label htmlFor="department" className="block text-sm font-medium text-slate-900 mb-1">
-                  Department
-                </label>
-                <div className="relative">
-                  <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
-                  <input
-                    id="department"
-                    type="text"
-                    value={formData.department}
-                    onChange={(e) => handleInputChange('department', e.target.value)}
-                    className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 py-2.5 sm:py-3 text-sm sm:text-base"
-                    placeholder="Enter your department"
-                   aria-label="Enter your department"/>
-                </div>
-              </div>
-            </div>
-            <div>
-              <label htmlFor="jobTitle" className="block text-sm font-medium text-slate-900 mb-1">
-                Job Title
-              </label>
-              <input
-                id="jobTitle"
-                type="text"
-                value={formData.jobTitle}
-                onChange={(e) => handleInputChange('jobTitle', e.target.value)}
-                className="bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full py-2.5 sm:py-3 text-sm sm:text-base"
-                placeholder="Enter your job title"
-               aria-label="Enter your job title"/>
-            </div>
-            {/* Password Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-slate-900 mb-1">
-                  Password *
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
-                  <input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    className={`bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 text-sm sm:text-base ${
-                      errors.password ? 'border-slate-200' : ''
-                    }`}
-                    placeholder="Create a password"
-                   aria-label="Create a password"/>
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-600"
+            )}
+
+            {step === 3 && (
+              <div className="space-y-4">
+                <AuthField id="securityQuestion" label="Security Question" icon={ShieldQuestion} required>
+                  <select
+                    id="securityQuestion"
+                    value={formData.securityQuestion}
+                    onChange={(e) => set('securityQuestion', e.target.value)}
+                    className="w-full bg-white border border-slate-300 rounded-lg py-2.5 sm:py-3 pl-9 sm:pl-10 pr-8 text-slate-900 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
-                  </button>
-                </div>
-                {/* Requirements live beside the field and tick off as they are met */}
-                <ul className="mt-2 space-y-1" aria-live="polite">
-                  {PASSWORD_RULES.map((rule) => {
-                    const met = rule.test(formData.password);
-                    return (
-                      <li key={rule.label} className="flex items-center gap-2 text-xs">
-                        {met ? (
-                          <CheckCircle className="w-3.5 h-3.5 text-green-700 flex-shrink-0" aria-hidden="true" />
-                        ) : (
-                          <span className="w-3.5 h-3.5 rounded-full border border-slate-300 flex-shrink-0" aria-hidden="true" />
-                        )}
-                        <span className={met ? 'text-green-800' : 'text-slate-600'}>
-                          {rule.label}
-                          <span className="sr-only">{met ? ' (met)' : ' (not met)'}</span>
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-                {formData.password && (
-                  <div className="mt-2">
-                    <div className="flex items-center space-x-1.5 sm:space-x-2">
-                      <div className="flex-1 h-1.5 sm:h-2 bg-white border border-slate-200 rounded-xl shadow-sm">
-                        <div 
-                          className={`h-1.5 sm:h-2 rounded transition-all duration-300 ${
-                            getPasswordStrength(formData.password) <= 2 ? 'bg-red-600' :
-                            getPasswordStrength(formData.password) === 3 ? 'bg-amber-500' :
-                            getPasswordStrength(formData.password) === 4 ? 'bg-blue-600' :
-                            'bg-green-600'
-                          }`}
-                          style={{ width: `${(getPasswordStrength(formData.password) / 5) * 100}%` }}
-                        ></div>
-                      </div>
-                      <span className={`text-xs font-medium ${getPasswordStrengthText(getPasswordStrength(formData.password)).color.replace('text-red-500', 'text-red-600').replace('text-yellow-500', 'text-amber-700').replace('text-blue-500', 'text-blue-600').replace('text-green-500', 'text-green-700')}`}>
-                        {getPasswordStrengthText(getPasswordStrength(formData.password)).text}
-                      </span>
-                    </div>
+                    {SECURITY_QUESTIONS.map((q) => (
+                      <option key={q} value={q}>{q}</option>
+                    ))}
+                  </select>
+                </AuthField>
+
+                <AuthField
+                  id="securityAnswer" label="Answer" icon={Lock} required error={errors.securityAnswer}
+                  hint="Used to confirm it is you if you ever reset your password. It is stored hashed, never in plain text."
+                  inputProps={{
+                    type: 'text', autoComplete: 'off', value: formData.securityAnswer,
+                    onChange: (e) => set('securityAnswer', e.target.value), placeholder: 'Your answer',
+                  }}
+                />
+
+                <AuthField id="password" label="Password" icon={Lock} required error={errors.password}>
+                  <>
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      value={formData.password}
+                      onChange={(e) => set('password', e.target.value)}
+                      aria-invalid={errors.password ? true : undefined}
+                      aria-describedby={`password-rules${errors.password ? ' password-error' : ''}`}
+                      placeholder="Create a password"
+                      className={`w-full bg-white border rounded-lg py-2.5 sm:py-3 pl-9 sm:pl-10 pr-11 text-slate-900 placeholder-slate-400 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 ${
+                        errors.password ? 'border-red-400' : 'border-slate-300'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded text-slate-500 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
+                    </button>
+                  </>
+                </AuthField>
+
+                {/* requirements sit right under the field they describe */}
+                <div id="password-rules" className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <span className="text-xs font-medium text-slate-700">Password strength</span>
+                    {meter.text && <span className={`text-xs font-semibold ${meter.color}`}>{meter.text}</span>}
                   </div>
-                )}
-                {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
-              </div>
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-900 mb-1">
-                  Confirm Password *
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
-                  <input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    className={`bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-full pl-8 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 text-sm sm:text-base ${
-                      errors.confirmPassword ? 'border-slate-200' : ''
-                    }`}
-                    placeholder="Confirm your password"
-                   aria-label="Confirm your password"/>
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-600"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
-                  </button>
+                  <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden mb-3" aria-hidden="true">
+                    <div className={`h-full rounded-full transition-all duration-300 motion-reduce:transition-none ${meter.bar}`} />
+                  </div>
+                  <ul className="space-y-1">
+                    {PASSWORD_RULES.map((rule) => {
+                      const met = rule.test(formData.password);
+                      return (
+                        <li key={rule.label} className="flex items-center gap-2 text-xs">
+                          <CheckCircle
+                            className={`w-3.5 h-3.5 shrink-0 ${met ? 'text-green-700' : 'text-slate-400'}`}
+                            aria-hidden="true"
+                          />
+                          <span className={met ? 'text-slate-700' : 'text-slate-600'}>
+                            {rule.label}
+                          </span>
+                          <span className="sr-only">{met ? ' — met' : ' — not met yet'}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
-                {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>}
+
+                <AuthField id="confirmPassword" label="Confirm Password" icon={Lock} required error={errors.confirmPassword}>
+                  <>
+                    <input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      value={formData.confirmPassword}
+                      onChange={(e) => set('confirmPassword', e.target.value)}
+                      aria-invalid={errors.confirmPassword ? true : undefined}
+                      aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                      placeholder="Confirm your password"
+                      className={`w-full bg-white border rounded-lg py-2.5 sm:py-3 pl-9 sm:pl-10 pr-11 text-slate-900 placeholder-slate-400 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 ${
+                        errors.confirmPassword ? 'border-red-400' : 'border-slate-300'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded text-slate-500 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
+                    </button>
+                  </>
+                </AuthField>
+
+                <div>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.agreeToTerms}
+                      onChange={(e) => set('agreeToTerms', e.target.checked)}
+                      aria-invalid={errors.agreeToTerms ? true : undefined}
+                      aria-describedby={errors.agreeToTerms ? 'terms-error' : undefined}
+                      className="mt-0.5 w-4 h-4 shrink-0 rounded border-slate-400 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                    />
+                    <span className="text-sm text-slate-700">
+                      I agree to the{' '}
+                      <Link to="/terms" className="text-blue-700 hover:text-blue-800 underline font-medium">
+                        Terms and Conditions
+                      </Link>{' '}
+                      and the{' '}
+                      <Link to="/privacy" className="text-blue-700 hover:text-blue-800 underline font-medium">
+                        Privacy Policy
+                      </Link>
+                      , and I consent to my data being processed under PDPA No. 9 of 2022.
+                    </span>
+                  </label>
+                  {errors.agreeToTerms && (
+                    <p id="terms-error" className="mt-1 text-sm text-red-700">{errors.agreeToTerms}</p>
+                  )}
+                </div>
               </div>
+            )}
+
+            <div className="mt-6 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
+              {step > 1 ? (
+                <button type="button" onClick={() => goTo(step - 1)} className={secondary}>
+                  <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                  Back
+                </button>
+              ) : (
+                <span className="hidden sm:block" />
+              )}
+
+              {step < STEPS.length ? (
+                <button type="button" onClick={next} className={primary}>
+                  Continue
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </button>
+              ) : (
+                <button type="submit" disabled={isLoading} className={primary}>
+                  {isLoading ? <Spinner size="sm" tone="white" /> : null}
+                  {isLoading ? 'Creating account…' : 'Create Account'}
+                </button>
+              )}
             </div>
-            {/* Terms and Conditions */}
-            <div className="flex items-start">
-              <input
-                id="agreeToTerms"
-                type="checkbox"
-                checked={formData.agreeToTerms}
-                onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
-                className={`mt-1 w-4 h-4 text-blue-600 bg-white border border-slate-200 rounded-xl shadow-sm border-slate-200 rounded focus:ring-blue-600 ${
-                  errors.agreeToTerms ? 'border-slate-200' : ''
-                }`}
-              />
-              <label htmlFor="agreeToTerms" className="ml-2 text-sm text-slate-600">
-                I agree to the{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-600">Terms and Conditions</a>
-                {' '}and{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-600">Privacy Policy</a>
-              </label>
-            </div>
-            {errors.agreeToTerms && <p className="text-sm text-red-600">{errors.agreeToTerms}</p>}
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full py-2.5 sm:py-3 px-4 text-sm sm:text-base ${
-                isLoading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
-            </button>
           </form>
-          <div className="mt-4 sm:mt-6 text-center">
-            <span className="text-sm text-slate-600">Already have an account? </span>
-            <Link
-              to="/login"
-              className="font-medium text-blue-600 hover:text-blue-600 transition-colors"
-            >
+
+          <p className="mt-6 text-center text-sm text-slate-600">
+            Already have an account?{' '}
+            <Link to="/login" className="text-blue-700 hover:text-blue-800 font-semibold">
               Sign In
             </Link>
-          </div>
+          </p>
         </div>
       </div>
     </div>
   );
 };
+
 export default Signup;

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useLockedLightTheme } from '../../contexts/ThemeContext';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 const Login: React.FC = () => {
+  useLockedLightTheme(); // the auth screens are a fixed brand panel
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
