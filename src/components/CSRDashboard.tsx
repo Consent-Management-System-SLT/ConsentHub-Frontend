@@ -318,7 +318,7 @@ const DashboardOverview: React.FC<{
     return (
       <div className="space-y-6">
         {/* Loading Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-900 rounded-xl shadow-lg p-6 text-white">
+        <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-900 rounded-xl shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold mb-2">Loading Dashboard...</h1>

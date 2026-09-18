@@ -1,4 +1,5 @@
 import React from 'react';
+import { Spinner } from './shared/Loading';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 interface ProtectedRouteProps {
@@ -12,7 +13,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, roles }) => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0072CE]"></div>
+        <Spinner size="lg" />
       </div>
     );
   }

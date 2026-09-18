@@ -713,7 +713,7 @@ export const PrivacyNotices: React.FC = () => {
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             title="Filter notices by status. Deleted notices are archived and hidden by default."
-          >
+           aria-label="Filter by status">
             <option value="">All Statuses</option>
             <option value="active">Active (Default)</option>
             <option value="draft">Draft</option>
@@ -725,7 +725,7 @@ export const PrivacyNotices: React.FC = () => {
             value={filters.category || ''}
             onChange={(e) => setFilters({ ...filters, category: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
+           aria-label="Filter by category">
             <option value="">All Categories</option>
             <option value="general">General</option>
             <option value="marketing">Marketing</option>
@@ -737,7 +737,7 @@ export const PrivacyNotices: React.FC = () => {
             value={filters.language || ''}
             onChange={(e) => setFilters({ ...filters, language: e.target.value })}
             className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
+           aria-label="Filter by language">
             <option value="">All Languages</option>
             <option value="en">English</option>
             <option value="si">Sinhala</option>
