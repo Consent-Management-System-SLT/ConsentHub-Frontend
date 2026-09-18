@@ -1,10 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Menu, User, LogOut, Settings, Bell, ChevronDown, RefreshCw } from 'lucide-react';
+import { Menu, User, LogOut, Settings, Bell, ChevronDown, RefreshCw, Sun, Moon, Monitor } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useTheme, Theme } from '../../contexts/ThemeContext';
 import LanguageSelector from '../LanguageSelector';
 import NotificationsModal from './NotificationsModal';
 import UserProfile from '../UserProfile';
+
+const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun }[] = [
+  { value: 'light', label: 'Light', icon: Sun },
+  { value: 'dark', label: 'Dark', icon: Moon },
+  { value: 'system', label: 'System', icon: Monitor },
+];
 
 const ROLE_LABELS: Record<string, string> = {
   admin: 'System Administrator',
@@ -47,6 +54,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const userName = user?.name || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Signed in';
   const userRole = ROLE_LABELS[user?.role || ''] || user?.role || '';
   const { unreadCount } = useNotifications();
+  const { theme, setTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -194,6 +202,39 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     Settings
                   </button>
                 )}
+
+                {/* Appearance. A segmented control rather than three menu
+                    items, so the current choice is visible at a glance. */}
+                <div className="border-t border-slate-100 mt-1 pt-2 px-3 pb-2">
+                  <p id="theme-label" className="text-[11px] font-medium text-slate-500 mb-1.5">
+                    Appearance
+                  </p>
+                  <div
+                    role="radiogroup"
+                    aria-labelledby="theme-label"
+                    className="flex gap-1 rounded-lg bg-slate-100 p-1"
+                  >
+                    {THEME_OPTIONS.map(({ value, label, icon: Icon }) => {
+                      const active = theme === value;
+                      return (
+                        <button
+                          key={value}
+                          role="radio"
+                          type="button"
+                          aria-checked={active}
+                          onClick={() => setTheme(value)}
+                          className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-md text-[11px] font-medium transition-colors
+                            focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
+                              active ? 'bg-white text-blue-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                        >
+                          <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
                 <div className="border-t border-slate-100 mt-1 pt-1">
                   <button

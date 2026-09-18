@@ -12,7 +12,8 @@
   }
   
   body {
-    @apply bg-slate-50 text-slate-900;
+    @apply bg-slate-50;
+    color: #0f172a;
   }
 
   /* No colour here on purpose. A base rule on the element beats a colour
@@ -22,11 +23,17 @@
   h1 { @apply text-2xl md:text-3xl font-semibold leading-tight m-0; }
   h2 { @apply text-xl md:text-2xl font-semibold leading-tight m-0; }
   h3 { @apply text-lg md:text-xl font-medium leading-tight m-0; }
-  h4 { @apply text-base md:text-lg font-medium text-slate-700 leading-tight m-0; }
-  h5 { @apply text-sm md:text-base font-medium text-slate-700 leading-tight m-0; }
-  h6 { @apply text-xs md:text-sm font-medium text-slate-500 leading-tight m-0; }
-  p { @apply text-sm md:text-base text-slate-600 leading-relaxed m-0; }
-  small { @apply text-xs text-slate-500; }
+  /* No colour on these either, for two reasons. An element rule outranks a
+     utility class, so `text-slate-600` here overrode `text-white` on a <p>
+     inside a dark panel. And `@apply` copies every rule matching the applied
+     class - including the `.dark` overrides below - which turned them into
+     `.dark p { ... }` and broke the same text in dark mode. Colour comes from
+     body, or from a utility at the call site. */
+  h4 { @apply text-base md:text-lg font-medium leading-tight m-0; }
+  h5 { @apply text-sm md:text-base font-medium leading-tight m-0; }
+  h6 { @apply text-xs md:text-sm font-medium leading-tight m-0; }
+  p { @apply text-sm md:text-base leading-relaxed m-0; }
+  small { @apply text-xs; }
 
   /* One visible focus ring for every interactive element. Keyboard and
      screen-reader users previously had no indication of focus anywhere. */
@@ -185,3 +192,103 @@
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* ---------------------------------------------------------------------------
+   Dark theme.
+
+   The app was written with light colours hard-coded at ~1,400 call sites
+   (bg-white, text-slate-900, border-slate-200 and so on). Rather than add a
+   `dark:` variant to each one, the handful of utilities that actually carry the
+   surface colours are remapped under `.dark`. `.dark .bg-white` has higher
+   specificity than `.bg-white`, so it wins without !important.
+
+   Only the surface and text ramps move. Brand blue, and the green/red/amber
+   status colours, keep their meaning; their pale *tints* are swapped for dark
+   equivalents so a badge stays legible.
+
+   Anything genuinely per-component still uses a normal `dark:` variant.
+   --------------------------------------------------------------------------- */
+@layer utilities {
+  .dark body { background-color: #0b1220; color: #e8edf5; }
+
+  /* surfaces */
+  .dark .bg-white { background-color: #131c2e; }
+  .dark .bg-slate-50 { background-color: #0f1726; }
+  .dark .bg-slate-100 { background-color: #1b2740; }
+  .dark .bg-slate-200 { background-color: #243047; }
+  .dark .bg-gray-50 { background-color: #0f1726; }
+  .dark .bg-gray-100 { background-color: #1b2740; }
+
+  /* text */
+  .dark .text-slate-900 { color: #e8edf5; }
+  .dark .text-slate-800 { color: #dbe3ee; }
+  .dark .text-slate-700 { color: #c5d0e0; }
+  .dark .text-slate-600 { color: #a4b2c6; }
+  .dark .text-slate-500 { color: #93a2b8; }
+  .dark .text-gray-900 { color: #e8edf5; }
+  .dark .text-gray-800 { color: #dbe3ee; }
+  .dark .text-gray-700 { color: #c5d0e0; }
+  .dark .text-gray-600 { color: #a4b2c6; }
+  .dark .text-gray-500 { color: #93a2b8; }
+  .dark .placeholder-slate-400::placeholder { color: #7d8ca3; }
+
+  /* rules */
+  .dark .border-slate-200 { border-color: #27334a; }
+  .dark .border-slate-300 { border-color: #33415c; }
+  .dark .border-gray-200 { border-color: #27334a; }
+  .dark .border-gray-300 { border-color: #33415c; }
+  .dark .divide-slate-100 > * + * { border-color: #212c42; }
+  .dark .divide-slate-200 > * + * { border-color: #27334a; }
+
+  /* hovers */
+  .dark .hover\:bg-slate-50:hover { background-color: #1b2740; }
+  .dark .hover\:bg-slate-100:hover { background-color: #22304a; }
+  .dark .hover\:bg-slate-200:hover { background-color: #2a3a58; }
+  .dark .hover\:bg-white:hover { background-color: #1b2740; }
+  .dark .hover\:bg-gray-50:hover { background-color: #1b2740; }
+
+  /* status tints: keep the hue, drop the brightness, lift the text */
+  .dark .bg-blue-50 { background-color: #142a4a; }
+  .dark .bg-blue-100 { background-color: #17355e; }
+  .dark .text-blue-800 { color: #93bdf0; }
+  .dark .text-blue-900 { color: #b3d2f7; }
+  .dark .text-blue-700 { color: #86b6ec; }
+  .dark .text-blue-600 { color: #7fb0e8; }
+
+  .dark .bg-green-50 { background-color: #10301f; }
+  .dark .bg-green-100 { background-color: #163a27; }
+  .dark .text-green-700 { color: #6ed79a; }
+  .dark .text-green-800 { color: #85e0aa; }
+  .dark .text-green-900 { color: #a5ebc2; }
+
+  .dark .bg-red-50 { background-color: #3a1620; }
+  .dark .bg-red-100 { background-color: #4a1b28; }
+  .dark .text-red-600 { color: #f79a9a; }
+  .dark .text-red-700 { color: #f9a7a7; }
+  .dark .text-red-800 { color: #fbb8b8; }
+
+  .dark .bg-amber-50, .dark .bg-yellow-50 { background-color: #3a2c10; }
+  .dark .bg-amber-100, .dark .bg-yellow-100 { background-color: #4a3814; }
+  .dark .text-amber-700, .dark .text-yellow-700 { color: #ecc069; }
+  .dark .text-amber-800, .dark .text-yellow-800 { color: #f0cb83; }
+
+  .dark .bg-purple-50 { background-color: #281a3d; }
+  .dark .bg-purple-100 { background-color: #33224d; }
+  .dark .text-purple-600, .dark .text-purple-700 { color: #c0a2ec; }
+  .dark .text-purple-800, .dark .text-purple-900 { color: #d0b8f2; }
+
+  /* Opacity-tinted surfaces (bg-blue-50/20 and friends) are separate classes,
+     so the solid overrides above miss them. Matched by attribute instead;
+     bg-slate-900/50 is left alone because it is the modal scrim. */
+  .dark [class*="bg-blue-50/"] { background-color: #16294a; }
+  .dark [class*="bg-slate-50/"] { background-color: #1b2740; }
+  .dark [class*="bg-blue-600/"] { background-color: #17355e; }
+  .dark [class*="bg-green-600/"] { background-color: #163a27; }
+  .dark [class*="bg-amber-600/"], .dark [class*="bg-yellow-100/"] { background-color: #4a3814; }
+  .dark [class*="bg-red-600/"] { background-color: #4a1b28; }
+  .dark [class*="bg-orange-400/"] { background-color: #4a3014; }
+
+  /* the focus ring offset is drawn in the page colour */
+  .dark .ring-offset-white { --tw-ring-offset-color: #131c2e; }
+  .dark :focus-visible { --tw-ring-offset-color: #131c2e; }
+}

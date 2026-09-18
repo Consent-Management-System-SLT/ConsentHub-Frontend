@@ -15,6 +15,10 @@ export interface RegisterRequest {
   company?: string;
   department?: string;
   jobTitle?: string;
+  /** Asked at sign-up so a password reset can be confirmed. The answer is
+      hashed on the server and never stored or returned in plain text. */
+  securityQuestion?: string;
+  securityAnswer?: string;
   acceptTerms: boolean;
   acceptPrivacy: boolean;
   language?: string;
@@ -63,6 +67,8 @@ class AuthService {
         company: userData.company,
         department: userData.department,
         jobTitle: userData.jobTitle,
+        securityQuestion: userData.securityQuestion,
+        securityAnswer: userData.securityAnswer,
         acceptTerms: userData.acceptTerms,
         acceptPrivacy: userData.acceptPrivacy,
         language: userData.language

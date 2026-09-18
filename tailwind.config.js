@@ -28,6 +28,8 @@ const sltBlue = {
 };
 
 export default {
+  // Dark mode is driven by a `dark` class on <html>, set by ThemeContext.
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
