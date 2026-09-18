@@ -46,8 +46,8 @@ const EasyApplyLogin: React.FC = () => {
       await requestOtp(digits);
       setOtp('');
       goTo(2);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setIsLoading(false);
     }
@@ -60,8 +60,8 @@ const EasyApplyLogin: React.FC = () => {
     try {
       await verifyOtp(mobileNumber.replace(/\D/g, ''), code);
       navigate('/customer/consents');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
       setOtp('');
     } finally {
       setIsLoading(false);

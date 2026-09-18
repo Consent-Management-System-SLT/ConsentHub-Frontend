@@ -14,7 +14,7 @@ const EnterpriseCampaignReview: React.FC = () => {
 
   const fetchCampaigns = async () => {
     try {
-      const res = await multiServiceApiClient.get('/admin/enterprise/campaigns', { service: API_SERVICES.CONSENT });
+      const res = await multiServiceApiClient.get('/api/v2/admin/enterprise/campaigns', { service: API_SERVICES.CONSENT });
       if (res.data.success) {
         setCampaigns(res.data.data);
       }
@@ -32,7 +32,7 @@ const EnterpriseCampaignReview: React.FC = () => {
         return;
       }
 
-      await multiServiceApiClient.post(`/admin/enterprise/campaigns/${selectedCampaign._id}/${action}`, 
+      await multiServiceApiClient.post(`/api/v2/admin/enterprise/campaigns/${selectedCampaign._id}/${action}`, 
         { reason }, 
         { service: API_SERVICES.CONSENT }
       );

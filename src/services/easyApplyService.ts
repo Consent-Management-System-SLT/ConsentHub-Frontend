@@ -24,8 +24,10 @@ api.interceptors.request.use((config) => {
 });
 
 /** The server returns its own message for these; surface it rather than a generic one. */
-const messageFrom = (err: any, fallback: string) =>
-  err?.response?.data?.error?.message || err?.response?.data?.message || fallback;
+const messageFrom = (err: unknown, fallback: string) => {
+  const axiosErr = err as { response?: { data?: { error?: { message?: string }; message?: string } } };
+  return axiosErr?.response?.data?.error?.message || axiosErr?.response?.data?.message || fallback;
+};
 
 export async function requestOtp(mobileNumber: string) {
   try {
