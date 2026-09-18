@@ -61,9 +61,35 @@ export interface CustomerConsent {
   createdAt?: string;
 }
 
+interface RawConsent {
+  id: string;
+  purpose: string;
+  status: string;
+  grantedAt?: string;
+  revokedAt?: string;
+  expiresAt?: string;
+  versionAccepted?: string;
+  channel?: string;
+  createdAt?: string;
+}
+
+// Served by GET /api/v1/customer/consents in comprehensive-backend.js - shared with
+// the regular customer-portal login, so the shape is theirs: { data: { consents: [] } }
+// with raw Mongoose field names (id, versionAccepted) rather than our own.
 export async function fetchCustomerConsents(): Promise<CustomerConsent[]> {
   const { data } = await api.get('/customer/consents');
-  return data?.data ?? [];
+  const raw: RawConsent[] = data?.data?.consents ?? [];
+  return raw.map((c) => ({
+    consentId: c.id,
+    purpose: c.purpose,
+    status: c.status,
+    grantedAt: c.grantedAt,
+    revokedAt: c.revokedAt,
+    expiresAt: c.expiresAt,
+    privacyNoticeVersion: c.versionAccepted,
+    channel: c.channel,
+    createdAt: c.createdAt,
+  }));
 }
 
 export function logoutCustomer() {
