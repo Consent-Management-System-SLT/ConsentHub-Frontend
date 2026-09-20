@@ -62,17 +62,17 @@
     "welcome": "Welcome, {{name}}",
     "navigation": {
       "dashboard": "Dashboard",
-      "dashboardDesc": "Overview of your consents and preferences",
+      "dashboardDesc": "Consents and preferences",
       "consentCenter": "Consent Center",
       "consentCenterDesc": "Manage your data consents",
       "preferences": "Preferences",
-      "preferencesDesc": "Communication and notification settings",
+      "preferencesDesc": "Communication settings",
       "valueAddedServices": "Value Added Services",
-      "valueAddedServicesDesc": "Subscribe to premium SLT services",
+      "valueAddedServicesDesc": "Premium SLT services",
       "privacyNotices": "Privacy Notices",
-      "privacyNoticesDesc": "View privacy policies and notices",
+      "privacyNoticesDesc": "Policies and notices",
       "dsarRequests": "DSAR Requests",
-      "dsarRequestsDesc": "Data export and deletion requests"
+      "dsarRequestsDesc": "Export and deletion"
     },
     "sidebar": {
       "title": "Navigation",
@@ -365,7 +365,7 @@
     "description": "Control how and when we communicate with you across different channels",
     "categories": {
       "email": "Email Preferences",
-      "sms": "SMS Preferences", 
+      "sms": "SMS Preferences",
       "push": "Push Notifications",
       "marketing": "Marketing Communications",
       "transactional": "Transactional Messages",
@@ -397,7 +397,7 @@
     "frequencySettings": {
       "title": "Communication Frequency",
       "daily": "Daily",
-      "weekly": "Weekly", 
+      "weekly": "Weekly",
       "monthly": "Monthly",
       "maxEmails": "Maximum emails per day",
       "maxSms": "Maximum SMS per day",
@@ -415,7 +415,7 @@
     "categories": {
       "all": "All Services",
       "entertainment": "Entertainment",
-      "productivity": "Productivity", 
+      "productivity": "Productivity",
       "security": "Security",
       "communication": "Communication",
       "lifestyle": "Lifestyle"
@@ -459,7 +459,7 @@
     "description": "Exercise your data rights under privacy regulations",
     "requestTypes": {
       "access": "Access My Data",
-      "export": "Export My Data", 
+      "export": "Export My Data",
       "deletion": "Delete My Data",
       "correction": "Correct My Data",
       "portability": "Data Portability"

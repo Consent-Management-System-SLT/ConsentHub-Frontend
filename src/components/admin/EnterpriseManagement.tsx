@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building, Filter, Search, ArrowRight, ArrowLeft, CheckCircle, XCircle, FileText, Send } from 'lucide-react';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { API_ORIGIN } from '../../config/api';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface Organization {
@@ -42,7 +43,7 @@ export default function EnterpriseManagement() {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:3001/api/v2/admin/enterprise/applications', {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/applications`, {
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
       const json = await res.json();
@@ -51,7 +52,7 @@ export default function EnterpriseManagement() {
       }
     } catch (error) {
       console.error('Fetch error', error);
-      addNotification({ type: 'system', category: 'error', title: 'Error', message: 'Failed to load applications' });
+      addNotification({ type: 'system', category: 'urgent', title: 'Error', message: 'Failed to load applications' });
     } finally {
       setLoading(false);
     }
@@ -64,7 +65,7 @@ export default function EnterpriseManagement() {
   const handleApprove = async (id: string) => {
     if (!window.confirm('Are you sure you want to approve this enterprise?')) return;
     try {
-      const res = await fetch(`http://localhost:3001/api/v2/admin/enterprise/applications/${id}/approve`, {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/applications/${id}/approve`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
@@ -77,14 +78,14 @@ export default function EnterpriseManagement() {
         throw new Error(data.message);
       }
     } catch (e: any) {
-      addNotification({ type: 'system', category: 'error', title: 'Error', message: e.message || 'Failed to approve' });
+      addNotification({ type: 'system', category: 'urgent', title: 'Error', message: e.message || 'Failed to approve' });
     }
   };
 
   const handleReject = async () => {
     if (!reviewReason.trim()) return alert('Reason is required');
     try {
-      const res = await fetch(`http://localhost:3001/api/v2/admin/enterprise/applications/${selectedOrg!._id}/reject`, {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/applications/${selectedOrg!._id}/reject`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: reviewReason })
@@ -105,7 +106,7 @@ export default function EnterpriseManagement() {
   const handleRequestInfo = async () => {
     if (!reviewReason.trim()) return alert('Reason is required');
     try {
-      const res = await fetch(`http://localhost:3001/api/v2/admin/enterprise/applications/${selectedOrg!._id}/request-information`, {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/applications/${selectedOrg!._id}/request-information`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getAuthToken()}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: reviewReason })
@@ -125,7 +126,7 @@ export default function EnterpriseManagement() {
 
   const handleResendActivation = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/v2/admin/enterprise/applications/${id}/resend-activation`, {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/applications/${id}/resend-activation`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
@@ -140,14 +141,14 @@ export default function EnterpriseManagement() {
         throw new Error(data.message);
       }
     } catch (e: any) {
-      addNotification({ type: 'system', category: 'error', title: 'Error', message: e.message });
+      addNotification({ type: 'system', category: 'urgent', title: 'Error', message: e.message });
     }
   };
 
   const handleViewDocument = async (docId: string, originalFilename: string) => {
     try {
       addNotification({ type: 'system', category: 'info', title: 'Loading...', message: 'Fetching secure document' });
-      const res = await fetch(`http://localhost:3001/api/v2/admin/enterprise/documents/${docId}`, {
+      const res = await fetch(`${API_ORIGIN}/api/v2/admin/enterprise/documents/${docId}`, {
         headers: { 'Authorization': `Bearer ${getAuthToken()}` }
       });
       if (!res.ok) throw new Error('Failed to load document');
@@ -162,7 +163,7 @@ export default function EnterpriseManagement() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      addNotification({ type: 'system', category: 'error', title: 'Error', message: 'Could not load document securely' });
+      addNotification({ type: 'system', category: 'urgent', title: 'Error', message: 'Could not load document securely' });
     }
   };
 
@@ -179,9 +180,9 @@ export default function EnterpriseManagement() {
           </button>
           <h2 className="text-2xl font-bold text-slate-800">Application Review: {selectedOrg.legalName}</h2>
           <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-            selectedOrg.status === 'ACTIVE' ? 'bg-green-100 text-green-700' :
+            selectedOrg.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
             selectedOrg.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
-            'bg-yellow-100 text-yellow-700'
+            'bg-yellow-100 text-yellow-800'
           }`}>
             {selectedOrg.status}
           </span>
@@ -273,7 +274,7 @@ export default function EnterpriseManagement() {
 
         {['SUBMITTED', 'UNDER_REVIEW', 'MORE_INFORMATION_REQUIRED'].includes(selectedOrg.status) && (
           <div className="flex space-x-4 bg-white p-6 rounded-xl border shadow-sm">
-            <button onClick={() => handleApprove(selectedOrg._id)} className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <button onClick={() => handleApprove(selectedOrg._id)} className="flex items-center space-x-2 px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-700">
               <CheckCircle className="w-5 h-5" /> <span>Approve</span>
             </button>
             <button onClick={() => setShowRejectModal(true)} className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
@@ -286,7 +287,7 @@ export default function EnterpriseManagement() {
         )}
 
         {showRejectModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div role="dialog" aria-modal="true" aria-label="Reject Application" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl w-full max-w-md">
               <h3 className="text-lg font-bold mb-4">Reject Application</h3>
               <textarea
@@ -294,7 +295,7 @@ export default function EnterpriseManagement() {
                 onChange={e => setReviewReason(e.target.value)}
                 className="w-full border rounded-lg p-3 h-32 mb-4"
                 placeholder="Provide reason for rejection..."
-              />
+               aria-label="Provide reason for rejection"/>
               <div className="flex justify-end space-x-3">
                 <button onClick={() => setShowRejectModal(false)} className="px-4 py-2 text-slate-500">Cancel</button>
                 <button onClick={handleReject} className="px-4 py-2 bg-red-600 text-white rounded-lg">Reject Application</button>
@@ -304,7 +305,7 @@ export default function EnterpriseManagement() {
         )}
 
         {showRequestInfoModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div role="dialog" aria-modal="true" aria-label="Request More Information" className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl w-full max-w-md">
               <h3 className="text-lg font-bold mb-4">Request More Information</h3>
               <textarea
@@ -312,7 +313,7 @@ export default function EnterpriseManagement() {
                 onChange={e => setReviewReason(e.target.value)}
                 className="w-full border rounded-lg p-3 h-32 mb-4"
                 placeholder="What information do you need?..."
-              />
+               aria-label="What information do you need?"/>
               <div className="flex justify-end space-x-3">
                 <button onClick={() => setShowRequestInfoModal(false)} className="px-4 py-2 text-slate-500">Cancel</button>
                 <button onClick={handleRequestInfo} className="px-4 py-2 bg-yellow-500 text-white rounded-lg">Send Request</button>
@@ -331,7 +332,7 @@ export default function EnterpriseManagement() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-        <div className="flex border-b">
+        <div className="flex border-b overflow-x-auto">
           {[
             { id: 'overview', label: 'Overview', count: organizations.length },
             { id: 'pending', label: 'Pending Review', count: pending.length },
@@ -361,16 +362,16 @@ export default function EnterpriseManagement() {
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-sm text-slate-500 border-b">
-                    <th className="pb-3 font-medium">Company</th>
-                    <th className="pb-3 font-medium">Registration</th>
-                    <th className="pb-3 font-medium">Industry</th>
-                    <th className="pb-3 font-medium">Representative</th>
-                    <th className="pb-3 font-medium">Status</th>
-                    <th className="pb-3 font-medium text-right">Actions</th>
+                  <tr className="bg-slate-50 border-b border-slate-200">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Company</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Registration</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Industry</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Representative</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-slate-200">
                   {organizations
                     .filter(o => {
                       if (activeTab === 'pending') return ['SUBMITTED', 'UNDER_REVIEW', 'MORE_INFORMATION_REQUIRED'].includes(o.status);
@@ -380,17 +381,17 @@ export default function EnterpriseManagement() {
                     })
                     .map(org => (
                     <tr key={org._id} className="hover:bg-slate-50">
-                      <td className="py-4">
+                      <td className="px-6 py-4">
                         <div className="font-medium text-slate-800">{org.legalName}</div>
                         <div className="text-sm text-slate-500">{org.country}</div>
                       </td>
-                      <td className="py-4 text-sm text-slate-600">{org.registrationNumber}</td>
-                      <td className="py-4 text-sm text-slate-600">{org.industry}</td>
-                      <td className="py-4">
+                      <td className="px-6 py-4 text-sm text-slate-700">{org.registrationNumber}</td>
+                      <td className="px-6 py-4 text-sm text-slate-700">{org.industry}</td>
+                      <td className="px-6 py-4">
                         <div className="text-sm font-medium text-slate-800">{org.authorizedRepresentative?.name || 'N/A'}</div>
                         <div className="text-sm text-slate-500">{org.authorizedRepresentative?.email || 'N/A'}</div>
                       </td>
-                      <td className="py-4">
+                      <td className="px-6 py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           org.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
                           org.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
@@ -399,7 +400,7 @@ export default function EnterpriseManagement() {
                           {org.status}
                         </span>
                       </td>
-                      <td className="py-4 text-right">
+                      <td className="px-6 py-4 text-right">
                         <button 
                           onClick={() => setSelectedOrg(org)}
                           className="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 border border-blue-200 rounded-md hover:bg-blue-50"

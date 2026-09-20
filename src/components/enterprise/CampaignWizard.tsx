@@ -118,11 +118,11 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
             <h3 className="text-lg font-medium">Basic Details</h3>
             <div>
               <label className="block text-sm font-medium mb-1">Campaign Name *</label>
-              <input type="text" className="w-full border rounded-md px-3 py-2" value={formData.campaignName} onChange={e => setFormData({...formData, campaignName: e.target.value})} />
+              <input type="text" className="w-full border rounded-md px-3 py-2" value={formData.campaignName} onChange={e => setFormData({...formData, campaignName: e.target.value})}  aria-label="Campaign Name"/>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Description *</label>
-              <textarea className="w-full border rounded-md px-3 py-2 h-24" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+              <textarea className="w-full border rounded-md px-3 py-2 h-24" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}  aria-label="Description"/>
             </div>
           </div>
         );
@@ -132,7 +132,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
             <h3 className="text-lg font-medium">Purpose & Scopes</h3>
             <div>
               <label className="block text-sm font-medium mb-1">Purpose *</label>
-              <select className="w-full border rounded-md px-3 py-2" value={formData.purposeId} onChange={e => setFormData({...formData, purposeId: e.target.value})}>
+              <select className="w-full border rounded-md px-3 py-2" value={formData.purposeId} onChange={e => setFormData({...formData, purposeId: e.target.value})} aria-label="Purpose">
                 <option value="">Select Purpose</option>
                 {config?.approvedPurposes?.map((p: any) => (
                   <option key={p._id} value={p._id}>{p.name}</option>
@@ -144,7 +144,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
                 <label className="block text-sm font-medium mb-2">Approved Scopes *</label>
                 <div className="space-y-2">
                   {config?.approvedScopes?.map((s: any) => (
-                    <label key={s._id} className="flex items-center gap-2">
+                    <label key={s._id} className="flex flex-wrap items-center gap-2">
                       <input type="checkbox" checked={formData.scopes.includes(s._id)} 
                         onChange={(e) => {
                           const scopes = e.target.checked 
@@ -169,7 +169,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
               <label className="block text-sm font-medium mb-2">Channel *</label>
               <div className="flex gap-4">
                 {config?.approvedChannels?.map((ch: string) => (
-                  <label key={ch} className="flex items-center gap-2">
+                  <label key={ch} className="flex flex-wrap items-center gap-2">
                     <input type="checkbox" checked={formData.channels.includes(ch)}
                       onChange={(e) => {
                           const channels = e.target.checked 
@@ -183,7 +183,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
                 ))}
               </div>
               {formData.channels.includes('SMS') && (
-                  <p className="mt-2 text-sm text-amber-600 bg-amber-50 p-2 rounded">
+                  <p className="mt-2 text-sm text-amber-700 bg-amber-50 p-2 rounded">
                     SMS delivery is currently unavailable. For UAT, approved SMS campaigns may be delivered using the configured Email fallback.
                   </p>
               )}
@@ -191,11 +191,11 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
             <div className="pt-4 border-t">
               <label className="block text-sm font-medium mb-1">Target Age Range</label>
               <div className="flex gap-2 mb-4">
-                <input type="number" placeholder="Min Age" className="border rounded-md px-3 py-2 flex-1" value={formData.ageMin} onChange={e => setFormData({...formData, ageMin: e.target.value})} />
-                <input type="number" placeholder="Max Age" className="border rounded-md px-3 py-2 flex-1" value={formData.ageMax} onChange={e => setFormData({...formData, ageMax: e.target.value})} />
+                <input type="number" placeholder="Min Age" className="border rounded-md px-3 py-2 flex-1" value={formData.ageMin} onChange={e => setFormData({...formData, ageMin: e.target.value})}  aria-label="Target Age Range"/>
+                <input type="number" placeholder="Max Age" className="border rounded-md px-3 py-2 flex-1" value={formData.ageMax} onChange={e => setFormData({...formData, ageMax: e.target.value})}  aria-label="Max Age"/>
               </div>
               <label className="block text-sm font-medium mb-1">Region</label>
-              <select className="w-full border rounded-md px-3 py-2 mb-4" value={formData.region} onChange={e => setFormData({...formData, region: e.target.value})}>
+              <select className="w-full border rounded-md px-3 py-2 mb-4" value={formData.region} onChange={e => setFormData({...formData, region: e.target.value})} aria-label="Region">
                 <option>All Regions</option>
                 <option>Western Province</option>
                 <option>Central Province</option>
@@ -216,7 +216,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
             <h3 className="text-lg font-medium">Templates & Schedule</h3>
             <div>
               <label className="block text-sm font-medium mb-1">Consent Template *</label>
-              <select className="w-full border rounded-md px-3 py-2" value={formData.consentTemplateVersionId} onChange={e => setFormData({...formData, consentTemplateVersionId: e.target.value})}>
+              <select className="w-full border rounded-md px-3 py-2" value={formData.consentTemplateVersionId} onChange={e => setFormData({...formData, consentTemplateVersionId: e.target.value})} aria-label="Consent Template">
                 <option value="">Select Template</option>
                 {consentTemplates.map(t => (
                   <option key={t._id} value={t._id}>{t.title} (v{t.version})</option>
@@ -225,7 +225,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Promotional Message Template *</label>
-              <select className="w-full border rounded-md px-3 py-2" value={formData.messageTemplateId} onChange={e => setFormData({...formData, messageTemplateId: e.target.value})}>
+              <select className="w-full border rounded-md px-3 py-2" value={formData.messageTemplateId} onChange={e => setFormData({...formData, messageTemplateId: e.target.value})} aria-label="Promotional Message Template">
                 <option value="">Select Message</option>
                 {messageTemplates.map(m => (
                   <option key={m._id} value={m._id}>{m.version} - {m.channel}</option>
@@ -236,11 +236,11 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
             <div className="flex gap-4 pt-4 border-t">
               <div className="flex-1">
                 <label className="block text-sm font-medium mb-1">Start Date *</label>
-                <input type="date" className="w-full border rounded-md px-3 py-2" value={formData.campaignStart} onChange={e => setFormData({...formData, campaignStart: e.target.value})} />
+                <input type="date" className="w-full border rounded-md px-3 py-2" value={formData.campaignStart} onChange={e => setFormData({...formData, campaignStart: e.target.value})}  aria-label="Start Date"/>
               </div>
               <div className="flex-1">
                 <label className="block text-sm font-medium mb-1">End Date *</label>
-                <input type="date" className="w-full border rounded-md px-3 py-2" value={formData.campaignEnd} onChange={e => setFormData({...formData, campaignEnd: e.target.value})} />
+                <input type="date" className="w-full border rounded-md px-3 py-2" value={formData.campaignEnd} onChange={e => setFormData({...formData, campaignEnd: e.target.value})}  aria-label="End Date"/>
               </div>
             </div>
           </div>
@@ -264,8 +264,8 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 max-w-3xl mx-auto">
-      <div className="p-6 border-b border-slate-200 flex items-center gap-4">
-        <button onClick={onCancel} className="text-slate-500 hover:text-slate-800">
+      <div className="p-6 border-b border-slate-200 flex flex-wrap items-center gap-4">
+        <button aria-label="Go back" onClick={onCancel} className="text-slate-500 hover:text-slate-800">
             <ArrowLeft className="w-5 h-5" />
         </button>
         <h2 className="text-xl font-semibold text-slate-800">{editCampaignId ? 'Edit Campaign' : 'Create Campaign'}</h2>
@@ -305,7 +305,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
             ) : (
               <button 
                 onClick={handleSaveDraft}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-700"
               >
                 Finish & Save
               </button>
