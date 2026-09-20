@@ -1,5 +1,5 @@
 // Type definitions for ConsentHub aligned with TM Forum Open APIs
-export type ConsentStatus = 'granted' | 'revoked' | 'pending' | 'expired';
+export type ConsentStatus = 'granted' | 'revoked' | 'pending' | 'expired' | 'declined';
 export type ConsentPurpose = 'marketing' | 'analytics' | 'thirdPartySharing' | 'dataProcessing' | 'location' | 'research' | 'personalization';
 export type ConsentChannel = 'email' | 'sms' | 'push' | 'voice' | 'all';
 export type PartyType = 'individual' | 'organization' | 'guardian';

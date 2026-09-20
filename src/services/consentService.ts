@@ -3,9 +3,12 @@ import { apiClient, ApiResponse } from './apiClient';
 import { PrivacyConsent, ConsentStatus, ConsentPurpose } from '../types/consent';
 export interface ConsentCreateRequest {
   partyId: string;
-  purpose: ConsentPurpose;
+  purpose: string;
   status: ConsentStatus;
   channel: string;
+  recordSource?: string;
+  consentDateTime?: string;
+  withdrawalDateTime?: string;
   validFor?: {
     startDateTime: string;
     endDateTime?: string;
@@ -17,6 +20,12 @@ export interface ConsentCreateRequest {
 }
 export interface ConsentUpdateRequest {
   status?: ConsentStatus;
+  purpose?: string;
+  channel?: string;
+  recordSource?: string;
+  versionAccepted?: string;
+  consentDateTime?: string;
+  withdrawalDateTime?: string;
   validFor?: {
     startDateTime?: string;
     endDateTime?: string;

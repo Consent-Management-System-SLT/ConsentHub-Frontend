@@ -54,6 +54,7 @@ export interface CustomerConsent {
   status: string;
   grantedAt?: string;
   revokedAt?: string;
+  deniedAt?: string;
   expiresAt?: string;
   privacyNoticeVersion?: string;
   channel?: string;
