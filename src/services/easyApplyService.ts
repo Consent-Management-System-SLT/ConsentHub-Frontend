@@ -48,18 +48,17 @@ export async function verifyOtp(mobileNumber: string, otp: string) {
   }
 }
 
+// A row of the CUSTOMER_CONSENT table with its consent type and version.
 export interface CustomerConsent {
-  consentId: string;
-  purpose: string;
-  status: string;
-  grantedAt?: string;
-  revokedAt?: string;
-  deniedAt?: string;
-  expiresAt?: string;
-  privacyNoticeVersion?: string;
-  channel?: string;
-  sourceSystem?: string;
-  createdAt?: string;
+  customerConsentId: number;
+  consentName: string;
+  scopeVersion: string;
+  consentStatus: 'GRANTED' | 'DENIED' | 'WITHDRAWN' | 'NOT_RESPONDED';
+  channel: string;
+  source: string;
+  consentDateTime: string | null;
+  withdrawalDateTime: string | null;
+  capturedBy: string;
 }
 
 // Own endpoint, deliberately separate from the internal customer-portal's

@@ -1,53 +1,48 @@
-// Values from SLT_Consent_Management_Data_Model.pdf (CONSENT_MASTER + CUSTOMER_CONSENT).
-// `value` is what the backend stores; `label` is the PDF's wording.
+// Values of SLT_Consent_Management_Data_Model.pdf (CUSTOMER_CONSENT). The consent types and
+// versions themselves come from the backend (consent_scopes); only the fixed lists live here.
 
-export const CONSENT_TYPES = [
-  { value: 'termsAndConditions', label: 'Terms & Conditions' },
-  { value: 'privacyPolicy', label: 'Privacy Policy' },
-  { value: 'serviceCommunication', label: 'Service Communications' },
-  { value: 'marketing', label: 'Marketing Communications' },
-  { value: 'personalization', label: 'Personalized Offers' },
-  { value: 'partnerOffers', label: 'Partner Offers' },
-  { value: 'customerFeedback', label: 'Customer Feedback' },
-] as const;
-
-// Stored as the existing backend statuses so CSR and customer screens keep working.
 export const CONSENT_STATUSES = [
-  { value: 'granted', label: 'Granted' },
-  { value: 'declined', label: 'Denied' },
-  { value: 'revoked', label: 'Withdrawn' },
-  { value: 'pending', label: 'Not Responded' },
+  { value: 'GRANTED', label: 'Granted' },
+  { value: 'DENIED', label: 'Denied' },
+  { value: 'WITHDRAWN', label: 'Withdrawn' },
+  { value: 'NOT_RESPONDED', label: 'Not Responded' },
 ] as const;
+
+export type ConsentStatus = (typeof CONSENT_STATUSES)[number]['value'];
 
 export const CONSENT_CHANNELS = [
-  { value: 'web', label: 'Web' },
-  { value: 'mobile_app', label: 'Mobile App' },
-  { value: 'sms', label: 'SMS' },
-  { value: 'email', label: 'Email' },
-  { value: 'ivr', label: 'IVR' },
-  { value: 'call_center', label: 'Call Center' },
-  { value: 'branch', label: 'Branch' },
+  { value: 'WEB', label: 'Web' },
+  { value: 'MOBILE_APP', label: 'Mobile App' },
+  { value: 'SMS', label: 'SMS' },
+  { value: 'EMAIL', label: 'Email' },
+  { value: 'IVR', label: 'IVR' },
+  { value: 'CALL_CENTER', label: 'Call Center' },
+  { value: 'BRANCH', label: 'Branch' },
 ] as const;
 
+// Where a decision can be recorded from. Anything else the system writes (REGISTRATION,
+// CUSTOMER_PORTAL, ...) is shown by turning the code into words.
 export const CONSENT_SOURCES = [
-  { value: 'admin-dashboard', label: 'Admin Dashboard' },
-  { value: 'csr-dashboard', label: 'CSR Dashboard' },
-  { value: 'onboarding_portal', label: 'Onboarding Portal' },
-  { value: 'self_care_app', label: 'Self-Care App' },
-  { value: 'ivr_system', label: 'IVR System' },
-  { value: 'survey_campaign', label: 'Survey Campaign' },
+  { value: 'ADMIN_DASHBOARD', label: 'Admin Dashboard' },
+  { value: 'CSR_DASHBOARD', label: 'CSR Dashboard' },
+  { value: 'ONBOARDING_PORTAL', label: 'Onboarding Portal' },
+  { value: 'SELF_CARE_APP', label: 'Self-Care App' },
+  { value: 'IVR_SYSTEM', label: 'IVR System' },
+  { value: 'SURVEY_CAMPAIGN', label: 'Survey Campaign' },
+  { value: 'EMAIL_CAMPAIGN', label: 'Email Campaign' },
+  { value: 'BRANCH_POS', label: 'Branch POS' },
 ] as const;
 
-const humanize = (key: string) =>
-  key
+const humanize = (code: string) =>
+  code
     .replace(/[_-]+/g, ' ')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .toLowerCase()
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
-const labeller = (list: readonly { value: string; label: string }[]) => (value?: string) =>
-  list.find((o) => o.value === value)?.label ?? (value ? humanize(value) : '—');
+// Codes arrive in either case (the API returns channels in lower case), so compare upper-cased.
+const labeller = (list: readonly { value: string; label: string }[]) => (value?: string | null) =>
+  list.find((o) => o.value === String(value).toUpperCase())?.label ?? (value ? humanize(value) : '—');
 
-export const consentTypeLabel = labeller(CONSENT_TYPES);
 export const consentStatusLabel = labeller(CONSENT_STATUSES);
 export const consentChannelLabel = labeller(CONSENT_CHANNELS);
 export const consentSourceLabel = labeller(CONSENT_SOURCES);
@@ -57,10 +52,12 @@ export const withCurrent = <T extends { value: string; label: string }>(
   list: readonly T[],
   current: string | undefined,
   labelFor: (v?: string) => string,
-): { value: string; label: string }[] =>
-  current && !list.some((o) => o.value === current)
-    ? [...list, { value: current, label: `${labelFor(current)} (existing)` }]
+): { value: string; label: string }[] => {
+  const code = current?.toUpperCase();
+  return code && !list.some((o) => o.value === code)
+    ? [...list, { value: code, label: `${labelFor(code)} (existing)` }]
     : [...list];
+};
 
 /** <input type="datetime-local"> wants local time as YYYY-MM-DDTHH:mm. */
 export const toLocalInput = (iso?: string | null) => {

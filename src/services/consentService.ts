@@ -1,37 +1,30 @@
 // TMF632 Party Privacy Management API Service
 import { apiClient, ApiResponse } from './apiClient';
 import { PrivacyConsent, ConsentStatus, ConsentPurpose } from '../types/consent';
+// One consent type at one version (a row of consent_scopes joined to its consent type).
+export interface ConsentScope {
+  consentScopeId: number;
+  consentId: number;
+  consentCode: string;
+  consentName: string;
+  scopeName: string;
+  scopeVersion: string;
+  status: string;
+  effectiveFrom?: string;
+  effectiveTo?: string | null;
+}
+
+// A customer's consent decision, in the columns of the CUSTOMER_CONSENT table.
 export interface ConsentCreateRequest {
-  partyId: string;
-  purpose: string;
-  status: ConsentStatus;
+  customerId: string;
+  consentScopeId: number;
+  consentStatus: string;
   channel: string;
-  recordSource?: string;
+  source: string;
   consentDateTime?: string;
   withdrawalDateTime?: string;
-  validFor?: {
-    startDateTime: string;
-    endDateTime?: string;
-  };
-  geoLocation?: string;
-  privacyNoticeId?: string;
-  versionAccepted?: string;
-  metadata?: Record<string, any>;
 }
-export interface ConsentUpdateRequest {
-  status?: ConsentStatus;
-  purpose?: string;
-  channel?: string;
-  recordSource?: string;
-  versionAccepted?: string;
-  consentDateTime?: string;
-  withdrawalDateTime?: string;
-  validFor?: {
-    startDateTime?: string;
-    endDateTime?: string;
-  };
-  metadata?: Record<string, any>;
-}
+export type ConsentUpdateRequest = Partial<Omit<ConsentCreateRequest, 'customerId'>>;
 export interface ConsentQuery {
   partyId?: string;
   purpose?: ConsentPurpose;
@@ -67,6 +60,10 @@ class ConsentService {
   /**
    * TMF632 - Get specific consent by ID
    */
+  /** Every consent type and version; the admin form offers only the active ones. */
+  async getConsentScopes(): Promise<ApiResponse<ConsentScope[]>> {
+    return apiClient.get<ConsentScope[]>(`${this.basePath}/consent-scopes?all=true`);
+  }
   async getConsentById(id: string): Promise<ApiResponse<PrivacyConsent>> {
     return apiClient.get<PrivacyConsent>(`${this.basePath}/consent/${id}`);
   }
