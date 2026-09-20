@@ -23,6 +23,12 @@ import { notificationManager } from '../shared/NotificationContainer';
 const formatPurposeName = (purpose: string): string => {
   if (!purpose) return 'Unknown Purpose';
   const purposeMap: { [key: string]: string } = {
+    'termsandconditions': 'Terms & Conditions',
+    'privacypolicy': 'Privacy Policy',
+    'servicecommunication': 'Service Communications',
+    'personalizedoffers': 'Personalized Offers',
+    'partneroffers': 'Partner Offers',
+    'customerfeedback': 'Customer Feedback',
     'research': 'Research & Analytics',
     'dataprocessing': 'Data Processing',
     'dataProcessing': 'Data Processing',
@@ -396,13 +402,13 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
                     className="px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"
                    aria-label="Filter by purpose">
                     <option value="all">All Purposes</option>
+                    <option value="termsAndConditions">Terms & Conditions</option>
+                    <option value="privacyPolicy">Privacy Policy</option>
+                    <option value="serviceCommunication">Service Communications</option>
                     <option value="marketing">Marketing Communications</option>
-                    <option value="analytics">Analytics & Performance</option>
-                    <option value="communication">Communication Services</option>
-                    <option value="personalization">Personalization Services</option>
-                    <option value="research">Research & Analytics</option>
-                    <option value="dataProcessing">Data Processing</option>
-                    <option value="essential">Essential Services</option>
+                    <option value="personalizedOffers">Personalized Offers</option>
+                    <option value="partnerOffers">Partner Offers</option>
+                    <option value="customerFeedback">Customer Feedback</option>
                   </select>
                 </div>
                 <button

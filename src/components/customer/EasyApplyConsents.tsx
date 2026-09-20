@@ -6,19 +6,16 @@ import {
 } from '../../services/easyApplyService';
 import { LoadingPanel } from '../shared/Loading';
 import DashboardFooter from '../shared/DashboardFooter';
-import { consentTypeLabel, consentStatusLabel, consentChannelLabel } from '../../utils/consentModel';
+import { consentStatusLabel, consentChannelLabel, consentSourceLabel } from '../../utils/consentModel';
 
-const STATUS_STYLES: Record<string, string> = {
-  granted: 'bg-green-100 text-green-800',
-  active: 'bg-green-100 text-green-800',
-  revoked: 'bg-red-100 text-red-800',
-  withdrawn: 'bg-red-100 text-red-800',
-  declined: 'bg-red-100 text-red-800',
-  expired: 'bg-slate-100 text-slate-800',
-  pending: 'bg-amber-100 text-amber-800',
+const STATUS_STYLES: Record<CustomerConsent['consentStatus'], string> = {
+  GRANTED: 'bg-green-100 text-green-800',
+  WITHDRAWN: 'bg-red-100 text-red-800',
+  DENIED: 'bg-red-100 text-red-800',
+  NOT_RESPONDED: 'bg-amber-100 text-amber-800',
 };
 
-const formatDate = (value?: string) => (value ? new Date(value).toLocaleDateString() : '—');
+const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString() : '—');
 
 /** The consent records tied to an EasyApply customer's partyId. */
 const EasyApplyConsents: React.FC = () => {
@@ -86,29 +83,30 @@ const EasyApplyConsents: React.FC = () => {
               <table className="w-full text-left">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Purpose</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Consent</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Consent Date</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Withdrawn</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Expires</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Channel</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Source</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {consents.map((c) => (
-                    <tr key={c.consentId} className="hover:bg-slate-50">
-                      <td className="px-6 py-4 text-sm font-medium text-slate-800">{consentTypeLabel(c.purpose)}</td>
+                    <tr key={c.customerConsentId} className="hover:bg-slate-50">
+                      <td className="px-6 py-4 text-sm font-medium text-slate-800">
+                        {c.consentName}
+                        <div className="text-xs font-normal text-slate-500">Version {c.scopeVersion}</div>
+                      </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          STATUS_STYLES[String(c.status).toLowerCase()] || 'bg-slate-100 text-slate-800'
-                        }`}>
-                          {consentStatusLabel(c.status)}
+                        <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[c.consentStatus] || 'bg-slate-100 text-slate-800'}`}>
+                          {consentStatusLabel(c.consentStatus)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">{formatDate(c.grantedAt || c.deniedAt || c.createdAt)}</td>
-                      <td className="px-6 py-4 text-sm text-slate-700">{c.status === 'revoked' ? formatDate(c.revokedAt) : '—'}</td>
-                      <td className="px-6 py-4 text-sm text-slate-700">{c.expiresAt ? formatDate(c.expiresAt) : 'No expiry'}</td>
+                      <td className="px-6 py-4 text-sm text-slate-700">{formatDate(c.consentDateTime)}</td>
+                      <td className="px-6 py-4 text-sm text-slate-700">{formatDate(c.withdrawalDateTime)}</td>
                       <td className="px-6 py-4 text-sm text-slate-700">{consentChannelLabel(c.channel)}</td>
+                      <td className="px-6 py-4 text-sm text-slate-700">{consentSourceLabel(c.source)}</td>
                     </tr>
                   ))}
                 </tbody>
