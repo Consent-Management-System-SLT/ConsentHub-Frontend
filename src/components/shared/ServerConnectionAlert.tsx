@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   CheckCircle, 
   XCircle, 
@@ -23,62 +23,66 @@ const ServerConnectionAlert: React.FC<ServerConnectionAlertProps> = ({
   const [errorMessage, setErrorMessage] = useState('');
   const BACKEND_URL = import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001';
   const MAX_RETRIES = 3;
-  const testServerConnection = async (attempt = 1) => {
+  // Keep a ref to the AbortController so we can cancel on unmount
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const testServerConnection = useCallback(async (attempt = 1) => {
+    // Cancel any previous in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
     try {
       setConnectionStatus(attempt === 1 ? 'testing' : 'retrying');
       setErrorMessage('');
-      // Test the server connection with multiple fallback endpoints
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout for Render
-      // Try endpoints that are most likely to exist based on your API structure
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      // Try health/lightweight endpoints first to avoid noisy 401s in the console,
+      // then fall back to authenticated routes (a 401 still proves the server is alive).
       const endpoints = [
-        '/api/v1/consent', // This exists based on your multiServiceApiClient
-        '/api/v1/party',   // This exists
-        '/api/v1/health',  // Common health endpoint
-        '/api/health',     // Alternative health endpoint
-        '/health',         // Simple health endpoint
-        '/'                // Root endpoint as last resort
+        '/api/health',     // Preferred: unauthenticated health endpoint
+        '/health',         // Alternative health endpoint
+        '/api/v1/health',  // Versioned health endpoint
+        '/',               // Root endpoint
+        '/api/v1/consent', // Falls back to an authenticated route — 401 = server alive
+        '/api/v1/party',   // Additional authenticated fallback
       ];
       let lastError = null;
       let connected = false;
       for (const endpoint of endpoints) {
+        if (controller.signal.aborted) break;
         try {
           const response = await fetch(`${BACKEND_URL}${endpoint}`, {
             method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             signal: controller.signal
           });
-          // Accept any response that's not a complete failure as a sign the server is alive
+          // Any response under 500 (including 401 Unauthorized) means the server is alive
           if (response.status < 500) {
             connected = true;
             setConnectionStatus('connected');
             setRetryCount(0);
-            // Auto-hide after successful connection
             if (autoHide) {
-              setTimeout(() => {
-                setIsVisible(false);
-              }, autoHideDelay);
+              hideTimerRef.current = setTimeout(() => setIsVisible(false), autoHideDelay);
             }
             break;
           }
         } catch (endpointError) {
+          // Ignore abort errors mid-loop; rethrow so the outer catch handles them
+          if ((endpointError as Error).name === 'AbortError') throw endpointError;
           lastError = endpointError;
-          continue;
         }
       }
       clearTimeout(timeoutId);
-      if (!connected) {
+      if (!connected && !controller.signal.aborted) {
         throw lastError || new Error('All health check endpoints failed');
       }
     } catch (error) {
-      console.error('Server connection test failed:', error);
+      if ((error as Error).name === 'AbortError') return; // Unmounted or superseded — ignore
       let errorMsg = 'Connection failed';
       if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          errorMsg = 'Connection timeout - Render server may be cold starting';
-        } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+        if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
           errorMsg = 'Network error - server may be offline';
         } else if (error.message.includes('CORS')) {
           errorMsg = 'CORS error - server is running but not configured for this domain';
@@ -87,31 +91,32 @@ const ServerConnectionAlert: React.FC<ServerConnectionAlertProps> = ({
         }
       }
       setErrorMessage(errorMsg);
-      // Retry logic with longer delays for Render cold starts
       if (attempt < MAX_RETRIES) {
         setRetryCount(attempt);
-        setTimeout(() => {
-          testServerConnection(attempt + 1);
-        }, 3000 * attempt); // Longer delays for Render servers
+        retryTimerRef.current = setTimeout(() => testServerConnection(attempt + 1), 3000 * attempt);
       } else {
         setConnectionStatus('failed');
         setRetryCount(MAX_RETRIES);
       }
     }
-  };
+  }, [BACKEND_URL, autoHide, autoHideDelay]);
   const handleManualRetry = () => {
     setRetryCount(0);
     testServerConnection(1);
   };
   const handleClose = () => {
     setIsVisible(false);
-    if (onClose) {
-      onClose();
-    }
+    if (onClose) onClose();
   };
   useEffect(() => {
     testServerConnection(1);
-  }, []);
+    // Cleanup: cancel in-flight requests and pending timers on unmount
+    return () => {
+      abortControllerRef.current?.abort();
+      if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
+  }, [testServerConnection]);
   if (!isVisible) return null;
   const getStatusConfig = () => {
     switch (connectionStatus) {
