@@ -15,6 +15,7 @@ import {
   Megaphone,
   ScrollText,
   ShieldCheck,
+  ListChecks,
 } from 'lucide-react';
 import DashboardSidebar, { NavItem } from '../shared/DashboardSidebar';
 
@@ -23,6 +24,7 @@ export const adminNavItems: NavItem[] = [
   { id: 'enterprise-management', label: 'Enterprise Management', icon: Webhook, description: 'Registrations and approvals' },
   { id: 'enterprise-campaigns', label: 'Enterprise Campaigns', icon: Megaphone, description: 'Review and approve' },
   { id: 'consents', label: 'Consents', icon: Shield, description: 'All customer consents' },
+  { id: 'consent-catalog', label: 'Consent Catalog', icon: ListChecks, description: 'Types, versions, categories' },
   { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Consent for minors' },
   { id: 'preference-management', label: 'Preference Management', icon: Cog, description: 'Channels and topics' },
   { id: 'vas-management', label: 'VAS Management', icon: Smartphone, description: 'Value Added Services' },

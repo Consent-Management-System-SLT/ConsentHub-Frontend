@@ -64,6 +64,10 @@ class ConsentService {
   async getConsentScopes(): Promise<ApiResponse<ConsentScope[]>> {
     return apiClient.get<ConsentScope[]>(`${this.basePath}/consent-scopes?all=true`);
   }
+  /** The same decision for every active customer that has none for this version yet. */
+  async createConsentForAll(consent: Omit<ConsentCreateRequest, 'customerId'>): Promise<ApiResponse<{ created: number; skipped: number; total: number }>> {
+    return apiClient.post(`${this.basePath}/consent/bulk`, consent);
+  }
   async getConsentById(id: string): Promise<ApiResponse<PrivacyConsent>> {
     return apiClient.get<PrivacyConsent>(`${this.basePath}/consent/${id}`);
   }

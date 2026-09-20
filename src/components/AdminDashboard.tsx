@@ -5,6 +5,7 @@ import DashboardFooter from './shared/DashboardFooter';
 import AdminSidebar from './admin/AdminSidebar';
 import DashboardHome from './admin/DashboardHome';
 import ConsentOverviewTable from './admin/ConsentOverviewTable';
+import ConsentCatalogManager from './admin/ConsentCatalogManager';
 import GuardianConsent from './admin/GuardianConsent';
 import PreferenceManagement from './admin/PreferenceManagementNew';
 import VASManagement from './admin/VASManagement';
@@ -42,6 +43,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
         return <EnterpriseCampaignReview />;
       case 'consents':
         return <ConsentOverviewTable />;
+      case 'consent-catalog':
+        return <ConsentCatalogManager />;
       case 'guardian-consent':
         return <GuardianConsent />;
       case 'preference-management':

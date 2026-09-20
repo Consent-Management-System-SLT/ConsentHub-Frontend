@@ -51,7 +51,7 @@ const STATUS_STYLE: Record<ConsentStatus, { icon: React.ReactNode; chip: string 
   NOT_RESPONDED: { icon: <AlertCircle className="w-4 h-4 text-amber-700" aria-hidden="true" />, chip: 'bg-amber-600/20 text-amber-800' },
 };
 
-const fieldClass = 'mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
+const fieldClass = 'mt-1 block w-full bg-white text-gray-900 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
 
 const formatDateTime = (value?: string | null) =>
   value
@@ -84,6 +84,7 @@ const ConsentOverviewTable: React.FC = () => {
   const [editing, setEditing] = useState<ConsentRecord | null>(null);
   const [creating, setCreating] = useState(false);
   const [createCustomerId, setCreateCustomerId] = useState('');
+  const ALL = 'ALL';
   const [form, setForm] = useState<ConsentForm>({ consentScopeId: '', consentStatus: 'GRANTED', channel: 'WEB', source: 'ADMIN_DASHBOARD', consentDateTime: '', withdrawalDateTime: '' });
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -197,16 +198,21 @@ const ConsentOverviewTable: React.FC = () => {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (creating && !createCustomerId) return setFormError('Please select a customer.');
+    if (creating && !createCustomerId) return setFormError('Please select a customer, or All customers.');
     if (!form.consentScopeId) return setFormError('Please select a consent type.');
     const problem = validate();
     if (problem) return setFormError(problem);
     setSaving(true);
     try {
       if (creating) {
-        await createConsent({ customerId: createCustomerId, ...payload() });
+        if (createCustomerId === ALL) {
+          const { data } = await consentService.createConsentForAll(payload());
+          notificationManager.success('Consent recorded', `Recorded for ${data.created} customer${data.created === 1 ? '' : 's'}${data.skipped ? `; ${data.skipped} already had this consent and were left unchanged` : ''}.`);
+        } else {
+          await createConsent({ customerId: createCustomerId, ...payload() });
+          notificationManager.success('Consent recorded', 'The consent decision was saved.');
+        }
         setCreating(false);
-        notificationManager.success('Consent recorded', 'The consent decision was saved.');
       } else if (editing) {
         await updateConsent(String(editing.customerConsentId), payload());
         setEditing(null);
@@ -429,14 +435,14 @@ const ConsentOverviewTable: React.FC = () => {
                 <input type="text" placeholder="Search customers..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 pr-4 py-2 w-full sm:w-64 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" aria-label="Search customers" />
               </div>
               <div className="relative">
-                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent" aria-label="Filter by status">
+                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="appearance-none bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent" aria-label="Filter by status">
                   <option value="all">All Status</option>
                   {CONSENT_STATUSES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
                 <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               </div>
               <div className="relative">
-                <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent" aria-label="Filter by type">
+                <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="appearance-none bg-white text-gray-900 border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent" aria-label="Filter by type">
                   <option value="all">All Types</option>
                   {typeOptions.map((name) => <option key={name} value={name}>{name}</option>)}
                 </select>
@@ -598,14 +604,18 @@ const ConsentOverviewTable: React.FC = () => {
         )}
       </Modal>
 
-      <Modal isOpen={creating} onClose={() => setCreating(false)} title="Create New Consent" footer={formFooter('Create Consent', () => setCreating(false))}>
+      <Modal isOpen={creating} onClose={() => setCreating(false)} title="Create New Consent" footer={formFooter(createCustomerId === ALL ? 'Create for All Customers' : 'Create Consent', () => setCreating(false))}>
         <form id="consent-form" onSubmit={submit} noValidate>
           <div className="mb-4">
             <label htmlFor="create-customer" className="block text-sm font-medium text-gray-700">Customer *</label>
             <select id="create-customer" value={createCustomerId} onChange={(e) => setCreateCustomerId(e.target.value)} className={fieldClass} required>
               <option value="">Select Customer</option>
+              <option value={ALL}>All customers ({parties.length})</option>
               {parties.map((p) => <option key={p.id} value={p.id}>{p.name} - {p.email}</option>)}
             </select>
+            {createCustomerId === ALL && (
+              <p className="mt-1 text-xs text-slate-600">Recorded for every active customer. Customers who already have this consent version keep their own decision.</p>
+            )}
           </div>
           {renderFields('create')}
           <div className="mb-4">

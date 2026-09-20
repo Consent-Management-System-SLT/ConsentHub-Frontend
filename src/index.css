@@ -35,6 +35,15 @@
   p { @apply text-sm md:text-base leading-relaxed m-0; }
   small { @apply text-xs; }
 
+  /* A native <select> list is drawn by the OS, and on Windows it takes its colours from the
+     select itself. With none set, the list came up dark-grey with near-black text whenever
+     Windows was in dark mode. Give every select and option explicit colours, and tell the
+     browser which scheme to draw the list in. */
+  select { color-scheme: light; background-color: #fff; color: #0f172a; }
+  select option, select optgroup { background-color: #fff; color: #0f172a; }
+  .dark select { color-scheme: dark; background-color: #131c2e; color: #e8edf5; }
+  .dark select option, .dark select optgroup { background-color: #131c2e; color: #e8edf5; }
+
   /* One visible focus ring for every interactive element. Keyboard and
      screen-reader users previously had no indication of focus anywhere. */
   :focus-visible {
