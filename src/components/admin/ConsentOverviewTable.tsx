@@ -18,7 +18,13 @@ import {
 } from 'lucide-react';
 import { useConsents, useParties, useConsentMutation } from '../../hooks/useApi';
 import { ConsentCreateRequest } from '../../services/consentService';
-import { ConsentPurpose, ConsentStatus } from '../../types/consent';
+import { ConsentStatus } from '../../types/consent';
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  CONSENT_TYPES, CONSENT_STATUSES, CONSENT_CHANNELS, CONSENT_SOURCES,
+  consentTypeLabel, consentStatusLabel, consentChannelLabel, consentSourceLabel,
+  withCurrent, toLocalInput, nowLocalInput
+} from '../../utils/consentModel';
 import { websocketService } from '../../services/websocketService';
 import { notificationManager } from '../shared/NotificationContainer';
 import { secureLog } from '../../utils/secureLogger';
@@ -27,14 +33,19 @@ interface Consent {
   customerId: string;
   customerName: string;
   email: string;
-  consentType: 'marketing' | 'analytics' | 'functional' | 'necessary';
-  status: 'active' | 'withdrawn' | 'expired' | 'pending' | 'granted' | 'revoked';
+  consentType: string;
+  status: 'active' | 'withdrawn' | 'expired' | 'pending' | 'denied' | 'granted' | 'revoked';
   grantedDate: string;
   expiryDate?: string;
   lastUpdated: string;
   source: 'website' | 'mobile' | 'email' | 'phone' | 'in-person' | 'sms' | 'push' | 'all' | 'customer_service' | 'mobile_app' | 'registration';
   version: string;
   isRealUser?: boolean;
+  channel: string;
+  recordSource: string;
+  capturedBy?: string;
+  consentDateTime?: string;
+  withdrawalDateTime?: string;
   // Add raw timestamps for sorting
   grantedAt?: string;
   revokedAt?: string;
@@ -81,7 +92,15 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     } else if ((consent.status === 'revoked' || consent.status === 'withdrawn') && consent.revokedAt) {
       const formatted = formatDateTime(consent.revokedAt);
       return {
-        action: 'Revoked',
+        action: 'Withdrawn',
+        date: formatted.date,
+        time: formatted.time,
+        source: consent.source || 'customer-portal'
+      };
+    } else if (consent.status === 'declined' && consent.deniedAt) {
+      const formatted = formatDateTime(consent.deniedAt);
+      return {
+        action: 'Denied',
         date: formatted.date,
         time: formatted.time,
         source: consent.source || 'customer-portal'
@@ -118,35 +137,31 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const { data: consentsData, loading: consentsLoading, error: consentsError, refetch: refetchConsents } = useConsents();
   const { createConsent, updateConsent } = useConsentMutation();
   // Form state for creating new consent
-  const [newConsentForm, setNewConsentForm] = useState<{
-    partyId: string;
-    purpose: ConsentPurpose;
-    status: ConsentStatus;
-    channel: string;
-    geoLocation: string;
-    privacyNoticeId: string;
-    versionAccepted: string;
-  }>({
+  const { user } = useAuth();
+  const emptyCreateForm = () => ({
     partyId: '',
-    purpose: 'marketing',
-    status: 'granted',
-    channel: 'email',
-    geoLocation: 'Sri Lanka',
-    privacyNoticeId: 'PN-001',
-    versionAccepted: '1.0'
+    purpose: CONSENT_TYPES[0].value as string,
+    status: 'granted' as ConsentStatus,
+    channel: 'web',
+    recordSource: 'admin-dashboard',
+    versionAccepted: '1.0',
+    consentDateTime: nowLocalInput(),
+    withdrawalDateTime: ''
   });
+  const [newConsentForm, setNewConsentForm] = useState(emptyCreateForm);
+  const [formError, setFormError] = useState('');
   // Form state for editing existing consent
-  const [editConsentForm, setEditConsentForm] = useState<{
-    status: ConsentStatus;
-    purpose: ConsentPurpose;
-    channel: string;
-    geoLocation: string;
-  }>({
-    status: 'granted',
-    purpose: 'marketing',
-    channel: 'email',
-    geoLocation: 'Sri Lanka'
+  const [editConsentForm, setEditConsentForm] = useState({
+    status: 'granted' as ConsentStatus,
+    purpose: '',
+    channel: 'web',
+    recordSource: 'admin-dashboard',
+    versionAccepted: '1.0',
+    consentDateTime: '',
+    withdrawalDateTime: ''
   });
+  // A validation message describes the last submit; drop it as soon as the form changes.
+  useEffect(() => { setFormError(''); }, [newConsentForm, editConsentForm]);
   // Transform parties data
   const parties = Array.isArray(partiesData) ? partiesData : 
     (partiesData && (partiesData as any).parties ? (partiesData as any).parties : []);
@@ -206,35 +221,12 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   // Transform API consent data to match UI interface
   const consents: Consent[] = rawConsents.map((consent: any) => {
     const party = partyLookup.get(consent.partyId) || {};
-    // Map consent types to UI-friendly names
-    const mapConsentType = (purpose: string) => {
-      const purposeMap: { [key: string]: string } = {
-        'marketing': 'marketing',
-        'analytics': 'analytics', 
-        'functional': 'functional',
-        'necessary': 'necessary',
-        'dataprocessing': 'functional',
-        'data_processing': 'functional',
-        'personalization': 'functional',
-        'thirdpartysharing': 'analytics',
-        'third_party_sharing': 'analytics',
-        'cookies': 'necessary',
-        'service': 'necessary',
-        'sms_marketing': 'marketing',
-        'location_tracking': 'analytics',
-        'push_notifications': 'functional',
-        'research': 'analytics',
-        'social_media': 'functional',
-        'newsletter': 'marketing',
-        'guardian_consent': 'necessary'
-      };
-      return purposeMap[purpose?.toLowerCase()] || 'marketing';
-    };
     // Map status values to UI expectations
     const mapStatus = (status: string) => {
       const statusMap: { [key: string]: string } = {
         'granted': 'active',
-        'denied': 'withdrawn',
+        'denied': 'denied',
+        'declined': 'denied',
         'revoked': 'withdrawn',
         'active': 'active',
         'withdrawn': 'withdrawn',
@@ -290,7 +282,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       customerId: consent.partyId || '',
       customerName: customerInfo.name,
       email: customerInfo.email,
-      consentType: mapConsentType(consent.purpose || consent.type),
+      consentType: consent.purpose || consent.type || 'marketing',
       status: mapStatus(consent.status),
       grantedDate: consent.grantedAt ? new Date(consent.grantedAt).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -311,8 +303,13 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
         month: '2-digit',
         day: '2-digit'
       }) : '',
-      source: consent.channel || consent.source || 'website',
-      version: consent.versionAccepted || 'v1.0',
+      source: consent.channel || consent.source || 'web',
+      channel: consent.channel || 'web',
+      recordSource: consent.recordSource || 'admin-dashboard',
+      capturedBy: consent.capturedBy,
+      consentDateTime: consent.grantedAt || consent.deniedAt,
+      withdrawalDateTime: consent.revokedAt,
+      version: consent.versionAccepted || '1.0',
       isRealUser: customerInfo.isRealUser,
       // Preserve raw timestamps for sorting
       grantedAt: consent.grantedAt,
@@ -340,6 +337,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     const reverseStatusMap: { [key: string]: ConsentStatus } = {
       'active': 'granted',
       'withdrawn': 'revoked',
+      'denied': 'declined',
       'expired': 'expired',
       'pending': 'pending'
     };
@@ -349,16 +347,42 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     setEditingConsent(consent);
     setEditConsentForm({
       status: reverseMapStatus(consent.status),
-      purpose: (consent.consentType === 'marketing' ? 'marketing' : 'analytics') as ConsentPurpose,
-      channel: consent.source || 'email',
-      geoLocation: 'Sri Lanka'
+      purpose: consent.consentType,
+      channel: consent.channel,
+      recordSource: consent.recordSource,
+      versionAccepted: consent.version,
+      consentDateTime: toLocalInput(consent.consentDateTime),
+      withdrawalDateTime: toLocalInput(consent.withdrawalDateTime)
     });
+    setFormError('');
     setShowEditModal(true);
   };
+  // Shared by create and edit: the checks the PDF's column rules imply.
+  const validateForm = (f: { status: ConsentStatus; consentDateTime: string; withdrawalDateTime: string }) => {
+    const needsDate = f.status !== 'pending';
+    if (needsDate && !f.consentDateTime) return 'Consent date & time is required.';
+    if (f.consentDateTime && new Date(f.consentDateTime).getTime() > Date.now()) return 'Consent date & time cannot be in the future.';
+    if (f.status === 'revoked') {
+      if (!f.withdrawalDateTime) return 'Withdrawal date & time is required for a withdrawn consent.';
+      if (new Date(f.withdrawalDateTime) < new Date(f.consentDateTime)) return 'Withdrawal cannot be before the consent date & time.';
+      if (new Date(f.withdrawalDateTime).getTime() > Date.now()) return 'Withdrawal date & time cannot be in the future.';
+    }
+    return '';
+  };
+  // Only the dates that apply to the chosen status are sent.
+  const datesFor = (f: { status: ConsentStatus; consentDateTime: string; withdrawalDateTime: string }) => ({
+    consentDateTime: f.status !== 'pending' && f.consentDateTime ? new Date(f.consentDateTime).toISOString() : undefined,
+    withdrawalDateTime: f.status === 'revoked' && f.withdrawalDateTime ? new Date(f.withdrawalDateTime).toISOString() : undefined
+  });
   const handleCreateConsent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newConsentForm.partyId) {
-      alert('Please select a customer');
+      setFormError('Please select a customer.');
+      return;
+    }
+    const problem = validateForm(newConsentForm);
+    if (problem) {
+      setFormError(problem);
       return;
     }
     try {
@@ -367,31 +391,23 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
         purpose: newConsentForm.purpose,
         status: newConsentForm.status,
         channel: newConsentForm.channel,
-        geoLocation: newConsentForm.geoLocation,
-        privacyNoticeId: newConsentForm.privacyNoticeId,
+        recordSource: newConsentForm.recordSource,
         versionAccepted: newConsentForm.versionAccepted,
+        ...datesFor(newConsentForm),
         validFor: {
           startDateTime: new Date().toISOString()
         }
       };
       await createConsent(consentData);
       setShowCreateModal(false);
-      // Reset form
-      setNewConsentForm({
-        partyId: '',
-        purpose: 'marketing',
-        status: 'granted',
-        channel: 'email',
-        geoLocation: 'Sri Lanka',
-        privacyNoticeId: 'PN-001',
-        versionAccepted: '1.0'
-      });
+      setNewConsentForm(emptyCreateForm());
+      setFormError('');
       alert('Consent created successfully!');
       // Refresh the consents data
       await refetchConsents();
     } catch (error) {
       console.error('Failed to create consent:', error);
-      alert('Failed to create consent. Please try again.');
+      setFormError('Failed to create consent. Please try again.');
     }
   };
   const handleUpdateConsent = async (e: React.FormEvent) => {
@@ -400,30 +416,29 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       alert('No consent selected for editing');
       return;
     }
+    const problem = validateForm(editConsentForm);
+    if (problem) {
+      setFormError(problem);
+      return;
+    }
     try {
       const updates = {
         status: editConsentForm.status,
         purpose: editConsentForm.purpose,
         channel: editConsentForm.channel,
-        geoLocation: editConsentForm.geoLocation,
-        lastUpdated: new Date().toISOString()
+        recordSource: editConsentForm.recordSource,
+        versionAccepted: editConsentForm.versionAccepted,
+        ...datesFor(editConsentForm)
       };
       await updateConsent(editingConsent.id, updates);
       setShowEditModal(false);
       setEditingConsent(null);
-      // Reset form
-      setEditConsentForm({
-        status: 'granted',
-        purpose: 'marketing',
-        channel: 'email',
-        geoLocation: 'Sri Lanka'
-      });
+      setFormError('');
       alert('Consent updated successfully!');
-      // Refresh the consents data
       await refetchConsents();
     } catch (error) {
       console.error('Failed to update consent:', error);
-      alert('Failed to update consent. Please try again.');
+      setFormError('Failed to update consent. Please try again.');
     }
   };
   const handleBulkAction = async (action: 'export' | 'delete' | 'update') => {
@@ -467,11 +482,14 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       id: consent.id,
       customerName: consent.customerName,
       email: consent.email,
-      consentType: consent.consentType,
-      status: consent.status,
-      grantedDate: consent.grantedDate,
+      consentType: consentTypeLabel(consent.consentType),
+      status: statusText(consent.status),
+      channel: consentChannelLabel(consent.channel),
+      source: consentSourceLabel(consent.recordSource),
+      capturedBy: consent.capturedBy,
+      consentDateTime: consent.consentDateTime,
+      withdrawalDateTime: consent.withdrawalDateTime,
       expiryDate: consent.expiryDate,
-      source: consent.source,
       version: consent.version
     }));
     const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
@@ -482,11 +500,15 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
     a.click();
     URL.revokeObjectURL(url);
   };
+  // List statuses are display buckets ('active' = granted); label them with the PDF's wording.
+  const statusText = (status: string) =>
+    consentStatusLabel(({ active: 'granted', denied: 'declined', withdrawn: 'revoked' } as Record<string, string>)[status] ?? status);
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
         return <CheckCircle className="w-4 h-4 text-green-700" />;
       case 'withdrawn':
+      case 'denied':
         return <XCircle className="w-4 h-4 text-red-600" />;
       case 'expired':
         return <AlertCircle className="w-4 h-4 text-amber-700" />;
@@ -501,6 +523,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
       case 'active':
         return 'bg-green-600/20 text-green-800';
       case 'withdrawn':
+      case 'denied':
         return 'bg-red-50 text-red-800';
       case 'expired':
         return 'bg-amber-600/20 text-amber-800';
@@ -524,22 +547,18 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
         return 'bg-white border border-slate-200 rounded-xl shadow-sm text-slate-600';
     }
   };
+  // Filter by label so old free-text purposes that read the same as a standard type merge into it.
+  const typeOptions = [...new Set([
+    ...CONSENT_TYPES.map((o) => o.label),
+    ...consents.map((c) => consentTypeLabel(c.consentType))
+  ])].map((label) => ({ value: label, label }));
   const filteredConsents = consents.filter(consent => {
     const matchesSearch = consent.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          consent.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          consent.customerId.toLowerCase().includes(searchTerm.toLowerCase());
     // Enhanced status filtering to support granted/revoked
-    let matchesStatus = false;
-    if (statusFilter === 'all') {
-      matchesStatus = true;
-    } else if (statusFilter === 'granted') {
-      matchesStatus = consent.status === 'active' || consent.status === 'granted';
-    } else if (statusFilter === 'revoked') {
-      matchesStatus = consent.status === 'withdrawn' || consent.status === 'revoked';
-    } else {
-      matchesStatus = consent.status === statusFilter;
-    }
-    const matchesType = consentTypeFilter === 'all' || consent.consentType === consentTypeFilter;
+    const matchesStatus = statusFilter === 'all' || consent.status === statusFilter;
+    const matchesType = consentTypeFilter === 'all' || consentTypeLabel(consent.consentType) === consentTypeFilter;
     return matchesSearch && matchesStatus && matchesType;
   });
   const sortedConsents = [...filteredConsents].sort((a, b) => {
@@ -565,6 +584,118 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedConsents = sortedConsents.slice(startIndex, endIndex);
+  const fieldClass = 'mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
+  type ConsentFieldsState = {
+    purpose: string;
+    status: ConsentStatus;
+    channel: string;
+    recordSource: string;
+    versionAccepted: string;
+    consentDateTime: string;
+    withdrawalDateTime: string;
+  };
+  // The CUSTOMER_CONSENT fields from the data model, shared by the create and edit dialogs.
+  // `existing` is the record being edited: its current values stay selectable even if they are
+  // not in the standard lists, so saving never silently changes them.
+  const renderConsentFields = <T extends ConsentFieldsState>(
+    prefix: string,
+    form: T,
+    setForm: (next: T) => void,
+    existing?: Consent
+  ) => (
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label htmlFor={`${prefix}-type`} className="block text-sm font-medium text-gray-700">Consent Type *</label>
+          <select id={`${prefix}-type`} value={form.purpose} onChange={(e) => setForm({ ...form, purpose: e.target.value })} className={fieldClass} required>
+            {withCurrent(CONSENT_TYPES, existing?.consentType, consentTypeLabel).map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor={`${prefix}-status`} className="block text-sm font-medium text-gray-700">Consent Status *</label>
+          <select
+            id={`${prefix}-status`}
+            value={form.status}
+            onChange={(e) => {
+              const status = e.target.value as ConsentStatus;
+              setForm({ ...form, status, consentDateTime: form.consentDateTime || nowLocalInput() });
+            }}
+            className={fieldClass}
+            required
+          >
+            {withCurrent(CONSENT_STATUSES, form.status, consentStatusLabel).map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label htmlFor={`${prefix}-channel`} className="block text-sm font-medium text-gray-700">Channel *</label>
+          <select id={`${prefix}-channel`} value={form.channel} onChange={(e) => setForm({ ...form, channel: e.target.value })} className={fieldClass} required>
+            {withCurrent(CONSENT_CHANNELS, existing?.channel, consentChannelLabel).map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor={`${prefix}-source`} className="block text-sm font-medium text-gray-700">Source *</label>
+          <select id={`${prefix}-source`} value={form.recordSource} onChange={(e) => setForm({ ...form, recordSource: e.target.value })} className={fieldClass} required>
+            {withCurrent(CONSENT_SOURCES, existing?.recordSource, consentSourceLabel).map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label htmlFor={`${prefix}-version`} className="block text-sm font-medium text-gray-700">Scope Version</label>
+          <input
+            id={`${prefix}-version`}
+            type="text"
+            value={form.versionAccepted}
+            onChange={(e) => setForm({ ...form, versionAccepted: e.target.value })}
+            className={fieldClass}
+            placeholder="1.0"
+            maxLength={20}
+          />
+        </div>
+        {form.status !== 'pending' && (
+          <div>
+            <label htmlFor={`${prefix}-consent-date`} className="block text-sm font-medium text-gray-700">Consent Date & Time *</label>
+            <input
+              id={`${prefix}-consent-date`}
+              type="datetime-local"
+              value={form.consentDateTime}
+              max={nowLocalInput()}
+              onChange={(e) => setForm({ ...form, consentDateTime: e.target.value })}
+              className={fieldClass}
+              required
+            />
+          </div>
+        )}
+      </div>
+      {form.status === 'revoked' && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor={`${prefix}-withdrawal-date`} className="block text-sm font-medium text-gray-700">Withdrawal Date & Time *</label>
+            <input
+              id={`${prefix}-withdrawal-date`}
+              type="datetime-local"
+              value={form.withdrawalDateTime}
+              min={form.consentDateTime || undefined}
+              max={nowLocalInput()}
+              onChange={(e) => setForm({ ...form, withdrawalDateTime: e.target.value })}
+              className={fieldClass}
+              required
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Loading State */}
@@ -597,7 +728,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
         </div>
         <div className="flex flex-wrap items-center gap-3 shrink-0">
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => { setNewConsentForm(emptyCreateForm()); setFormError(''); setShowCreateModal(true); }}
             className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 flex items-center gap-2 whitespace-nowrap"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden="true" />
@@ -721,12 +852,11 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                  aria-label="Filter by status">
                   <option value="all">All Status</option>
-                  <option value="active">Active/Granted</option>
-                  <option value="withdrawn">Withdrawn/Revoked</option>
-                  <option value="granted">Granted</option>
-                  <option value="revoked">Revoked</option>
+                  <option value="active">Granted</option>
+                  <option value="denied">Denied</option>
+                  <option value="withdrawn">Withdrawn</option>
+                  <option value="pending">Not Responded</option>
                   <option value="expired">Expired</option>
-                  <option value="pending">Pending</option>
                 </select>
                 <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               </div>
@@ -737,10 +867,9 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                  aria-label="Filter by type">
                   <option value="all">All Types</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="analytics">Analytics</option>
-                  <option value="functional">Functional</option>
-                  <option value="necessary">Necessary</option>
+                  {typeOptions.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
                 </select>
                 <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-500 w-4 h-4" />
               </div>
@@ -759,7 +888,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   <div className="flex items-center space-x-3">
                     <input
                       type="checkbox"
-                      aria-label={`Select ${consent.consentType} consent for ${consent.customerName}`}
+                      aria-label={`Select ${consentTypeLabel(consent.consentType)} consent for ${consent.customerName}`}
                       checked={selectedConsents.has(consent.id)}
                       onChange={() => handleSelectConsent(consent.id)}
                       className="rounded border-gray-300 text-red-600 focus:ring-red-500"
@@ -792,16 +921,16 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
                     <span className="text-slate-600">Type:</span>
-                    <span className={`ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium capitalize ${getConsentTypeColor(consent.consentType)}`}>
-                      {consent.consentType}
+                    <span className={`ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${getConsentTypeColor(consent.consentType)}`}>
+                      {consentTypeLabel(consent.consentType)}
                     </span>
                   </div>
                   <div>
                     <span className="text-slate-600">Status:</span>
                     <div className="flex items-center ml-1">
                       {getStatusIcon(consent.status)}
-                      <span className={`ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(consent.status)}`}>
-                        {consent.status}
+                      <span className={`ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(consent.status)}`}>
+                        {statusText(consent.status)}
                       </span>
                     </div>
                   </div>
@@ -810,9 +939,9 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     <span className="ml-1 text-slate-900">{new Date(consent.grantedDate).toLocaleDateString()}</span>
                   </div>
                   <div>
-                    <span className="text-slate-600">Source:</span>
-                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white text-gray-800 capitalize">
-                      {consent.source}
+                    <span className="text-slate-600">Channel:</span>
+                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-white text-gray-800">
+                      {consentChannelLabel(consent.channel)}
                     </span>
                   </div>
                 </div>
@@ -869,7 +998,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   }}
                 >
                   <div className="flex items-center space-x-1">
-                    <span>Grant/Revoke Date</span>
+                    <span>Consent / Withdrawal Date</span>
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortBy === 'date' && sortOrder === 'desc' ? 'rotate-180' : ''}`} />
                   </div>
                 </th>
@@ -877,7 +1006,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   Expiry Date
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
-                  Source
+                  Channel
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
                   Actions
@@ -890,7 +1019,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="checkbox"
-                      aria-label={`Select ${consent.consentType} consent for ${consent.customerName}`}
+                      aria-label={`Select ${consentTypeLabel(consent.consentType)} consent for ${consent.customerName}`}
                       checked={selectedConsents.has(consent.id)}
                       onChange={() => handleSelectConsent(consent.id)}
                       className="rounded border-gray-300 text-red-600 focus:ring-red-500"
@@ -909,15 +1038,15 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getConsentTypeColor(consent.consentType)}`}>
-                      {consent.consentType}
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getConsentTypeColor(consent.consentType)}`}>
+                      {consentTypeLabel(consent.consentType)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       {getStatusIcon(consent.status)}
-                      <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(consent.status)}`}>
-                        {consent.status}
+                      <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(consent.status)}`}>
+                        {statusText(consent.status)}
                       </span>
                     </div>
                   </td>
@@ -933,7 +1062,7 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                             return (
                               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                                 dateInfo.action === 'Granted' ? 'bg-green-100 text-green-800' :
-                                dateInfo.action === 'Revoked' ? 'bg-red-100 text-red-800' :
+                                dateInfo.action === 'Withdrawn' || dateInfo.action === 'Denied' ? 'bg-red-100 text-red-800' :
                                 'bg-gray-100 text-gray-800'
                               }`}>
                                 {dateInfo.action}
@@ -973,8 +1102,8 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white border border-slate-200 text-gray-800 capitalize">
-                      {consent.source}
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white border border-slate-200 text-gray-800">
+                      {consentChannelLabel(consent.channel)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -1070,10 +1199,12 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
                 <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Consent Details</h4>
                   <div className="bg-white border border-slate-200 rounded-lg p-4 space-y-2">
-                    <p><span className="font-medium">Type:</span> {modalData.consentType}</p>
-                    <p><span className="font-medium">Status:</span> {modalData.status}</p>
-                    <p><span className="font-medium">Source:</span> {modalData.source}</p>
-                    <p><span className="font-medium">Version:</span> {modalData.version}</p>
+                    <p><span className="font-medium">Type:</span> {consentTypeLabel(modalData.consentType)}</p>
+                    <p><span className="font-medium">Status:</span> {statusText(modalData.status)}</p>
+                    <p><span className="font-medium">Channel:</span> {consentChannelLabel(modalData.channel)}</p>
+                    <p><span className="font-medium">Source:</span> {consentSourceLabel(modalData.recordSource)}</p>
+                    <p><span className="font-medium">Captured By:</span> {modalData.capturedBy || '—'}</p>
+                    <p><span className="font-medium">Scope Version:</span> {modalData.version}</p>
                   </div>
                 </div>
               </div>
@@ -1125,111 +1256,43 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Create New Consent</h3>
-              <button onClick={() => setShowCreateModal(false)} className="text-slate-500 hover:text-gray-600">
+              <button onClick={() => setShowCreateModal(false)} className="text-slate-500 hover:text-gray-600" aria-label="Close">
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form onSubmit={handleCreateConsent}>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Customer *</label>
-                  <select
-                    value={newConsentForm.partyId}
-                    onChange={(e) => setNewConsentForm({ ...newConsentForm, partyId: e.target.value })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                   aria-label="Customer">
-                    <option value="">Select Customer</option>
-                    {parties.map((party: any) => (
-                      <option key={party.id} value={party.id}>
-                        {party.name} - {party.email}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Purpose *</label>
-                  <select
-                    value={newConsentForm.purpose}
-                    onChange={(e) => setNewConsentForm({ ...newConsentForm, purpose: e.target.value as ConsentPurpose })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                   aria-label="Purpose">
-                    <option value="marketing">Marketing</option>
-                    <option value="analytics">Analytics</option>
-                    <option value="thirdPartySharing">Third Party Sharing</option>
-                    <option value="dataProcessing">Data Processing</option>
-                    <option value="location">Location</option>
-                    <option value="research">Research</option>
-                    <option value="personalization">Personalization</option>
-                  </select>
-                </div>
+            <form onSubmit={handleCreateConsent} noValidate>
+              <div className="mb-4">
+                <label htmlFor="create-customer" className="block text-sm font-medium text-gray-700">Customer *</label>
+                <select
+                  id="create-customer"
+                  value={newConsentForm.partyId}
+                  onChange={(e) => setNewConsentForm({ ...newConsentForm, partyId: e.target.value })}
+                  className={fieldClass}
+                  required
+                >
+                  <option value="">Select Customer</option>
+                  {parties.map((party: any) => (
+                    <option key={party.id} value={party.id}>
+                      {party.name} - {party.email}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Status *</label>
-                  <select
-                    value={newConsentForm.status}
-                    onChange={(e) => setNewConsentForm({ ...newConsentForm, status: e.target.value as ConsentStatus })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                   aria-label="Status">
-                    <option value="granted">Granted</option>
-                    <option value="pending">Pending</option>
-                    <option value="revoked">Revoked</option>
-                    <option value="expired">Expired</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Channel *</label>
-                  <select
-                    value={newConsentForm.channel}
-                    onChange={(e) => setNewConsentForm({ ...newConsentForm, channel: e.target.value })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                   aria-label="Channel">
-                    <option value="email">Email</option>
-                    <option value="sms">SMS</option>
-                    <option value="push">Push</option>
-                    <option value="voice">Voice</option>
-                    <option value="all">All</option>
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Geo Location</label>
-                  <input
-                    type="text"
-                    value={newConsentForm.geoLocation}
-                    onChange={(e) => setNewConsentForm({ ...newConsentForm, geoLocation: e.target.value })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Sri Lanka"
-                   aria-label="Geo Location"/>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Privacy Notice ID</label>
-                  <input
-                    type="text"
-                    value={newConsentForm.privacyNoticeId}
-                    onChange={(e) => setNewConsentForm({ ...newConsentForm, privacyNoticeId: e.target.value })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="PN-001"
-                   aria-label="Privacy Notice ID"/>
-                </div>
-              </div>
+              {renderConsentFields('create', newConsentForm, setNewConsentForm)}
               <div className="mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Version</label>
-                  <input
-                    type="text"
-                    value={newConsentForm.versionAccepted}
-                    onChange={(e) => setNewConsentForm({ ...newConsentForm, versionAccepted: e.target.value })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="1.0"
-                   aria-label="Version"/>
-                </div>
+                <label htmlFor="create-captured-by" className="block text-sm font-medium text-gray-700">Captured By</label>
+                <input
+                  id="create-captured-by"
+                  type="text"
+                  value={user?.email || ''}
+                  readOnly
+                  className={`${fieldClass} bg-gray-50 text-gray-600`}
+                />
+                <p className="mt-1 text-xs text-slate-600">Recorded automatically from your sign-in.</p>
               </div>
+              {formError && (
+                <div role="alert" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-slate-900">{formError}</div>
+              )}
               <div className="flex justify-end space-x-3">
                 <button
                   type="button"
@@ -1255,90 +1318,38 @@ const ConsentOverviewTable: React.FC<ConsentOverviewTableProps> = () => {
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 id="consentoverviewtable-dialog-3-title" className="text-lg font-semibold text-gray-900">Edit Consent - {editingConsent.customerName}</h3>
-              <button onClick={() => setShowEditModal(false)} className="text-slate-500 hover:text-gray-600">
+              <button onClick={() => setShowEditModal(false)} className="text-slate-500 hover:text-gray-600" aria-label="Close">
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form onSubmit={handleUpdateConsent}>
+            <form onSubmit={handleUpdateConsent} noValidate>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Customer</label>
-                <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-600">
+                <span className="block text-sm font-medium text-gray-700">Customer</span>
+                <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-600 break-words">
                   {editingConsent.customerName} - {editingConsent.email}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Purpose *</label>
-                  <select
-                    value={editConsentForm.purpose}
-                    onChange={(e) => setEditConsentForm({ ...editConsentForm, purpose: e.target.value as ConsentPurpose })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                   aria-label="Purpose">
-                    <option value="marketing">Marketing</option>
-                    <option value="analytics">Analytics</option>
-                    <option value="thirdPartySharing">Third Party Sharing</option>
-                    <option value="dataProcessing">Data Processing</option>
-                    <option value="location">Location</option>
-                    <option value="research">Research</option>
-                    <option value="personalization">Personalization</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Status *</label>
-                  <select
-                    value={editConsentForm.status}
-                    onChange={(e) => setEditConsentForm({ ...editConsentForm, status: e.target.value as ConsentStatus })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                   aria-label="Status">
-                    <option value="granted">Granted</option>
-                    <option value="pending">Pending</option>
-                    <option value="revoked">Revoked</option>
-                    <option value="expired">Expired</option>
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Channel *</label>
-                  <select
-                    value={editConsentForm.channel}
-                    onChange={(e) => setEditConsentForm({ ...editConsentForm, channel: e.target.value })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                   aria-label="Channel">
-                    <option value="email">Email</option>
-                    <option value="sms">SMS</option>
-                    <option value="push">Push</option>
-                    <option value="voice">Voice</option>
-                    <option value="all">All</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Geo Location</label>
-                  <input
-                    type="text"
-                    value={editConsentForm.geoLocation}
-                    onChange={(e) => setEditConsentForm({ ...editConsentForm, geoLocation: e.target.value })}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Sri Lanka"
-                   aria-label="Geo Location"/>
-                </div>
-              </div>
+              {renderConsentFields('edit', editConsentForm, setEditConsentForm, editingConsent)}
               <div className="mb-4 p-4 bg-gray-50 rounded-lg">
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Consent Information</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div className="min-w-0 sm:col-span-2">
                     <span className="text-gray-600">Consent ID:</span>
-                    <div className="font-mono text-gray-900">{editingConsent.id}</div>
+                    <div className="font-mono text-gray-900 break-all">{editingConsent.id}</div>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <span className="text-gray-600">Original Date:</span>
-                    <div className="text-gray-900">{editingConsent.grantedDate}</div>
+                    <div className="text-gray-900">{editingConsent.grantedDate || '—'}</div>
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-gray-600">Captured By:</span>
+                    <div className="text-gray-900 break-words">{editingConsent.capturedBy || '—'}</div>
                   </div>
                 </div>
               </div>
+              {formError && (
+                <div role="alert" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-slate-900">{formError}</div>
+              )}
               <div className="flex justify-end space-x-3">
                 <button
                   type="button"
