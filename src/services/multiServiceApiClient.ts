@@ -280,11 +280,13 @@ export class MultiServiceApiClient {
       let client: AxiosInstance;
       let fullEndpoint: string;
       // Get auth token for authenticated requests
+      // Skip token for public auth endpoints (login, register) to avoid stale token 401s
+      const isPublicAuthEndpoint = endpoint.includes('/auth/login') || endpoint.includes('/auth/register');
       const token = localStorage.getItem('authToken');
       const headers: any = {
         'Content-Type': 'application/json'
       };
-      if (token) {
+      if (token && !isPublicAuthEndpoint) {
         headers['Authorization'] = `Bearer ${token}`;
       }
       // Choose specific service client if provided
