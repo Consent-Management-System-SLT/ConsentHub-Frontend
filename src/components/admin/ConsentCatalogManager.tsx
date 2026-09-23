@@ -56,7 +56,7 @@ const ConsentCatalogManager: React.FC = () => {
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const masterOptions = (catalog?.masters ?? []).map((m) => ({ value: String(m.consentId), label: `${m.consentName} (${m.consentCode})` }));
+  const masterOptions = (catalog?.masters ?? []).map((m) => ({ value: String(m.consentId), label: `${m.consentId} — ${m.consentName} (${m.consentCode})` }));
   const masterName = (id: number) => catalog?.masters.find((m) => m.consentId === id)?.consentName ?? `#${id}`;
 
   const FIELDS: Record<Tab, Field[]> = {
@@ -67,7 +67,7 @@ const ConsentCatalogManager: React.FC = () => {
       { name: 'isActive', label: 'Status', kind: 'select', options: ACTIVE, required: true },
     ],
     scopes: [
-      { name: 'consentId', label: 'Consent Type', kind: 'select', options: masterOptions, required: true, createOnly: true },
+      { name: 'consentId', label: 'Consent Type ID', kind: 'select', options: masterOptions, required: true, createOnly: true },
       { name: 'scopeVersion', label: 'Version', required: true, hint: 'e.g. 2.0' },
       { name: 'scopeType', label: 'Scope Type', required: true, hint: 'e.g. DOCUMENT' },
       { name: 'scopeCode', label: 'Scope Code', required: true },
@@ -128,10 +128,11 @@ const ConsentCatalogManager: React.FC = () => {
 
   const tables: Record<Tab, { head: string[]; rows: () => React.ReactNode }> = {
     scopes: {
-      head: ['ID', 'Consent Type', 'Version', 'Scope', 'Status', 'Effective From', 'Effective To', 'Active', 'Customers', ''],
+      head: ['Version ID', 'Consent Type ID', 'Consent Type', 'Version', 'Scope', 'Status', 'Effective From', 'Effective To', 'Active', 'Customers', ''],
       rows: () => (catalog?.scopes ?? []).map((s: ConsentScopeRow) => (
         <tr key={s.consentScopeId} className="hover:bg-slate-50">
           <td className={`${td} font-mono`}>{s.consentScopeId}</td>
+          <td className={`${td} font-mono`}>{s.consentId}</td>
           <td className={td}>{masterName(s.consentId)}</td>
           <td className={`${td} font-medium`}>{s.scopeVersion}</td>
           <td className={td}><div>{s.scopeName}</div><div className="text-xs text-slate-600 font-mono">{s.scopeType} · {s.scopeCode}</div></td>
