@@ -4,10 +4,10 @@ import Modal from '../shared/Modal';
 import { notificationManager } from '../shared/NotificationContainer';
 import { toLocalInput } from '../../utils/consentModel';
 import {
-  consentCatalogService, ConsentCatalog, ConsentCategory, ConsentMaster, ConsentScopeRow,
+  consentCatalogService, ConsentCatalog, ConsentCategory, ConsentScopeRow,
 } from '../../services/consentCatalogService';
 
-type Tab = 'masters' | 'scopes' | 'categories';
+type Tab = 'scopes' | 'categories';
 type Row = Record<string, unknown>;
 
 interface Field {
@@ -21,7 +21,6 @@ interface Field {
   hint?: string;
 }
 
-const YES_NO = [{ value: 'Y', label: 'Yes' }, { value: 'N', label: 'No' }];
 const ACTIVE = [{ value: 'Y', label: 'Active' }, { value: 'N', label: 'Inactive' }];
 const SCOPE_STATUSES = ['DRAFT', 'UNDER_REVIEW', 'APPROVAL_PENDING', 'APPROVED', 'PLANNED', 'ACTIVE', 'REJECTED', 'RETIRED']
   .map((v) => ({ value: v, label: v.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) }));
@@ -41,7 +40,7 @@ const Chip: React.FC<{ on: boolean; onLabel?: string; offLabel?: string }> = ({ 
 const ConsentCatalogManager: React.FC = () => {
   const [catalog, setCatalog] = useState<ConsentCatalog | null>(null);
   const [loadError, setLoadError] = useState('');
-  const [tab, setTab] = useState<Tab>('masters');
+  const [tab, setTab] = useState<Tab>('scopes');
   const [editor, setEditor] = useState<{ row: Row | null } | null>(null); // row null = create
   const [values, setValues] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState('');
@@ -57,26 +56,14 @@ const ConsentCatalogManager: React.FC = () => {
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const categoryOptions = (catalog?.categories ?? []).map((c) => ({ value: c.categoryCode, label: c.categoryName }));
   const masterOptions = (catalog?.masters ?? []).map((m) => ({ value: String(m.consentId), label: `${m.consentName} (${m.consentCode})` }));
   const masterName = (id: number) => catalog?.masters.find((m) => m.consentId === id)?.consentName ?? `#${id}`;
-  const categoryName = (code: string) => catalog?.categories.find((c) => c.categoryCode === code)?.categoryName ?? code;
 
   const FIELDS: Record<Tab, Field[]> = {
     categories: [
       { name: 'categoryCode', label: 'Category Code', required: true, createOnly: true, hint: 'Capital letters, digits and underscores, e.g. COMMUNICATION' },
       { name: 'categoryName', label: 'Category Name', required: true },
       { name: 'description', label: 'Description', kind: 'textarea' },
-      { name: 'isActive', label: 'Status', kind: 'select', options: ACTIVE, required: true },
-    ],
-    masters: [
-      { name: 'consentCode', label: 'Consent Code', required: true, createOnly: true, hint: 'Capital letters, digits and underscores. Cannot be changed later.' },
-      { name: 'consentName', label: 'Consent Name', required: true },
-      { name: 'consentCategory', label: 'Consent Category', kind: 'select', options: categoryOptions, required: true },
-      { name: 'isMandatory', label: 'Mandatory', kind: 'select', options: YES_NO, required: true },
-      { name: 'description', label: 'Description', kind: 'textarea' },
-      { name: 'purpose', label: 'Purpose', kind: 'textarea' },
-      { name: 'applicability', label: 'Applicability', hint: 'Who this applies to, e.g. All active customers' },
       { name: 'isActive', label: 'Status', kind: 'select', options: ACTIVE, required: true },
     ],
     scopes: [
@@ -99,7 +86,6 @@ const ConsentCatalogManager: React.FC = () => {
     }
     if (!row) {
       if (tab === 'scopes') Object.assign(start, { status: 'DRAFT', scopeType: 'DOCUMENT', effectiveFrom: toLocalInput(new Date().toISOString()).slice(0, 10) });
-      if (tab === 'masters') Object.assign(start, { isMandatory: 'N', isActive: 'Y', consentCategory: categoryOptions[0]?.value ?? '' });
       if (tab === 'categories') start.isActive = 'Y';
     }
     setValues(start);
@@ -123,7 +109,6 @@ const ConsentCatalogManager: React.FC = () => {
     setSaving(true);
     try {
       if (tab === 'categories') await (row ? consentCatalogService.updateCategory(String(row.categoryCode), body) : consentCatalogService.createCategory(body));
-      else if (tab === 'masters') await (row ? consentCatalogService.updateMaster(Number(row.consentId), body) : consentCatalogService.createMaster(body));
       else await (row ? consentCatalogService.updateScope(Number(row.consentScopeId), body) : consentCatalogService.createScope(body));
       setEditor(null);
       notificationManager.success('Saved', row ? 'The change was saved.' : 'Created.');
@@ -142,24 +127,6 @@ const ConsentCatalogManager: React.FC = () => {
   );
 
   const tables: Record<Tab, { head: string[]; rows: () => React.ReactNode }> = {
-    masters: {
-      head: ['ID', 'Code', 'Name', 'Category', 'Mandatory', 'Status', 'Purpose', 'Applicability', 'Created', 'Updated', ''],
-      rows: () => (catalog?.masters ?? []).map((m: ConsentMaster) => (
-        <tr key={m.consentId} className="hover:bg-slate-50">
-          <td className={`${td} font-mono`}>{m.consentId}</td>
-          <td className={`${td} font-mono text-xs`}>{m.consentCode}</td>
-          <td className={td}><div className="font-medium">{m.consentName}</div><div className="text-xs text-slate-600 max-w-xs">{m.description}</div></td>
-          <td className={td}>{categoryName(m.consentCategory)}</td>
-          <td className={td}><Chip on={m.isMandatory === 'Y'} onLabel="Mandatory" offLabel="Optional" /></td>
-          <td className={td}><Chip on={m.isActive === 'Y'} /></td>
-          <td className={`${td} max-w-xs`}>{m.purpose || '—'}</td>
-          <td className={td}>{m.applicability || '—'}</td>
-          <td className={`${td} whitespace-nowrap`}>{show(m.createdDate)}<div className="text-xs text-slate-600">{m.createdBy}</div></td>
-          <td className={`${td} whitespace-nowrap`}>{show(m.updatedDate)}<div className="text-xs text-slate-600">{m.updatedBy}</div></td>
-          <td className={td}>{editButton(m as unknown as Row, m.consentName)}</td>
-        </tr>
-      )),
-    },
     scopes: {
       head: ['ID', 'Consent Type', 'Version', 'Scope', 'Status', 'Effective From', 'Effective To', 'Active', 'Customers', ''],
       rows: () => (catalog?.scopes ?? []).map((s: ConsentScopeRow) => (
@@ -194,7 +161,6 @@ const ConsentCatalogManager: React.FC = () => {
   };
 
   const TABS: { id: Tab; label: string; noun: string }[] = [
-    { id: 'masters', label: 'Consent Types', noun: 'Consent Type' },
     { id: 'scopes', label: 'Versions', noun: 'Version' },
     { id: 'categories', label: 'Categories', noun: 'Category' },
   ];
@@ -206,7 +172,7 @@ const ConsentCatalogManager: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-slate-900">Consent Catalog</h1>
-          <p className="text-slate-600">The consent types customers are asked about, their versions and categories.</p>
+          <p className="text-slate-600">Manage consent versions and their categories.</p>
         </div>
         <div className="flex gap-2">
           <button onClick={load} className="inline-flex items-center gap-2 bg-white border border-gray-300 text-slate-800 hover:bg-slate-50 text-sm font-medium rounded-lg px-4 py-2"><RefreshCw className="w-4 h-4" aria-hidden="true" />Refresh</button>

@@ -4,7 +4,8 @@ import DashboardHeader from './shared/DashboardHeader';
 import DashboardFooter from './shared/DashboardFooter';
 import AdminSidebar from './admin/AdminSidebar';
 import DashboardHome from './admin/DashboardHome';
-import ConsentOverviewTable from './admin/ConsentOverviewTable';
+import CustomerConsentsTable from './admin/CustomerConsentsTable';
+import ConsentManagement from './admin/ConsentManagement';
 import ConsentCatalogManager from './admin/ConsentCatalogManager';
 import GuardianConsent from './admin/GuardianConsent';
 import PreferenceManagement from './admin/PreferenceManagementNew';
@@ -42,7 +43,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ className = '' }) => {
       case 'enterprise-campaigns':
         return <EnterpriseCampaignReview />;
       case 'consents':
-        return <ConsentOverviewTable />;
+        return <CustomerConsentsTable />;
+      case 'consent-management':
+        return <ConsentManagement />;
       case 'consent-catalog':
         return <ConsentCatalogManager />;
       case 'guardian-consent':
