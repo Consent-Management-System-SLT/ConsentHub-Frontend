@@ -46,19 +46,39 @@ export interface CustomerData {
   guardianFor?: string[];
 }
 export interface ConsentData {
+  // PDF CUSTOMER_CONSENT columns (from SLT_Consent_Management_Data_Model.pdf)
+  customerConsentId: number;
+  customerId: string;
+  consentScopeId: number;
+  consentStatus: 'GRANTED' | 'DENIED' | 'WITHDRAWN' | 'NOT_RESPONDED';
+  channel: string;
+  source: string;
+  consentDateTime?: string | null;
+  withdrawalDateTime?: string | null;
+  capturedBy: string;
+  createdDate: string;
+  updatedDate?: string;
+  // Joined from CONSENT_MASTER / CONSENT_SCOPE
+  consentName?: string;
+  consentCode?: string;
+  consentCategory?: string;
+  categoryName?: string;
+  isMandatory?: 'Y' | 'N';
+  scopeVersion?: string;
+  scopeCode?: string;
+  description?: string;
+  // Legacy aliases still returned by toApi() for backward compatibility
   id: string;
   partyId: string;
-  customerId: string;
-  type: string;
-  purpose: string;
-  status: string;
-  grantedAt?: string;
-  deniedAt?: string;
-  expiresAt?: string;
-  source: string;
-  lawfulBasis: string;
+  purpose?: string;
+  type?: string;
+  status?: string;
+  grantedAt?: string | null;
+  deniedAt?: string | null;
+  revokedAt?: string | null;
+  expiresAt?: string | null;
+  lawfulBasis?: string;
   category?: string;
-  description?: string;
 }
 export interface DSARRequest {
   id: string;

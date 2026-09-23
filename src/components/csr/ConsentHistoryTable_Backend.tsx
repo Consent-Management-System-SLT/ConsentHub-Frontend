@@ -125,7 +125,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       console.log(' Received real-time consent update:', event);
       // Show notification
       const customerName = getCustomerName(event.consent.partyId || event.consent.userId) || event.user.email;
-      const purposeName = formatPurposeName(event.consent.purpose);
+      const purposeName = event.consent.consentName || formatPurposeName(event.consent.purpose || '');
       if (event.type === 'granted') {
         notificationManager.success(
           'Consent Granted',
@@ -157,7 +157,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
         return updatedConsents.sort((a, b) => {
           // Use the most recent date available for sorting
           const getLatestDate = (consent: any) => {
-            const dates = [consent.grantedAt, consent.deniedAt, consent.updatedAt, consent.createdAt].filter(Boolean);
+            const dates = [consent.consentDateTime, consent.withdrawalDateTime, consent.updatedDate, consent.createdDate, (consent as any).updatedAt, (consent as any).createdAt].filter(Boolean);
             if (dates.length === 0) return new Date(0);
             return new Date(Math.max(...dates.map(d => new Date(d).getTime())));
           };
@@ -257,7 +257,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
       const sortedConsents = filteredConsents.sort((a, b) => {
         // Use the most recent date available (grantedAt or deniedAt)
         const getLatestDate = (consent: any) => {
-          const dates = [consent.grantedAt, consent.deniedAt, consent.updatedAt, consent.createdAt].filter(Boolean);
+          const dates = [consent.consentDateTime, consent.withdrawalDateTime, consent.updatedDate, consent.createdDate, (consent as any).updatedAt, (consent as any).createdAt].filter(Boolean);
           if (dates.length === 0) return new Date(0);
           return new Date(Math.max(...dates.map(d => new Date(d).getTime())));
         };
@@ -289,20 +289,18 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
     return customer ? customer.name : `Customer ${partyId}`;
   };
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'granted':
-        return 'bg-green-100 text-green-800';
-      case 'revoked':
-        return 'bg-red-100 text-red-800';
-      case 'denied':
-        return 'bg-red-100 text-red-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'expired':
-        return 'bg-white border border-slate-200 text-slate-600';
-      default:
-        return 'bg-white border border-slate-200 text-slate-600';
-    }
+    const s = status?.toUpperCase();
+    if (s === 'GRANTED' || s === 'granted') return 'bg-green-100 text-green-800';
+    if (s === 'DENIED' || s === 'denied' || s === 'revoked' || s === 'WITHDRAWN') return 'bg-red-100 text-red-800';
+    if (s === 'NOT_RESPONDED' || s === 'pending') return 'bg-yellow-100 text-yellow-800';
+    return 'bg-white border border-slate-200 text-slate-600';
+  };
+  const displayStatus = (status: string) => {
+    const map: Record<string, string> = {
+      GRANTED: 'Granted', DENIED: 'Denied', WITHDRAWN: 'Withdrawn', NOT_RESPONDED: 'Not Responded',
+      granted: 'Granted', revoked: 'Withdrawn', denied: 'Denied', pending: 'Not Responded',
+    };
+    return map[status] || status;
   };
   const handleViewDetails = (consent: any) => {
     setSelectedConsent(consent);
@@ -451,24 +449,26 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-900">{formatPurposeName(consent.purpose)}</div>
+                    <div className="text-sm text-slate-900">{consent.consentName || formatPurposeName(consent.purpose || '')}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(consent.status)}`}>
-                      {consent.status}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(consent.consentStatus || consent.status || '')}`}>
+                      {displayStatus(consent.consentStatus || consent.status || '')}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-slate-900">
-                      {formatDate(consent.lastModified || consent.updatedAt || consent.createdAt)}
+                      {formatDate(consent.updatedDate || consent.consentDateTime || (consent as any).updatedAt || (consent as any).createdAt)}
                     </div>
                     <div className="text-xs text-slate-500">
-                      {new Date(consent.lastModified || consent.updatedAt || consent.createdAt).toLocaleTimeString()}
+                      {consent.capturedBy || ''}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-slate-900">{consent.channel || 'All Channels'}</div>
-                    <div className="text-xs text-slate-500">{consent.consentType || 'Standard'}</div>
+                    <div className="text-sm text-slate-900">
+                      {consent.channel ? consent.channel.replace(/_/g,' ').toLowerCase().replace(/\b\w/g,(c:string)=>c.toUpperCase()) : '—'}
+                    </div>
+                    <div className="text-xs text-slate-500">{consent.scopeVersion ? `v${consent.scopeVersion}` : ''}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
@@ -518,8 +518,8 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                       </div>
                       <div className="text-right">
                         <label className="block text-sm font-medium text-gray-700">Current Status</label>
-                        <span className={`inline-flex px-4 py-2 rounded-full text-sm font-medium mt-1 ${getStatusColor(selectedConsent.status)}`}>
-                          {selectedConsent.status.toUpperCase()}
+                        <span className={`inline-flex px-4 py-2 rounded-full text-sm font-medium mt-1 ${getStatusColor(selectedConsent.consentStatus || selectedConsent.status || '')}`}>
+                          {displayStatus(selectedConsent.consentStatus || selectedConsent.status || '')}
                         </span>
                       </div>
                     </div>
@@ -529,8 +529,8 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Purpose</label>
                   <div className="mt-1 bg-white border border-slate-200 p-3 rounded-lg">
-                    <p className="text-lg text-slate-900 font-medium">{formatPurposeName(selectedConsent.purpose)}</p>
-                    <p className="text-sm text-slate-500 mt-1">{generateDescription(selectedConsent.purpose)}</p>
+                    <p className="text-lg text-slate-900 font-medium">{selectedConsent.consentName || formatPurposeName(selectedConsent.purpose || '')}</p>
+                    <p className="text-sm text-slate-500 mt-1">{selectedConsent.description || generateDescription(selectedConsent.purpose || '')}</p>
                   </div>
                 </div>
                 {/* Consent ID - Full Width with Copy */}
@@ -538,7 +538,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                   <label className="block text-sm font-medium text-gray-700">Consent ID</label>
                   <div className="mt-1 bg-slate-100 border border-slate-300 p-4 rounded-lg">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-slate-800 font-mono break-all pr-4 font-semibold">{selectedConsent.id}</p>
+                      <p className="text-sm text-slate-800 font-mono break-all pr-4 font-semibold">{selectedConsent.customerConsentId || selectedConsent.id}</p>
                       <button 
                         onClick={() => handleCopyToClipboard(selectedConsent.id)}
                         className={`flex-shrink-0 px-3 py-1 text-white text-xs rounded transition-all duration-200 ${
@@ -564,18 +564,18 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                       <div className="flex justify-between items-start">
                         <div>
                           <label className="block text-sm font-medium text-gray-700">Created Date</label>
-                          <p className="mt-1 text-sm text-slate-900">{formatDate(selectedConsent.createdAt)}</p>
+                          <p className="mt-1 text-sm text-slate-900">{formatDate(selectedConsent.createdDate || (selectedConsent as any).createdAt)}</p>
                           <p className="text-xs text-slate-500">
-                            {new Date(selectedConsent.createdAt).toLocaleString()}
+                            {new Date(selectedConsent.createdDate || (selectedConsent as any).createdAt).toLocaleString()}
                           </p>
                         </div>
                         <div className="text-right">
                           <label className="block text-sm font-medium text-gray-700">Last Modified</label>
                           <p className="mt-1 text-sm text-slate-900">
-                            {formatDate(selectedConsent.lastModified || selectedConsent.updatedAt || selectedConsent.createdAt)}
+                            {formatDate(selectedConsent.updatedDate || (selectedConsent as any).lastModified || (selectedConsent as any).updatedAt || selectedConsent.createdDate)}
                           </p>
                           <p className="text-xs text-slate-500">
-                            {new Date(selectedConsent.lastModified || selectedConsent.updatedAt || selectedConsent.createdAt).toLocaleString()}
+                            {new Date(selectedConsent.updatedDate || (selectedConsent as any).lastModified || (selectedConsent as any).updatedAt || selectedConsent.createdDate).toLocaleString()}
                           </p>
                         </div>
                       </div>
@@ -588,15 +588,15 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Channel</label>
-                      <p className="mt-1 text-sm text-slate-900">{selectedConsent.channel || 'All Channels'}</p>
+                      <p className="mt-1 text-sm text-slate-900">{selectedConsent.channel ? selectedConsent.channel.replace(/_/g,' ').toLowerCase().replace(/\b\w/g,(c:string)=>c.toUpperCase()) : '—'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Consent Type</label>
-                      <p className="mt-1 text-sm text-slate-900">{selectedConsent.consentType || 'Standard'}</p>
+                      <p className="mt-1 text-sm text-slate-900">{selectedConsent.consentCode ? `${selectedConsent.consentCode}${selectedConsent.scopeVersion ? ' v'+selectedConsent.scopeVersion : ''}` : '—'}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Legal Basis</label>
-                      <p className="mt-1 text-sm text-slate-900">{selectedConsent.lawfulBasis || 'Consent'}</p>
+                      <label className="block text-sm font-medium text-gray-700">Captured By</label>
+                      <p className="mt-1 text-sm text-slate-900">{selectedConsent.capturedBy || '—'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Source</label>

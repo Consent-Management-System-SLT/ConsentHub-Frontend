@@ -1,105 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Search, 
-  User, 
-  Shield, 
-  Check, 
-  X, 
-  Clock,
-  RefreshCw,
-  Edit,
-  Eye,
-  History,
-  FileText,
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  Filter
+import {
+  Search, User, Shield, Check, X, Clock, RefreshCw, Edit, ChevronDown, ChevronUp, Filter
 } from 'lucide-react';
 import { csrDashboardService, CustomerData, ConsentData } from '../../services/csrDashboardService';
 import { websocketService } from '../../services/websocketService';
 import { notificationManager } from '../shared/NotificationContainer';
-// Function to format consent purpose names properly
-const formatPurposeName = (purpose: string): string => {
-  if (!purpose) return 'Unknown Purpose';
-  const purposeMap: { [key: string]: string } = {
-    'termsandconditions': 'Terms & Conditions',
-    'privacypolicy': 'Privacy Policy',
-    'servicecommunication': 'Service Communications',
-    'personalizedoffers': 'Personalized Offers',
-    'partneroffers': 'Partner Offers',
-    'customerfeedback': 'Customer Feedback',
-    'research': 'Research & Analytics',
-    'dataprocessing': 'Data Processing',
-    'dataProcessing': 'Data Processing',
-    'marketing': 'Marketing Communications',
-    'analytics': 'Analytics & Performance',
-    'personalization': 'Personalization Services',
-    'communication': 'Communication Services',
-    'advertising': 'Advertising & Promotions',
-    'profiling': 'User Profiling',
-    'thirdparty': 'Third Party Sharing',
-    'thirdParty': 'Third Party Sharing',
-    'cookies': 'Cookies & Tracking',
-    'location': 'Location Services',
-    'biometric': 'Biometric Data Processing',
-    'financial': 'Financial Services',
-    'health': 'Health Data Processing',
-    'essential': 'Essential Services',
-    'email': 'Email Communications',
-    'sms': 'SMS Communications',
-    'push': 'Push Notifications',
-    'data_sharing': 'Data Sharing'
-  };
-  // If we have a mapping, use it
-  const lowerPurpose = purpose.toLowerCase();
-  if (purposeMap[lowerPurpose]) {
-    return purposeMap[lowerPurpose];
-  }
-  // Otherwise, format camelCase or snake_case properly
-  return purpose
-    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
-    .replace(/_/g, ' ') // Replace underscores with spaces
-    .replace(/\b\w/g, l => l.toUpperCase()) // Capitalize first letter of each word
-    .trim();
+import {
+  CONSENT_STATUSES,
+  consentStatusLabel, consentChannelLabel, consentSourceLabel,
+} from '../../utils/consentModel';
+
+const formatDate = (v?: string | null) =>
+  v ? new Date(v).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+const formatDateTime = (v?: string | null) =>
+  v ? new Date(v).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+
+const STATUS_STYLE: Record<string, { chip: string; icon: React.ReactNode }> = {
+  GRANTED:       { chip: 'bg-green-600/20 text-green-800', icon: <Check className="w-3 h-3 mr-1" /> },
+  DENIED:        { chip: 'bg-red-100 text-red-800',        icon: <X className="w-3 h-3 mr-1" /> },
+  WITHDRAWN:     { chip: 'bg-amber-100 text-amber-800',    icon: <X className="w-3 h-3 mr-1" /> },
+  NOT_RESPONDED: { chip: 'bg-slate-100 text-slate-700',   icon: <Clock className="w-3 h-3 mr-1" /> },
 };
-// Function to generate proper descriptions for consent purposes
-const generateDescription = (purpose: string): string => {
-  const descriptionMap: { [key: string]: string } = {
-    'research': 'Allow us to use your data for research and analytics to improve our services and develop new features.',
-    'dataprocessing': 'Consent for processing your personal data as part of our core services and business operations.',
-    'dataProcessing': 'Consent for processing your personal data as part of our core services and business operations.',
-    'marketing': 'Permission to send you marketing emails, promotional SMS messages, and other advertising communications.',
-    'analytics': 'Allow collection and analysis of usage data to improve service performance and user experience.',
-    'personalization': 'Customize content, recommendations, and services based on your preferences and behavior.',
-    'communication': 'Send you important service updates, notifications, and customer service communications.',
-    'advertising': 'Show you personalized advertisements and promotional content based on your interests.',
-    'profiling': 'Create user profiles based on your data to provide personalized services and recommendations.',
-    'thirdparty': 'Share your data with trusted third-party partners for enhanced services and integrations.',
-    'thirdParty': 'Share your data with trusted third-party partners for enhanced services and integrations.',
-    'cookies': 'Use cookies and similar tracking technologies to improve your browsing experience.',
-    'location': 'Access and use your location data to provide location-based services and features.',
-    'biometric': 'Process biometric data for identity verification and enhanced security features.',
-    'financial': 'Process financial information for payment processing and financial services.',
-    'health': 'Process health-related data for health services and wellness features.',
-    'essential': 'Essential data processing required for service delivery and core functionality.',
-    'email': 'Send you important emails and communications related to your account and services.',
-    'sms': 'Send you SMS notifications and important updates about your account.',
-    'push': 'Send push notifications to your devices for important updates and alerts.',
-    'data_sharing': 'Share your data with authorized partners to provide enhanced services.'
-  };
-  const lowerPurpose = purpose.toLowerCase();
-  return descriptionMap[lowerPurpose] || 
-         `Permission for ${formatPurposeName(purpose).toLowerCase()} related data processing and services.`;
+
+const statusChip = (s: string) => {
+  const cfg = STATUS_STYLE[s] || STATUS_STYLE.NOT_RESPONDED;
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cfg.chip}`}>
+      {cfg.icon}{consentStatusLabel(s)}
+    </span>
+  );
 };
+
+const detail = (label: string, value: React.ReactNode) => (
+  <div className="flex justify-between text-sm">
+    <span className="text-slate-600">{label}</span>
+    <span className="text-slate-900 text-right ml-4 break-words max-w-xs">{value || '—'}</span>
+  </div>
+);
+
 interface ConsentManagementProps {
   className?: string;
   customerId?: string;
 }
-const ConsentManagement: React.FC<ConsentManagementProps> = ({ 
-  className = '', 
-  customerId 
-}) => {
+
+const ConsentManagement: React.FC<ConsentManagementProps> = ({ className = '', customerId }) => {
   const [selectedCustomer, setSelectedCustomer] = useState<string>(customerId || '');
   const [customers, setCustomers] = useState<CustomerData[]>([]);
   const [consents, setConsents] = useState<ConsentData[]>([]);
@@ -108,193 +52,87 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
   const [saving, setSaving] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [purposeFilter, setPurposeFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [expandedConsent, setExpandedConsent] = useState<string | null>(null);
   const [editingConsent, setEditingConsent] = useState<string | null>(null);
-  const [updateNotes, setUpdateNotes] = useState<Record<string, string>>({});
-  const [showHistory, setShowHistory] = useState(false);
   const [selectedCustomerInfo, setSelectedCustomerInfo] = useState<CustomerData | null>(null);
-  // Load customers on component mount
+
   useEffect(() => {
-    loadCustomers();
-    loadAllConsents();
+    csrDashboardService.getCustomers().then(setCustomers).catch(() => setCustomers([]));
+    csrDashboardService.getConsents().then(setConsents).catch(() => setConsents([]));
   }, []);
-  // Load customer consents when a customer is selected
+
   useEffect(() => {
-    if (selectedCustomer) {
-      loadCustomerConsents();
-      loadSelectedCustomerInfo();
-    }
-  }, [selectedCustomer]);
-  // WebSocket real-time updates for consent changes
+    if (!selectedCustomer) return;
+    setLoading(true);
+    const filtered = consents.filter(c => c.customerId === selectedCustomer || c.partyId === selectedCustomer);
+    setCustomerConsents(filtered);
+    setSelectedCustomerInfo(customers.find(c => c.id === selectedCustomer) || null);
+    setLoading(false);
+  }, [selectedCustomer, consents, customers]);
+
+  // Real-time consent updates
   useEffect(() => {
-    console.log(' ConsentManagement: Setting up WebSocket for real-time consent updates');
-    // Join CSR dashboard for real-time updates
     websocketService.joinCSRDashboard();
-    // Listen for consent updates
-    const handleConsentUpdate = (event: any) => {
-      console.log(' ConsentManagement: Received real-time consent update:', event);
-      // Show notification
-      const customerName = customers.find(c => c.id === event.consent.partyId)?.name || event.user.email;
-      const purposeName = formatPurposeName(event.consent.purpose);
-      if (event.type === 'granted') {
-        notificationManager.success(
-          'Consent Granted',
-          `${customerName} granted consent for ${purposeName}`
-        );
-      } else {
-        notificationManager.warning(
-          'Consent Revoked',
-          `${customerName} revoked consent for ${purposeName}`
-        );
-      }
-      // Update the customer consents list
-      if (selectedCustomer && (event.consent.partyId === selectedCustomer || event.consent.customerId === selectedCustomer)) {
-        setCustomerConsents(prevConsents => {
-          const updatedConsents = prevConsents.map(consent => {
-            if (consent.id === event.consent.id) {
-              return {
-                ...consent,
-                status: event.consent.status,
-                updatedAt: event.timestamp,
-                grantedAt: event.consent.status === 'granted' ? new Date().toISOString() : consent.grantedAt
-              };
+    const onUpdate = (event: any) => {
+      const c = event.consent;
+      const name = c.consentName || c.purpose || 'consent';
+      if (event.type === 'granted') notificationManager.success('Consent Granted', `${event.user?.email || ''} granted ${name}`);
+      else notificationManager.warning('Consent Updated', `${event.user?.email || ''} updated ${name}`);
+      setCustomerConsents(prev =>
+        prev.map(consent => consent.id === c.id
+          ? { ...consent, consentStatus: c.consentStatus || (c.status === 'granted' ? 'GRANTED' : 'WITHDRAWN'), updatedDate: event.timestamp }
+          : consent)
+      );
+    };
+    websocketService.onConsentUpdate(onUpdate);
+    return () => websocketService.offConsentUpdate();
+  }, []);
+
+  const handleUpdate = async (consentId: string, newStatus: 'GRANTED' | 'WITHDRAWN') => {
+    setSaving(consentId);
+    try {
+      await csrDashboardService.updateConsentStatus(consentId, newStatus === 'GRANTED' ? 'granted' : 'revoked');
+      setCustomerConsents(prev =>
+        prev.map(c => c.id === consentId
+          ? {
+              ...c,
+              consentStatus: newStatus,
+              status: newStatus === 'GRANTED' ? 'granted' : 'revoked',
+              consentDateTime: newStatus === 'GRANTED' ? new Date().toISOString() : c.consentDateTime,
+              withdrawalDateTime: newStatus === 'WITHDRAWN' ? new Date().toISOString() : c.withdrawalDateTime,
+              grantedAt: newStatus === 'GRANTED' ? new Date().toISOString() : c.grantedAt,
             }
-            return consent;
-          });
-          return updatedConsents;
-        });
-      }
-      // Update the all consents list
-      setConsents(prevConsents => {
-        const updatedConsents = prevConsents.map(consent => {
-          if (consent.id === event.consent.id) {
-            return {
-              ...consent,
-              status: event.consent.status,
-              updatedAt: event.timestamp,
-              grantedAt: event.consent.status === 'granted' ? new Date().toISOString() : consent.grantedAt
-            };
-          }
-          return consent;
-        });
-        return updatedConsents;
-      });
-    };
-    websocketService.onConsentUpdate(handleConsentUpdate);
-    return () => {
-      websocketService.offConsentUpdate();
-    };
-  }, [customers, selectedCustomer]);
-  const loadCustomers = async () => {
-    try {
-      const customersData = await csrDashboardService.getCustomers();
-      setCustomers(customersData);
-      console.log('Loaded customers:', customersData.length);
-    } catch (error) {
-      console.error('Error loading customers:', error);
-      setCustomers([]);
-    }
-  };
-  const loadAllConsents = async () => {
-    try {
-      const consentsData = await csrDashboardService.getConsents();
-      setConsents(consentsData);
-      console.log('Loaded all consents:', consentsData.length);
-    } catch (error) {
-      console.error('Error loading consents:', error);
-      setConsents([]);
-    }
-  };
-  const loadCustomerConsents = async () => {
-    if (!selectedCustomer) return;
-    try {
-      setLoading(true);
-      // Filter consents for the selected customer
-      const customerSpecificConsents = consents.filter(
-        consent => consent.customerId === selectedCustomer || consent.partyId === selectedCustomer
+          : c)
       );
-      setCustomerConsents(customerSpecificConsents);
-      console.log(`Loaded ${customerSpecificConsents.length} consents for customer ${selectedCustomer}`);
-    } catch (error) {
-      console.error('Error loading customer consents:', error);
-      setCustomerConsents([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const loadSelectedCustomerInfo = async () => {
-    if (!selectedCustomer) return;
-    const customerInfo = customers.find(c => c.id === selectedCustomer);
-    setSelectedCustomerInfo(customerInfo || null);
-  };
-  const handleConsentUpdate = async (consentId: string, newStatus: 'granted' | 'revoked') => {
-    try {
-      setSaving(consentId);
-      const notes = updateNotes[consentId] || '';
-      console.log('Updating consent:', { consentId, newStatus, notes });
-      // Use the CSR dashboard service to update consent
-      await csrDashboardService.updateConsentStatus(consentId, newStatus, notes);
-      // Update local state
-      setCustomerConsents(prevConsents => 
-        prevConsents.map(consent => 
-          consent.id === consentId 
-            ? { 
-                ...consent, 
-                status: newStatus,
-                grantedAt: newStatus === 'granted' ? new Date().toISOString() : consent.grantedAt,
-                deniedAt: newStatus === 'revoked' ? new Date().toISOString() : consent.deniedAt
-              }
-            : consent
-        )
-      );
-      // Clear editing state
       setEditingConsent(null);
-      setUpdateNotes(prev => ({ ...prev, [consentId]: '' }));
-      console.log(`Consent ${consentId} updated to ${newStatus} successfully`);
-    } catch (error) {
-      console.error('Error updating consent:', error);
-      alert('Failed to update consent. Please try again.');
+      notificationManager.success('Consent updated', `Marked as ${consentStatusLabel(newStatus)}`);
+    } catch {
+      notificationManager.error('Update failed', 'Please try again.');
     } finally {
       setSaving(null);
     }
   };
-  const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = !searchTerm || 
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.phone.includes(searchTerm);
-    return matchesSearch;
+
+  const filteredCustomers = customers.filter(c =>
+    !searchTerm ||
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.phone.includes(searchTerm)
+  );
+
+  const typeOptions = [...new Set(customerConsents.map(c => c.consentName).filter(Boolean))];
+
+  const filteredConsents = customerConsents.filter(c => {
+    const matchStatus = statusFilter === 'all' || c.consentStatus === statusFilter;
+    const matchType = typeFilter === 'all' || c.consentName === typeFilter;
+    return matchStatus && matchType;
   });
-  const filteredConsents = customerConsents.filter(consent => {
-    const matchesStatus = statusFilter === 'all' || consent.status === statusFilter;
-    const matchesPurpose = purposeFilter === 'all' || consent.purpose.toLowerCase().includes(purposeFilter.toLowerCase());
-    return matchesStatus && matchesPurpose;
-  });
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      granted: { color: 'bg-green-100 text-green-800', icon: Check },
-      revoked: { color: 'bg-red-100 text-red-800', icon: X },
-      expired: { color: 'bg-gray-100 text-gray-800', icon: Clock }
-    };
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.expired;
-    const Icon = config.icon;
-    return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
-        <Icon className="w-3 h-3 mr-1" />
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
-    );
-  };
-  const getConsentTypeIcon = (purpose: string) => {
-    const lowerPurpose = purpose.toLowerCase();
-    if (lowerPurpose.includes('marketing')) return <FileText className="w-4 h-4" />;
-    if (lowerPurpose.includes('analytics')) return <Eye className="w-4 h-4" />;
-    if (lowerPurpose.includes('communication')) return <User className="w-4 h-4" />;
-    return <Shield className="w-4 h-4" />;
-  };
+
+  const consentKey = (c: ConsentData) => String(c.customerConsentId || c.id);
+
   return (
-    <div className={`bg-white border border-slate-200 rounded-xl shadow-sm rounded-xl shadow-lg border border-slate-200 ${className}`}>
+    <div className={`bg-white border border-slate-200 rounded-xl shadow-sm ${className}`}>
       {/* Header */}
       <div className="border-b border-slate-200 p-6">
         <div className="flex items-center justify-between">
@@ -302,262 +140,240 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
             <Shield className="w-6 h-6 text-blue-600 mr-3" />
             <div>
               <h2 className="text-2xl font-bold text-slate-900">Consent Management</h2>
-              <p className="text-sm text-slate-600 mt-1">
-                Search customers and manage their consent records
-              </p>
+              <p className="text-sm text-slate-600 mt-1">Search customers and manage their consent records</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => { loadCustomers(); loadAllConsents(); }}
-              className="px-4 py-2 bg-blue-50/10 text-blue-600 rounded-lg hover:bg-blue-50/20 transition-colors flex items-center"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              csrDashboardService.getCustomers().then(setCustomers).catch(() => {});
+              csrDashboardService.getConsents().then(setConsents).catch(() => {});
+            }}
+            className="px-4 py-2 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors flex items-center"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />Refresh
+          </button>
         </div>
       </div>
+
       <div className="p-6">
-        {/* Customer Search Section */}
+        {/* Customer Search */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Search Customer</h3>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
-            {/* Search Input */}
             <div className="relative">
               <Search className="absolute left-3 top-3 w-5 h-5 text-slate-600" />
               <input
                 type="text"
-                placeholder="Search by name, email, or phone..."
+                placeholder="Search by name, email, or phone…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50"
-               aria-label="Search by name, email, or phone"/>
+                className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
+                aria-label="Search customers"
+              />
             </div>
-            {/* Customer Selection */}
             <div className="relative">
               <User className="absolute left-3 top-3 w-5 h-5 text-slate-600" />
               <select
                 value={selectedCustomer}
                 onChange={(e) => setSelectedCustomer(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-slate-50 appearance-none"
-               aria-label="Select a customer">
-                <option value="">Select a customer...</option>
-                {filteredCustomers.map(customer => (
-                  <option key={customer.id} value={customer.id}>
-                    {customer.name} - {customer.email}
-                  </option>
+                className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-600 bg-white appearance-none"
+                aria-label="Select a customer"
+              >
+                <option value="">Select a customer…</option>
+                {filteredCustomers.map(c => (
+                  <option key={c.id} value={c.id}>{c.name} — {c.email}</option>
                 ))}
               </select>
               <ChevronDown className="absolute right-3 top-3 w-5 h-5 text-slate-600 pointer-events-none" />
             </div>
           </div>
-          {/* Selected Customer Info */}
+
           {selectedCustomerInfo && (
-            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <User className="w-5 h-5 text-blue-600 mr-3" />
-                  <div>
-                    <h4 className="font-semibold text-slate-900">{selectedCustomerInfo.name}</h4>
-                    <p className="text-sm text-slate-600">{selectedCustomerInfo.email}</p>
-                  </div>
+            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200 flex items-center justify-between">
+              <div className="flex items-center">
+                <User className="w-5 h-5 text-blue-600 mr-3" />
+                <div>
+                  <p className="font-semibold text-slate-900">{selectedCustomerInfo.name}</p>
+                  <p className="text-sm text-slate-600">{selectedCustomerInfo.email}</p>
                 </div>
-                <div className="flex items-center space-x-4 text-sm text-slate-600">
-                  <span>Phone: {selectedCustomerInfo.phone}</span>
-                  <span>Customer Since: {new Date(selectedCustomerInfo.createdAt).toLocaleDateString()}</span>
-                  <span className="flex items-center">
-                    <Shield className="w-4 h-4 mr-1" />
-                    {filteredConsents.length} Consents
-                  </span>
-                </div>
+              </div>
+              <div className="flex items-center space-x-4 text-sm text-slate-600">
+                <span>Phone: {selectedCustomerInfo.phone}</span>
+                <span className="flex items-center"><Shield className="w-4 h-4 mr-1" />{filteredConsents.length} Consents</span>
               </div>
             </div>
           )}
         </div>
-        {/* Consent Management Section */}
+
+        {/* Consents Section */}
         {selectedCustomer && (
           <>
             {/* Filters */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-slate-900 mb-4">Customer Consents</h3>
               <div className="flex flex-wrap gap-4">
-                <div className="flex items-center">
-                  <Filter className="w-4 h-4 text-slate-600 mr-2" />
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-slate-600" />
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"
-                   aria-label="Filter by status">
+                    className="px-3 py-2 border border-slate-200 rounded-lg bg-white text-sm"
+                    aria-label="Filter by status"
+                  >
                     <option value="all">All Status</option>
-                    <option value="granted">Granted</option>
-                    <option value="revoked">Revoked</option>
+                    {CONSENT_STATUSES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </select>
                 </div>
-                <div className="flex items-center">
-                  <FileText className="w-4 h-4 text-slate-600 mr-2" />
+                <div className="flex items-center gap-2">
                   <select
-                    value={purposeFilter}
-                    onChange={(e) => setPurposeFilter(e.target.value)}
-                    className="px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"
-                   aria-label="Filter by purpose">
-                    <option value="all">All Purposes</option>
-                    <option value="termsAndConditions">Terms & Conditions</option>
-                    <option value="privacyPolicy">Privacy Policy</option>
-                    <option value="serviceCommunication">Service Communications</option>
-                    <option value="marketing">Marketing Communications</option>
-                    <option value="personalizedOffers">Personalized Offers</option>
-                    <option value="partnerOffers">Partner Offers</option>
-                    <option value="customerFeedback">Customer Feedback</option>
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    className="px-3 py-2 border border-slate-200 rounded-lg bg-white text-sm"
+                    aria-label="Filter by consent type"
+                  >
+                    <option value="all">All Types</option>
+                    {typeOptions.map(t => <option key={t} value={t!}>{t}</option>)}
                   </select>
                 </div>
-                <button
-                  onClick={() => setShowHistory(!showHistory)}
-                  className="px-4 py-2 bg-blue-50/10 text-blue-600 rounded-lg hover:bg-blue-50/20 transition-colors flex items-center text-sm"
-                >
-                  <History className="w-4 h-4 mr-2" />
-                  {showHistory ? 'Hide History' : 'Show History'}
-                </button>
               </div>
             </div>
-            {/* Consents List */}
+
+            {/* List */}
             {loading ? (
               <div className="text-center py-8">
                 <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-blue-600" />
-                <p className="text-slate-600">Loading consents...</p>
+                <p className="text-slate-600">Loading consents…</p>
               </div>
             ) : filteredConsents.length === 0 ? (
               <div className="text-center py-8">
-                <Shield className="w-12 h-12 mx-auto mb-4 text-slate-500" />
+                <Shield className="w-12 h-12 mx-auto mb-4 text-slate-400" />
                 <h3 className="text-lg font-semibold text-slate-600 mb-2">No Consents Found</h3>
-                <p className="text-slate-500">
-                  {selectedCustomer ? 'This customer has no consent records matching your filters.' : 'Select a customer to view their consents.'}
-                </p>
+                <p className="text-slate-500">No consent records match your filters.</p>
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredConsents.map(consent => (
-                  <div 
-                    key={consent.id}
-                    className="border border-slate-200 rounded-lg bg-slate-50 hover:shadow-md transition-shadow"
-                  >
-                    {/* Consent Header */}
-                    <div className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          {getConsentTypeIcon(consent.purpose)}
-                          <div>
-                            <h4 className="font-semibold text-slate-900">{formatPurposeName(consent.purpose)}</h4>
-                            <p className="text-sm text-slate-600">{consent.description || generateDescription(consent.purpose)}</p>
+                {filteredConsents.map(consent => {
+                  const key = consentKey(consent);
+                  const isExp = expandedConsent === key;
+                  const isEdit = editingConsent === key;
+                  return (
+                    <div key={key} className="border border-slate-200 rounded-lg bg-slate-50 hover:shadow-md transition-shadow">
+                      {/* Row header */}
+                      <div className="p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="font-semibold text-slate-900">
+                                {consent.consentName || consent.purpose || '—'}
+                              </h4>
+                              {consent.isMandatory === 'Y' && (
+                                <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Mandatory</span>
+                              )}
+                              {consent.scopeVersion && (
+                                <span className="text-xs text-slate-500">v{consent.scopeVersion}</span>
+                              )}
+                            </div>
+                            {consent.description && (
+                              <p className="text-sm text-slate-600 mt-0.5 line-clamp-1">{consent.description}</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0">
+                            {statusChip(consent.consentStatus)}
+                            <button
+                              onClick={() => setExpandedConsent(isExp ? null : key)}
+                              className="p-2 rounded-lg hover:bg-slate-200 text-slate-600 transition-colors"
+                              aria-label={isExp ? 'Collapse' : 'Expand'}
+                            >
+                              {isExp ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </button>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-3">
-                          {getStatusBadge(consent.status)}
-                          <button
-                            onClick={() => setExpandedConsent(expandedConsent === consent.id ? null : consent.id)}
-                            className="p-2 rounded-lg hover:bg-blue-50/10 text-slate-600 hover:text-blue-600 transition-colors"
-                          >
-                            {expandedConsent === consent.id ? 
-                              <ChevronUp className="w-4 h-4" /> : 
-                              <ChevronDown className="w-4 h-4" />
-                            }
-                          </button>
+
+                        {/* Quick row */}
+                        <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-600">
+                          {consent.consentDateTime && (
+                            <span>Consent: {formatDate(consent.consentDateTime)}</span>
+                          )}
+                          {consent.withdrawalDateTime && (
+                            <span>Withdrawn: {formatDate(consent.withdrawalDateTime)}</span>
+                          )}
+                          {consent.channel && (
+                            <span>Channel: {consentChannelLabel(consent.channel)}</span>
+                          )}
+                          <span>Source: {consentSourceLabel(consent.source)}</span>
                         </div>
                       </div>
-                      {/* Quick Info */}
-                      <div className="mt-3 flex items-center space-x-6 text-sm text-slate-600">
-                        <span className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-1" />
-                          {consent.grantedAt ? `Granted: ${new Date(consent.grantedAt).toLocaleDateString()}` : 
-                           consent.deniedAt ? `Revoked: ${new Date(consent.deniedAt).toLocaleDateString()}` : 
-                           'No date available'}
-                        </span>
-                        <span>Source: {consent.source}</span>
-                        <span>Basis: {consent.lawfulBasis}</span>
-                      </div>
-                    </div>
-                    {/* Expanded Details */}
-                    {expandedConsent === consent.id && (
-                      <div className="border-t border-slate-200 p-4 bg-white border rounded-xl shadow-sm/50">
-                        <div className="grid md:grid-cols-2 gap-6">
-                          {/* Consent Details */}
-                          <div>
-                            <h5 className="font-semibold text-slate-900 mb-3">Consent Details</h5>
-                            <div className="space-y-2 text-sm">
-                              <div className="flex justify-between">
-                                <span className="text-slate-600">Type:</span>
-                                <span className="text-slate-900">{consent.type}</span>
+
+                      {/* Expanded panel */}
+                      {isExp && (
+                        <div className="border-t border-slate-200 p-4 bg-white rounded-b-lg">
+                          <div className="grid md:grid-cols-2 gap-6">
+                            {/* PDF fields */}
+                            <div>
+                              <h5 className="font-semibold text-slate-900 mb-3">Consent Details</h5>
+                              <div className="space-y-2">
+                                {detail('Consent ID', consent.customerConsentId)}
+                                {detail('Consent Code', consent.consentCode)}
+                                {detail('Consent Name', consent.consentName)}
+                                {detail('Version', consent.scopeVersion)}
+                                {detail('Scope Code', consent.scopeCode)}
+                                {detail('Category', consent.categoryName || consent.consentCategory)}
+                                {detail('Mandatory', consent.isMandatory === 'Y' ? 'Yes' : consent.isMandatory === 'N' ? 'No' : '—')}
+                                {detail('Status', consentStatusLabel(consent.consentStatus))}
+                                {detail('Channel', consentChannelLabel(consent.channel))}
+                                {detail('Source', consentSourceLabel(consent.source))}
+                                {detail('Consent Date & Time', formatDateTime(consent.consentDateTime))}
+                                {detail('Withdrawal Date & Time', formatDateTime(consent.withdrawalDateTime))}
+                                {detail('Captured By', consent.capturedBy)}
+                                {detail('Recorded', formatDateTime(consent.createdDate))}
+                                {detail('Last Updated', formatDateTime(consent.updatedDate))}
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-slate-600">Category:</span>
-                                <span className="text-slate-900">{consent.category || 'General'}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-slate-600">Lawful Basis:</span>
-                                <span className="text-slate-900">{consent.lawfulBasis}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-slate-600">Source:</span>
-                                <span className="text-slate-900">{consent.source}</span>
-                              </div>
-                              {consent.expiresAt && (
-                                <div className="flex justify-between">
-                                  <span className="text-slate-600">Expires:</span>
-                                  <span className="text-slate-900">{new Date(consent.expiresAt).toLocaleDateString()}</span>
+                            </div>
+
+                            {/* Actions */}
+                            <div>
+                              <h5 className="font-semibold text-slate-900 mb-3">Update Consent</h5>
+                              {isEdit ? (
+                                <div className="space-y-3">
+                                  <p className="text-sm text-slate-600">Select the new status for this consent:</p>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => handleUpdate(String(consent.customerConsentId || consent.id), 'GRANTED')}
+                                      disabled={saving === key}
+                                      className="flex-1 px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
+                                    >
+                                      {saving === key ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" />Grant</>}
+                                    </button>
+                                    <button
+                                      onClick={() => handleUpdate(String(consent.customerConsentId || consent.id), 'WITHDRAWN')}
+                                      disabled={saving === key}
+                                      className="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
+                                    >
+                                      {saving === key ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" />Withdraw</>}
+                                    </button>
+                                  </div>
+                                  <button
+                                    onClick={() => setEditingConsent(null)}
+                                    className="w-full px-3 py-2 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors text-sm"
+                                  >
+                                    Cancel
+                                  </button>
                                 </div>
+                              ) : (
+                                <button
+                                  onClick={() => setEditingConsent(key)}
+                                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                                >
+                                  <Edit className="w-4 h-4 mr-2" />Update Consent
+                                </button>
                               )}
                             </div>
                           </div>
-                          {/* Update Actions */}
-                          <div>
-                            <h5 className="font-semibold text-slate-900 mb-3">Update Consent</h5>
-                            {editingConsent === consent.id ? (
-                              <div className="space-y-3">
-                                <textarea
-                                  placeholder="Add notes for this update..."
-                                  value={updateNotes[consent.id] || ''}
-                                  onChange={(e) => setUpdateNotes(prev => ({ ...prev, [consent.id]: e.target.value }))}
-                                  className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm"
-                                  rows={3}
-                                 aria-label="Add notes for this update"/>
-                                <div className="flex space-x-2">
-                                  <button
-                                    onClick={() => handleConsentUpdate(consent.id, 'granted')}
-                                    disabled={saving === consent.id}
-                                    className="flex-1 px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
-                                  >
-                                    {saving === consent.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" />Grant</>}
-                                  </button>
-                                  <button
-                                    onClick={() => handleConsentUpdate(consent.id, 'revoked')}
-                                    disabled={saving === consent.id}
-                                    className="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
-                                  >
-                                    {saving === consent.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" />Revoke</>}
-                                  </button>
-                                </div>
-                                <button
-                                  onClick={() => setEditingConsent(null)}
-                                  className="w-full px-3 py-2 bg-blue-50/10 text-blue-600 rounded-lg hover:bg-blue-50/20 transition-colors text-sm"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => setEditingConsent(consent.id)}
-                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
-                              >
-                                <Edit className="w-4 h-4 mr-2" />
-                                Update Consent
-                              </button>
-                            )}
-                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </>
@@ -566,4 +382,5 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({
     </div>
   );
 };
+
 export default ConsentManagement;
