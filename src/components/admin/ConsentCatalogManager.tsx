@@ -120,7 +120,7 @@ const ConsentCatalogManager: React.FC = () => {
     }
   };
 
-  const th = 'px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider whitespace-nowrap';
+  const th = 'sticky top-0 z-10 bg-slate-50 px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider whitespace-nowrap border-b border-slate-200';
   const td = 'px-4 py-3 text-sm text-slate-900 align-top';
   const editButton = (row: Row, label: string) => (
     <button onClick={() => open(row)} aria-label={`Edit ${label}`} className="p-2 text-blue-700 hover:bg-blue-50 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"><Edit className="w-4 h-4" aria-hidden="true" /></button>
@@ -130,18 +130,18 @@ const ConsentCatalogManager: React.FC = () => {
     scopes: {
       head: ['Scope ID', 'Consent Type', 'Version', 'Scope Code', 'Scope Name', 'Description', 'Status', 'Effective From', 'Effective To', 'Active', 'Customers', ''],
       rows: () => (catalog?.scopes ?? []).map((s: ConsentScopeRow) => (
-        <tr key={s.consentScopeId} className="hover:bg-slate-50">
+        <tr key={s.consentScopeId} className="odd:bg-white even:bg-slate-50/50 hover:bg-blue-50/60">
           <td className={`${td} font-mono`}>{s.consentScopeId}</td>
           <td className={td}>{masterName(s.consentId)}</td>
           <td className={`${td} font-medium`}>{s.scopeVersion}</td>
-          <td className={`${td} font-mono`}>{s.scopeCode}</td>
-          <td className={`${td} font-medium`}>{s.scopeName}</td>
-          <td className={`${td} max-w-sm`}>{s.description || '—'}</td>
+          <td className={`${td} font-mono text-xs max-w-44 whitespace-normal break-words`}>{s.scopeCode}</td>
+          <td className={`${td} font-medium min-w-44 whitespace-normal`}>{s.scopeName}</td>
+          <td className={`${td} max-w-64 whitespace-normal break-words text-slate-700`}>{s.description || '—'}</td>
           <td className={td}><Chip on={s.status === 'ACTIVE'} onLabel="Active" offLabel={SCOPE_STATUSES.find((o) => o.value === s.status)?.label ?? s.status} /></td>
           <td className={`${td} whitespace-nowrap`}>{show(s.effectiveFrom)}</td>
           <td className={`${td} whitespace-nowrap`}>{show(s.effectiveTo)}</td>
-          <td className={td}>{s.isActive}</td>
-          <td className={td}>{s.customerConsents}</td>
+          <td className={td}><Chip on={s.isActive === 'Y'} /></td>
+          <td className={`${td} text-center tabular-nums`}>{s.customerConsents}</td>
           <td className={td}>{editButton(s as unknown as Row, `${masterName(s.consentId)} ${s.scopeVersion}`)}</td>
         </tr>
       )),
@@ -149,14 +149,16 @@ const ConsentCatalogManager: React.FC = () => {
     categories: {
       head: ['Code', 'Name', 'Description', 'Status', 'Created', 'Updated', ''],
       rows: () => (catalog?.categories ?? []).map((c: ConsentCategory) => (
-        <tr key={c.categoryCode} className="hover:bg-slate-50">
+        <tr key={c.categoryCode} className="odd:bg-white even:bg-slate-50/50 hover:bg-blue-50/60">
           <td className={`${td} font-mono text-xs`}>{c.categoryCode}</td>
           <td className={`${td} font-medium`}>{c.categoryName}</td>
-          <td className={`${td} max-w-md`}>{c.description || '—'}</td>
+          <td className={`${td} max-w-xl whitespace-normal break-words text-slate-700`}>{c.description || '—'}</td>
           <td className={td}><Chip on={c.isActive === 'Y'} /></td>
           <td className={`${td} whitespace-nowrap`}>{show(c.createdDate)}</td>
           <td className={`${td} whitespace-nowrap`}>{show(c.updatedDate)}</td>
-          <td className={td}>{editButton(c as unknown as Row, c.categoryName)}</td>
+          <td className={`${td} w-12 px-2 text-center`}>
+            {editButton(c as unknown as Row, c.categoryName)}
+          </td>
         </tr>
       )),
     },
@@ -173,12 +175,12 @@ const ConsentCatalogManager: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-slate-900">Consent Catalog</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Consent Catalog</h1>
           <p className="text-slate-600">Manage consent scopes, their versions, and categories.</p>
         </div>
         <div className="flex gap-2">
           <button onClick={load} className="inline-flex items-center gap-2 bg-white border border-gray-300 text-slate-800 hover:bg-slate-50 text-sm font-medium rounded-lg px-4 py-2"><RefreshCw className="w-4 h-4" aria-hidden="true" />Refresh</button>
-          <button onClick={() => open(null)} disabled={!catalog} className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2 disabled:opacity-60"><Plus className="w-4 h-4" aria-hidden="true" />New {current.noun}</button>
+          <button onClick={() => open(null)} disabled={!catalog || (tab === 'scopes' && catalog.masters.length === 0)} className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2 disabled:opacity-60"><Plus className="w-4 h-4" aria-hidden="true" />New {current.noun}</button>
         </div>
       </div>
 
@@ -186,7 +188,7 @@ const ConsentCatalogManager: React.FC = () => {
         {TABS.map((t) => (
           <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${tab === t.id ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-600 hover:text-slate-900'}`}>
-            {t.label}{catalog && <span className="ml-2 text-xs text-slate-600">{catalog[t.id].length}</span>}
+            {t.label}{catalog && <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${tab === t.id ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'}`}>{catalog[t.id].length}</span>}
           </button>
         ))}
       </div>
@@ -195,10 +197,14 @@ const ConsentCatalogManager: React.FC = () => {
       {!catalog && !loadError && <p className="text-slate-600">Loading…</p>}
 
       {catalog && (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50"><tr>{tables[tab].head.map((h) => <th key={h} scope="col" className={th}>{h || <span className="sr-only">Actions</span>}</th>)}</tr></thead>
-            <tbody className="divide-y divide-slate-200">{tables[tab].rows()}</tbody>
+        <div className={`${tab === 'categories' ? 'w-fit max-w-full' : 'w-full'} bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto`}>
+          <table className={`${tab === 'scopes' ? 'min-w-[1450px]' : 'w-max min-w-0'} divide-y divide-slate-200`}>
+            <caption className="sr-only">{tab === 'scopes' ? 'Consent scopes and their versions' : 'Consent categories'}</caption>
+            <thead><tr>{tables[tab].head.map((h, index) => <th key={h || 'actions'} scope="col" className={`${th} ${tab === 'categories' && index === tables[tab].head.length - 1 ? 'w-12 px-2' : ''}`}>{h || <span className="sr-only">Actions</span>}</th>)}</tr></thead>
+            <tbody className="divide-y divide-slate-200">
+              {tables[tab].rows()}
+              {catalog[tab].length === 0 && <tr><td colSpan={tables[tab].head.length} className="px-4 py-10 text-center text-slate-600">No {current.noun.toLowerCase()} records yet.</td></tr>}
+            </tbody>
           </table>
         </div>
       )}

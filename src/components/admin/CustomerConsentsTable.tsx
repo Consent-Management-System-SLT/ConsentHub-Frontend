@@ -21,6 +21,12 @@ interface CustomerConsentRow {
 const date = (value?: string | null) => value ? new Date(value).toLocaleString() : '—';
 const messageOf = (error: unknown) => (error as { message?: string })?.message || 'Could not load customer consent records.';
 const statuses = ['GRANTED', 'DENIED', 'WITHDRAWN', 'NOT_RESPONDED'] as const;
+const statusStyles: Record<CustomerConsentRow['consentStatus'], string> = {
+  GRANTED: 'bg-green-100 text-green-800',
+  DENIED: 'bg-red-100 text-red-800',
+  WITHDRAWN: 'bg-slate-100 text-slate-700',
+  NOT_RESPONDED: 'bg-amber-100 text-amber-800',
+};
 
 const CustomerConsentsTable: React.FC = () => {
   const [rows, setRows] = useState<CustomerConsentRow[]>([]);
@@ -50,7 +56,7 @@ const CustomerConsentsTable: React.FC = () => {
     return matchesSearch && (status === 'all' || row.consentStatus === status);
   }), [rows, search, status]);
 
-  const th = 'px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider whitespace-nowrap';
+  const th = 'sticky top-0 z-10 bg-slate-50 px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider whitespace-nowrap border-b border-slate-200';
   const td = 'px-4 py-3 text-sm text-slate-900 whitespace-nowrap';
 
   return (
@@ -79,17 +85,18 @@ const CustomerConsentsTable: React.FC = () => {
       </div>
 
       {error && <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-slate-900">{error}</div>}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200">
-          <thead className="bg-slate-50"><tr>{['Record ID', 'Customer ID', 'Version ID', 'Status', 'Channel', 'Source', 'Decision Date & Time', 'Withdrawal Date & Time', 'Captured By', 'Created', 'Updated'].map((name) => <th key={name} scope="col" className={th}>{name}</th>)}</tr></thead>
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+        <table className="min-w-[1400px] divide-y divide-slate-200">
+          <caption className="sr-only">Read-only customer consent decision history</caption>
+          <thead><tr>{['Record ID', 'Customer ID', 'Version ID', 'Status', 'Channel', 'Source', 'Decision Date & Time', 'Withdrawal Date & Time', 'Captured By', 'Created', 'Updated'].map((name) => <th key={name} scope="col" className={th}>{name}</th>)}</tr></thead>
           <tbody className="divide-y divide-slate-200">
             {loading && <tr><td colSpan={11} className="px-4 py-10 text-center text-slate-600">Loading customer consents…</td></tr>}
             {!loading && filtered.map((row) => (
-              <tr key={row.customerConsentId} className="hover:bg-slate-50">
+              <tr key={row.customerConsentId} className="odd:bg-white even:bg-slate-50/50 hover:bg-blue-50/60">
                 <td className={`${td} font-mono`}>{row.customerConsentId}</td>
                 <td className={`${td} font-mono text-xs`}>{row.customerId}</td>
                 <td className={td}>{row.consentScopeId}{row.consentName && <div className="text-xs text-slate-500">{row.consentName}{row.scopeVersion ? ` · v${row.scopeVersion}` : ''}</div>}</td>
-                <td className={td}>{row.consentStatus}</td>
+                <td className={td}><span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusStyles[row.consentStatus]}`}>{row.consentStatus.replace(/_/g, ' ')}</span></td>
                 <td className={td}>{row.channel}</td>
                 <td className={td}>{row.source}</td>
                 <td className={td}>{date(row.consentDateTime)}</td>

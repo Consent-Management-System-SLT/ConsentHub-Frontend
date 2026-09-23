@@ -5,7 +5,7 @@ import { notificationManager } from '../shared/NotificationContainer';
 import { consentCatalogService, ConsentCatalog } from '../../services/consentCatalogService';
 
 const fieldClass = 'mt-1 block w-full bg-white text-gray-900 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
-const messageOf = (error: unknown) => (error as { message?: string })?.message || 'Could not save the consent type.';
+const messageOf = (error: unknown) => (error as { message?: string })?.message || 'Could not save the consent.';
 const APPLICABILITY_OPTIONS = ['All active customers', 'Customer Base 01', 'Customer Base 02'];
 
 const ConsentManagement: React.FC = () => {
@@ -49,7 +49,7 @@ const ConsentManagement: React.FC = () => {
         consentName: values.consentName.trim(),
       });
       setFormOpen(false);
-      notificationManager.success('Consent type created', `${values.consentName.trim()} was added.`);
+      notificationManager.success('Consent created', `${values.consentName.trim()} was added.`);
       await load();
     } catch (error) {
       setFormError(messageOf(error));
@@ -67,8 +67,8 @@ const ConsentManagement: React.FC = () => {
     </div>
   );
 
-  const th = 'px-4 py-3 text-left text-xs font-medium text-slate-600 uppercase tracking-wider whitespace-nowrap';
-  const td = 'px-4 py-3 text-sm text-slate-900 align-top';
+  const th = 'sticky top-0 z-10 bg-slate-50 px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider whitespace-nowrap border-b border-slate-200';
+  const td = 'px-3 py-3 text-sm text-slate-900 align-top';
   const categoryLabel = (code: string) => catalog?.categories.find((category) => category.categoryCode === code)?.categoryName || code;
 
   return (
@@ -80,29 +80,30 @@ const ConsentManagement: React.FC = () => {
         </div>
         <div className="flex gap-2">
           <button onClick={() => void load()} className="inline-flex items-center gap-2 bg-white border border-gray-300 text-slate-800 hover:bg-slate-50 text-sm font-medium rounded-lg px-4 py-2"><RefreshCw className="w-4 h-4" aria-hidden="true" />Refresh</button>
-          <button onClick={openCreate} disabled={!catalog?.categories.length} className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2 disabled:opacity-60"><Plus className="w-4 h-4" aria-hidden="true" />New Consent Type</button>
+          <button onClick={openCreate} disabled={!catalog?.categories.length} className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2 disabled:opacity-60"><Plus className="w-4 h-4" aria-hidden="true" />New Consent</button>
         </div>
       </div>
 
       {loadError && <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-slate-900">{loadError}</div>}
       {!catalog && !loadError && <p className="text-slate-600">Loading consent types…</p>}
       {catalog && (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50"><tr>{['Consent Type ID', 'Code', 'Name', 'Description', 'Category', 'Purpose', 'Mandatory', 'Applies To', 'Active', 'Created By', 'Created', 'Updated By', 'Updated'].map((name) => <th key={name} scope="col" className={th}>{name}</th>)}</tr></thead>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+          <table className="min-w-[1450px] divide-y divide-slate-200">
+            <caption className="sr-only">Consent definitions with their details and audit dates</caption>
+            <thead><tr>{['Consent ID', 'Code', 'Name', 'Description', 'Category', 'Purpose', 'Mandatory', 'Applies To', 'Active', 'Created By', 'Created', 'Updated By', 'Updated'].map((name) => <th key={name} scope="col" className={th}>{name}</th>)}</tr></thead>
             <tbody className="divide-y divide-slate-200">
               {catalog.masters.map((master) => (
-                <tr key={master.consentId} className="hover:bg-slate-50">
-                  <td className={`${td} font-mono`}>{master.consentId}</td>
-                  <td className={`${td} font-mono text-xs`}>{master.consentCode}</td>
-                  <td className={`${td} font-medium`}>{master.consentName}</td>
-                  <td className={`${td} max-w-xs`}>{master.description || '—'}</td>
-                  <td className={td}>{master.consentCategory} <span className="text-slate-500">({categoryLabel(master.consentCategory)})</span></td>
-                  <td className={`${td} max-w-xs`}>{master.purpose || '—'}</td>
-                  <td className={td}>{master.isMandatory}</td>
-                  <td className={td}>{master.applicability || '—'}</td>
-                  <td className={td}>{master.isActive}</td>
-                  <td className={td}>{master.createdBy}</td>
+                <tr key={master.consentId} className="odd:bg-white even:bg-slate-50/50 hover:bg-blue-50/60">
+                  <td className={`${td} font-mono tabular-nums`}>{master.consentId}</td>
+                  <td className={`${td} font-mono text-xs max-w-48 whitespace-normal break-words`}>{master.consentCode}</td>
+                  <td className={`${td} font-medium min-w-44`}>{master.consentName}</td>
+                  <td className={`${td} max-w-64 whitespace-normal break-words text-slate-700`}>{master.description || '—'}</td>
+                  <td className={`${td} min-w-40`}><div>{categoryLabel(master.consentCategory)}</div><div className="text-xs text-slate-500">{master.consentCategory}</div></td>
+                  <td className={`${td} max-w-64 whitespace-normal break-words text-slate-700`}>{master.purpose || '—'}</td>
+                  <td className={`${td} text-center font-medium`}>{master.isMandatory === 'Y' ? 'Yes' : 'No'}</td>
+                  <td className={`${td} min-w-44`}>{master.applicability || '—'}</td>
+                  <td className={`${td} text-center`}><span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${master.isActive === 'Y' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-700'}`}>{master.isActive === 'Y' ? 'Active' : 'Inactive'}</span></td>
+                  <td className={`${td} min-w-40`}>{master.createdBy}</td>
                   <td className={`${td} whitespace-nowrap`}>{master.createdDate ? new Date(master.createdDate).toLocaleString() : '—'}</td>
                   <td className={td}>{master.updatedBy || '—'}</td>
                   <td className={`${td} whitespace-nowrap`}>{master.updatedDate ? new Date(master.updatedDate).toLocaleString() : '—'}</td>
@@ -114,10 +115,10 @@ const ConsentManagement: React.FC = () => {
         </div>
       )}
 
-      <Modal isOpen={formOpen} onClose={() => setFormOpen(false)} title="New Consent Type" footer={(
+      <Modal isOpen={formOpen} onClose={() => setFormOpen(false)} title="New Consent" size="lg" footer={(
         <>
           <button type="button" onClick={() => setFormOpen(false)} className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Cancel</button>
-          <button type="submit" form="master-form" disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60">{saving ? 'Saving…' : 'Create Consent Type'}</button>
+          <button type="submit" form="master-form" disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60">{saving ? 'Saving…' : 'Create Consent'}</button>
         </>
       )}>
         <form id="master-form" onSubmit={submit} noValidate className="grid grid-cols-1 sm:grid-cols-2 gap-4">
