@@ -70,6 +70,10 @@ const ConsentManagement: React.FC = () => {
   const th = 'sticky top-0 z-10 bg-slate-50 px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider whitespace-nowrap border-b border-slate-200';
   const td = 'px-3 py-3 text-sm text-slate-900 align-top';
   const categoryLabel = (code: string) => catalog?.categories.find((category) => category.categoryCode === code)?.categoryName || code;
+  const consentVersions = (consentId: number) => catalog?.scopes
+    .filter((scope) => scope.consentId === consentId)
+    .map((scope) => scope.scopeVersion)
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true })) ?? [];
 
   return (
     <div className="space-y-6">
@@ -90,13 +94,14 @@ const ConsentManagement: React.FC = () => {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
           <table className="min-w-[1450px] divide-y divide-slate-200">
             <caption className="sr-only">Consent definitions with their details and audit dates</caption>
-            <thead><tr>{['Consent ID', 'Code', 'Name', 'Description', 'Category', 'Purpose', 'Mandatory', 'Applies To', 'Active', 'Created By', 'Created', 'Updated By', 'Updated'].map((name) => <th key={name} scope="col" className={th}>{name}</th>)}</tr></thead>
+            <thead><tr>{['Consent ID', 'Code', 'Name', 'Version', 'Description', 'Category', 'Purpose', 'Mandatory', 'Applies To', 'Active', 'Created By', 'Created', 'Updated By', 'Updated'].map((name) => <th key={name} scope="col" className={th}>{name}</th>)}</tr></thead>
             <tbody className="divide-y divide-slate-200">
               {catalog.masters.map((master) => (
                 <tr key={master.consentId} className="odd:bg-white even:bg-slate-50/50 hover:bg-blue-50/60">
                   <td className={`${td} font-mono tabular-nums`}>{master.consentId}</td>
                   <td className={`${td} font-mono text-xs max-w-48 whitespace-normal break-words`}>{master.consentCode}</td>
                   <td className={`${td} font-medium min-w-44`}>{master.consentName}</td>
+                  <td className={`${td} min-w-24 whitespace-nowrap`}>{consentVersions(master.consentId).length ? consentVersions(master.consentId).map((version) => `v${version}`).join(', ') : '—'}</td>
                   <td className={`${td} max-w-64 whitespace-normal break-words text-slate-700`}>{master.description || '—'}</td>
                   <td className={`${td} min-w-40`}><div>{categoryLabel(master.consentCategory)}</div><div className="text-xs text-slate-500">{master.consentCategory}</div></td>
                   <td className={`${td} max-w-64 whitespace-normal break-words text-slate-700`}>{master.purpose || '—'}</td>
@@ -109,7 +114,7 @@ const ConsentManagement: React.FC = () => {
                   <td className={`${td} whitespace-nowrap`}>{master.updatedDate ? new Date(master.updatedDate).toLocaleString() : '—'}</td>
                 </tr>
               ))}
-              {catalog.masters.length === 0 && <tr><td colSpan={13} className="px-4 py-10 text-center text-slate-600">No consent types yet.</td></tr>}
+              {catalog.masters.length === 0 && <tr><td colSpan={14} className="px-4 py-10 text-center text-slate-600">No consent types yet.</td></tr>}
             </tbody>
           </table>
         </div>
