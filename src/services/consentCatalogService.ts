@@ -29,9 +29,9 @@ export interface ConsentMaster {
 export interface ConsentScopeRow {
   consentScopeId: number;
   consentId: number;
-  scopeType: string;
   scopeCode: string;
   scopeName: string;
+  description?: string;
   scopeVersion: string;
   status: string;
   effectiveFrom: string;

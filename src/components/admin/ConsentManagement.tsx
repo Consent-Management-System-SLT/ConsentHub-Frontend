@@ -6,6 +6,7 @@ import { consentCatalogService, ConsentCatalog } from '../../services/consentCat
 
 const fieldClass = 'mt-1 block w-full bg-white text-gray-900 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
 const messageOf = (error: unknown) => (error as { message?: string })?.message || 'Could not save the consent type.';
+const APPLICABILITY_OPTIONS = ['All active customers', 'Customer Base 01', 'Customer Base 02'];
 
 const ConsentManagement: React.FC = () => {
   const [catalog, setCatalog] = useState<ConsentCatalog | null>(null);
@@ -15,7 +16,7 @@ const ConsentManagement: React.FC = () => {
   const [formError, setFormError] = useState('');
   const [values, setValues] = useState({
     consentCode: '', consentName: '', description: '', consentCategory: '', purpose: '',
-    isMandatory: 'N', applicability: '', isActive: 'Y',
+    isMandatory: 'N', applicability: APPLICABILITY_OPTIONS[0], isActive: 'Y',
   });
 
   const load = useCallback(async () => {
@@ -29,7 +30,7 @@ const ConsentManagement: React.FC = () => {
   useEffect(() => { void load(); }, [load]);
 
   const openCreate = () => {
-    setValues({ consentCode: '', consentName: '', description: '', consentCategory: catalog?.categories[0]?.categoryCode ?? '', purpose: '', isMandatory: 'N', applicability: '', isActive: 'Y' });
+    setValues({ consentCode: '', consentName: '', description: '', consentCategory: catalog?.categories[0]?.categoryCode ?? '', purpose: '', isMandatory: 'N', applicability: APPLICABILITY_OPTIONS[0], isActive: 'Y' });
     setFormError('');
     setFormOpen(true);
   };
@@ -135,13 +136,18 @@ const ConsentManagement: React.FC = () => {
           </div>
           {input('description', 'Description', false, 'textarea')}
           {input('purpose', 'Purpose', false, 'textarea')}
-          {input('applicability', 'Applicability')}
+          <div>
+            <label htmlFor="master-applicability" className="block text-sm font-medium text-gray-700">Applicability *</label>
+            <select id="master-applicability" value={values.applicability} onChange={(e) => setValues({ ...values, applicability: e.target.value })} className={fieldClass} required>
+              {APPLICABILITY_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+            </select>
+          </div>
           <div>
             <label htmlFor="master-isActive" className="block text-sm font-medium text-gray-700">Is Active *</label>
             <select id="master-isActive" value={values.isActive} onChange={(e) => setValues({ ...values, isActive: e.target.value })} className={fieldClass}><option value="Y">Y — Active</option><option value="N">N — Inactive</option></select>
           </div>
           {formError && <div role="alert" className="sm:col-span-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-slate-900">{formError}</div>}
-          <p className="sm:col-span-2 text-xs text-slate-600">CONSENT_ID, CREATED_BY, CREATED_DATE, UPDATED_BY, and UPDATED_DATE are assigned or maintained by the system.</p>
+          <p className="sm:col-span-2 text-xs text-slate-600">Identifiers and audit details are assigned or maintained by the system.</p>
         </form>
       </Modal>
     </div>

@@ -56,7 +56,7 @@ const ConsentCatalogManager: React.FC = () => {
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const masterOptions = (catalog?.masters ?? []).map((m) => ({ value: String(m.consentId), label: `${m.consentId} — ${m.consentName} (${m.consentCode})` }));
+  const masterOptions = (catalog?.masters ?? []).map((m) => ({ value: String(m.consentId), label: m.consentName }));
   const masterName = (id: number) => catalog?.masters.find((m) => m.consentId === id)?.consentName ?? `#${id}`;
 
   const FIELDS: Record<Tab, Field[]> = {
@@ -67,12 +67,12 @@ const ConsentCatalogManager: React.FC = () => {
       { name: 'isActive', label: 'Status', kind: 'select', options: ACTIVE, required: true },
     ],
     scopes: [
-      { name: 'consentId', label: 'Consent Type ID', kind: 'select', options: masterOptions, required: true, createOnly: true },
+      { name: 'consentId', label: 'Consent Type', kind: 'select', options: masterOptions, required: true, createOnly: true },
       { name: 'scopeVersion', label: 'Version', required: true, hint: 'e.g. 2.0' },
-      { name: 'scopeType', label: 'Scope Type', required: true, hint: 'e.g. DOCUMENT' },
       { name: 'scopeCode', label: 'Scope Code', required: true },
       { name: 'scopeName', label: 'Scope Name', required: true },
       { name: 'status', label: 'Status', kind: 'select', options: SCOPE_STATUSES, required: true, hint: 'Customers are recorded against the Active version; only one version per consent type can be active.' },
+      { name: 'description', label: 'Description', kind: 'textarea', hint: 'Briefly describe the wording or document covered by this scope.' },
       { name: 'effectiveFrom', label: 'Effective From', kind: 'date', required: true },
       { name: 'effectiveTo', label: 'Effective To', kind: 'date', hint: 'Leave empty if it has no end date' },
     ],
@@ -85,7 +85,7 @@ const ConsentCatalogManager: React.FC = () => {
       start[f.name] = f.kind === 'date' ? dateOnly(current as string) : current == null ? '' : String(current);
     }
     if (!row) {
-      if (tab === 'scopes') Object.assign(start, { status: 'DRAFT', scopeType: 'DOCUMENT', effectiveFrom: toLocalInput(new Date().toISOString()).slice(0, 10) });
+      if (tab === 'scopes') Object.assign(start, { status: 'DRAFT', effectiveFrom: toLocalInput(new Date().toISOString()).slice(0, 10) });
       if (tab === 'categories') start.isActive = 'Y';
     }
     setValues(start);
@@ -128,14 +128,15 @@ const ConsentCatalogManager: React.FC = () => {
 
   const tables: Record<Tab, { head: string[]; rows: () => React.ReactNode }> = {
     scopes: {
-      head: ['Version ID', 'Consent Type ID', 'Consent Type', 'Version', 'Scope', 'Status', 'Effective From', 'Effective To', 'Active', 'Customers', ''],
+      head: ['Scope ID', 'Consent Type', 'Version', 'Scope Code', 'Scope Name', 'Description', 'Status', 'Effective From', 'Effective To', 'Active', 'Customers', ''],
       rows: () => (catalog?.scopes ?? []).map((s: ConsentScopeRow) => (
         <tr key={s.consentScopeId} className="hover:bg-slate-50">
           <td className={`${td} font-mono`}>{s.consentScopeId}</td>
-          <td className={`${td} font-mono`}>{s.consentId}</td>
           <td className={td}>{masterName(s.consentId)}</td>
           <td className={`${td} font-medium`}>{s.scopeVersion}</td>
-          <td className={td}><div>{s.scopeName}</div><div className="text-xs text-slate-600 font-mono">{s.scopeType} · {s.scopeCode}</div></td>
+          <td className={`${td} font-mono`}>{s.scopeCode}</td>
+          <td className={`${td} font-medium`}>{s.scopeName}</td>
+          <td className={`${td} max-w-sm`}>{s.description || '—'}</td>
           <td className={td}><Chip on={s.status === 'ACTIVE'} onLabel="Active" offLabel={SCOPE_STATUSES.find((o) => o.value === s.status)?.label ?? s.status} /></td>
           <td className={`${td} whitespace-nowrap`}>{show(s.effectiveFrom)}</td>
           <td className={`${td} whitespace-nowrap`}>{show(s.effectiveTo)}</td>
@@ -162,7 +163,7 @@ const ConsentCatalogManager: React.FC = () => {
   };
 
   const TABS: { id: Tab; label: string; noun: string }[] = [
-    { id: 'scopes', label: 'Versions', noun: 'Version' },
+    { id: 'scopes', label: 'Scopes', noun: 'Scope' },
     { id: 'categories', label: 'Categories', noun: 'Category' },
   ];
   const current = TABS.find((t) => t.id === tab)!;
@@ -173,7 +174,7 @@ const ConsentCatalogManager: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-slate-900">Consent Catalog</h1>
-          <p className="text-slate-600">Manage consent versions and their categories.</p>
+          <p className="text-slate-600">Manage consent scopes, their versions, and categories.</p>
         </div>
         <div className="flex gap-2">
           <button onClick={load} className="inline-flex items-center gap-2 bg-white border border-gray-300 text-slate-800 hover:bg-slate-50 text-sm font-medium rounded-lg px-4 py-2"><RefreshCw className="w-4 h-4" aria-hidden="true" />Refresh</button>
@@ -217,8 +218,15 @@ const ConsentCatalogManager: React.FC = () => {
           {FIELDS[tab].map((f) => {
             const id = `catalog-${f.name}`;
             const locked = !!editor?.row && !!f.createOnly;
-            const wide = f.kind === 'textarea' || f.name === 'consentId' || f.name === 'scopeName';
-            const set = (v: string) => { setValues({ ...values, [f.name]: v }); setFormError(''); };
+            const wide = f.kind === 'textarea' || f.name === 'consentId';
+            const set = (v: string) => {
+              const next = { ...values, [f.name]: v };
+              if (tab === 'scopes' && f.name === 'scopeName' && !values.description?.trim()) {
+                next.description = v ? `Consent wording and terms for ${v}.` : '';
+              }
+              setValues(next);
+              setFormError('');
+            };
             return (
               <div key={f.name} className={wide ? 'sm:col-span-2' : ''}>
                 <label htmlFor={id} className="block text-sm font-medium text-gray-700">{f.label}{f.required ? ' *' : ''}</label>
