@@ -48,7 +48,7 @@ export async function verifyOtp(mobileNumber: string, otp: string) {
   }
 }
 
-// A row of the CUSTOMER_CONSENT table with its consent type and version.
+// A customer's recorded decision with its consent type and version.
 export interface CustomerConsent {
   customerConsentId: number;
   consentName: string;

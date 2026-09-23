@@ -1,5 +1,4 @@
-// Values of SLT_Consent_Management_Data_Model.pdf (CUSTOMER_CONSENT). The consent types and
-// versions themselves come from the backend (consent_scopes); only the fixed lists live here.
+// Statuses and channels accepted by the consent API. Consent types and versions come from the backend.
 
 export const CONSENT_STATUSES = [
   { value: 'GRANTED', label: 'Granted' },

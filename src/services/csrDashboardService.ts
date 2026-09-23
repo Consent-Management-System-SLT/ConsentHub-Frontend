@@ -46,7 +46,7 @@ export interface CustomerData {
   guardianFor?: string[];
 }
 export interface ConsentData {
-  // PDF CUSTOMER_CONSENT columns (from SLT_Consent_Management_Data_Model.pdf)
+  // Fields returned for recorded customer consent decisions.
   customerConsentId: number;
   customerId: string;
   consentScopeId: number;
@@ -58,7 +58,7 @@ export interface ConsentData {
   capturedBy: string;
   createdDate: string;
   updatedDate?: string;
-  // Joined from CONSENT_MASTER / CONSENT_SCOPE
+  // Consent type and version details joined by the API.
   consentName?: string;
   consentCode?: string;
   consentCategory?: string;

@@ -1,6 +1,6 @@
 import { apiClient } from './apiClient';
 
-// Rows of CONSENT_CATEGORY, CONSENT_MASTER and CONSENT_SCOPE (SLT_Consent_Management_Data_Model.pdf).
+// Consent categories, types, and version rows from the consent catalog API.
 export interface ConsentCategory {
   categoryCode: string;
   categoryName: string;

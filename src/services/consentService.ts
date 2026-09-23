@@ -1,7 +1,7 @@
 // TMF632 Party Privacy Management API Service
 import { apiClient, ApiResponse } from './apiClient';
 import { PrivacyConsent, ConsentStatus, ConsentPurpose } from '../types/consent';
-// One consent type at one version (a row of consent_scopes joined to its consent type).
+// One consent type at one version, with the API-resolved type details.
 export interface ConsentScope {
   consentScopeId: number;
   consentId: number;
@@ -14,7 +14,7 @@ export interface ConsentScope {
   effectiveTo?: string | null;
 }
 
-// A customer's consent decision, in the columns of the CUSTOMER_CONSENT table.
+// A customer's consent decision as returned by the consent API.
 export interface ConsentCreateRequest {
   customerId: string;
   consentScopeId: number;
@@ -55,7 +55,16 @@ class ConsentService {
     });
     const queryString = params.toString();
     const url = `${this.basePath}/consent${queryString ? `?${queryString}` : ''}`;
-    return apiClient.get<ConsentListResponse>(url);
+    const response = await apiClient.get<PrivacyConsent[] | ConsentListResponse>(url);
+    const list = Array.isArray(response.data) ? response.data : response.data.consents;
+    return {
+      ...response,
+      data: {
+        consents: list,
+        totalCount: Array.isArray(response.data) ? list.length : response.data.totalCount,
+        hasMore: Array.isArray(response.data) ? false : response.data.hasMore,
+      },
+    };
   }
   /**
    * TMF632 - Get specific consent by ID
@@ -94,33 +103,11 @@ class ConsentService {
     });
   }
   /**
-   * TMF632 - Delete consent (hard delete)
-   */
-  async deleteConsent(id: string): Promise<ApiResponse<void>> {
-    return apiClient.delete<void>(`${this.basePath}/consent/${id}`);
-  }
-  /**
    * Get consent history for a party
    */
   async getConsentHistory(partyId: string): Promise<ApiResponse<PrivacyConsent[]>> {
-    return apiClient.get<PrivacyConsent[]>(`${this.basePath}/privacyConsent/history/${partyId}`);
-  }
-  /**
-   * Bulk create consents (for migration)
-   */
-  async bulkCreateConsents(consents: ConsentCreateRequest[]): Promise<ApiResponse<PrivacyConsent[]>> {
-    return apiClient.post<PrivacyConsent[]>(`${this.basePath}/privacyConsent/bulk`, { consents });
-  }
-  /**
-   * Validate consent before processing
-   */
-  async validateConsent(partyId: string, purpose: ConsentPurpose, channel?: string): Promise<ApiResponse<{ isValid: boolean; reason?: string }>> {
-    const params = new URLSearchParams({
-      partyId,
-      purpose,
-      ...(channel && { channel })
-    });
-    return apiClient.get<{ isValid: boolean; reason?: string }>(`${this.basePath}/privacyConsent/validate?${params}`);
+    const response = await this.getConsents({ partyId });
+    return { ...response, data: response.data.consents };
   }
   /**
    * Get consent statistics for dashboard
@@ -134,8 +121,26 @@ class ConsentService {
     byPurpose: Record<ConsentPurpose, number>;
     byChannel: Record<string, number>;
   }>> {
-    const params = partyId ? `?partyId=${partyId}` : '';
-    return apiClient.get<any>(`${this.basePath}/privacyConsent/stats${params}`);
+    const { consents } = (await this.getConsents({ partyId })).data;
+    const byPurpose = Object.fromEntries(
+      (['marketing', 'analytics', 'thirdPartySharing', 'dataProcessing', 'location', 'research', 'personalization'] as ConsentPurpose[])
+        .map((purpose) => [purpose, consents.filter((consent) => consent.purpose === purpose).length]),
+    ) as Record<ConsentPurpose, number>;
+    return {
+      status: 200,
+      data: {
+        totalConsents: consents.length,
+        granted: consents.filter((consent) => consent.status === 'granted').length,
+        revoked: consents.filter((consent) => consent.status === 'revoked').length,
+        pending: consents.filter((consent) => consent.status === 'pending').length,
+        expired: consents.filter((consent) => consent.status === 'expired').length,
+        byPurpose,
+        byChannel: consents.reduce<Record<string, number>>((counts, consent) => {
+          counts[consent.channel] = (counts[consent.channel] || 0) + 1;
+          return counts;
+        }, {}),
+      },
+    };
   }
 }
 export const consentService = new ConsentService();

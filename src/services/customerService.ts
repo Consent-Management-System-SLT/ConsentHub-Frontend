@@ -6,6 +6,7 @@ import {
   dsarService
 } from './index';
 import { PrivacyConsent, PrivacyPreference, Party, DSARRequest, ConsentPurpose } from '../types/consent';
+import { customerApiClient } from './customerApiClient';
 interface ConsentPreference {
   dataProcessing: boolean;
   marketing: boolean;
@@ -41,35 +42,21 @@ class CustomerService {
   }
   // TMF632 - Update customer's consent preferences
   async updateConsentPreferences(customerId: string, preferences: ConsentPreference): Promise<void> {
-    const purposeMap: Record<keyof ConsentPreference, ConsentPurpose> = {
+    const purposeMap: Partial<Record<keyof ConsentPreference, ConsentPurpose>> = {
       dataProcessing: 'dataProcessing',
       marketing: 'marketing',
-      analytics: 'analytics',
       thirdPartySharing: 'thirdPartySharing',
-      location: 'location'
     };
+    const consents = (await consentService.getConsents({ partyId: customerId })).data.consents;
     for (const [prefKey, purpose] of Object.entries(purposeMap)) {
+      if (!purpose) continue;
       const isGranted = preferences[prefKey as keyof ConsentPreference];
-      // Check if consent already exists
-      const existingConsents = await consentService.getConsents({ partyId: customerId, purpose });
-      if (existingConsents.data.consents.length > 0) {
-        // Update existing consent
-        const consent = existingConsents.data.consents[0];
-        await consentService.updateConsent(consent.id, {
-          status: isGranted ? 'granted' : 'revoked'
-        });
-      } else if (isGranted) {
-        // Create new consent
-        await consentService.createConsent({
-          partyId: customerId,
-          purpose,
-          status: 'granted',
-          channel: 'all',
-          validFor: {
-            startDateTime: new Date().toISOString()
-          }
-        });
-      }
+      const consent = consents.find((record) => record.purpose === purpose);
+      if (!consent) continue; // New customers receive the currently active consent scopes at registration.
+      if ((consent.status === 'granted') === isGranted) continue;
+      const consentId = (consent as PrivacyConsent & { customerConsentId?: number }).customerConsentId || consent.id;
+      if (isGranted) await customerApiClient.grantConsent({ consentId: String(consentId), status: 'GRANTED' });
+      else await customerApiClient.revokeConsent(String(consentId), 'Customer updated consent preferences');
     }
   }
   // TMF632 - Get customer's consent history
@@ -121,9 +108,8 @@ class CustomerService {
   }
   // Update privacy agreement acceptance status
   async updatePrivacyAgreementStatus(_customerId: string, agreementId: string, accepted: boolean): Promise<void> {
-    await consentService.updateConsent(agreementId, {
-      status: accepted ? 'granted' : 'revoked'
-    });
+    if (accepted) await customerApiClient.grantConsent({ consentId: agreementId, status: 'GRANTED' });
+    else await customerApiClient.revokeConsent(agreementId, 'Customer withdrew consent');
   }
   // Get customer profile
   async getCustomerProfile(customerId: string): Promise<Party> {
