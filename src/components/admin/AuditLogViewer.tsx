@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Spinner } from '../shared/Loading';
+import { LoadingPanel } from '../shared/Loading';
 import { 
   Activity, 
   Search, 
@@ -263,10 +263,7 @@ const AuditLogViewer: React.FC = () => {
   if (loading && auditLogs.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center">
-          <Spinner size="lg" className="mx-auto" />
-          <p className="mt-4 text-gray-600">Loading audit logs...</p>
-        </div>
+        <LoadingPanel label="Loading audit logs" />
       </div>
     );
   }

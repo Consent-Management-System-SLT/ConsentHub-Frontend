@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Spinner } from '../shared/Loading';
+import { LoadingPanel } from '../shared/Loading';
 import { Shield, Settings, Plus, AlertTriangle, Eye, Edit, Trash2, X, Save, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 const ComplianceRulesManager = () => {
@@ -192,9 +192,7 @@ const ComplianceRulesManager = () => {
         </div>
       )}
       {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <Spinner size="lg" />
-        </div>
+        <LoadingPanel label="Loading compliance rules" />
       ) : rules.length === 0 ? (
         <div className="text-center py-12">
           <AlertTriangle className="mx-auto h-12 w-12 text-slate-500 mb-4" />

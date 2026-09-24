@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Spinner } from '../shared/Loading';
-import { Plus, Trash2, X, Settings, Users, MessageSquare, Bell, Mail, Smartphone, CheckCircle, AlertCircle, Download, Loader } from 'lucide-react';
+import { LoadingPanel, Spinner } from '../shared/Loading';
+import { Plus, Trash2, X, Settings, Users, MessageSquare, Bell, Mail, Smartphone, CheckCircle, AlertCircle, Download } from 'lucide-react';
 interface CommunicationChannel {
   _id: string;
   name: string;
@@ -305,10 +305,7 @@ const PreferenceManagement: React.FC = () => {
   };
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner size="md" />
-        <span className="ml-2 text-gray-600">Loading preferences...</span>
-      </div>
+      <LoadingPanel label="Loading preferences" />
     );
   }
   return (
@@ -333,7 +330,7 @@ const PreferenceManagement: React.FC = () => {
                 >
                   {loadingStandard ? (
                     <>
-                      <Loader className="animate-spin h-4 w-4 mr-2" />
+                      <Spinner size="sm" className="mr-2" />
                       Loading...
                     </>
                   ) : (

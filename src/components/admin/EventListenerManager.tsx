@@ -1,7 +1,8 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect, useCallback } from 'react';
 import Modal from '../shared/Modal';
 import { 
-  Webhook, Plus, Settings, Activity, CheckCircle, XCircle, RefreshCw, 
+  Webhook, Plus, Settings, Activity, CheckCircle, XCircle, 
   Search, Edit, Trash2, Eye, AlertTriangle, Clock, TrendingUp,
   Globe, Zap, Shield, X, Save
 } from 'lucide-react';
@@ -474,9 +475,7 @@ const EventListenerManager: React.FC = () => {
       </div>
       {/* Webhooks Grid */}
       {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
-        </div>
+        <LoadingPanel label="Loading webhooks" />
       ) : (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-8">

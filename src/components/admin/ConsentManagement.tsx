@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import Modal from '../shared/Modal';
@@ -73,6 +74,7 @@ const ConsentManagement: React.FC = () => {
   const consentVersions = (consentId: number) => catalog?.scopes
     .filter((scope) => scope.consentId === consentId)
     .map((scope) => scope.scopeVersion)
+    .filter((version, index, all) => all.indexOf(version) === index)
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true })) ?? [];
 
   return (
@@ -89,7 +91,7 @@ const ConsentManagement: React.FC = () => {
       </div>
 
       {loadError && <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-slate-900">{loadError}</div>}
-      {!catalog && !loadError && <p className="text-slate-600">Loading consent types…</p>}
+      {!catalog && !loadError && <LoadingPanel label="Loading consent types" />}
       {catalog && (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
           <table className="min-w-[1450px] divide-y divide-slate-200">

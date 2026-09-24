@@ -1,3 +1,4 @@
+import { Spinner } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { FileText, Trash2, Upload, Edit, AlertTriangle, Clock, Info, BarChart, CheckCircle } from 'lucide-react';
 import { apiClient } from '../../services/apiClient';
@@ -263,7 +264,7 @@ const DSARAutomation: React.FC<DSARAutomationProps> = ({ requests: propRequests,
                       >
                         {isProcessing ? (
                           <div className="flex items-center">
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                            <Spinner size="sm" tone="white" className="mr-2" />
                             Processing...
                           </div>
                         ) : (

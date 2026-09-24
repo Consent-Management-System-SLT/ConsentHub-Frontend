@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { multiServiceApiClient, API_SERVICES } from '../../services/multiServiceApiClient';
 import { CheckCircle, XCircle, AlertCircle, Eye } from 'lucide-react';
@@ -46,7 +47,7 @@ const EnterpriseCampaignReview: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="p-8">Loading campaigns...</div>;
+  if (loading) return <div className="p-8"><LoadingPanel label="Loading campaigns" /></div>;
 
   if (selectedCampaign) {
     return (

@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { consentService } from '../../services/consentService';
@@ -90,7 +91,7 @@ const CustomerConsentsTable: React.FC = () => {
           <caption className="sr-only">Read-only customer consent decision history</caption>
           <thead><tr>{['Record ID', 'Customer ID', 'Version ID', 'Status', 'Channel', 'Source', 'Decision Date & Time', 'Withdrawal Date & Time', 'Captured By', 'Created', 'Updated'].map((name) => <th key={name} scope="col" className={th}>{name}</th>)}</tr></thead>
           <tbody className="divide-y divide-slate-200">
-            {loading && <tr><td colSpan={11} className="px-4 py-10 text-center text-slate-600">Loading customer consents…</td></tr>}
+            {loading && <tr><td colSpan={11}><LoadingPanel label="Loading customer consents" /></td></tr>}
             {!loading && filtered.map((row) => (
               <tr key={row.customerConsentId} className="odd:bg-white even:bg-slate-50/50 hover:bg-blue-50/60">
                 <td className={`${td} font-mono`}>{row.customerConsentId}</td>

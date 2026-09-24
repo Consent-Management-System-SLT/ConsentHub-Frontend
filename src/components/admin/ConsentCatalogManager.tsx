@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Plus, Edit } from 'lucide-react';
 import Modal from '../shared/Modal';
@@ -68,10 +69,10 @@ const ConsentCatalogManager: React.FC = () => {
     ],
     scopes: [
       { name: 'consentId', label: 'Consent Type', kind: 'select', options: masterOptions, required: true, createOnly: true },
-      { name: 'scopeVersion', label: 'Version', required: true, hint: 'e.g. 2.0' },
-      { name: 'scopeCode', label: 'Scope Code', required: true },
+      { name: 'scopeVersion', label: 'Version', required: true, hint: 'e.g. 1.0. Different scopes can share a version number; a scope cannot repeat one.' },
+      { name: 'scopeCode', label: 'Scope Code', required: true, hint: 'Identifies the scope, e.g. SVC_OUTAGE_ALERT. New versions of the same scope reuse its code.' },
       { name: 'scopeName', label: 'Scope Name', required: true },
-      { name: 'status', label: 'Status', kind: 'select', options: SCOPE_STATUSES, required: true, hint: 'Customers are recorded against the Active version; only one version per consent type can be active.' },
+      { name: 'status', label: 'Status', kind: 'select', options: SCOPE_STATUSES, required: true, hint: 'Customers are recorded against the Active version; only one version of a scope (same Scope Code) can be active.' },
       { name: 'description', label: 'Description', kind: 'textarea', hint: 'Briefly describe the wording or document covered by this scope.' },
       { name: 'effectiveFrom', label: 'Effective From', kind: 'date', required: true },
       { name: 'effectiveTo', label: 'Effective To', kind: 'date', hint: 'Leave empty if it has no end date' },
@@ -193,7 +194,7 @@ const ConsentCatalogManager: React.FC = () => {
       </div>
 
       {loadError && <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-slate-900">{loadError}</div>}
-      {!catalog && !loadError && <p className="text-slate-600">Loading…</p>}
+      {!catalog && !loadError && <LoadingPanel label="Loading consent catalog" />}
 
       {catalog && (
         <div className={`${tab === 'categories' ? 'w-fit max-w-full' : 'w-full'} bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto`}>

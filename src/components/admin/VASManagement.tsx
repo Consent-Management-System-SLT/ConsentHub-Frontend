@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Spinner } from '../shared/Loading';
+import { LoadingPanel } from '../shared/Loading';
 import { 
   Search, 
   Plus, 
@@ -583,9 +583,7 @@ const VASManagement: React.FC = () => {
           </div>
           {/* Services Grid */}
           {loadingServices ? (
-            <div className="flex justify-center items-center h-64">
-              <Spinner size="lg" />
-            </div>
+            <LoadingPanel label="Loading services" />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredServices.map(service => (
@@ -603,9 +601,7 @@ const VASManagement: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-900">Customer Subscriptions</h3>
             </div>
             {loadingSubscriptions ? (
-              <div className="flex justify-center items-center h-64">
-                <Spinner size="lg" />
-              </div>
+              <LoadingPanel label="Loading subscriptions" />
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -711,9 +707,7 @@ const VASManagement: React.FC = () => {
             <h3 className="text-lg font-medium text-gray-900">Subscription History</h3>
           </div>
           {loadingHistory ? (
-            <div className="flex justify-center items-center h-64">
-              <Spinner size="lg" />
-            </div>
+            <LoadingPanel label="Loading history" />
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">

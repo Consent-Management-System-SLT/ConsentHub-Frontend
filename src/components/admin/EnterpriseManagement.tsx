@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { Building, Filter, Search, ArrowRight, ArrowLeft, CheckCircle, XCircle, FileText, Send } from 'lucide-react';
 import { useNotifications } from '../../contexts/NotificationContext';
@@ -357,7 +358,7 @@ export default function EnterpriseManagement() {
 
         <div className="p-6">
           {loading ? (
-            <div className="text-center py-12 text-slate-500">Loading applications...</div>
+            <LoadingPanel label="Loading applications" />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left">

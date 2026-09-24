@@ -1,5 +1,6 @@
+import { LoadingPanel, Spinner } from '../shared/Loading';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Upload, Download, CheckCircle, AlertCircle, RefreshCw, FileText, X, Search } from 'lucide-react';
+import { Upload, Download, CheckCircle, AlertCircle, FileText, X, Search } from 'lucide-react';
 import axios from 'axios';
 interface BulkImport {
   _id: string;
@@ -234,7 +235,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
       case 'failed':
         return <AlertCircle className="w-5 h-5 text-red-600" />;
       case 'processing':
-        return <RefreshCw className="w-5 h-5 text-blue-600 animate-spin" />;
+        return <Spinner size="sm" />;
       case 'pending':
         return <FileText className="w-5 h-5 text-yellow-700" />;
       default:
@@ -430,9 +431,7 @@ CSR User,csr@example.com,+1987654321,csr,true`
             </div>
           </div>
           {loading ? (
-            <div className="flex justify-center items-center py-8">
-              <RefreshCw className="w-6 h-6 text-blue-600 animate-spin" />
-            </div>
+            <LoadingPanel label="Loading import history" />
           ) : (
             <>
               <div className="space-y-4 max-h-96 overflow-y-auto">

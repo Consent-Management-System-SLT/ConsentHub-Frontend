@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import Modal from '../shared/Modal';
 ﻿import { pageWindow } from '../../utils/pagination';
@@ -244,17 +245,7 @@ const DSARManager: React.FC = () => {
   };
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-white border border-slate-200 rounded-xl shadow-sm"></div>
-          <div className="h-16 bg-white border border-slate-200 rounded-xl shadow-sm"></div>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-white border border-slate-200 rounded-xl shadow-sm"></div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <div className="p-6"><LoadingPanel label="Loading DSAR requests" /></div>
     );
   }
   return (

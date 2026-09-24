@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { 
   Users, 
@@ -9,7 +10,7 @@ import {
   Activity,
   TrendingUp,
   Server,
-  RefreshCw,
+  
   Calendar,
   FileText,
   BarChart3
@@ -113,12 +114,7 @@ const DashboardHome: React.FC = () => {
   };
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="flex items-center space-x-3">
-          <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
-          <span className="text-lg text-slate-600">Loading dashboard data...</span>
-        </div>
-      </div>
+      <LoadingPanel label="Loading dashboard data" />
     );
   }
   if (error) {

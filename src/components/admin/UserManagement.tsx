@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Spinner } from '../shared/Loading';
-import { Users, Plus, Search, Edit, Trash2, Shield, UserCheck, RefreshCw, Eye, EyeOff, X, UserX, Pause, Play, AlertTriangle } from 'lucide-react';
+import { LoadingPanel, Spinner } from '../shared/Loading';
+import { Users, Plus, Search, Edit, Trash2, Shield, UserCheck, Eye, EyeOff, X, UserX, Pause, Play, AlertTriangle } from 'lucide-react';
 import { useCRUDNotifications } from '../shared/withNotifications';
 // Utility function to format dates
 const formatDateTime = (dateString: string | null) => {
@@ -970,10 +970,7 @@ const UserManagement: React.FC = () => {
       {/* Users Table */}
       {loading && users.length === 0 ? (
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
-          <div className="text-center">
-            <Spinner size="md" className="mx-auto mb-4" />
-            <p className="text-slate-600">Loading users...</p>
-          </div>
+          <LoadingPanel label="Loading users" />
         </div>
       ) : error && users.length === 0 ? (
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8">
@@ -1635,7 +1632,7 @@ const UserManagement: React.FC = () => {
                 disabled={loading}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
               >
-                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                {loading ? <Spinner size="sm" tone="white" /> : <Trash2 className="w-4 h-4" />}
                 <span>{loading ? 'Deleting...' : 'Delete User'}</span>
               </button>
             </div>

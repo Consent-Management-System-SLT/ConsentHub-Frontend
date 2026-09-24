@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import Modal from '../shared/Modal';
 import { Users, Search, Eye, Shield, Calendar, Phone, Mail, Filter, UserPlus, X } from 'lucide-react';
@@ -132,16 +133,7 @@ const CustomerManagement: React.FC = () => {
   });
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <div className="p-6"><LoadingPanel label="Loading customers" /></div>
     );
   }
   return (

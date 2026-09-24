@@ -11,7 +11,7 @@ import {
   UserCheck,
   Zap,
   Cog,
-  Smartphone,
+  // Smartphone, // VAS Management hidden
   Megaphone,
   ScrollText,
   ShieldCheck,
@@ -21,14 +21,15 @@ import DashboardSidebar, { NavItem } from '../shared/DashboardSidebar';
 
 export const adminNavItems: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: BarChart3, description: 'Overview and analytics' },
+  { id: 'consent-management', label: 'Consent Management', icon: Shield, description: 'Consent types customers can be asked to accept' },
+  { id: 'consent-catalog', label: 'Consent Catalog', icon: ListChecks, description: 'Scopes, versions and categories' },
+  { id: 'consents', label: 'Customer Consents', icon: Shield, description: 'Read-only customer decision history' },
   { id: 'enterprise-management', label: 'Enterprise Management', icon: Webhook, description: 'Registrations and approvals' },
   { id: 'enterprise-campaigns', label: 'Enterprise Campaigns', icon: Megaphone, description: 'Review and approve' },
-  { id: 'consent-management', label: 'Consent Management', icon: Shield, description: 'Consent types customers can be asked to accept' },
-  { id: 'consent-catalog', label: 'Consent Catalog', icon: ListChecks, description: 'Versions and categories' },
-  { id: 'consents', label: 'Customer Consents', icon: Shield, description: 'Read-only customer decision history' },
-  { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Consent for minors' },
   { id: 'preference-management', label: 'Preference Management', icon: Cog, description: 'Channels and topics' },
-  { id: 'vas-management', label: 'VAS Management', icon: Smartphone, description: 'Value Added Services' },
+  // Hidden for now: Guardian Consent and VAS Management
+  // { id: 'guardian-consent', label: 'Guardian Consent', icon: UserCheck, description: 'Consent for minors' },
+  // { id: 'vas-management', label: 'VAS Management', icon: Smartphone, description: 'Value Added Services' },
   { id: 'privacy-notices', label: 'Privacy Notices', icon: FileText, description: 'Manage privacy policies' },
   { id: 'dsar-requests', label: 'DSAR Requests', icon: Database, description: 'Subject access requests' },
   { id: 'dsar-automation', label: 'DSAR Automation', icon: Zap, description: 'Automated processing' },
