@@ -65,7 +65,6 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [notificationLogs, setNotificationLogs] = useState<NotificationLog[]>([]);
   // UI states
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   // Load data on component mount
@@ -367,14 +366,6 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
             <p className="text-slate-600 mt-1">Send notifications and manage campaigns</p>
           </div>
           <div className="flex items-center space-x-3">
-            <button
-              onClick={loadAnalytics}
-              disabled={loading}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
-            </button>
           </div>
         </div>
         {/* Tab Navigation */}

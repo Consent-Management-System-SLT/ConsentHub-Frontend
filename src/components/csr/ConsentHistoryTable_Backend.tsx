@@ -396,14 +396,6 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
             >
               {autoRefresh ? 'Auto ON' : 'Auto OFF'}
             </button>
-            <button
-              onClick={loadConsentsAndCustomers}
-              disabled={loading}
-              className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex flex-wrap items-center gap-2 disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
           </div>
         </div>
       </div>

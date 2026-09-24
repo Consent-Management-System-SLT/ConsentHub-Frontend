@@ -422,13 +422,6 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium text-slate-900">Guardian Consents</h3>
-              <button
-                onClick={loadGuardianConsents}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <RefreshCw className="w-4 h-4" />
-                <span>Refresh</span>
-              </button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full border border-slate-200 rounded-lg">

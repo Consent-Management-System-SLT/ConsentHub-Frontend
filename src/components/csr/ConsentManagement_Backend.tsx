@@ -143,15 +143,6 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({ className = '', c
               <p className="text-sm text-slate-600 mt-1">Search customers and manage their consent records</p>
             </div>
           </div>
-          <button
-            onClick={() => {
-              csrDashboardService.getCustomers().then(setCustomers).catch(() => {});
-              csrDashboardService.getConsents().then(setConsents).catch(() => {});
-            }}
-            className="px-4 py-2 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors flex items-center"
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />Refresh
-          </button>
         </div>
       </div>
 

@@ -302,14 +302,6 @@ const CSRCustomerVASManagement: React.FC = () => {
               <div className="text-sm text-gray-600">
                 <span className="font-medium">Active:</span> {stats.activeSubscriptions} / {stats.totalServices}
               </div>
-              <button
-                onClick={() => handleSelectCustomer(selectedCustomer)}
-                disabled={isLoadingVAS}
-                className="flex items-center space-x-2 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg"
-              >
-                <RefreshCw className={`w-4 h-4 ${isLoadingVAS ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
-              </button>
             </div>
           </div>
           {isLoadingVAS ? (
