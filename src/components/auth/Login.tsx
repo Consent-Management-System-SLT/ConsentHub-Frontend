@@ -1,3 +1,4 @@
+import { Spinner } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { useLockedLightTheme } from '../../contexts/ThemeContext';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -184,10 +185,7 @@ const Login: React.FC = () => {
               >
                 {isLoading ? (
                   <>
-                    <span
-                      className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"
-                      aria-hidden="true"
-                    />
+                    <Spinner size="sm" tone="white" />
                     <span className="sr-only">Signing in</span>
                   </>
                 ) : (

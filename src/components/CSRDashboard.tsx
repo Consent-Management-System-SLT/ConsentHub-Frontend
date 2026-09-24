@@ -1,3 +1,4 @@
+import { LoadingPanel, Spinner } from './shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { 
   Users, 
@@ -8,7 +9,7 @@ import {
   CheckCircle,
   Clock,
   HelpCircle,
-  RefreshCw,
+  
   Activity
 } from 'lucide-react';
 import { csrDashboardService } from '../services/csrDashboardService';
@@ -317,36 +318,7 @@ const DashboardOverview: React.FC<{
 }) => {
   if (loading) {
     return (
-      <div className="space-y-6">
-        {/* Loading Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-900 rounded-xl shadow-lg p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Loading Dashboard...</h1>
-              <p className="text-white/90 text-sm sm:text-base">
-                Please wait while we fetch your real-time data.
-              </p>
-            </div>
-            <div className="hidden sm:block">
-              <RefreshCw className="w-16 h-16 opacity-80 animate-spin" />
-            </div>
-          </div>
-        </div>
-        {/* Loading Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 animate-pulse">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="h-4 bg-blue-50/30 rounded w-3/4 mb-2"></div>
-                  <div className="h-8 bg-blue-50/30 rounded w-1/2"></div>
-                </div>
-                <div className="w-12 h-12 bg-blue-50/30 rounded-lg"></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <LoadingPanel label="Loading dashboard" />
     );
   }
   return (
@@ -494,7 +466,7 @@ const DashboardOverview: React.FC<{
             <h3 className="text-lg font-semibold text-slate-900">Recent Activity</h3>
             {isRefreshing && (
               <div className="flex items-center text-green-700 text-sm">
-                <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+                <Spinner size="sm" className="mr-2" />
                 Refreshing...
               </div>
             )}
@@ -549,7 +521,7 @@ const DashboardOverview: React.FC<{
           <h3 className="text-lg font-semibold text-slate-900">Today's Insights</h3>
           {isRefreshing && (
             <div className="flex items-center text-green-700 text-sm">
-              <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+              <Spinner size="sm" className="mr-2" />
               Refreshing...
             </div>
           )}

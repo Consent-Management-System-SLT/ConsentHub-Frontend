@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './shared/Modal';
-import { Spinner } from './shared/Loading';
+import { LoadingPanel, Spinner } from './shared/Loading';
 import { 
   FileText, 
   Eye, 
@@ -584,10 +584,7 @@ export const PrivacyNotices: React.FC = () => {
   if (loading && notices.length === 0) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading privacy notices...</p>
-        </div>
+        <LoadingPanel label="Loading privacy notices" />
       </div>
     );
   }
