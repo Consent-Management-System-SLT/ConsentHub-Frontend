@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { Eye, Edit, Trash, Play, Send } from 'lucide-react';
 import { multiServiceApiClient, API_SERVICES } from '../../services/multiServiceApiClient';
@@ -57,7 +58,7 @@ const CampaignList: React.FC<CampaignListProps> = ({ onCreateNew, onViewDetail }
     }
   };
 
-  if (loading) return <div>Loading campaigns...</div>;
+  if (loading) return <LoadingPanel label="Loading campaigns" />;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200">

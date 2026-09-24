@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Play, Send, Edit, Trash } from 'lucide-react';
 import { multiServiceApiClient, API_SERVICES } from '../../services/multiServiceApiClient';
@@ -59,7 +60,7 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId, onBack, onE
     }
   };
 
-  if (loading) return <div>Loading details...</div>;
+  if (loading) return <LoadingPanel label="Loading details" />;
   if (!campaign) return <div>Campaign not found</div>;
 
   return (
