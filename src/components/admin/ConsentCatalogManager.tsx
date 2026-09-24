@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Plus, Edit, RefreshCw } from 'lucide-react';
+import { Plus, Edit } from 'lucide-react';
 import Modal from '../shared/Modal';
 import { notificationManager } from '../shared/NotificationContainer';
 import { toLocalInput } from '../../utils/consentModel';
@@ -179,7 +179,6 @@ const ConsentCatalogManager: React.FC = () => {
           <p className="text-slate-600">Manage consent scopes, their versions, and categories.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={load} className="inline-flex items-center gap-2 bg-white border border-gray-300 text-slate-800 hover:bg-slate-50 text-sm font-medium rounded-lg px-4 py-2"><RefreshCw className="w-4 h-4" aria-hidden="true" />Refresh</button>
           <button onClick={() => open(null)} disabled={!catalog || (tab === 'scopes' && catalog.masters.length === 0)} className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2 disabled:opacity-60"><Plus className="w-4 h-4" aria-hidden="true" />New {current.noun}</button>
         </div>
       </div>

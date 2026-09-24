@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Plus, RefreshCw } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Modal from '../shared/Modal';
 import { notificationManager } from '../shared/NotificationContainer';
 import { consentCatalogService, ConsentCatalog } from '../../services/consentCatalogService';
@@ -83,7 +83,7 @@ const ConsentManagement: React.FC = () => {
           <p className="text-slate-600">Create and review the consent types customers may be asked to accept. Manage their versions in Consent Catalog.</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => void load()} className="inline-flex items-center gap-2 bg-white border border-gray-300 text-slate-800 hover:bg-slate-50 text-sm font-medium rounded-lg px-4 py-2"><RefreshCw className="w-4 h-4" aria-hidden="true" />Refresh</button>
+
           <button onClick={openCreate} disabled={!catalog?.categories.length} className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg px-4 py-2 disabled:opacity-60"><Plus className="w-4 h-4" aria-hidden="true" />New Consent</button>
         </div>
       </div>

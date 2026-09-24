@@ -829,15 +829,6 @@ const UserManagement: React.FC = () => {
             <Plus className="w-4 h-4" />
             <span>Add User</span>
           </button>
-          <button 
-            onClick={fetchUsers}
-            disabled={loading}
-            className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 text-sm font-medium"
-            title={lastRefresh ? `Last updated: ${lastRefresh.toLocaleTimeString()}` : 'Click to refresh'}
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </button>
           {lastRefresh && (
             <span className="text-xs text-gray-500 hidden sm:block">
               Updated: {formatDateTime(lastRefresh.toISOString())}

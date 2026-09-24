@@ -76,7 +76,6 @@ const EventListenerManager: React.FC = () => {
   const [availableEvents, setAvailableEvents] = useState<EventType[]>([]);
   const [stats, setStats] = useState<WebhookStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   // Search and filtering
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -149,7 +148,6 @@ const EventListenerManager: React.FC = () => {
       });
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   }, [searchTerm, statusFilter, eventFilter]);
   // Fetch available events
@@ -203,11 +201,6 @@ const EventListenerManager: React.FC = () => {
     }, 30000);
     return () => clearInterval(interval);
   }, []);
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchWebhooks(currentPage);
-    fetchStats();
-  };
   const resetForm = () => {
     setFormData({
       name: '',
@@ -387,14 +380,6 @@ const EventListenerManager: React.FC = () => {
             >
               <Plus className="w-4 h-4" />
               <span className="text-sm font-medium">Add Webhook</span>
-            </button>
-            <button 
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center space-x-2 disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-              <span className="text-sm font-medium">Refresh</span>
             </button>
           </div>
         </div>

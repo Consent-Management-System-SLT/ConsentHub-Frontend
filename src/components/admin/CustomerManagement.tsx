@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../shared/Modal';
-import { Users, Search, Eye, Shield, Calendar, Phone, Mail, RefreshCw, Filter, UserPlus, X } from 'lucide-react';
+import { Users, Search, Eye, Shield, Calendar, Phone, Mail, Filter, UserPlus, X } from 'lucide-react';
 import { useCRUDNotifications } from '../shared/withNotifications';
 interface Customer {
   id: string;
@@ -158,13 +158,6 @@ const CustomerManagement: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-3">
-          <button
-            onClick={fetchCustomers}
-            className="flex flex-wrap items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </button>
         </div>
       </div>
       {/* Stats Cards */}

@@ -11,7 +11,6 @@ import {
   Calendar,
   User,
   ChevronDown,
-  RefreshCw,
   Archive,
   MessageSquare,
   ChevronLeft,
@@ -27,7 +26,6 @@ const DSARManager: React.FC = () => {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [refreshing, setRefreshing] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
@@ -120,15 +118,6 @@ const DSARManager: React.FC = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedRequests = filteredRequests.slice(startIndex, endIndex);
-    // Add manual refresh function
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await loadDSARRequests();
-    } finally {
-      setRefreshing(false);
-    }
-  };
   const handleExport = async () => {
     try {
       const token = localStorage.getItem('authToken'); // Fixed: use 'authToken' not 'token'
@@ -278,14 +267,6 @@ const DSARManager: React.FC = () => {
           <p className="text-slate-600 mt-1">Manage Data Subject Access Requests</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button aria-label="Refresh"
-            onClick={handleRefresh}
-            disabled={loading || refreshing}
-            className={`bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex flex-wrap items-center gap-2 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
-          </button>
           <button
             onClick={handleExport}
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2"

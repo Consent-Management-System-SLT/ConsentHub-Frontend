@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { consentService } from '../../services/consentService';
 
 interface CustomerConsentRow {
@@ -66,7 +66,7 @@ const CustomerConsentsTable: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-900">Customer Consents</h1>
           <p className="text-slate-600">A read-only history of customer consent decisions received through customer and integration APIs.</p>
         </div>
-        <button onClick={() => void load()} disabled={loading} className="inline-flex items-center justify-center gap-2 bg-white border border-gray-300 text-slate-800 hover:bg-slate-50 text-sm font-medium rounded-lg px-4 py-2 disabled:opacity-60"><RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />Refresh</button>
+
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 bg-white rounded-xl shadow-sm border border-slate-200 p-4">

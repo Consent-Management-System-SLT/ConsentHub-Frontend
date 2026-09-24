@@ -59,7 +59,6 @@ const BulkImportManager: React.FC = () => {
   const [selectedImport, setSelectedImport] = useState<BulkImport | null>(null);
   const [importHistory, setImportHistory] = useState<BulkImport[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   // Search and pagination
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -118,7 +117,6 @@ const BulkImportManager: React.FC = () => {
       });
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   }, [searchTerm, statusFilter, typeFilter]);
   // Load import history on component mount and when filters change
@@ -229,10 +227,6 @@ CSR User,csr@example.com,+1987654321,csr,true`
     setSelectedImport(importItem);
     setShowErrorModal(true);
   };
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchImportHistory(currentPage);
-  };
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -295,14 +289,6 @@ CSR User,csr@example.com,+1987654321,csr,true`
           >
             <Download className="w-4 h-4 text-slate-500" />
             <span className="text-sm font-medium text-slate-600">Download Template</span>
-          </button>
-          <button 
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            <span className="text-sm font-medium">Refresh</span>
           </button>
         </div>
       </div>
