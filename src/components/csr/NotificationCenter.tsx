@@ -1,3 +1,4 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { 
   Send, 
@@ -10,7 +11,7 @@ import {
   Calendar,
   Search,
   Download,
-  RefreshCw,
+  
   Plus,
   Edit3,
   Trash2,
@@ -736,10 +737,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' 
                 </div>
               </div>
               {preBuiltTemplates.length === 0 ? (
-                <div className="text-center py-8 text-slate-600">
-                  <RefreshCw className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Loading pre-built templates...</p>
-                </div>
+                <LoadingPanel label="Loading pre-built templates" />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {preBuiltTemplates.map(template => (

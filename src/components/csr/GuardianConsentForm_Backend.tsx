@@ -1,3 +1,4 @@
+import { LoadingPanel, Spinner } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { 
   User, 
@@ -15,7 +16,7 @@ import {
   Clock,
   CheckCircle,
   Search,
-  RefreshCw,
+  
   Plus
 } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
@@ -192,10 +193,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="flex items-center justify-center py-12">
-          <RefreshCw className="w-6 h-6 animate-spin text-indigo-600" />
-          <span className="ml-2 text-slate-600">Loading guardian consent data...</span>
-        </div>
+        <LoadingPanel label="Loading guardian consent data" />
       </div>
     );
   }
@@ -411,7 +409,7 @@ const GuardianConsentForm: React.FC<GuardianConsentFormProps> = ({ onClose, cust
                 disabled={saving}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center space-x-2"
               >
-                {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                {saving ? <Spinner size="sm" tone="white" /> : <Check className="w-4 h-4" />}
                 <span>{saving ? 'Creating...' : 'Create Consent'}</span>
               </button>
             </div>

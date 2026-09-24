@@ -1,3 +1,4 @@
+import { LoadingPanel, Spinner } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
@@ -236,10 +237,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-center py-12">
-          <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
-          <span className="ml-2 text-slate-600">Loading DSAR requests...</span>
-        </div>
+        <LoadingPanel label="Loading DSAR requests" />
       </div>
     );
   }
@@ -396,7 +394,7 @@ const DSARRequestPanel: React.FC<DSARRequestPanelProps> = ({
                     )}
                     {processing === request.id && (
                       <div className="flex items-center space-x-2">
-                        <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />
+                        <Spinner size="sm" />
                         <span className="text-sm text-slate-600">Processing...</span>
                       </div>
                     )}

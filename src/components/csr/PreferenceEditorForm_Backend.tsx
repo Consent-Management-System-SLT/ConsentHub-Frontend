@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Spinner } from '../shared/Loading';
+import { LoadingPanel, Spinner } from '../shared/Loading';
 import { 
   Settings, 
   Save, 
@@ -8,7 +8,7 @@ import {
   MessageCircle, 
   Phone, 
   Bell, 
-  RefreshCw, 
+  
   Search,
   Clock,
   VolumeX,
@@ -491,9 +491,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     </div>
                   </div>
                 )) || (
-                  <div className="text-center py-8 text-slate-500">
-                    <p>Loading communication channels...</p>
-                  </div>
+                  <LoadingPanel label="Loading communication channels" />
                 )}
               </div>
             </div>
@@ -534,9 +532,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                     </div>
                   </div>
                 )) || (
-                  <div className="text-center py-8 text-slate-500">
-                    <p>Loading topic subscriptions...</p>
-                  </div>
+                  <LoadingPanel label="Loading topic subscriptions" />
                 )}
               </div>
             </div>
@@ -692,7 +688,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 transition-colors"
               >
                 {saving ? (
-                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <Spinner size="sm" tone="white" />
                 ) : (
                   <Save className="w-4 h-4" />
                 )}
@@ -703,10 +699,7 @@ const PreferenceEditorForm: React.FC<PreferenceEditorFormProps> = ({ className =
         </div>
       ) : selectedCustomer && loading ? (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12">
-          <div className="text-center">
-            <Spinner size="lg" className="mx-auto mb-4" />
-            <p className="text-slate-600">Loading preferences...</p>
-          </div>
+          <LoadingPanel label="Loading preferences" />
         </div>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12">

@@ -1,5 +1,6 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
-import { Activity, Search, Filter, RefreshCw, AlertCircle, Calendar } from 'lucide-react';
+import { Activity, Search, Filter, AlertCircle, Calendar } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
 interface AuditLogTableProps {
   className?: string;
@@ -119,10 +120,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-center py-12">
-          <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
-          <span className="ml-2 text-slate-600">Loading audit logs...</span>
-        </div>
+        <LoadingPanel label="Loading audit logs" />
       </div>
     );
   }

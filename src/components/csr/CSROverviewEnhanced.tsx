@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Spinner } from '../shared/Loading';
+import { LoadingPanel } from '../shared/Loading';
 import { 
   Users, 
   FileText, 
@@ -189,10 +189,7 @@ const CSROverviewEnhanced: React.FC<CSROverviewEnhancedProps> = ({
   if (loading) {
     return (
       <div className={`bg-white rounded-xl shadow-sm border border-slate-200 ${className}`}>
-        <div className="p-8 text-center">
-          <Spinner size="lg" className="mx-auto mb-4" />
-          <p className="text-slate-900">Loading CSR overview...</p>
-        </div>
+        <LoadingPanel label="Loading CSR overview" />
       </div>
     );
   }

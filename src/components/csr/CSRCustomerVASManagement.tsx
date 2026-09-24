@@ -1,3 +1,4 @@
+import { LoadingPanel, Spinner } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { 
   Search, 
@@ -5,7 +6,7 @@ import {
   Mail, 
   Phone, 
   Settings, 
-  RefreshCw,
+  
   AlertCircle,
   X
 } from 'lucide-react';
@@ -220,7 +221,7 @@ const CSRCustomerVASManagement: React.FC = () => {
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
           >
             {isSearching ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
+              <Spinner size="sm" tone="white" />
             ) : (
               <Search className="w-4 h-4" />
             )}
@@ -305,10 +306,7 @@ const CSRCustomerVASManagement: React.FC = () => {
             </div>
           </div>
           {isLoadingVAS ? (
-            <div className="flex items-center justify-center py-12">
-              <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
-              <span className="ml-2 text-gray-600">Loading VAS services...</span>
-            </div>
+            <LoadingPanel label="Loading VAS services" />
           ) : vasServices.length === 0 ? (
             <div className="text-center py-12">
               <Settings className="w-12 h-12 text-slate-500 mx-auto mb-3" />
@@ -352,7 +350,7 @@ const CSRCustomerVASManagement: React.FC = () => {
                       }`}
                     >
                       {isUpdating === service.id ? (
-                        <RefreshCw className="w-3 h-3 animate-spin" />
+                        <Spinner size="sm" />
                       ) : service.isSubscribed ? (
                         'Unsubscribe'
                       ) : (

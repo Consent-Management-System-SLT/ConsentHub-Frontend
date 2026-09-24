@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Spinner } from '../shared/Loading';
-import { Search, User, Phone, Mail, Shield, AlertCircle, RefreshCw } from 'lucide-react';
+import { LoadingPanel, Spinner } from '../shared/Loading';
+import { Search, User, Phone, Mail, Shield, AlertCircle } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
 interface CustomerSearchFormProps {
   onCustomerSelect?: (customer: any) => void;
@@ -90,7 +90,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
             disabled={!searchTerm.trim() || isSearching}
             className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium flex flex-wrap items-center gap-2"
           >
-            {isSearching ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+            {isSearching ? <Spinner size="sm" tone="white" /> : <Search className="w-4 h-4" />}
             {isSearching ? 'Searching...' : 'Search'}
           </button>
         </div>
@@ -107,10 +107,7 @@ const CustomerSearchForm: React.FC<CustomerSearchFormProps> = ({
       {/* Search Results */}
       <div className="p-6">
         {isSearching ? (
-          <div className="flex items-center justify-center py-8">
-            <Spinner size="md" />
-            <span className="ml-2 text-slate-600">Searching customers...</span>
-          </div>
+          <LoadingPanel label="Searching customers" />
         ) : searchResults.length > 0 ? (
           <div className="space-y-3">
             <h3 className="text-lg font-medium text-slate-900">

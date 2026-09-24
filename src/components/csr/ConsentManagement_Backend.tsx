@@ -1,6 +1,7 @@
+import { LoadingPanel, Spinner } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import {
-  Search, User, Shield, Check, X, Clock, RefreshCw, Edit, ChevronDown, ChevronUp, Filter
+  Search, User, Shield, Check, X, Clock, Edit, ChevronDown, ChevronUp, Filter
 } from 'lucide-react';
 import { csrDashboardService, CustomerData, ConsentData } from '../../services/csrDashboardService';
 import { websocketService } from '../../services/websocketService';
@@ -231,10 +232,7 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({ className = '', c
 
             {/* List */}
             {loading ? (
-              <div className="text-center py-8">
-                <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-blue-600" />
-                <p className="text-slate-600">Loading consents…</p>
-              </div>
+              <LoadingPanel label="Loading consents" />
             ) : filteredConsents.length === 0 ? (
               <div className="text-center py-8">
                 <Shield className="w-12 h-12 mx-auto mb-4 text-slate-400" />
@@ -333,14 +331,14 @@ const ConsentManagement: React.FC<ConsentManagementProps> = ({ className = '', c
                                       disabled={saving === key}
                                       className="flex-1 px-3 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
                                     >
-                                      {saving === key ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4 mr-1" />Grant</>}
+                                      {saving === key ? <Spinner size="sm" tone="white" /> : <><Check className="w-4 h-4 mr-1" />Grant</>}
                                     </button>
                                     <button
                                       onClick={() => handleUpdate(String(consent.customerConsentId || consent.id), 'WITHDRAWN')}
                                       disabled={saving === key}
                                       className="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center text-sm disabled:opacity-50"
                                     >
-                                      {saving === key ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4 mr-1" />Withdraw</>}
+                                      {saving === key ? <Spinner size="sm" tone="white" /> : <><X className="w-4 h-4 mr-1" />Withdraw</>}
                                     </button>
                                   </div>
                                   <button

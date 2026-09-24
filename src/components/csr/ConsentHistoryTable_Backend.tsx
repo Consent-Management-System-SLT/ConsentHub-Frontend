@@ -1,5 +1,6 @@
+import { LoadingPanel } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
-import { FileText, Eye, Clock, RefreshCw, History, Calendar, User, AlertCircle } from 'lucide-react';
+import { FileText, Eye, Clock, History, Calendar, User, AlertCircle } from 'lucide-react';
 import { csrDashboardService } from '../../services/csrDashboardService';
 import { websocketService, ConsentUpdateEvent } from '../../services/websocketService';
 import WebSocketStatus from '../shared/WebSocketStatus';
@@ -327,10 +328,7 @@ const ConsentHistoryTable: React.FC<ConsentHistoryTableProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-center py-12">
-          <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
-          <span className="ml-2 text-slate-600">Loading consent history...</span>
-        </div>
+        <LoadingPanel label="Loading consent history" />
       </div>
     );
   }
