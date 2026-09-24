@@ -1,3 +1,4 @@
+import { LoadingPanel, Spinner } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -276,10 +277,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-green-700 mx-auto mb-4" />
-          <p className="text-slate-600">Loading privacy notices...</p>
-        </div>
+        <LoadingPanel label="Loading privacy notices" />
       </div>
     );
   }
@@ -374,7 +372,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                   className="flex-1 flex items-center justify-center space-x-2 py-3 px-6 bg-green-700 hover:bg-green-800 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
                   {isProcessing === (selectedNotice.id || selectedNotice._id || selectedNotice.noticeId) ? (
-                    <RefreshCw className="w-5 h-5 animate-spin" />
+                    <Spinner size="sm" tone="white" />
                   ) : (
                     <ThumbsUp className="w-5 h-5" />
                   )}
@@ -386,7 +384,7 @@ const CustomerPrivacyNotices: React.FC<CustomerPrivacyNoticesProps> = () => {
                   className="flex-1 flex items-center justify-center space-x-2 py-3 px-6 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
                   {isProcessing === (selectedNotice.id || selectedNotice._id || selectedNotice.noticeId) ? (
-                    <RefreshCw className="w-5 h-5 animate-spin" />
+                    <Spinner size="sm" tone="white" />
                   ) : (
                     <ThumbsDown className="w-5 h-5" />
                   )}

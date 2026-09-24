@@ -1,3 +1,4 @@
+import { LoadingPanel, Spinner } from '../shared/Loading';
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -229,7 +230,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
       case 'completed':
         return <CheckCircle className="w-5 h-5 text-green-700" />;
       case 'processing':
-        return <RefreshCw className="w-5 h-5 text-blue-600 animate-spin" />;
+        return <Spinner size="sm" />;
       case 'pending':
         return <Clock className="w-5 h-5 text-yellow-700" />;
       case 'rejected':
@@ -487,12 +488,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
           </div>
           {/* Requests List */}
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="flex items-center space-x-3">
-                <RefreshCw className="w-6 h-6 text-blue-600 animate-spin" />
-                <span className="text-slate-500">Loading your DSAR requests...</span>
-              </div>
-            </div>
+            <LoadingPanel label="Loading your DSAR requests" />
           ) : (
             <div className="space-y-4">
               {dsarRequests.map((request) => (
@@ -705,7 +701,7 @@ const CustomerDSARRequests: React.FC<CustomerDSARRequestsProps> = () => {
               >
                 {isSubmitting ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <Spinner size="sm" tone="white" />
                     <span>Submitting...</span>
                   </>
                 ) : (

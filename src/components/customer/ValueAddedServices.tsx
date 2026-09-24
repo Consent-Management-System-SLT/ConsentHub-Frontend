@@ -1,3 +1,4 @@
+import { LoadingPanel, Spinner } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -11,7 +12,7 @@ import {
   Zap,
   CheckCircle,
   XCircle,
-  Loader,
+  
   Star,
   Info,
   AlertCircle,
@@ -306,9 +307,7 @@ const ValueAddedServices: React.FC = () => {
   const subscribedCount = services.filter(s => s.isSubscribed).length;
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader className="w-8 h-8 animate-spin text-blue-600" />
-      </div>
+      <LoadingPanel label="Loading services" />
     );
   }
   return (
@@ -505,7 +504,7 @@ const ValueAddedServices: React.FC = () => {
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {isLoading ? (
-                  <Loader className="w-4 h-4 animate-spin mx-auto" />
+                  <Spinner size="sm" className="mx-auto" />
                 ) : service.isSubscribed ? (
                   'Unsubscribe'
                 ) : (

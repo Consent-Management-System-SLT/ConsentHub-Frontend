@@ -1,3 +1,4 @@
+import { LoadingPanel, Spinner } from '../shared/Loading';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -261,10 +262,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
   // Show loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mr-3" />
-        <span className="text-slate-600">Loading consents...</span>
-      </div>
+      <LoadingPanel label="Loading consents" />
     );
   }
   const filteredConsents = consents.filter(consent => {
@@ -577,7 +575,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                           title="Click to revoke this consent"
                          aria-label="Click to revoke this consent">
                           {updating === consent.id ? (
-                            <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
+                            <Spinner size="sm" className="mr-1" />
                           ) : (
                             <XCircle className="w-4 h-4 mr-1" />
                           )}
@@ -591,7 +589,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                           title={`Click to grant this ${consent.status} consent`}
                         >
                           {updating === consent.id ? (
-                            <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
+                            <Spinner size="sm" className="mr-1" />
                           ) : (
                             <CheckCircle className="w-4 h-4 mr-1" />
                           )}
@@ -697,7 +695,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                       className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {updating === selectedConsent.id ? (
-                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        <Spinner size="sm" className="mr-2" />
                       ) : (
                         <XCircle className="w-4 h-4 mr-2" />
                       )}
@@ -713,7 +711,7 @@ const ConsentCenter: React.FC<ConsentCenterProps> = () => {
                       className="px-4 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {updating === selectedConsent.id ? (
-                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        <Spinner size="sm" className="mr-2" />
                       ) : (
                         <CheckCircle className="w-4 h-4 mr-2" />
                       )}
