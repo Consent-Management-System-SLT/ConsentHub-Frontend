@@ -233,20 +233,21 @@ const ConsentCatalogManager: React.FC = () => {
               setValues(next);
               setFormError('');
             };
+            const hintId = f.hint ? `${id}-hint` : undefined;
             return (
               <div key={f.name} className={wide ? 'sm:col-span-2' : ''}>
                 <label htmlFor={id} className="block text-sm font-medium text-gray-700">{f.label}{f.required ? ' *' : ''}</label>
                 {f.kind === 'select' ? (
-                  <select id={id} value={values[f.name] ?? ''} onChange={(e) => set(e.target.value)} disabled={locked} className={fieldClass}>
+                  <select id={id} value={values[f.name] ?? ''} onChange={(e) => set(e.target.value)} disabled={locked} aria-required={f.required} aria-describedby={hintId} className={fieldClass}>
                     {!values[f.name] && <option value="">Select…</option>}
                     {f.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 ) : f.kind === 'textarea' ? (
-                  <textarea id={id} rows={3} value={values[f.name] ?? ''} onChange={(e) => set(e.target.value)} className={fieldClass} />
+                  <textarea id={id} rows={3} value={values[f.name] ?? ''} onChange={(e) => set(e.target.value)} aria-required={f.required} aria-describedby={hintId} className={fieldClass} />
                 ) : (
-                  <input id={id} type={f.kind === 'date' ? 'date' : 'text'} value={values[f.name] ?? ''} onChange={(e) => set(e.target.value)} disabled={locked} className={fieldClass} />
+                  <input id={id} type={f.kind === 'date' ? 'date' : 'text'} value={values[f.name] ?? ''} onChange={(e) => set(e.target.value)} disabled={locked} aria-required={f.required} aria-describedby={hintId} className={fieldClass} />
                 )}
-                {f.hint && <p className="mt-1 text-xs text-slate-600">{f.hint}</p>}
+                {f.hint && <p id={hintId} className="mt-1 text-xs text-slate-600">{f.hint}</p>}
               </div>
             );
           })}

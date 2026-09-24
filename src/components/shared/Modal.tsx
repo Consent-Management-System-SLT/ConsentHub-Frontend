@@ -41,12 +41,15 @@ const Modal: React.FC<ModalProps> = ({
   footer,
   children,
 }) => {
+  const dialogRef = React.useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', onKey);
+    dialogRef.current?.focus();
     return () => document.removeEventListener('keydown', onKey);
   }, [isOpen, onClose]);
 
@@ -57,7 +60,9 @@ const Modal: React.FC<ModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={typeof title === 'string' ? title : undefined}
-      className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
+      ref={dialogRef}
+      tabIndex={-1}
+      className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 focus:outline-none"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
