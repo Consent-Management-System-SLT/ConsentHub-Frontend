@@ -56,6 +56,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
     newCustomers: 0
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [autoRefresh, setAutoRefresh] = useState(true);
   useEffect(() => {
     console.log('CSR Dashboard initializing...');
@@ -162,6 +163,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
   // Handle manual refresh
   const handleRefresh = async () => {
     setIsRefreshing(true);
+    setRefreshKey((k) => k + 1);
     try {
       await loadDashboardData();
     } catch (error) {
@@ -267,7 +269,7 @@ const CSRDashboard: React.FC<CSRDashboardProps> = ({ className = '' }) => {
         >
           <div className="p-4 sm:p-5 lg:p-6">
             <div className="max-w-7xl mx-auto">
-              {renderContent()}
+              <React.Fragment key={refreshKey}>{renderContent()}</React.Fragment>
             </div>
           </div>
         </main>
@@ -308,7 +310,6 @@ const DashboardOverview: React.FC<{
   activities, 
   onSectionChange, 
   loading = false, 
-  onRefresh, 
   insights, 
   isRefreshing = false, 
   autoRefresh = false, 
@@ -366,17 +367,6 @@ const DashboardOverview: React.FC<{
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-600"
              aria-label="Auto-refresh"/>
           </div>
-          {onRefresh && (
-            <button
-              onClick={onRefresh}
-              disabled={isRefreshing}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-              title="Refresh Data"
-             aria-label="Refresh Data">
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
-            </button>
-          )}
         </div>
       </div>
       {/* Key Metrics */}
