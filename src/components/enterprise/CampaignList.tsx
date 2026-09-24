@@ -30,7 +30,7 @@ const CampaignList: React.FC<CampaignListProps> = ({ onCreateNew, onViewDetail }
 
   const fetchCampaigns = async () => {
     try {
-      const response = await multiServiceApiClient.get('/enterprise/campaigns', {
+      const response = await multiServiceApiClient.get('/api/v2/enterprise/campaigns', {
         service: API_SERVICES.CONSENT
       });
       if (response.data.success) {

@@ -39,7 +39,7 @@ const EnterpriseDashboard: React.FC = () => {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await multiServiceApiClient.get('/enterprise/analytics', { service: API_SERVICES.CONSENT });
+      const res = await multiServiceApiClient.get('/api/v2/enterprise/analytics', { service: API_SERVICES.CONSENT });
       if (res.data.success) {
         setMetrics({
           activeCampaigns: res.data.metrics.totalCampaigns || 0,

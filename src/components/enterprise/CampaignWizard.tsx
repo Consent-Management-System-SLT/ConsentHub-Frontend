@@ -41,24 +41,24 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
 
   const fetchConfig = async () => {
     try {
-      const res = await multiServiceApiClient.get('/enterprise/configuration', { service: API_SERVICES.CONSENT });
+      const res = await multiServiceApiClient.get('/api/v2/enterprise/configuration', { service: API_SERVICES.CONSENT });
       if (res.data.success) setConfig(res.data.data);
     } catch (e) {}
   };
 
   const fetchTemplates = async () => {
     try {
-      const cons = await multiServiceApiClient.get('/enterprise/consent-templates', { service: API_SERVICES.CONSENT });
+      const cons = await multiServiceApiClient.get('/api/v2/enterprise/consent-templates', { service: API_SERVICES.CONSENT });
       if (cons.data.success) setConsentTemplates(cons.data.data);
 
-      const msg = await multiServiceApiClient.get('/enterprise/message-templates', { service: API_SERVICES.CONSENT });
+      const msg = await multiServiceApiClient.get('/api/v2/enterprise/message-templates', { service: API_SERVICES.CONSENT });
       if (msg.data.success) setMessageTemplates(msg.data.data);
     } catch (e) {}
   };
 
   const fetchExistingCampaign = async () => {
       try {
-        const res = await multiServiceApiClient.get(`/enterprise/campaigns/${editCampaignId}`, { service: API_SERVICES.CONSENT });
+        const res = await multiServiceApiClient.get(`/api/v2/enterprise/campaigns/${editCampaignId}`, { service: API_SERVICES.CONSENT });
         if (res.data.success) {
             const c = res.data.data;
             setFormData({
@@ -81,7 +81,7 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
 
   const estimateReach = async () => {
     try {
-      const res = await multiServiceApiClient.post('/enterprise/audience/estimate', {
+      const res = await multiServiceApiClient.post('/api/v2/enterprise/audience/estimate', {
         ageRange: { min: formData.ageMin, max: formData.ageMax },
         region: formData.region === 'All Regions' ? null : formData.region
       }, { service: API_SERVICES.CONSENT });
@@ -100,9 +100,9 @@ const CampaignWizard: React.FC<CampaignWizardProps> = ({ onCancel, onComplete, e
       if (payload.region === 'All Regions') delete (payload as any).region;
       
       if (editCampaignId) {
-          await multiServiceApiClient.put(`/enterprise/campaigns/${editCampaignId}`, payload, { service: API_SERVICES.CONSENT });
+          await multiServiceApiClient.put(`/api/v2/enterprise/campaigns/${editCampaignId}`, payload, { service: API_SERVICES.CONSENT });
       } else {
-          await multiServiceApiClient.post('/enterprise/campaigns', payload, { service: API_SERVICES.CONSENT });
+          await multiServiceApiClient.post('/api/v2/enterprise/campaigns', payload, { service: API_SERVICES.CONSENT });
       }
       onComplete();
     } catch (e) {

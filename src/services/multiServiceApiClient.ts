@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 import { logApiRequest, logApiResponse, secureLog } from '../utils/secureLogger';
 // Service configurations - Updated for local development
 const SERVICES = {
-  AUTH: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:3001/api/v1',
+  AUTH: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:3001',
   CUSTOMER: import.meta.env.VITE_CUSTOMER_API_URL || 'http://localhost:3001',
   CSR: import.meta.env.VITE_CSR_API_URL || 'http://localhost:3001',
   GATEWAY: import.meta.env.VITE_GATEWAY_API_URL || 'http://localhost:3001',
@@ -289,58 +289,21 @@ export class MultiServiceApiClient {
       }
       // Choose specific service client if provided
       if (service) {
-        switch (service) {
-          case 'auth':
-            // Auth service - strip /api/v1 prefix since base URL now includes it
-            client = authApi;
-            fullEndpoint = endpoint.replace('/api/v1', '') || endpoint;
-            break;
-          case 'csr':
-            // CSR service needs full path including /api/v1
-            client = this.csrClient;
-            fullEndpoint = endpoint;
-            break;
-          case 'consent':
-            // Extract just the path part since clients now have full base URLs
-            const pathPartConsent = endpoint.replace('/api/v1', '');
-            fullEndpoint = pathPartConsent;
-            client = this.consentClient;
-            break;
-          case 'preference':
-            const pathPartPreference = endpoint.replace('/api/v1', '');
-            fullEndpoint = pathPartPreference;
-            client = this.preferenceClient;
-            break;
-          case 'privacy-notice':
-            const pathPartPrivacy = endpoint.replace('/api/v1', '');
-            fullEndpoint = pathPartPrivacy;
-            client = this.privacyNoticeClient;
-            break;
-          case 'party':
-            const pathPartParty = endpoint.replace('/api/v1', '');
-            fullEndpoint = pathPartParty;
-            client = this.partyClient;
-            break;
-          case 'dsar':
-            const pathPartDsar = endpoint.replace('/api/v1', '');
-            fullEndpoint = pathPartDsar;
-            client = this.dsarClient;
-            break;
-          case 'event':
-            const pathPartEvent = endpoint.replace('/api/v1', '');
-            fullEndpoint = pathPartEvent;
-            client = this.eventClient;
-            break;
-          case 'catalog':
-            const pathPartCatalog = endpoint.replace('/api/v1', '');
-            fullEndpoint = pathPartCatalog;
-            client = this.catalogClient;
-            break;
-          default:
-            client = this.getApiClient(role);
-            fullEndpoint = endpoint;
-            fullEndpoint = endpoint;
-        }
+        // Every base URL is a bare origin and every endpoint carries its full /api/v1/... path.
+        const clients: Record<string, AxiosInstance> = {
+          auth: authApi,
+          csr: this.csrClient,
+          consent: this.consentClient,
+          preference: this.preferenceClient,
+          'privacy-notice': this.privacyNoticeClient,
+          party: this.partyClient,
+          dsar: this.dsarClient,
+          event: this.eventClient,
+          catalog: this.catalogClient,
+          gateway: this.adminClient,
+        };
+        client = clients[service] ?? this.getApiClient(role);
+        fullEndpoint = endpoint;
       } else {
         client = this.getApiClient(role);
         fullEndpoint = endpoint;

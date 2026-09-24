@@ -7,7 +7,7 @@
     "env": {
       "VITE_API_URL": "https://consenthub-backend.onrender.com",
       "VITE_API_BASE_URL": "https://consenthub-backend.onrender.com/api/v1",
-      "VITE_AUTH_API_URL": "https://consenthub-backend.onrender.com/api/v1",
+      "VITE_AUTH_API_URL": "https://consenthub-backend.onrender.com",
       "VITE_CUSTOMER_API_URL": "https://consenthub-backend.onrender.com",
       "VITE_CSR_API_URL": "https://consenthub-backend.onrender.com",
       "VITE_GATEWAY_API_URL": "https://consenthub-backend.onrender.com",

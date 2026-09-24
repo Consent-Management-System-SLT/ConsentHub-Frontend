@@ -19,7 +19,7 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId, onBack, onE
 
   const fetchDetail = async () => {
     try {
-      const res = await multiServiceApiClient.get(`/enterprise/campaigns/${campaignId}`, {
+      const res = await multiServiceApiClient.get(`/api/v2/enterprise/campaigns/${campaignId}`, {
         service: API_SERVICES.CONSENT
       });
       if (res.data.success) {
@@ -34,7 +34,7 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId, onBack, onE
 
   const submitCampaign = async () => {
     try {
-      const res = await multiServiceApiClient.post(`/enterprise/campaigns/${campaignId}/submit`, {}, {
+      const res = await multiServiceApiClient.post(`/api/v2/enterprise/campaigns/${campaignId}/submit`, {}, {
         service: API_SERVICES.CONSENT
       });
       if (res.data.success) {
@@ -48,7 +48,7 @@ const CampaignDetail: React.FC<CampaignDetailProps> = ({ campaignId, onBack, onE
 
   const launchCampaign = async () => {
     try {
-      const res = await multiServiceApiClient.post(`/enterprise/campaigns/${campaignId}/launch`, {}, {
+      const res = await multiServiceApiClient.post(`/api/v2/enterprise/campaigns/${campaignId}/launch`, {}, {
         service: API_SERVICES.CONSENT
       });
       if (res.data.success) {
