@@ -43,15 +43,20 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const dialogRef = React.useRef<HTMLDivElement>(null);
 
+  // callers pass inline onClose; keep it in a ref so re-renders (every keystroke)
+  // don't re-run the effect below and steal focus from the input being typed in
+  const onCloseRef = React.useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') onCloseRef.current();
     };
     document.addEventListener('keydown', onKey);
     dialogRef.current?.focus();
     return () => document.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
